@@ -1,7 +1,7 @@
 
 # -*- coding: UTF-8 -*-
 # libraries and data
-import battery_graphic
+import battery_mov
 import battery_hover
 import battery_all
 import uav_loc_graphic
@@ -46,7 +46,6 @@ if teste:
 list_folder = np.array(list_folder)
 list_folder.sort()
 
-uav_bat = {}
 uav_mov = {}
 
 # # Initial scenario
@@ -56,14 +55,22 @@ uav_mov = {}
 # for time in list_folder:
 #     client.scenario (str(time), main_path, teste)
 #
-# # Bij
-# for time in list_folder:
-#     (uav_bat, uav_mov) = bij_graphic.bij(str(time), main_path, teste)
-
-# Battery
-battery_graphic.battery(main_path, teste, uav_bat)
-battery_hover.battery(main_path, teste, uav_bat)
-battery_all.battery(main_path, teste, uav_bat)
+t_ini = -1
+# Bij
+for time in list_folder:
+    if teste:
+        print time
+    (uavs_id, uav_mov) = bij_graphic.bij(str(time), main_path, teste)
+    if teste:
+        print uavs_id
+    # Battery
+    if t_ini > -1:
+        battery_mov.battery(main_path, teste, uavs_id, t_ini, time)
+        battery_hover.battery(main_path, teste, uavs_id, t_ini, time)
+        battery_all.battery(main_path, teste, uavs_id, t_ini, time)
+        t_ini = time
+    else:
+        t_ini = 0
 
 #
 # # Dist
