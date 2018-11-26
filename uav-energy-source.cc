@@ -232,6 +232,35 @@ void UavEnergySource::UpdateEnergySourceMov (double energyToDecrease)
   }
 }
 
+void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
+{
+  NS_LOG_FUNCTION(this);
+  NS_LOG_INFO("UavEnergySource:UpdateEnergySourceHover.");
+
+  if (m_remainingEnergyJ < energyToDecrease)
+  {
+    m_remainingEnergyJ = 0; // energy never goes below 0
+  }
+  else
+  {
+    m_remainingEnergyJ -= energyToDecrease;
+  }
+
+  if (!m_depleted && m_remainingEnergyJ <= m_lowBatteryTh * m_initialEnergyJ)
+  {
+    m_depleted = true;
+    HandleEnergyDrainedEvent();
+  }
+  // salvando historico do consumo de bateria por movimentacao
+  if (m_node) {
+    std::ostringstream os;
+    os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_battery_hover_" << m_node->GetId() << ".txt";
+    m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << std::endl;
+    m_file.close();
+  }
+}
+
 /*
  * Private functions start here.
  */

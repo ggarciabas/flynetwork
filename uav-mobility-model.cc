@@ -51,7 +51,11 @@ UavMobilityModel::GetTypeId(void)
                           .AddAttribute("FirstPosition", "The first position",
                                         VectorValue(Vector(0.0, 0.0, 0.0)),
                                         MakeVectorAccessor(&UavMobilityModel::SetFirstPosition),
-                                        MakeVectorChecker());
+                                        MakeVectorChecker())
+                           .AddTraceSource ("CourseChangeDevice",
+                                            "",
+                                            MakeTraceSourceAccessor (&UavMobilityModel::m_courseChangeDevice),
+                                            "ns3::MobilityModel::TracedCallback");
   return tid;
 }
 
@@ -94,6 +98,7 @@ void UavMobilityModel::DoStop()
   NS_LOG_INFO ("UavMobilityModel :: [[ FINAL ]] " << Simulator::Now().GetSeconds() << " (" << position.x << "," << position.y << ") deveria estar em (" << m_goTo.x << "," << m_goTo.y << ")");
 
   NotifyCourseChange();
+  m_courseChangeDevice(this);
 }
 
 void UavMobilityModel::UpdatePosition()
@@ -117,8 +122,9 @@ void UavMobilityModel::DoSetPosition(const Vector &position)
     Simulator::Remove(m_event);
     Simulator::Remove(m_envPos);
     m_event = Simulator::ScheduleNow(&UavMobilityModel::DoInitializePrivate, this);
+    m_courseChangeDevice(this); // notificacoes intermediarias
   } else {
-    NotifyCourseChange();
+    NotifyCourseChange(); // somente notificacao final
   }
 }
 

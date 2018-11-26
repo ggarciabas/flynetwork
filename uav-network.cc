@@ -548,6 +548,8 @@ void UavNetwork::ConfigureUav(int total)
 
     // Mobility
     (*i)->GetObject<MobilityModel>()->TraceConnectWithoutContext ("CourseChange", MakeCallback (&UavApplication::CourseChange, uavApp));
+    Ptr<UavDeviceEnergyModel> dev = (*i)->GetObject<UavDeviceEnergyModel>();
+    DynamicCast<UavMobilityModel>((*i)->GetObject<MobilityModel>())->TraceConnectWithoutContext ("CourseChangeDevice", MakeCallback (&UavDeviceEnergyModel::CourseChange, dev));
 
     // energy start
     Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>((*i)->GetObject<UavDeviceEnergyModel>()->GetEnergySource());

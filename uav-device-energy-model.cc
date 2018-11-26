@@ -55,8 +55,8 @@ UavDeviceEnergyModel::GetTypeId(void)
                                         MakeDoubleAccessor(&UavDeviceEnergyModel::m_avgVel),
                                         MakeDoubleChecker<double>())
                           .AddAttribute("PeriodicEnergyUpdateInterval",
-                                        "Time between two consecutive periodic energy updates.",
-                                        TimeValue(Seconds(0.3)), // s
+                                        "Time between two consecutive periodic energy updates - Hover time.",
+                                        TimeValue(Seconds(0.1)), // s
                                         MakeTimeAccessor(&UavDeviceEnergyModel::m_energyUpdateInterval),
                                         MakeTimeChecker())
                          .AddTraceSource ("TotalEnergyConsumption",
@@ -72,6 +72,7 @@ UavDeviceEnergyModel::UavDeviceEnergyModel()
   m_source = 0;
   m_energyCost = 0.0;
   m_totalEnergyConsumption = 0.0;
+  m_hoverCost = 0.0;
 }
 
 UavDeviceEnergyModel::~UavDeviceEnergyModel()
@@ -114,6 +115,7 @@ void UavDeviceEnergyModel::SetEnergySource(Ptr<EnergySource> source)
   NS_ASSERT(source != NULL);
   m_source = source;
   m_energyCost = m_source->GetInitialEnergy() / (m_resistTime * m_avgVel); // joule/meter
+  m_hoverCost = m_source->GetInitialEnergy() / m_resistTime;
 }
 
 const Ptr<EnergySource>
@@ -128,9 +130,7 @@ void UavDeviceEnergyModel::SetNode(Ptr<Node> node)
   NS_ASSERT(node != NULL);
   m_node = node;
   m_lastPosition = node->GetObject<MobilityModel>()->GetPosition();
-  m_movingUpdateEvent = Simulator::Schedule(m_energyUpdateInterval,
-                                            &UavDeviceEnergyModel::UpdateMoving,
-                                            this);
+  StartHover();
 }
 
 Ptr<Node>
@@ -147,10 +147,10 @@ UavDeviceEnergyModel::GetTotalEnergyConsumption (void) const
   return m_totalEnergyConsumption;
 }
 
-void UavDeviceEnergyModel::UpdateMoving(void)
+void UavDeviceEnergyModel::HoverConsumption(void)
 {
   NS_LOG_FUNCTION(this);
-  NS_LOG_DEBUG("UavDeviceEnergyModel:Updating moving.");
+  NS_LOG_DEBUG("UavDeviceEnergyModel:HoverConsumption.");
 
   // do not update if simulation has finished
   if (Simulator::IsFinished())
@@ -158,18 +158,17 @@ void UavDeviceEnergyModel::UpdateMoving(void)
     return;
   }
 
-  m_movingUpdateEvent.Cancel();
+  m_hoverEvent.Cancel();
 
-  CalculateMoving();
-
-  m_lastPosition = m_node->GetObject<MobilityModel>()->GetPosition();
-
-  m_movingUpdateEvent = Simulator::Schedule(m_energyUpdateInterval,
-                                            &UavDeviceEnergyModel::UpdateMoving,
+  double diff_time = Simulator::Now().GetSeconds() - m_lastTime.GetSeconds();
+  double energyToDecrease = m_hoverCost * diff_time;
+  DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceHover(energyToDecrease);
+  m_hoverEvent = Simulator::Schedule(m_energyUpdateInterval,
+                                          &UavDeviceEnergyModel::HoverConsumption,
                                             this);
 }
 
-void UavDeviceEnergyModel::CalculateMoving(void)
+void UavDeviceEnergyModel::CourseChange (Ptr<const MobilityModel> mob)
 {
   NS_LOG_FUNCTION(this);
   Vector actual = m_node->GetObject<MobilityModel>()->GetPosition();
@@ -190,6 +189,20 @@ void UavDeviceEnergyModel::CalculateMoving(void)
   m_file.close();
 }
 
+void UavDeviceEnergyModel::StopHover()
+{
+  m_hoverEvent.Cancel();
+  HoverConsumption();
+}
+
+void UavDeviceEnergyModel::StartHover()
+{
+  m_lastTime = Simulator::Now();
+  m_hoverEvent = Simulator::Schedule(m_energyUpdateInterval,
+                                          &UavDeviceEnergyModel::HoverConsumption,
+                                            this);
+}
+
 double
 UavDeviceEnergyModel::DoGetEnergyCost(void) const
 {
@@ -199,7 +212,6 @@ UavDeviceEnergyModel::DoGetEnergyCost(void) const
 
 void UavDeviceEnergyModel::DoDispose (void) {
   NS_LOG_DEBUG("UavDeviceEnergyModel::DoDispose");
-  m_movingUpdateEvent.Cancel();
   m_source = 0;
   m_node = 0;
 }

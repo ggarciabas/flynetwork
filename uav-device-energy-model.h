@@ -134,6 +134,12 @@ public:
   {
   }
 
+  void CourseChange (Ptr<const MobilityModel> mob);
+
+  void HoverConsumption(void);
+  void StartHover ();
+  void StopHover ();
+
 private:
 
   void DoDispose (void);
@@ -153,7 +159,7 @@ private:
   virtual double DoGetCurrentA (void) const;
 
   void UpdateMoving(void);
-  void CalculateMoving(void);
+  void HoveConsumption(void);
 
 private:
   Time m_energyUpdateInterval;
@@ -161,10 +167,12 @@ private:
   double m_energyCost; // energy cost to a unit of distance J/m
   Ptr<EnergySource> m_source;
   Ptr<Node> m_node;
-  EventId m_movingUpdateEvent;
+  EventId m_hoverEvent;
+  Time m_lastTime;
   std::ofstream m_file;
   double m_avgVel;
   double m_resistTime;
+  double m_hoverCost;
   TracedValue<double> m_totalEnergyConsumption;
   std::string m_scenarioName;
   /**

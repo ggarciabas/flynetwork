@@ -81,6 +81,7 @@ public:
    */
   virtual void UpdateEnergySourceMov(double);
   virtual void UpdateEnergySource (void);
+  virtual void UpdateEnergySourceHover (double energyToDecrease);
 
   /**
    * \param initialEnergyJ Initial energy, in Joules

@@ -129,10 +129,14 @@ void UavApplication::Stop() {
 void
 UavApplication::CourseChange (Ptr<const MobilityModel> mob)
 {
+  // verificar UavMobility para tirar duvidas, este somente é executado quando chega ao destino!
   NS_LOG_INFO ("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " course changed!!! ---- ~~~~");
   Simulator::Remove(m_sendEvent);
   NS_LOG_INFO("UAV #" << m_id << " chegou ao seu posicionamento final.");
   SendPacket();
+
+  Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
+  dev->StartHover();
 }
 
 void
@@ -174,6 +178,8 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
         m_packetTrace(mm.str());
         double z = std::stod(results.at(3), &sz) - GetNode()->GetObject<MobilityModel>()->GetPosition().z;
         // mudar o posicionamento do UAV
+        Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
+        dev->StopHover();
         GetNode()->GetObject<MobilityModel>()->SetPosition(Vector(std::stod(results.at(1), &sz), std::stod(results.at(2), &sz), (z > 0) ? z : 0.0)); // Verficar necessidade de subir em no eixo Z
         // repply to server
         ReplyServer();
