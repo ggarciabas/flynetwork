@@ -35,6 +35,7 @@ TypeId
 UavDeviceEnergyModel::GetTypeId(void)
 {
   // http://documents.4rgos.it/v1/static/6259381_R_D002 http://www.argos.co.uk/product/6259381?tag=ar:drones:6259381
+  // http://www.dronesglobe.com/guide/long-flight-time/
   static TypeId tid = TypeId("ns3::UavDeviceEnergyModel")
                           .SetParent<DeviceEnergyModel>()
                           .SetGroupName("Flynetwork-Energy")
@@ -51,7 +52,7 @@ UavDeviceEnergyModel::GetTypeId(void)
                                         MakeStringChecker())
                           .AddAttribute("AverageVelocity",
                                         "Average velocity of uav in m/s",
-                                        DoubleValue(18), // m/s
+                                        DoubleValue(18), // 18 m/s
                                         MakeDoubleAccessor(&UavDeviceEnergyModel::m_avgVel),
                                         MakeDoubleChecker<double>())
                           .AddAttribute("PeriodicEnergyUpdateInterval",
@@ -116,6 +117,12 @@ void UavDeviceEnergyModel::SetEnergySource(Ptr<EnergySource> source)
   m_source = source;
   m_energyCost = m_source->GetInitialEnergy() / (m_resistTime * m_avgVel); // joule/meter
   m_hoverCost = m_source->GetInitialEnergy() / m_resistTime;
+
+  std::ostringstream os;
+  os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/cost_energy.txt";
+  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  m_file << "Energycost: " << m_energyCost << "\nHovercost: " << m_hoverCost << std::endl;
+  m_file.close();
 }
 
 const Ptr<EnergySource>
@@ -163,6 +170,8 @@ void UavDeviceEnergyModel::HoverConsumption(void)
   double diff_time = Simulator::Now().GetSeconds() - m_lastTime.GetSeconds();
   double energyToDecrease = m_hoverCost * diff_time;
   DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceHover(energyToDecrease);
+
+  m_lastTime = Simulator::Now();
   m_hoverEvent = Simulator::Schedule(m_energyUpdateInterval,
                                           &UavDeviceEnergyModel::HoverConsumption,
                                             this);

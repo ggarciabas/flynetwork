@@ -2,6 +2,8 @@
 # -*- coding: UTF-8 -*-
 # libraries and data
 import battery_graphic
+import battery_hover
+import battery_all
 import uav_loc_graphic
 import bij_graphic
 import mij_graphic
@@ -47,43 +49,46 @@ list_folder.sort()
 uav_bat = {}
 uav_mov = {}
 
-# Initial scenario
-initial_scenario.scenario(str(list_folder[0]),main_path, teste)
-
-# Client
-for time in list_folder:
-    client.scenario (str(time), main_path, teste)
-
-# Bij
-for time in list_folder:
-    (uav_bat, uav_mov) = bij_graphic.bij(str(time), main_path, teste)
-
-# Dist
-for time in list_folder:
-    dist_graphic.dist(str(time), main_path, teste)
-
-# Cli
-for time in list_folder:
-    cli_graphic.cli(str(time), main_path, teste)
-
-# Bat
-for time in list_folder:
-    bat_graphic.bat(str(time), main_path, teste)
-
-# Location
-for time in list_folder:
-    location.scenario (str(time), main_path, teste)
-
-# Uav Loc
-for time in list_folder:
-    uav_loc_graphic.uav_loc (str(time), main_path, teste, raio_cli, raio_uav)
-
-# Mij
-for time in list_folder:
-    mij_graphic.mij(str(time), main_path, teste)
+# # Initial scenario
+# initial_scenario.scenario(str(list_folder[0]),main_path, teste)
+#
+# # Client
+# for time in list_folder:
+#     client.scenario (str(time), main_path, teste)
+#
+# # Bij
+# for time in list_folder:
+#     (uav_bat, uav_mov) = bij_graphic.bij(str(time), main_path, teste)
 
 # Battery
 battery_graphic.battery(main_path, teste, uav_bat)
+battery_hover.battery(main_path, teste, uav_bat)
+battery_all.battery(main_path, teste, uav_bat)
 
-# Moving
-moving_graphic.moving(main_path, teste, uav_mov)
+#
+# # Dist
+# for time in list_folder:
+#     dist_graphic.dist(str(time), main_path, teste)
+#
+# # Cli
+# for time in list_folder:
+#     cli_graphic.cli(str(time), main_path, teste)
+#
+# # Bat
+# for time in list_folder:
+#     bat_graphic.bat(str(time), main_path, teste)
+#
+# # Location
+# for time in list_folder:
+#     location.scenario (str(time), main_path, teste)
+#
+# # Uav Loc
+# for time in list_folder:
+#     uav_loc_graphic.uav_loc (str(time), main_path, teste, raio_cli, raio_uav)
+#
+# # Mij
+# for time in list_folder:
+#     mij_graphic.mij(str(time), main_path, teste)
+#
+# # Moving
+# moving_graphic.moving(main_path, teste, uav_mov)

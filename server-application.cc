@@ -158,7 +158,7 @@ void ServerApplication::AddSupplyUav(uint32_t id, Ipv4Address addrAdhoc, double 
 {
   NS_LOG_FUNCTION(this);
 
-  std::cout << "Criando supply uav: " << id << "\n";
+  NS_LOG_DEBUG("Criando supply uav: " << id);
 
   Ptr<Socket> socket = Socket::CreateSocket(GetNode(), UdpSocketFactory::GetTypeId());
 
@@ -179,7 +179,6 @@ void ServerApplication::AddSupplyUav(uint32_t id, Ipv4Address addrAdhoc, double 
     NS_FATAL_ERROR("Servidor nao conseguiu se conectar com o UAV!");
   }
   m_uavContainer.Add(uav, m_supplyPos); // posicao que deve ser suprida
-
 }
 
 void ServerApplication::AddNewFixedClient(string login, double x, double y)
@@ -678,28 +677,25 @@ void ServerApplication::runAgendamento(void)
           case 3:
             custo = ((1 - (c_lj/c_total + b_ui_res/b_ui_tot)/2.0) + ((ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot))/2.0;
         }
-        custo_x[count].push_back(custo);
       } else {
         NS_LOG_INFO("Sem bateria para esta localizacao!");
         custo = 1.0; // máximo, como se consumisse toda a bateria quando carregada!
       }
 
+      custo_x[count].push_back(custo);
       b_ij[count].push_back(custo);
       verify_uav += custo; // somando o valor dos custos, assim se ao final tiver o mesmo valor que o total de localizações, quer dizer que este UAV somente tem carga para voltar a central
     }
 
     if (verify_uav == int(m_locationContainer.GetN())) {
       NS_LOG_DEBUG("ServerApplication::runAgendamento --> Enviar UAV " << (*u_i)->GetId() << " para a central  REF " << (*u_i)->GetReferenceCount());
-      // deletar toda a estrutura deste nó, verificar todos os elementos que envolvem o nó! UAVApplication, UAVModel, etc (cuidar com os ponteiros!)
-      m_removeUav((*u_i)->GetId()); // desligando todas as informacoes do nó
+      m_removeUav((*u_i)->GetId());
       (*u_i)->Dispose();
-      // Obs.: smartPointer do ns3 irá apagar o Ptr do UavModel e dos Objetos agregados ao Node!
-      // adicionar o novo nó na posição do primeiro dentro do container de UAV!
       m_supplyPos = count; // posicao que será suprida
       // criar um novo nó iniciando na região central, como sempre!
       m_newUav(1, true); // true, pois está sendo solicitado para suprir uma posicao
       // calcular o custo para este novo nó e todas as localizações
-      u_i--; // verificar se isto dá certo!
+      // u_i--; // verificar se isto dá certo!
     }
     NS_LOG_INFO (" ------------------------- ");
   }
@@ -999,13 +995,15 @@ ServerApplication::PrintCusto (vector<vector<double>> custo, int print)
   file << std::endl;
   for (vector<vector<double>>::iterator i = custo.begin(); i != custo.end(); ++i) {
     vector<double>::iterator j = (*i).begin();
-    file << (*j);
-    j++;
-    for (; j != (*i).end(); ++j)
-    {
-      file << "," << (*j);
+    if (j != (*i).end()) {
+      file << (*j);
+      j++;
+      for (; j != (*i).end(); ++j)
+      {
+        file << "," << (*j);
+      }
+      file << std::endl;
     }
-    file << std::endl;
   }
 
   file.close();

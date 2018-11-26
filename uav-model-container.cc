@@ -121,9 +121,10 @@ void UavModelContainer::Add(std::string modelName)
   m_models.push_back(model);
 }
 
-void UavModelContainer::Add(Ptr<UavModel> model, int pos)
+void UavModelContainer::Add(Ptr<UavModel> model, uint32_t pos)
 {
-  m_models[pos] = model;
+  RemoveAt(pos);
+  Add(model);
 }
 
 void UavModelContainer::Clear(void)

@@ -38,7 +38,7 @@ using namespace ns3;
 	4- Surburban
 */
 
-
+// https://www.wired.com/story/the-physics-of-why-bigger-drones-can-fly-longer/
 int main (int argc, char *argv[])
 {
 	double sim_time=300.0, cli_pos_update = 5.0;

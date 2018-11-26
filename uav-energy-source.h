@@ -160,6 +160,9 @@ private:
   Time m_energyUpdateInterval;           // energy update interval
   std::ofstream m_file;
 
+  double m_hoverAcum;
+  double m_movAcum;
+
   std::string m_scenarioName;
 
 };

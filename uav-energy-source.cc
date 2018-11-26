@@ -88,6 +88,9 @@ UavEnergySource::UavEnergySource()
   m_lastUpdateTime = Seconds (0.0);
   m_depleted = false;
   m_node = 0;
+
+  m_movAcum = 0.0;
+  m_hoverAcum = 0.0;
 }
 
 UavEnergySource::~UavEnergySource()
@@ -142,8 +145,6 @@ double
 UavEnergySource::GetRemainingEnergy(void)
 {
   NS_LOG_FUNCTION(this);
-  // update energy source to get the latest remaining energy.
-  UpdateEnergySource ();
   return m_remainingEnergyJ;
 }
 
@@ -151,8 +152,6 @@ double
 UavEnergySource::GetEnergyFraction (void)
 {
   NS_LOG_FUNCTION (this);
-  // update energy source to get the latest remaining energy.
-  UpdateEnergySource ();
   return m_remainingEnergyJ / m_initialEnergyJ;
 }
 
@@ -160,46 +159,6 @@ void
 UavEnergySource::UpdateEnergySource (void)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_INFO ("UavEnergySource:Updating remaining energy.");
-
-  // do not update if simulation has finished
-  if (Simulator::IsFinished ())
-    {
-      return;
-    }
-
-  m_energyUpdateEvent.Cancel ();
-
-  double remainingEnergy = m_remainingEnergyJ;
-  CalculateRemainingEnergy ();
-
-  m_lastUpdateTime = Simulator::Now ();
-
-  if (!m_depleted && m_remainingEnergyJ <= m_lowBatteryTh * m_initialEnergyJ)
-    {
-      m_depleted = true;
-      HandleEnergyDrainedEvent ();
-    }
-  else if (m_depleted && m_remainingEnergyJ > m_highBatteryTh * m_initialEnergyJ)
-    {
-      m_depleted = false;
-      HandleEnergyRechargedEvent ();
-    }
-  else if (m_remainingEnergyJ != remainingEnergy)
-    {
-      NotifyEnergyChanged ();
-    }
-
-  m_energyUpdateEvent = Simulator::Schedule (m_energyUpdateInterval, &UavEnergySource::UpdateEnergySource, this);
-
-  // salvando historico do consumo de bateria por comunicacao
-  if (m_node) {
-    std::ostringstream os;
-    os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_battery_" << m_node->GetId() << ".txt";
-    m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-    m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << std::endl;
-    m_file.close();
-  }
 }
 
 
@@ -225,7 +184,13 @@ void UavEnergySource::UpdateEnergySourceMov (double energyToDecrease)
   // salvando historico do consumo de bateria por movimentacao
   if (m_node) {
     std::ostringstream os;
-    os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_battery_" << m_node->GetId() << ".txt";
+    os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_battery_graphic_" << m_node->GetId() << ".txt";
+    m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    m_movAcum += energyToDecrease;
+    m_file << Simulator::Now().GetSeconds() << "," << m_movAcum / m_initialEnergyJ << std::endl;
+    m_file.close();
+    os.str("");
+    os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_battery_all_" << m_node->GetId() << ".txt";
     m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
     m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << std::endl;
     m_file.close();
@@ -255,6 +220,12 @@ void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
   if (m_node) {
     std::ostringstream os;
     os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_battery_hover_" << m_node->GetId() << ".txt";
+    m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    m_hoverAcum += energyToDecrease;
+    m_file << Simulator::Now().GetSeconds() << "," << m_hoverAcum / m_initialEnergyJ << std::endl;
+    m_file.close();
+    os.str("");
+    os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_battery_all_" << m_node->GetId() << ".txt";
     m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
     m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << std::endl;
     m_file.close();
@@ -290,7 +261,6 @@ void
 UavEnergySource::DoInitialize (void)
 {
   NS_LOG_FUNCTION (this);
-  UpdateEnergySource ();  // start periodic update
 }
 
 void UavEnergySource::DoDispose() {

@@ -10,15 +10,15 @@ import sys
 
 def battery(main_path, teste, uav_bat):
     plt.clf()
-    print 'Battery Graphic'
+    print 'Battery all'
     uavs = []
     data = {}
     if teste:
         print uav_bat
-    for name_file in glob.glob(main_path+'uav_battery_graphic_*.txt'):
+    for name_file in glob.glob(main_path+'uav_battery_all_*.txt'):
         base=os.path.basename(name_file)
         # if str(os.path.splitext(base)[0]) in uav_bat:
-        uav_id = "UAV "+os.path.splitext(base)[0].split("uav_battery_graphic_")[-1]
+        uav_id = "UAV "+os.path.splitext(base)[0].split("uav_battery_all_")[-1]
         if teste:
             print (os.path.splitext(base)[0])
             print (uav_id)
@@ -46,13 +46,12 @@ def battery(main_path, teste, uav_bat):
         # Plot the lineplot
         plt.plot(data[uav][0], data[uav][1], marker='', linewidth=2.4, alpha=0.9, label=uav)
 
-
     # general title
     plt.suptitle("Consumo de bateria dos UAVs ao longo do tempo", fontsize=13, fontweight=0, color='black', style='italic')
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.10), fancybox=True, shadow=True, ncol=8, fontsize=7)
     plt.xlabel('Tempo (s)')
     plt.ylabel('Bateria (%)')
 
-    plt.savefig(main_path+'battery_graphic.svg')
-    plt.savefig(main_path+'battery_graphic.eps')
-    plt.savefig(main_path+'battery_graphic.png')
+    plt.savefig(main_path+'battery_all.svg')
+    plt.savefig(main_path+'battery_all.eps')
+    plt.savefig(main_path+'battery_all.png')

@@ -4,66 +4,54 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import seaborn as sns
 import glob
 import os
 import sys
 
-def bij (time, main_path, teste):
-    uav_bat = {}
-    uav_mov = {}
-    data_bij = {}
-    try:
-        file = open(main_path+time+"/bij.txt", 'r')
-    except IOError:
-        return
-    line = file.readline().strip()
-    uavs = [x for x in line.split(',')]
-
-    for i in uavs:
-        uav_bat[str("uav_battery_"+str(int(i)))] = 1
-        uav_mov[str("uav_moving_"+str(int(i)))] = 1
-
-    line = file.readline().strip()
-    locs = [x for x in line.split(',')]
-    cont = 0
-    for line in file:
-        data_bij[uavs[cont]] = [float(x) for x in line.split(',')] # read row from file
-        cont = cont + 1
-    file.close()
-
+def battery(main_path, teste, uav_bat):
     plt.clf()
-    cmap = sns.cubehelix_palette(50, hue=0.05, rot=0, light=0.9, dark=0, as_cmap=True)
+    print 'Battery Graphic'
+    uavs = []
+    data = {}
+    if teste:
+        print uav_bat
+    for name_file in glob.glob(main_path+'uav_battery_graphic_*.txt'):
+        base=os.path.basename(name_file)
+        # if str(os.path.splitext(base)[0]) in uav_bat:
+        uav_id = "UAV "+os.path.splitext(base)[0].split("uav_battery_graphic_")[-1]
+        if teste:
+            print (os.path.splitext(base)[0])
+            print (uav_id)
+        uavs.append(uav_id)
+        if teste:
+            print uavs
+        data[uav_id] = []
+        data[uav_id].append([]) # x
+        data[uav_id].append([]) # y
+        file = open(name_file, 'r')
+        for line in file:
+            # if teste:
+            #     print ('Line: ' + str(line))
+            point = [float(x) for x in line.split(',')]
+            data[uav_id][0].append(point[0])
+            data[uav_id][1].append(point[1])
+        file.close()
 
-    # Create a dataset
-    df_bij = pd.DataFrame(data_bij, index=locs)
+    # Initialize the figure
+    plt.style.use('seaborn-darkgrid')
 
-    # Default heatmap: just a visualization of this square matrix
-    sns.heatmap(df_bij, cmap=cmap, vmin=0, vmax=1)
-
-    plt.ylabel("Localizacao")
-    plt.xlabel("UAV")
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    for uav in uavs:
+        # Plot the lineplot
+        plt.plot(data[uav][0], data[uav][1], marker='', linewidth=2.4, alpha=0.9, label=uav)
 
     # general title
-    plt.title("Bij", fontsize=13, fontweight=0, color='black', style='italic')
+    plt.suptitle("Consumo de bateria dos UAVs ao longo do tempo", fontsize=13, fontweight=0, color='black', style='italic')
+    lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.10), fancybox=True, shadow=True, ncol=8, fontsize=7)
+    plt.xlabel('Tempo (s)')
+    plt.ylabel('Bateria (%)')
 
-    plt.savefig(main_path+time+'/bij.svg')
-    plt.savefig(main_path+time+'/bij.png')
-    plt.savefig(main_path+time+'/bij.eps')
-
-    plt.clf()
-    cmap = sns.cubehelix_palette(50, hue=0.05, rot=0, light=0.9, dark=0, as_cmap=True)
-    # Default heatmap: just a visualization of this square matrix
-    sns.heatmap(df_bij, cmap=cmap)
-
-    plt.ylabel("Localizacao")
-    plt.xlabel("UAV")
-
-    # general title
-    plt.title("Bij", fontsize=13, fontweight=0, color='black', style='italic')
-
-    plt.savefig(main_path+time+'/bij_.svg')
-    plt.savefig(main_path+time+'/bij_.png')
-    plt.savefig(main_path+time+'/bij_.eps')
-
-    return (uav_bat, uav_mov)
+    plt.savefig(main_path+'battery_graphic.svg')
+    plt.savefig(main_path+'battery_graphic.eps')
+    plt.savefig(main_path+'battery_graphic.png')

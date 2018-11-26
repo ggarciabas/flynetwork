@@ -98,7 +98,7 @@ public:
    */
   void Add(Ptr<UavModel> model);
 
-  void Add(Ptr<UavModel> model, int pos);
+  void Add(Ptr<UavModel> model, uint32_t pos);
 
   /**
    * \brief Append a single Ptr<UavModel> referred to by its object
