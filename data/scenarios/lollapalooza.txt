@@ -1,0 +1,20 @@
+8
+550,1100 
+225,500
+# Lollapalooza - 450x1000 (https://www.lollapalooza.com/wp-www-lollapalooza-com/wp/wp-content/uploads/2015/06/LOL17-Map-V6.pdf)
+# Grant Park - 200x300
+400,2
+# Lake Shore - 200x100
+450,270
+# Perry's - 100x200
+230,150
+# KIDZapalooza - 100x100
+450,410
+# BMI - 100x100
+450,710
+# Pepsi - 100x100
+230,750
+# Tito's - 100x100
+350,940
+# Bud Light - 200x200
+400,1000

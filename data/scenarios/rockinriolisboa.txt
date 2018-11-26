@@ -1,0 +1,16 @@
+6
+700,900
+300,400
+# Rock in Rio Lisboa - 650,900 (http://rockinriolisboa.sapo.pt/sobre-o-rock-in-rio/mapa-3d-cidade-do-rock/)
+# Palco Mundo - 200x200
+400,200
+# Street Dance -100x100
+600,300
+# Área Vip - 50x50
+250,500
+# Palco vodafone - 100x100
+150,650
+# Paco eletronica - 100x100
+200,800
+# EDP Rock Street - 50x50
+200,400

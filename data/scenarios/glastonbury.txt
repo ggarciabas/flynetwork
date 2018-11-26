@@ -1,0 +1,32 @@
+14
+1050,1500
+475,700
+# Glastonbury 950x1400
+# The park - 200x200 (http://cdn.glastonburyfestivals.co.uk/wp-content/uploads/2014/03/2017v1map.png)
+75,75
+# Arcadia - 200x150
+100,300
+# Avalon - 100x100
+800,200
+# Cabaret - 100x100
+900,400
+# West Holts - 100x100
+790,500
+# Circus - 100x100
+790,600
+# Theatre - 200,200
+940,650
+# The Glade - 100x100
+400,500
+# Other stage - 200x200
+325,650
+# Silver hayes - 250x250
+100,950
+# John peel - 100x100
+200,1400
+# Pyramid - 350x350
+500,950
+# William's green - 50x50
+830,650
+# Pilton Palais - 100x100
+950,750

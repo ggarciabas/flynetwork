@@ -1,0 +1,20 @@
+8
+650,450
+275,175
+# Austin City Limits - 550x350 (https://www.aclfestival.com/wp/wp-content/uploads/2015/06/ACL16_PublicMap_0926.pdf)
+# Samsung - 200x100
+550,250
+# Homeaway - 100x100
+370,200
+# Tito's - 100x50
+390,300
+# BMI - 50x50
+320,190
+# Austin Kiddie Limits - 50x50
+430,100
+# Cirrus Logic - 50x100
+150,150
+# Miller Lite - 100x100
+200,350
+# Honda - 200x100
+50,250

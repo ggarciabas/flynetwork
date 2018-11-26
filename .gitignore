@@ -1,0 +1,5 @@
+scratch/flynetwork/da_python
+*.pyc
+*.zip
+da_python
+data/output

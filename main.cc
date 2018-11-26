@@ -1,0 +1,71 @@
+/* Copyright (c) 2010 Network Security Lab, University of Washington, Seattle.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation;
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Authors: Giovanna Garcia <ggarciabas@gmail.com>
+ */
+
+#include "uav-network.h"
+
+using namespace ns3;
+
+/*
+	Scenario
+	0- teste somente pontos fixos
+	1- Austin City Limits
+	2- Lollapalooza
+	3- Rock in Rio Brasil
+	4- Rock in Rio Lisboa
+	5- Rock in Rio USA
+
+	7- teste com clientes ao redor dos pontos fixos
+
+	Environment
+	1- High-rise Urban
+	2- Dense Urban
+	3- Urban
+	4- Surburban
+*/
+
+
+int main (int argc, char *argv[])
+{
+	double sim_time=300.0, cli_pos_update = 5.0;
+	uint32_t scenario = 7, env = 2, protocol = 2, custo=1;
+	CommandLine cmd;
+  cmd.AddValue ("SimTime", "Simulation time", sim_time);
+  cmd.AddValue ("CliUpdate", "Client update position", cli_pos_update);
+  cmd.AddValue ("Scenario", "Scenario", scenario);
+  cmd.AddValue ("Env", "Environment", env);
+  cmd.AddValue ("Protocol", "Routing Protocol", protocol);
+	cmd.AddValue ("Custo", "Metrica de análise do DA de Posicionamento", custo);
+  cmd.Parse (argc, argv);
+
+	LogComponentEnable("UavNetwork", LOG_DEBUG);
+	LogComponentEnable("ServerApplication", LOG_DEBUG);
+
+	SeedManager::SetSeed(6112018);
+
+	ObjectFactory obj;
+	obj.SetTypeId("ns3::UavNetwork");
+	obj.Set("SimulationTime", DoubleValue(sim_time));
+	obj.Set("LocationUpdateCli", DoubleValue(cli_pos_update));
+	obj.Set("Scenario", UintegerValue(scenario));
+	obj.Set("Environment", UintegerValue(env));
+	obj.Set("Protocol", UintegerValue(protocol));
+	obj.Set("Custo", UintegerValue(custo));
+	Ptr<UavNetwork> net = obj.Create()->GetObject<UavNetwork>();
+	net->Run();
+	net->Dispose();
+}

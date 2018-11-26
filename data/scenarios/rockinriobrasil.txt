@@ -1,0 +1,22 @@
+9
+600,600 
+225,250
+# Rock in Rio Parque Olímpico - 600x600 (https://oglobo.globo.com/cultura/musica/rock-in-rio-2017-conheca-nova-cidade-do-rock-21171119) (novo: http://rockinrio.com/rio/pt-BR/informacoes)
+# Eletronica - 0
+187,37
+# Street Dance - 1
+200,250
+# Rock district - 2
+125,75
+# Roda Gigante - 3
+137,187
+# Rock street - 4
+175,150
+# Palco mundo - 5
+37,187
+# Área Vip - 6
+75,225
+# Palco sunset - 7
+162,212
+# Montanha russa - 8
+125,112
