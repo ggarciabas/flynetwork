@@ -136,6 +136,7 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   SendPacket();
 
   Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
+  dev->ChangeThreshold(); // atualiza valor minimo para retorno na bateria
   dev->StartHover();
 }
 

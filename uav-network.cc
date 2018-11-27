@@ -477,6 +477,8 @@ void UavNetwork::ConfigureUav(int total)
   energyHelper.Set("AverageVelocity", DoubleValue(18)); // m/s
   energyHelper.Set("ResistTime", DoubleValue(27*60)); // s
   energyHelper.Set("ScenarioName", StringValue(m_scenarioName));
+  energyHelper.Set("xCentral", DoubleValue(m_cx)); // utilizado para calcular o threshold dinamicamente
+  energyHelper.Set("yCentral", DoubleValue(m_cy));
   // install device model
   DeviceEnergyModelContainer uavEnergyModels = energyHelper.Install(uav, sources);
   /* device energy model */
