@@ -314,9 +314,9 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
               m_newUav(1, false); // solicita novo UAV
               // atualizar o posicionamento do Uav na última posicao do vetor, mandando ele para a localização do UAV que esta saindo
               uav = m_uavContainer.GetLast();
-              p.push_back(std::stod (results.at(1),&sz));
               p.push_back(std::stod (results.at(2),&sz));
-              p.push_back(std::stod(results.at(3), &sz)); // UAV tem posição 3D
+              p.push_back(std::stod (results.at(3),&sz));
+              p.push_back(std::stod(results.at(4), &sz)); // UAV tem posição 3D
               uav->SetNewPosition(p); // pegar posicao do servidor, ele é a central!
               uav->CancelSendPositionEvent();
               uav->NotConfirmed();
