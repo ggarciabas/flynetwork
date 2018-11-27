@@ -348,7 +348,8 @@ void UavNetwork::ConfigureServer()
   m_serverApp->SetStartTime(Seconds(0.0));
   m_serverApp->SetStopTime(Seconds(m_simulationTime));
 
-  m_serverApp->TraceConnectWithoutContext("NewUav", MakeCallback(&UavNetwork::NewUav, this)); // adicionando callback para criar UAVs
+  m_serverApp->TraceConnectWithoutContext("NewUav", MakeCallback(&UavNetwork::NewUav, this));// adicionando callback para criar UAVs
+  m_serverApp->TraceConnectWithoutContext("RemoveUav", MakeCallback(&UavNetwork::RemoveUav, this));
   // m_serverApp->TraceConnectWithoutContext("PacketTrace", MakeCallback(&UavNetwork::PacketServer, this));
   m_serverApp->TraceConnectWithoutContext("ClientPositionTrace", MakeCallback(&UavNetwork::ClientPosition, this));
 
@@ -414,11 +415,19 @@ void UavNetwork::NewUav(int total, bool update)
 
 void UavNetwork::RemoveUav(int id)
 {
+  NS_LOG_DEBUG ("UavNetwork::RemoveUav [" << id << "]");
   Ptr<Node> n = m_uavNodeActive.RemoveId(id);
   m_uavNode.Add(n);
 
   // Stop application
-  Ptr<UavApplication> uavApp = n->GetObject<UavApplication>();
+  NS_LOG_DEBUG ("Apps " << n->GetNApplications());
+  int app = n->GetNApplications()-1;
+  Ptr<UavApplication> uavApp = NULL;
+  do {
+    uavApp = DynamicCast<UavApplication>(n->GetApplication(app));
+    --app;
+  } while (uavApp==NULL && app >= 0);
+  NS_ASSERT (uavApp != NULL);
   uavApp->Stop();
 
   // modificando posicionamento para fora do cenario
@@ -525,13 +534,12 @@ void UavNetwork::ConfigureUav(int total)
     obj.Set("AdhocAddress", Ipv4AddressValue(addContainer.GetAddress(c)));
     obj.Set("ServerPort", UintegerValue(m_serverPort));
     obj.Set("ClientPort", UintegerValue(m_cliPort));
-    obj.Set("SimulationTime", UintegerValue(m_simulationTime));
 
     std::cout << "Uav #" << (*i)->GetId() << " IP " << addContainer.GetAddress(c) << std::endl;
 
     Ptr<UavApplication> uavApp = obj.Create()->GetObject<UavApplication>();
-    uavApp->SetStartTime(Seconds(5.0));
-    uavApp->SetStopTime(Seconds(6.0));
+    uavApp->SetStartTime(Seconds(0.0));
+    uavApp->SetStopTime(Seconds(0.01));
 
     // uavApp->TraceConnectWithoutContext("PacketTrace", MakeCallback(&UavNetwork::PacketUav, this));
     Ptr<WifiNetDevice> wifiDeviceAdhoc = DynamicCast<WifiNetDevice> (adhoc.Get(c));

@@ -79,6 +79,7 @@ public:
 private:
   void DoDispose();
   virtual void StartApplication(void);
+  virtual void StopApplication(void);
 
   void ReplyServer ();
 
@@ -90,7 +91,6 @@ private:
   uint32_t m_id;
   uint16_t m_serverPort;
   uint16_t m_cliPort;
-  uint32_t m_simulationTime;
   double m_meanConsumption; // consumo medio do UAV
   Ipv4Address m_addressAdhoc;
   double m_updateTime;

@@ -61,11 +61,6 @@ UavApplication::GetTypeId(void)
                                         DataRateValue(),
                                         MakeDataRateAccessor(&UavApplication::m_dataRate),
                                         MakeDataRateChecker())
-                          .AddAttribute("SimulationTime",
-                                        "",
-                                        UintegerValue(0),
-                                        MakeUintegerAccessor(&UavApplication::m_simulationTime),
-                                        MakeUintegerChecker<uint32_t>())
                           .AddAttribute("ServerPort",
                                         "Communication port number",
                                         UintegerValue(8080),
@@ -94,7 +89,7 @@ UavApplication::GetTypeId(void)
 UavApplication::UavApplication()
 {
   NS_LOG_FUNCTION(this);
-  NS_LOG_DEBUG ("UavApplication::UavApplication @" << Simulator::Now().GetSeconds());
+  NS_LOG_INFO ("UavApplication::UavApplication @" << Simulator::Now().GetSeconds());
   m_running = false;
   m_meanConsumption = 0.0;
 }
@@ -102,16 +97,40 @@ UavApplication::UavApplication()
 UavApplication::~UavApplication()
 {
   NS_LOG_FUNCTION(this);
-  NS_LOG_DEBUG ("UavApplication::~UavApplication @" << Simulator::Now().GetSeconds());
+  NS_LOG_INFO ("UavApplication::~UavApplication @" << Simulator::Now().GetSeconds());
 }
 
 void UavApplication::Start(double stoptime) {
+  NS_LOG_DEBUG("UavApplication::Start [" << m_id << "]");
+  Simulator::Remove(m_startEvent);
   Simulator::Remove(m_stopEvent);
-  SetStartTime(Simulator::Now());
-  SetStopTime(Seconds(m_simulationTime));
+  // SetStartTime(Simulator::Now());
+  SetStopTime(Seconds(stoptime));
+  StartApplication();
+}
+
+void UavApplication::StartApplication(void)
+{
+  NS_LOG_DEBUG("UavApplication::StartApplication [" << m_id << "]");
+  m_running = true;
+  // criando socket para enviar informacoes ao servidor
+  m_sendSck = Socket::CreateSocket(m_node, UdpSocketFactory::GetTypeId());
+  if (m_sendSck->Connect(InetSocketAddress(m_peer, m_serverPort))) {
+    NS_FATAL_ERROR ("UAV - $$ [NÃO] conseguiu conectar com Servidor!");
+  }
+  ScheduleTx();
 }
 
 void UavApplication::Stop() {
+  NS_LOG_DEBUG("UavApplication::Stop [" << m_id << "]");
+  // SetStopTime(Simulator::Now());
+  Simulator::Remove(m_stopEvent);
+  StopApplication();
+}
+
+void UavApplication::StopApplication()
+{
+  NS_LOG_DEBUG("UavApplication::StopApplication [" << m_id << "]");
   m_meanConsumption = 0.0;
   Simulator::Remove(m_stopEvent);
   m_running = false;
@@ -168,13 +187,13 @@ UavApplication::GetId()
 void
 UavApplication::EnergyRechargedCallback()
 {
-  NS_LOG_DEBUG("---- EnergyRechargedCallback ");
+  NS_LOG_INFO("---- EnergyRechargedCallback ");
 }
 
 void
 UavApplication::EnergyDepletionCallback()
 {
-  NS_LOG_DEBUG("---->>> EnergyDepletionCallback - ASK SAFE POSITION");
+  NS_LOG_INFO("---->>> EnergyDepletionCallback - ASK SAFE POSITION");
   // avisar central e mudar posição para central!
   m_packetDepletion = Simulator::ScheduleNow(&UavApplication::SendPacketDepletion, this);
 }
@@ -309,7 +328,7 @@ UavApplication::TracedCallbackRxAppInfra (Ptr<const Packet> packet, const Addres
     std::vector<std::string> results(std::istream_iterator<std::string>{iss},
                                      std::istream_iterator<std::string>());
 
-    NS_LOG_DEBUG ("UavApplication::TracedCallbackRxAppInfra :: " << msg << " @" << Simulator::Now().GetSeconds());
+    NS_LOG_INFO ("UavApplication::TracedCallbackRxAppInfra :: " << msg << " @" << Simulator::Now().GetSeconds());
 
     if (results.at(0).compare("CLIENT") == 0) { // received a message from a client
       std::string::size_type sz; // alias of size_t
@@ -333,17 +352,6 @@ UavApplication::TracedCallbackRxAppInfra (Ptr<const Packet> packet, const Addres
   }
 }
 
-void UavApplication::StartApplication(void)
-{
-  m_running = true;
-  // criando socket para enviar informacoes ao servidor
-  m_sendSck = Socket::CreateSocket(m_node, UdpSocketFactory::GetTypeId());
-  if (m_sendSck->Connect(InetSocketAddress(m_peer, m_serverPort))) {
-    NS_FATAL_ERROR ("UAV - $$ [NÃO] conseguiu conectar com Servidor!");
-  }
-  ScheduleTx();
-}
-
 void UavApplication::SendCliData ()
 {
   if (m_running) {
@@ -365,7 +373,7 @@ void UavApplication::SendCliData ()
       msg.str("");
       msg << "UAV\t" << m_id << "\tSENT\t" << Simulator::Now().GetSeconds() << "\tDATAtoSERVER";
       m_packetTrace(msg.str());
-      NS_LOG_DEBUG("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - DATA to Server.");
+      NS_LOG_INFO("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - DATA to Server.");
     }
 
     m_sendCliDataEvent = Simulator::Schedule (Seconds(5.0), &UavApplication::SendCliData, this);
@@ -405,7 +413,7 @@ void UavApplication::ScheduleTx(void)
 }
 
 void UavApplication::DoDispose() {
-  NS_LOG_DEBUG ("UavApplication::DoDispose id " << m_id << " REF " << GetReferenceCount() << " @" << Simulator::Now().GetSeconds());
+  NS_LOG_INFO ("UavApplication::DoDispose id " << m_id << " REF " << GetReferenceCount() << " @" << Simulator::Now().GetSeconds());
   Simulator::Remove(m_sendEvent);
   Simulator::Remove(m_startEvent);
   Simulator::Remove(m_stopEvent);
