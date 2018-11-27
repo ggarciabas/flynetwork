@@ -110,6 +110,8 @@ private:
   Ptr<WifiRadioEnergyModel> m_wifiRadioEnergyModel;
   Ptr<UavEnergySource> m_uavEnergySource;
 
+  std::string m_scenarioName;
+
 };
 
 } // namespace ns3

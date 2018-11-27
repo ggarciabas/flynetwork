@@ -53,6 +53,11 @@ UavApplication::GetTypeId(void)
                                         DoubleValue(55.0),
                                         MakeDoubleAccessor(&UavApplication::m_cliUpdateTime),
                                         MakeDoubleChecker<double>())
+                          .AddAttribute("ScenarioName",
+                                        "Name of scenario",
+                                        StringValue("none"),
+                                        MakeStringAccessor(&UavApplication::m_scenarioName),
+                                        MakeStringChecker())
                           .AddAttribute("Remote", "The address of the destination",
                                         Ipv4AddressValue(),
                                         MakeIpv4AddressAccessor(&UavApplication::m_peer),
@@ -172,9 +177,10 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   double energy = dev->ChangeThreshold(); // atualiza valor minimo para retorno na bateria
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/course_changed_" << m_id << ".txt";
-  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  m_file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << "," << energy << std::endl;
-  m_file.close();
+  std::ofstream file;
+  file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << "," << energy << std::endl;
+  file.close();
   dev->StartHover();
 }
 
