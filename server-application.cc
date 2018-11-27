@@ -215,6 +215,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
     std::vector<double> pos;
     pos.push_back(std::stod (results.at(1),&sz));
     pos.push_back(std::stod (results.at(2),&sz));
+
     std::ostringstream mm;
     mm << "SERVER\t-1\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tUAV";
     m_packetTrace(mm.str());
@@ -222,13 +223,20 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
     Ptr<UavModel> uav = m_uavContainer.FindUavModel(std::stoi(results.at(4), &sz));
     if (uav != NULL)
     {
-      uav->SetPosition(pos.at(0), pos.at(1));
-      uav->ConfirmPosition(); // confirma o posicionamento do UAV
-      uav->SetTotalEnergy(std::stod(results.at(5), &sz)); // atualiza energia total do UAV
-      NS_LOG_INFO ("SERVER - atualizando UAV " << uav->GetId());
-      if (uav->IsConfirmed()) {
-        NS_LOG_INFO("SERVER - UAV #" << uav->GetId() << " confirmado no posicionamento");
-        ReplyUav(uav);
+      if (CalculateDistanceCentral(pos)==0.0) { // caso o UAv esteja na central, desligar!
+        NS_LOG_DEBUG("SERVER received UAV pos na central @"<< Simulator::Now().GetSeconds() <<"  --- Removendo nó [" << uav->GetId() << "]");
+        m_removeUav(uav->GetId()); // desligando todas as informacoes do nó
+        uav->Dispose(); // parando eventos do UavModel
+        m_uavContainer.RemoveUav(uav);
+      } else {
+        uav->SetPosition(pos.at(0), pos.at(1));
+        uav->ConfirmPosition(); // confirma o posicionamento do UAV
+        uav->SetTotalEnergy(std::stod(results.at(5), &sz)); // atualiza energia total do UAV
+        NS_LOG_INFO ("SERVER - atualizando UAV " << uav->GetId());
+        if (uav->IsConfirmed()) {
+          NS_LOG_INFO("SERVER - UAV #" << uav->GetId() << " confirmado no posicionamento");
+          ReplyUav(uav);
+        }
       }
     }
     else
@@ -944,21 +952,13 @@ void ServerApplication::runAgendamento(void)
     else
       osbij << "," << b_ij[i][id]; // b_ij, custo de deslocamento
 
-    if (CalculateDistanceCentral(vp)==0.0) { // caso o UAV seja enviado para a central, se faz necessario remover o nó!
-      NS_LOG_DEBUG("ServerApplication::runAgendamento --> SERVER @"<< Simulator::Now().GetSeconds() <<"  --- Removendo nó [" << (*u_i)->GetId() << "]");
-      m_removeUav((*u_i)->GetId()); // desligando todas as informacoes do nó
-      (*u_i)->Dispose(); // parando eventos do UavModel
-      m_uavContainer.RemoveAt(i);
-      i--;
-      u_i--;
-    } else {
-      NS_LOG_INFO("SERVER - definindo novo posicionamento @" << Simulator::Now().GetSeconds());
-      (*u_i)->SetNewPosition(m_locationContainer.Get(id)->GetPosition());
-      (*u_i)->NotConfirmed(); // atualiza o valor para identificar se o UAV chegou a posicao correta
-      (*u_i)->CancelSendPositionEvent();
-      (*u_i)->SetSendPositionEvent(Simulator::Schedule(Seconds(t), &ServerApplication::SendUavPacket, this, (*u_i)));
-      t += 0.5;
-    }
+    NS_LOG_INFO("SERVER - definindo novo posicionamento @" << Simulator::Now().GetSeconds());
+    (*u_i)->SetNewPosition(m_locationContainer.Get(id)->GetPosition());
+    (*u_i)->NotConfirmed(); // atualiza o valor para identificar se o UAV chegou a posicao correta
+    (*u_i)->CancelSendPositionEvent();
+    (*u_i)->SetSendPositionEvent(Simulator::Schedule(Seconds(t), &ServerApplication::SendUavPacket, this, (*u_i)));
+    t += 0.5;
+
     vp.clear();
   }
 

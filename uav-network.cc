@@ -413,7 +413,7 @@ void UavNetwork::NewUav(int total, bool update)
     std::ostringstream os;
     os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_network_log.txt";
     m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-    m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << ",ACTIVATED" << std::endl;
+    m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << ",1" << std::endl;
     m_file.close();
 
     n = 0;
@@ -451,7 +451,7 @@ void UavNetwork::RemoveUav(int id)
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_network_log.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << ",DEACTIVATED" << std::endl;
+  m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << ",0" << std::endl;
   m_file.close();
 
   n = 0;
