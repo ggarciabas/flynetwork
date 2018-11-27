@@ -205,7 +205,7 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
     } else if (results.at(0).compare("GOTO") == 0)
       {
         std::ostringstream mm;
-        mm << "UAV\t" << m_id << "\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tSERVER";
+        mm << "UAV\t" << m_id << "\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tGOTO";
         m_packetTrace(mm.str());
         double z = std::stod(results.at(3), &sz) - GetNode()->GetObject<MobilityModel>()->GetPosition().z;
         // mudar o posicionamento do UAV
@@ -218,7 +218,7 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
         {
           m_packetDepletion.Cancel();
           std::ostringstream mm;
-          mm << "UAV\t" << m_id << "\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tSERVER";
+          mm << "UAV\t" << m_id << "\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tGOTOCENTRAL";
           m_packetTrace(mm.str());
           double z = std::stod(results.at(3), &sz) - GetNode()->GetObject<MobilityModel>()->GetPosition().z;
           // mudar o posicionamento do UAV

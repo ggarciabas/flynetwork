@@ -150,6 +150,7 @@ void UavDeviceEnergyModel::HandleEnergyDepletion(void)
  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
  m_file << Simulator::Now().GetSeconds() << "," << m_source->GetRemainingEnergy() - energy << std::endl;
  m_file.close();
+ m_energyDepletionCallback(); // avisa a aplicação, helper quem configura!
 }
 
 void UavDeviceEnergyModel::SetEnergyUpdateInterval(Time interval)

@@ -307,7 +307,6 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
               p.push_back(pos.x);
               p.push_back(pos.y);
               uav->SetNewPosition(p); // pegar posicao do servidor, ele é a central!
-              uav->NotConfirmed(); // atualiza o valor para identificar se o UAV chegou a posicao correta
               uav->CancelSendDepletionEvent();
               uav->SetSendDepletionEvent(Simulator::ScheduleNow(&ServerApplication::SendDepletionPacket, this, uav));
               p.clear();
