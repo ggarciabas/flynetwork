@@ -12,6 +12,7 @@ def battery(main_path, teste, uavs_id, time_ini, time_end):
     uavs = []
     data = {}
     filtred = []
+    filtred_time = []
     if teste:
         print uavs_id
     for name_file in glob.glob(main_path+'uav_battery_hover_*.txt'):
@@ -35,6 +36,7 @@ def battery(main_path, teste, uavs_id, time_ini, time_end):
                 point = [float(x) for x in line.split(',')]
                 if time_ini < point[0] < time_end: # just between the snapshot
                     filtred.append(point[1])
+                    filtred_time.append(point[0])
                 data[uav_id][0].append(point[0])
                 data[uav_id][1].append(point[1])
             file.close()
@@ -63,7 +65,7 @@ def battery(main_path, teste, uavs_id, time_ini, time_end):
         plt.plot(data[uav][0], data[uav][1], marker='', color=palette(num), linewidth=2.4, alpha=0.9, label=uav)
 
         # Same limits for everybody!
-        plt.xlim(time_ini-2, time_end+2)
+        plt.xlim(min(filtred_time), max(filtred_time))
         plt.ylim(min(filtred), max(filtred))
 
         # # Not ticks everywhere
@@ -75,7 +77,7 @@ def battery(main_path, teste, uavs_id, time_ini, time_end):
             plt.tick_params(labelbottom=False)
 
         # Add title
-        plt.title(str(uav), loc='left', fontsize=12, fontweight=0, color=palette(num) )
+        plt.title(str(uav), loc='left', fontsize=10, fontweight=0, color=palette(num), y=0.92)
 
     # general title
     plt.suptitle("Consumo de bateria por flutuar dos UAVs entre os tempos ["+str(time_ini)+"s, "+str(time_end)+"s]", fontsize=13, fontweight=0, color='black', style='italic')
