@@ -61,6 +61,11 @@ UavApplication::GetTypeId(void)
                                         DataRateValue(),
                                         MakeDataRateAccessor(&UavApplication::m_dataRate),
                                         MakeDataRateChecker())
+                          .AddAttribute("SimulationTime",
+                                        "",
+                                        UintegerValue(0),
+                                        MakeUintegerAccessor(&UavApplication::m_simulationTime),
+                                        MakeUintegerChecker<uint32_t>())
                           .AddAttribute("ServerPort",
                                         "Communication port number",
                                         UintegerValue(8080),
@@ -101,17 +106,25 @@ UavApplication::~UavApplication()
 }
 
 void UavApplication::Start(double stoptime) {
-  Simulator::Remove(m_startEvent);
-  StartApplication();
   Simulator::Remove(m_stopEvent);
-  m_stopEvent = Simulator::Schedule (Seconds(stoptime), &UavApplication::StopApplication, this);
+  SetStartTime(Simulator::Now());
+  SetStopTime(Seconds(m_simulationTime));
 }
 
 void UavApplication::Stop() {
   m_meanConsumption = 0.0;
-  Simulator::Remove(m_startEvent);
   Simulator::Remove(m_stopEvent);
-  StopApplication();
+  m_running = false;
+  Simulator::Remove(m_sendEvent);
+  Simulator::Remove(m_sendCliDataEvent);
+  Simulator::Remove(m_packetDepletion);
+  if (m_sendSck)
+  {
+    m_sendSck->ShutdownRecv();
+    m_sendSck->ShutdownSend();
+    m_sendSck->Close();
+    m_sendSck = 0;
+  }
 }
 
 // void UavApplication::SetTurnOffWifiPhyCallback(UavApplication::OffWifiPhyCallback adhoc, UavApplication::OffWifiPhyCallback infra)
@@ -328,7 +341,6 @@ void UavApplication::StartApplication(void)
   if (m_sendSck->Connect(InetSocketAddress(m_peer, m_serverPort))) {
     NS_FATAL_ERROR ("UAV - $$ [NÃO] conseguiu conectar com Servidor!");
   }
-
   ScheduleTx();
 }
 
@@ -357,24 +369,6 @@ void UavApplication::SendCliData ()
     }
 
     m_sendCliDataEvent = Simulator::Schedule (Seconds(5.0), &UavApplication::SendCliData, this);
-  }
-}
-
-void UavApplication::StopApplication(void)
-{
-  m_running = false;
-
-  if (m_sendEvent.IsRunning())
-  {
-    Simulator::Remove(m_sendEvent);
-  }
-
-  if (m_sendSck)
-  {
-    m_sendSck->ShutdownRecv();
-    m_sendSck->ShutdownSend();
-    m_sendSck->Close();
-    m_sendSck = 0;
   }
 }
 

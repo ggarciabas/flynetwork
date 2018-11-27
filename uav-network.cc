@@ -525,6 +525,7 @@ void UavNetwork::ConfigureUav(int total)
     obj.Set("AdhocAddress", Ipv4AddressValue(addContainer.GetAddress(c)));
     obj.Set("ServerPort", UintegerValue(m_serverPort));
     obj.Set("ClientPort", UintegerValue(m_cliPort));
+    obj.Set("SimulationTime", UintegerValue(m_simulationTime));
 
     std::cout << "Uav #" << (*i)->GetId() << " IP " << addContainer.GetAddress(c) << std::endl;
 

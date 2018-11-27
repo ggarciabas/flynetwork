@@ -229,7 +229,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
     }
     else
     {
-      NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV --- fora da rede?! ID " << results.at(4));
+      NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [UAV] --- fora da rede?! ID " << results.at(4));
     }
     pos.clear();
    } else if (results.at(0).compare("UAVRECEIVED") == 0)  {
@@ -240,7 +240,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
               NS_LOG_INFO("SERVER - UAVRECEIVED ::: UAV #" << uav->GetId() << " @" << Simulator::Now().GetSeconds());
             } else
             {
-              NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV --- fora da rede?! ID " << results.at(1));
+              NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [UAVRECEIVED] --- fora da rede?! ID " << results.at(1));
             }
       } else if (results.at(0).compare("CENTRALOK") == 0)  {
                Ptr<UavModel> uav = m_uavContainer.FindUavModel(std::stoi(results.at(1), &sz));
@@ -254,7 +254,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
                  NS_LOG_INFO("SERVER - CENTRALOK ::: UAV removed @" << Simulator::Now().GetSeconds());
                } else
                {
-                 NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV --- fora da rede?! ID " << results.at(1));
+                 NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [CENTRALOK] --- fora da rede?! ID " << results.at(1));
                }
         } else if (results.at(0).compare("DATA") == 0) {
           NS_LOG_INFO("ServerApplication::TracedCallbackRxApp " << s << " @" << Simulator::Now().GetSeconds());
@@ -297,7 +297,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             ReplyAskCliData (uav);
           } else
           {
-            NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV --- fora da rede?! ID " << results.at(1));
+            NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [DATA] --- fora da rede?! ID " << results.at(1));
           }
         } else if (results.at(0).compare("DEPLETION") == 0)  {
             Ptr<UavModel> uav = m_uavContainer.FindUavModel(std::stoi(results.at(1), &sz));
@@ -322,7 +322,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
               uav->NotConfirmed();
               uav->SetSendPositionEvent(Simulator::ScheduleNow(&ServerApplication::SendUavPacket, this, uav));
             } else {
-              NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV --- fora da rede?! ID " << results.at(1));
+              NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [DEPLETION] --- fora da rede?! ID " << results.at(1));
             }
             uav = 0;
           } else {
