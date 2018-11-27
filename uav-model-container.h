@@ -112,6 +112,8 @@ public:
    */
   void Clear(void);
 
+  void RemoveUav (Ptr<UavModel> uav);
+
 private:
   std::vector<Ptr<UavModel>> m_models;
 };

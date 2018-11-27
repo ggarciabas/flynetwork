@@ -140,20 +140,15 @@ void UavDeviceEnergyModel::HandleEnergyRecharged (void)
 
 void UavDeviceEnergyModel::HandleEnergyDepletion(void)
 {
- m_hoverEvent.Cancel();
- HoverConsumption();
  Vector actual = m_node->GetObject<MobilityModel>()->GetPosition();
  double distance = std::sqrt(std::pow(m_xCentral - actual.x, 2) + std::pow(m_yCentral - actual.y, 2));
  NS_ASSERT(distance >= 0);
  // energy to decrease = energy cost * distance from last position to the actual
- double energyToDecrease = m_energyCost * distance;
- m_totalEnergyConsumption += energyToDecrease;
- DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceMov(energyToDecrease);
- // salvando historico do consumo de bateria por movimentacao
+ double energy = m_energyCost * distance;
  std::ostringstream os;
- os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_moving_" << m_node->GetId() << ".txt";
+ os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/depletion_" << m_node->GetId() << ".txt";
  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
- m_file << Simulator::Now().GetSeconds() << "," << m_totalEnergyConsumption / m_source->GetInitialEnergy() << std::endl;
+ m_file << Simulator::Now().GetSeconds() << "," << m_source->GetRemainingEnergy() - energy << std::endl;
  m_file.close();
 }
 

@@ -90,6 +90,18 @@ UavModel::CancelSendPositionEvent()
   Simulator::Remove(m_sendPosition);
 }
 
+void
+UavModel::SetSendDepletionEvent (EventId id)
+{
+  m_sendDepletion = id;
+}
+
+void
+UavModel::CancelSendDepletionEvent()
+{
+  Simulator::Remove(m_sendDepletion);
+}
+
 void UavModel::SetAskCliDataEvent (EventId id)
 {
   m_askCliData = id;

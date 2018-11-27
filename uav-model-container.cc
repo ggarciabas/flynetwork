@@ -145,4 +145,15 @@ Ptr<UavModel> UavModelContainer::RemoveAt (uint32_t pos) {
   return n;
 }
 
+void UavModelContainer::RemoveUav (Ptr<UavModel> uav) {
+  int c = 0;
+  for (Iterator i = m_models.begin(); i != m_models.end(); i++, c++)
+  {
+    if ((*i)->GetId() == uav->GetId()) {
+      break;
+    }
+  }
+  RemoveAt(c);
+}
+
 } // namespace ns3

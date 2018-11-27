@@ -74,6 +74,8 @@ public:
   void Start(double);
   void Stop();
 
+  void ReplyServerDepletion ();
+
 private:
   void DoDispose();
   virtual void StartApplication(void);
@@ -84,6 +86,7 @@ private:
   void ScheduleTx(void);
   void SendPacket(void);
   void SendCliData ();
+  void SendPacketDepletion(void);
 
   uint32_t m_id;
   uint16_t m_serverPort;
@@ -97,6 +100,7 @@ private:
   Ptr<Socket> m_sendSck; // sending socket
   EventId m_sendEvent;
   EventId m_sendCliDataEvent;
+  EventId m_packetDepletion;
   bool m_running;
   TracedCallback<std::string> m_packetTrace;
   Callback<void> m_setOffWifiPhyInfra; // turn off wifiphy
