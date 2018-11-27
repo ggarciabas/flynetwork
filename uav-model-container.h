@@ -69,6 +69,8 @@ public:
 
   Ptr<UavModel> RemoveAt (uint32_t pos);
 
+  Ptr<UavModel> GetLast();
+
   /**
    * \brief Get the number of Ptr<UavModel> stored in this container.
    *

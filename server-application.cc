@@ -310,6 +310,17 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
               uav->CancelSendDepletionEvent();
               uav->SetSendDepletionEvent(Simulator::ScheduleNow(&ServerApplication::SendDepletionPacket, this, uav));
               p.clear();
+              // solicitar novo UAV para a rede!
+              m_newUav(1, false); // solicita novo UAV
+              // atualizar o posicionamento do Uav na última posicao do vetor, mandando ele para a localização do UAV que esta saindo
+              uav = m_uavContainer.GetLast();
+              p.push_back(std::stod (results.at(1),&sz));
+              p.push_back(std::stod (results.at(2),&sz));
+              p.push_back(std::stod(results.at(3), &sz)); // UAV tem posição 3D
+              uav->SetNewPosition(p); // pegar posicao do servidor, ele é a central!
+              uav->CancelSendPositionEvent();
+              uav->NotConfirmed();
+              uav->SetSendPositionEvent(Simulator::ScheduleNow(&ServerApplication::SendUavPacket, this, uav));
             } else {
               NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV --- fora da rede?! ID " << results.at(1));
             }

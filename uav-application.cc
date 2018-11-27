@@ -169,7 +169,8 @@ void UavApplication::SendPacketDepletion(void)
 {
   m_packetDepletion.Cancel();
   std::ostringstream msg;
-  msg << "DEPLETION " << m_id << " " << '\0';
+  Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
+  msg << "DEPLETION " << m_id << " " << pos.x << " " << pos.y << " " << pos.z << " " << '\0';
   uint16_t packetSize = msg.str().length() + 1;
   Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
   if (m_sendSck->Send(packet) == packetSize)

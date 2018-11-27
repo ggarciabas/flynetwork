@@ -56,6 +56,12 @@ UavModelContainer::UavModelContainer(const UavModelContainer &a, const UavModelC
 }
 
 Ptr<UavModel>
+UavModelContainer::GetLast()
+{
+  return m_models.back();
+}
+
+Ptr<UavModel>
 UavModelContainer::FindUavModel(uint32_t id)
 {
   NS_LOG_FUNCTION(this);
