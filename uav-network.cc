@@ -407,14 +407,15 @@ void UavNetwork::NewUav(int total, bool update)
     } else { // adiciona um novo UAV no servidor
       m_serverApp->AddNewUav(n->GetId(), addr, source->GetRemainingEnergy(), n->GetObject<UavDeviceEnergyModel>()->GetEnergyCost(), source->GetInitialEnergy(), n->GetObject<MobilityModel>()); // tell the server to create a new model of UAV, used to identify the actual location of those UAV nodes
     }
-    n = 0;
-    NS_LOG_DEBUG (" ------------------------------------- ");
 
     std::ostringstream os;
     os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_network_log.txt";
     m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
     m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << ",ACTIVATED" << std::endl;
     m_file.close();
+
+    n = 0;
+    NS_LOG_DEBUG (" ------------------------------------- ");
   }
   NS_LOG_DEBUG("Id " << m_uavNodeActive.Get(m_uavNodeActive.GetN()-1)->GetId() << " REF " << m_uavNodeActive.Get(m_uavNodeActive.GetN()-1)->GetReferenceCount() << " ------------");
 }

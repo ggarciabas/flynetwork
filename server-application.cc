@@ -177,7 +177,12 @@ void ServerApplication::AddSupplyUav(uint32_t id, Ipv4Address addrAdhoc, double 
   {
     NS_FATAL_ERROR("Servidor nao conseguiu se conectar com o UAV!");
   }
-  m_uavContainer.Add(uav, m_supplyPos); // posicao que deve ser suprida
+
+  Ptr<UavModel> removed = m_uavContainer.Get(m_supplyPos);
+  m_removeUav(removed->GetId());
+  removed->Dispose();
+  removed = 0;
+  m_uavContainer.Add(uav, m_supplyPos); // metodo manda remover do container a posição a ser suprida, e adiciona no final!
 }
 
 void ServerApplication::AddNewFixedClient(string login, double x, double y)
@@ -754,13 +759,9 @@ void ServerApplication::runAgendamento(void)
 
     if (verify_uav == int(m_locationContainer.GetN())) {
       NS_LOG_DEBUG("ServerApplication::runAgendamento --> Enviar UAV " << (*u_i)->GetId() << " para a central  REF " << (*u_i)->GetReferenceCount());
-      m_removeUav((*u_i)->GetId());
-      (*u_i)->Dispose();
-      m_supplyPos = count; // posicao que será suprida
       // criar um novo nó iniciando na região central, como sempre!
       m_newUav(1, true); // true, pois está o solicitado para suprir uma posicao
-      // calcular o custo para este novo nó e todas as localizações
-      // u_i--; // verificar se isto dá certo!
+      m_supplyPos = count; // posicao que será suprida
     }
     NS_LOG_INFO (" ------------------------- ");
   }
