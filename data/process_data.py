@@ -49,59 +49,59 @@ list_folder.sort()
 uav_mov = {}
 uavs_id = {}
 
-# # Initial scenario
-# initial_scenario.scenario(str(list_folder[0]), main_path, teste)
-#
-# # Client
-# for time in list_folder:
-#     client.scenario (str(time), main_path, teste)
-#
-# activated = {}
-# file_ac = open(main_path+'uav_network_log.txt', 'r')
-# for line in file_ac:
-#     if teste:
-#         print line
-#     sep = [x for x in line.split(',')]
-#
-#     if not (str("UAV "+sep[1]) in activated):
-#         activated[str("UAV "+sep[1])] = {}
-#
-#     if int(sep[2]) == 1:
-#         activated[str("UAV "+sep[1])][int(sep[0])] = 'k'
-#     elif int(sep[2]) == 0:
-#         activated[str("UAV "+sep[1])][int(sep[0])] = 'r'
-#
-# if teste:
-#     print activated
-# t_ini = -1
-# all_uav = []
-# # Bij
-# for time in list_folder:
-#     if teste:
-#         print time
-#     (uavs_id, uav_mov) = bij_graphic.bij(str(time), main_path, teste)
-#     if teste:
-#         print uavs_id
-#     # Battery
-#     if t_ini > -1:
-#         # battery_mov.battery(main_path, teste, uavs_id, t_ini, time)
-#         battery_hover.battery(main_path, teste, uavs_id, t_ini, time, activated, time)
-#         battery_all.battery(main_path, teste, uavs_id, t_ini, time, activated, time)
-#         t_ini = time
-#     else:
-#         t_ini = -0.5
-#
-#     all_uav.extend(uavs_id[:])
-#
-# if teste:
-#     print all_uav
-# battery_all.battery(main_path, teste, all_uav, 0, t_ini+10, activated, 'all')
-# battery_mov.battery(main_path, teste, [], 0, t_ini+10, activated, 'all')
-# battery_hover.battery(main_path, teste, all_uav, 0, t_ini+10, activated, 'all')
-#
-# # Dist
-# for time in list_folder:
-#     dist_graphic.dist(str(time), main_path, teste)
+# Initial scenario
+initial_scenario.scenario(str(list_folder[0]), main_path, teste)
+
+# Client
+for time in list_folder:
+    client.scenario (str(time), main_path, teste)
+
+activated = {}
+file_ac = open(main_path+'uav_network_log.txt', 'r')
+for line in file_ac:
+    if teste:
+        print line
+    sep = [x for x in line.split(',')]
+
+    if not (str("UAV "+sep[1]) in activated):
+        activated[str("UAV "+sep[1])] = {}
+
+    if int(sep[2]) == 1:
+        activated[str("UAV "+sep[1])][float(sep[0])] = 'k'
+    elif int(sep[2]) == 0:
+        activated[str("UAV "+sep[1])][float(sep[0])] = 'r'
+
+if teste:
+    print activated
+t_ini = -1
+all_uav = []
+# Bij
+for time in list_folder:
+    if teste:
+        print time
+    (uavs_id, uav_mov) = bij_graphic.bij(str(time), main_path, teste)
+    if teste:
+        print uavs_id
+    # Battery
+    if t_ini > -1:
+        # battery_mov.battery(main_path, teste, uavs_id, t_ini, time)
+        battery_hover.battery(main_path, teste, uavs_id, t_ini, time, activated, time)
+        battery_all.battery(main_path, teste, uavs_id, t_ini, time, activated, time)
+        t_ini = time
+    else:
+        t_ini = -0.5
+
+    all_uav.extend(uavs_id[:])
+
+if teste:
+    print all_uav
+battery_all.battery(main_path, teste, all_uav, 0, t_ini+10, activated, 'all')
+battery_mov.battery(main_path, teste, [], 0, t_ini+10, activated, 'all')
+battery_hover.battery(main_path, teste, all_uav, 0, t_ini+10, activated, 'all')
+
+# Dist
+for time in list_folder:
+    dist_graphic.dist(str(time), main_path, teste)
 
 # Cli
 for time in list_folder:
