@@ -151,6 +151,8 @@ private:
 
   UavApplicationContainer   m_uavAppContainer;
   Ptr< PositionAllocator >    m_positionAlloc; // utilizado para distanciar os UAVs da central
+
+  std::ofstream m_file;
 };
 
 } // namespace ns3

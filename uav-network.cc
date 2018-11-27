@@ -409,6 +409,12 @@ void UavNetwork::NewUav(int total, bool update)
     }
     n = 0;
     NS_LOG_DEBUG (" ------------------------------------- ");
+
+    std::ostringstream os;
+    os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_network_log.txt";
+    m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << ",ACTIVATED" << std::endl;
+    m_file.close();
   }
   NS_LOG_DEBUG("Id " << m_uavNodeActive.Get(m_uavNodeActive.GetN()-1)->GetId() << " REF " << m_uavNodeActive.Get(m_uavNodeActive.GetN()-1)->GetReferenceCount() << " ------------");
 }
@@ -438,6 +444,12 @@ void UavNetwork::RemoveUav(int id)
   // Parar Uav
   Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>(n->GetObject<UavDeviceEnergyModel>()->GetEnergySource());
   source->Stop(); // recarregando
+
+  std::ostringstream os;
+  os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_network_log.txt";
+  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << ",DEACTIVATED" << std::endl;
+  m_file.close();
 
   n = 0;
 }
