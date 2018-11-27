@@ -60,6 +60,7 @@ public:
   uint32_t GetId();
 
   void EnergyDepletionCallback();
+  void EnergyRechargedCallback();
 
   void CourseChange (Ptr<const MobilityModel>);
 

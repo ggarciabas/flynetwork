@@ -76,7 +76,8 @@ private:
   virtual Ptr<UavDeviceEnergyModel> DoInstall(Ptr<Node> node, Ptr<EnergySource> source) const;
 
   ObjectFactory m_energyModel;
-  UavDeviceEnergyModel::EnergyDepletionCallback m_depletionCallback;
+  UavDeviceEnergyModel::EnergyCallback m_depletionCallback;
+  UavDeviceEnergyModel::EnergyCallback m_rechargedCallback;
 };
 
 } // namespace ns3

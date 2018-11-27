@@ -44,7 +44,7 @@ namespace ns3
 class UavDeviceEnergyModel : public DeviceEnergyModel
 {
 public:
-  typedef Callback<void> EnergyDepletionCallback;
+  typedef Callback<void> EnergyCallback;
 
   static TypeId GetTypeId(void);
   UavDeviceEnergyModel();
@@ -110,20 +110,19 @@ public:
    *
    * Sets callback for energy depletion handling.
    */
-  void SetEnergyDepletionCallback(EnergyDepletionCallback callback);
+  void SetEnergyDepletionCallback(EnergyCallback callback);
+  void SetEnergyRechargedCallback(EnergyCallback callback);
 
   /**
    * \brief Handles energy depletion.
    *
    * Not implemented
    */
-  virtual void HandleEnergyDepletion(void)
-  {
-    m_energyDepletionCallback();
-  }
+  virtual void HandleEnergyDepletion(void);
 
-  virtual void HandleEnergyRecharged (void)
-  {}
+  virtual void HandleEnergyRecharged (void);
+
+  void ChangeThreshold ();
 
   /**
    * \brief Handles energy changed.
@@ -173,13 +172,15 @@ private:
   double m_avgVel;
   double m_resistTime;
   double m_hoverCost;
+  double m_xCentral, m_yCentral;
   TracedValue<double> m_totalEnergyConsumption;
   std::string m_scenarioName;
   /**
    * Callback type for Energy Depletion function. Devices uses this callbak to notify
    * the node about the energy depletion.
    */
-  EnergyDepletionCallback m_energyDepletionCallback;
+  EnergyCallback m_energyDepletionCallback;
+  EnergyCallback m_energyRechargedCallback;
 };
 
 } // namespace ns3

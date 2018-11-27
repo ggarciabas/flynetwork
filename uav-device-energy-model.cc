@@ -50,6 +50,16 @@ UavDeviceEnergyModel::GetTypeId(void)
                                         StringValue("none"),
                                         MakeStringAccessor(&UavDeviceEnergyModel::m_scenarioName),
                                         MakeStringChecker())
+                          .AddAttribute("xCentral",
+                                        "",
+                                        DoubleValue(0),
+                                        MakeDoubleAccessor(&UavDeviceEnergyModel::m_xCentral),
+                                        MakeDoubleChecker<double>())
+                          .AddAttribute("yCentral",
+                                        "",
+                                        DoubleValue(0),
+                                        MakeDoubleAccessor(&UavDeviceEnergyModel::m_yCentral),
+                                        MakeDoubleChecker<double>())
                           .AddAttribute("AverageVelocity",
                                         "Average velocity of uav in m/s",
                                         DoubleValue(18), // 18 m/s
@@ -88,7 +98,7 @@ double UavDeviceEnergyModel::GetEnergyCost ()
 }
 
 void UavDeviceEnergyModel::SetEnergyDepletionCallback(
-    EnergyDepletionCallback callback)
+   EnergyCallback callback)
 {
   NS_LOG_FUNCTION(this);
   if (callback.IsNull())
@@ -96,6 +106,55 @@ void UavDeviceEnergyModel::SetEnergyDepletionCallback(
     NS_LOG_DEBUG("EnergyDepletionCallback:Setting NULL energy depletion callback!");
   }
   m_energyDepletionCallback = callback;
+}
+
+void UavDeviceEnergyModel::SetEnergyRechargedCallback(
+   EnergyCallback callback)
+{
+  NS_LOG_FUNCTION(this);
+  if (callback.IsNull())
+  {
+    NS_LOG_DEBUG("EnergyRechargedCallback:Setting NULL energy Recharged callback!");
+  }
+  m_energyRechargedCallback = callback;
+}
+
+void UavDeviceEnergyModel::ChangeThreshold () {
+  Vector actual = m_node->GetObject<MobilityModel>()->GetPosition();
+  double distance = std::sqrt(std::pow(m_xCentral - actual.x, 2) + std::pow(m_yCentral - actual.y, 2));
+  NS_ASSERT(distance >= 0);
+  double thr = (m_energyCost * distance)/ m_source->GetInitialEnergy(); // % necessaria para voltar a central de onde está!
+  DynamicCast<UavEnergySource>(m_source)->SetBasicEnergyLowBatteryThreshold(thr*1.02); // +2%!
+}
+
+void UavDeviceEnergyModel::HandleEnergyRecharged (void)
+{
+  m_energyRechargedCallback();
+  m_totalEnergyConsumption = 0.0;
+  m_lastPosition = m_node->GetObject<MobilityModel>()->GetPosition();
+  m_lastTime = Simulator::Now();
+  m_hoverEvent = Simulator::Schedule(m_energyUpdateInterval,
+                                          &UavDeviceEnergyModel::HoverConsumption,
+                                            this);
+}
+
+void UavDeviceEnergyModel::HandleEnergyDepletion(void)
+{
+ m_hoverEvent.Cancel();
+ HoverConsumption();
+ Vector actual = m_node->GetObject<MobilityModel>()->GetPosition();
+ double distance = std::sqrt(std::pow(m_xCentral - actual.x, 2) + std::pow(m_yCentral - actual.y, 2));
+ NS_ASSERT(distance >= 0);
+ // energy to decrease = energy cost * distance from last position to the actual
+ double energyToDecrease = m_energyCost * distance;
+ m_totalEnergyConsumption += energyToDecrease;
+ DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceMov(energyToDecrease);
+ // salvando historico do consumo de bateria por movimentacao
+ std::ostringstream os;
+ os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_moving_" << m_node->GetId() << ".txt";
+ m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+ m_file << Simulator::Now().GetSeconds() << "," << m_totalEnergyConsumption / m_source->GetInitialEnergy() << std::endl;
+ m_file.close();
 }
 
 void UavDeviceEnergyModel::SetEnergyUpdateInterval(Time interval)

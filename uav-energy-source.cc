@@ -54,15 +54,10 @@ UavEnergySource::GetTypeId(void)
                                                              &UavEnergySource::GetSupplyVoltage),
                                          MakeDoubleChecker<double> ())
                                       // TODO: o valor de threshold deve ser dinamico em relacao do custo necessario para ele voltar a central de onde ele está
-                          .AddAttribute("BasicEnergyLowBatteryThreshold",
+                          .AddAttribute ("BasicEnergyLowBatteryThreshold",
                                         "Low battery threshold for basic energy source.",
                                         DoubleValue(0.10), // as a fraction of the initial energy
                                         MakeDoubleAccessor(&UavEnergySource::m_lowBatteryTh),
-                                        MakeDoubleChecker<double>())
-                          .AddAttribute("BasicEnergyHighBatteryThreshold",
-                                        "High battery threshold for basic energy source.",
-                                        DoubleValue(0.15), // as a fraction of the initial energy
-                                        MakeDoubleAccessor(&UavEnergySource::m_highBatteryTh),
                                         MakeDoubleChecker<double>())
                         .AddAttribute ("PeriodicEnergyUpdateInterval",
                                        "Time between two consecutive periodic energy updates.",
@@ -274,6 +269,8 @@ void UavEnergySource::Reset () {
   m_depleted = false;
   m_lastPosition = m_node->GetObject<MobilityModel>()->GetPosition();
   m_remainingEnergyJ = m_initialEnergyJ;
+  m_movAcum = 0.0;
+  m_hoverAcum = 0.0;
   NotifyEnergyRecharged();
 }
 

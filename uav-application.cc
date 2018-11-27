@@ -152,9 +152,17 @@ UavApplication::GetId()
 }
 
 void
+UavApplication::EnergyRechargedCallback()
+{
+  std::cout << "---- EnergyRechargedCallback ##$#$#$#$#$#$\n";
+}
+
+void
 UavApplication::EnergyDepletionCallback()
 {
   std::cout << "---- EnergyDepletionCallback ##$#$#$#$#$#$\n";
+
+  // avisar central!
 }
 
 void

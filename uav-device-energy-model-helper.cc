@@ -103,16 +103,14 @@ UavDeviceEnergyModelHelper::DoInstall(Ptr<Node> node, Ptr<EnergySource> source) 
     model->SetEnergyDepletionCallback(m_depletionCallback);
   }
 
-  // // set energy recharged callback
-  // // if none is specified, make a callback to WifiPhy::ResumeFromSleep
-  // if (m_rechargedCallback.IsNull ())
-  //   {
-  //     model->SetEnergyRechargedCallback (MakeCallback (&WifiPhy::ResumeFromSleep, wifiPhy));
-  //   }
-  // else
-  //   {
-  //     model->SetEnergyRechargedCallback (m_rechargedCallback);
-  //   }
+  if (m_rechargedCallback.IsNull())
+  {
+    model->SetEnergyRechargedCallback(MakeCallback(&UavApplication::EnergyRechargedCallback, app));
+  }
+  else
+  {
+    model->SetEnergyRechargedCallback(m_rechargedCallback);
+  }
 
   // set energy source
   model->SetEnergySource(source);
