@@ -370,8 +370,9 @@ void UavNetwork::NewUav(int total, bool update)
   if (m_uavNode.GetN() < uint32_t(total)) {// Caso nao, configurar um novo
     ConfigureUav(total - m_uavNode.GetN()); // diferenca
   }
-  uint32_t sz = m_uavNode.GetN();
-  for (uint32_t i = sz-1; i >= (sz-total); i = i - 1) {
+  // uint32_t sz = m_uavNode.GetN();
+  // for (uint32_t i = sz-1; i >= (sz-total); i = i - 1) {
+  for (uint32_t i = 0; i < (uint32_t)total; i++) {
     NS_LOG_DEBUG("I " << i << " Id " << m_uavNode.Get(i)->GetId() << " REF " << m_uavNode.Get(i)->GetReferenceCount());
     Ptr<Node> n = m_uavNode.RemoveAt(i);
     NS_LOG_DEBUG("->REF " << n->GetReferenceCount());
