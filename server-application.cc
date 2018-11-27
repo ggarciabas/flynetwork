@@ -17,7 +17,6 @@
  *
  * Authors: Giovanna Garcia <ggarciabas@gmail.com>
  */
-
 #include "server-application.h"
 
 #include "ns3/simulator.h"

@@ -18,7 +18,7 @@ def battery(main_path, teste, uavs_id, time_ini, time_end):
     for name_file in glob.glob(main_path+'uav_battery_all_*.txt'):
         base=os.path.basename(name_file)
         uav_id = os.path.splitext(base)[0].split("uav_battery_all_")[-1]
-        if uav_id in uavs_id:
+        if uav_id in uavs_id or len(uavs_id)==0:
             uav_id = "UAV "+str(uav_id)
             if teste:
                 print (os.path.splitext(base)[0])
@@ -80,7 +80,7 @@ def battery(main_path, teste, uavs_id, time_ini, time_end):
         plt.title(str(uav), loc='left', fontsize=10, fontweight=0, color=palette(num), y=0.92)
 
     # general title
-    plt.suptitle("Consumo de bateria por flutuar dos UAVs entre os tempos ["+str(time_ini)+"s, "+str(time_end)+"s]", fontsize=13, fontweight=0, color='black', style='italic')
+    plt.suptitle("Consumo de bateria total dos UAVs entre os tempos ["+str(time_ini)+"s, "+str(time_end)+"s]", fontsize=13, fontweight=0, color='black', style='italic')
 
     plt.xlabel('Tempo (s)')
     plt.ylabel('Bateria (%)')

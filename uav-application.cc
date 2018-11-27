@@ -163,12 +163,18 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
 {
   // verificar UavMobility para tirar duvidas, este somente é executado quando chega ao destino!
   NS_LOG_INFO ("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " course changed!!! ---- ~~~~");
+
   Simulator::Remove(m_sendEvent);
   NS_LOG_INFO("UAV #" << m_id << " chegou ao seu posicionamento final.");
   SendPacket();
 
   Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
-  dev->ChangeThreshold(); // atualiza valor minimo para retorno na bateria
+  double energy = dev->ChangeThreshold(); // atualiza valor minimo para retorno na bateria
+  std::ostringstream os;
+  os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/course_changed_" << m_id << ".txt";
+  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  m_file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << "," << energy << std::endl;
+  m_file.close();
   dev->StartHover();
 }
 

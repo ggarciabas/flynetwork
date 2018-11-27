@@ -18,7 +18,7 @@ def battery(main_path, teste, uavs_id, time_ini, time_end):
     for name_file in glob.glob(main_path+'uav_battery_hover_*.txt'):
         base=os.path.basename(name_file)
         uav_id = os.path.splitext(base)[0].split("uav_battery_hover_")[-1]
-        if uav_id in uavs_id:
+        if uav_id in uavs_id or len(uavs_id)==0:
             uav_id = "UAV "+str(uav_id)
             if teste:
                 print (os.path.splitext(base)[0])

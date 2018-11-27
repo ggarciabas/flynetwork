@@ -48,35 +48,40 @@ list_folder.sort()
 
 uav_mov = {}
 
-# # Initial scenario
+# # # Initial scenario
 # initial_scenario.scenario(str(list_folder[0]),main_path, teste)
 #
 # # Client
 # for time in list_folder:
 #     client.scenario (str(time), main_path, teste)
 #
-# t_ini = -1
-# # Bij
-# for time in list_folder:
-#     if teste:
-#         print time
-#     (uavs_id, uav_mov) = bij_graphic.bij(str(time), main_path, teste)
-#     if teste:
-#         print uavs_id
-#     # Battery
-#     if t_ini > -1:
-#         # battery_mov.battery(main_path, teste, uavs_id, t_ini, time)
-#         battery_hover.battery(main_path, teste, uavs_id, t_ini, time)
-#         battery_all.battery(main_path, teste, uavs_id, t_ini, time)
-#         t_ini = time
-#     else:
-#         t_ini = 0
+t_ini = -1
+all_uav = []
+# Bij
+for time in list_folder:
+    if teste:
+        print time
+    (uavs_id, uav_mov) = bij_graphic.bij(str(time), main_path, teste)
+    if teste:
+        print uavs_id
+    # Battery
+    if t_ini > -1:
+        # battery_mov.battery(main_path, teste, uavs_id, t_ini, time)
+        battery_hover.battery(main_path, teste, uavs_id, t_ini, time)
+        battery_all.battery(main_path, teste, uavs_id, t_ini, time)
+        t_ini = time
+    else:
+        t_ini = 0
+
+    all_uav.extend(uavs_id[:])
+
+if teste:
+    print all_uav
+battery_all.battery(main_path, teste, all_uav, 0, t_ini+10)
+battery_hover.battery(main_path, teste, all_uav, 0, t_ini+10)
+battery_mov.battery(main_path, teste, [], 0, t_ini+10)
 
 
-
-battery_mov.battery(main_path, teste, [], 0, 480)
-
-#
 # # Dist
 # for time in list_folder:
 #     dist_graphic.dist(str(time), main_path, teste)

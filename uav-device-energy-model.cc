@@ -119,12 +119,13 @@ void UavDeviceEnergyModel::SetEnergyRechargedCallback(
   m_energyRechargedCallback = callback;
 }
 
-void UavDeviceEnergyModel::ChangeThreshold () {
+double UavDeviceEnergyModel::ChangeThreshold () {
   Vector actual = m_node->GetObject<MobilityModel>()->GetPosition();
   double distance = std::sqrt(std::pow(m_xCentral - actual.x, 2) + std::pow(m_yCentral - actual.y, 2));
   NS_ASSERT(distance >= 0);
   double thr = (m_energyCost * distance)/ m_source->GetInitialEnergy(); // % necessaria para voltar a central de onde está!
   DynamicCast<UavEnergySource>(m_source)->SetBasicEnergyLowBatteryThreshold(thr*1.02); // +2%!
+  return thr;
 }
 
 void UavDeviceEnergyModel::HandleEnergyRecharged (void)
