@@ -255,7 +255,7 @@ void UavNetwork::Run()
 
   // Configure UAV
   NS_LOG_INFO("Configurando UAV");
-  ConfigureUav(20);
+  ConfigureUav(5);
 
   // Configure Client
   NS_LOG_INFO("Configurando Cliente");
