@@ -372,9 +372,10 @@ void UavNetwork::NewUav(int total, bool update)
   }
   // uint32_t sz = m_uavNode.GetN();
   // for (uint32_t i = sz-1; i >= (sz-total); i = i - 1) {
-  for (uint32_t i = 0; i < (uint32_t)total; i++) {
-    NS_LOG_DEBUG("I " << i << " Id " << m_uavNode.Get(i)->GetId() << " REF " << m_uavNode.Get(i)->GetReferenceCount());
-    Ptr<Node> n = m_uavNode.RemoveAt(i);
+  while (total--) {
+    NS_LOG_DEBUG("Id " << m_uavNode.Get(0)->GetId() << " REF " << m_uavNode.Get(0)->GetReferenceCount());
+    Ptr<Node> n = m_uavNode.RemoveAt(0);
+
     NS_LOG_DEBUG("->REF " << n->GetReferenceCount());
     m_uavNodeActive.Add(n);
 
