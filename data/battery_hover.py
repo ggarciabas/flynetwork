@@ -7,7 +7,7 @@ import glob
 import os
 import sys
 
-def battery(main_path, teste, uavs_id, time_ini, time_end):
+def battery(main_path, teste, uavs_id, time_ini, time_end, activated, title_f):
     plt.clf()
     uavs = []
     data = {}
@@ -15,11 +15,21 @@ def battery(main_path, teste, uavs_id, time_ini, time_end):
     filtred_time = []
     if teste:
         print uavs_id
+    uav_files = {}
+    ordered_uav_id = []
     for name_file in glob.glob(main_path+'uav_battery_hover_*.txt'):
         base=os.path.basename(name_file)
-        uav_id = os.path.splitext(base)[0].split("uav_battery_hover_")[-1]
-        if uav_id in uavs_id or len(uavs_id)==0:
-            uav_id = "UAV "+str(uav_id)
+        id = os.path.splitext(base)[0].split("uav_battery_hover_")[-1]
+        uav_files[id] = name_file
+        ordered_uav_id.append(id)
+
+    ordered_uav_id = np.array(ordered_uav_id)
+    ordered_uav_id.sort()
+
+    for id in ordered_uav_id:
+        name_file = uav_files[id]
+        if id in uavs_id or len(uavs_id)==0:
+            uav_id = "UAV "+str(id)
             if teste:
                 print (os.path.splitext(base)[0])
                 print (uav_id)
@@ -51,11 +61,17 @@ def battery(main_path, teste, uavs_id, time_ini, time_end):
 
     # multiple line plot
     num=0
+    first = 0
     for uav in uavs:
         num+=1
 
         # Find the right spot on the plot
-        plt.subplot(number_plots, 1, num) #(3,3, num)
+        if first:
+            ax = plt.subplot(number_plots, 1, num) #(3,3, num)
+            lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.23), fancybox=True, shadow=True, ncol=5)
+            first = 1
+        else:
+            plt.subplot(number_plots, 1, num) #(3,3, num)
 
         # plot every groups, but discreet
         for key, value in data.iteritems():
@@ -63,6 +79,13 @@ def battery(main_path, teste, uavs_id, time_ini, time_end):
 
         # Plot the lineplot
         plt.plot(data[uav][0], data[uav][1], marker='', color=palette(num), linewidth=2.4, alpha=0.9, label=uav)
+
+        values = activated[uav]
+        for time,cor in values.iteritems():
+            # lb = 'ativado'
+            # if cor == 'r':
+            #     lb = 'desativado'
+            plt.axvline(x=time, c=cor)
 
         # Same limits for everybody!
         plt.xlim(min(filtred_time), max(filtred_time))
@@ -77,7 +100,7 @@ def battery(main_path, teste, uavs_id, time_ini, time_end):
             plt.tick_params(labelbottom=False)
 
         # Add title
-        plt.title(str(uav), loc='left', fontsize=10, fontweight=0, color=palette(num), y=0.92)
+        plt.title(str(uav), loc='left', fontsize=7, fontweight=0, color=palette(num), y=0.92)
 
     # general title
     plt.suptitle("Consumo de bateria por flutuar dos UAVs entre os tempos ["+str(time_ini)+"s, "+str(time_end)+"s]", fontsize=13, fontweight=0, color='black', style='italic')
@@ -85,6 +108,6 @@ def battery(main_path, teste, uavs_id, time_ini, time_end):
     plt.xlabel('Tempo (s)')
     plt.ylabel('Bateria (%)')
 
-    plt.savefig(main_path+'battery_hover_'+str(time_end)+'.svg')
-    plt.savefig(main_path+'battery_hover_'+str(time_end)+'.eps')
-    plt.savefig(main_path+'battery_hover_'+str(time_end)+'.png')
+    plt.savefig(main_path+'battery_hover_'+str(title_f)+'.svg')
+    plt.savefig(main_path+'battery_hover_'+str(title_f)+'.eps')
+    plt.savefig(main_path+'battery_hover_'+str(title_f)+'.png')
