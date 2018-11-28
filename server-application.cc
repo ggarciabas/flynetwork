@@ -768,8 +768,8 @@ void ServerApplication::runAgendamento(void)
     if (verify_uav == int(m_locationContainer.GetN())) {
       NS_LOG_DEBUG("ServerApplication::runAgendamento --> Enviar UAV " << (*u_i)->GetId() << " para a central  REF " << (*u_i)->GetReferenceCount());
       // criar um novo nó iniciando na região central, como sempre!
-      m_newUav(1, true); // true, pois está o solicitado para suprir uma posicao
       m_supplyPos = count; // posicao que será suprida
+      m_newUav(1, true); // true, pois está o solicitado para suprir uma posicao
     }
     NS_LOG_INFO (" ------------------------- ");
   }
