@@ -70,6 +70,7 @@ public:
   // void SetTurnOffWifiPhyCallback(OffWifiPhyCallback adhoc, OffWifiPhyCallback infra);
 
   void TotalEnergyConsumptionTrace (double oldV, double newV);
+  void TotalLeasedTrace (int oldV, int newV);
 
   void Start(double);
   void Stop();
@@ -107,10 +108,13 @@ private:
   Callback<void> m_setOffWifiPhyAdhoc; // turn off wifiphy
 
   ClientModelContainer m_client;
+  
   Ptr<WifiRadioEnergyModel> m_wifiRadioEnergyModel;
   Ptr<UavEnergySource> m_uavEnergySource;
 
   std::string m_scenarioName;
+
+  int m_totalLeased;
 
 };
 

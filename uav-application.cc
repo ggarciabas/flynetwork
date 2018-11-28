@@ -182,6 +182,19 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << "," << energy << std::endl;
   file.close();
   dev->StartHover();
+
+  // clear ClientModelContainer based on last update time
+  NS_LOG_DEBUG ("UavApplication::CourseChange UAV " << m_id << " este cliente esta no container: ");
+  for (ClientModelContainer::Iterator it = m_client.Begin(); it != m_client.End(); ++it) {
+     NS_LOG_DEBUG ("\t" << (*it)->GetLogin());
+  }
+  for (ClientModelContainer::Iterator it = m_client.Begin(); it != m_client.End(); ++it) {
+    NS_LOG_DEBUG ("UavApplication::CourseChange avaliando Cliente " << (*it)->GetLogin());
+    if ((Simulator::Now().GetSeconds() - (*it)->GetUpdatePos().GetSeconds()) > 60.0) {
+      NS_LOG_DEBUG ("UavApplication::CourseChange removendo cliente " << (*it)->GetLogin());
+      m_client.RemoveLogin((*it)->GetLogin());
+    }
+  }
 }
 
 void
@@ -436,6 +449,12 @@ void UavApplication::DoDispose() {
     m_sendSck = 0;
   }
   m_running = false;
+}
+
+void UavApplication::TotalLeasedTrace (int oldV, int newV)
+{
+  NS_LOG_DEBUG ("UavApplication::TotalLeasedTrace " << newV);
+  m_totalLeased = newV;
 }
 
 void UavApplication::TotalEnergyConsumptionTrace (double oldV, double newV)

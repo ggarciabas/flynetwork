@@ -79,6 +79,10 @@ DhcpServerUav::GetTypeId (void)
                    Ipv4AddressValue (),
                    MakeIpv4AddressAccessor (&DhcpServerUav::m_gateway),
                    MakeIpv4AddressChecker ())
+    .AddTraceSource ("TotalLeased",
+                     "Total leased address.",
+                     MakeTraceSourceAccessor (&DhcpServerUav::m_totalLeased),
+                     "ns3::TracedValueCallback::Int8")
   ;
   return tid;
 }
@@ -134,6 +138,8 @@ void DhcpServerUav::StartApplication (void)
 
           myOwnAddress = ipv4->GetAddress (ifIndex, addrIndex).GetLocal ();
           m_leasedAddresses[Address ()] = std::make_pair (myOwnAddress, 0xffffffff);
+          m_totalLeased++;
+          std::cout << "DhcpServerUav::StopApplication " << m_totalLeased << std::endl;
           break;
         }
     }
@@ -171,6 +177,8 @@ void DhcpServerUav::StopApplication ()
     }
 
   m_leasedAddresses.clear ();
+  m_totalLeased = 0;
+  std::cout << "DhcpServerUav::StopApplication " << m_totalLeased << std::endl;
   Simulator::Remove (m_expiredEvent);
 }
 
@@ -192,6 +200,8 @@ void DhcpServerUav::TimerHandler ()
                            "chaddr: " << i->first <<
                            "IP address " << i->second.first);
               i->second.second = 0;
+              m_totalLeased--;
+              std::cout << "DhcpServerUav::StopApplication " << m_totalLeased << std::endl;
               m_expiredAddresses.push_front (i->first);
             }
         }

@@ -156,4 +156,19 @@ bool ClientModelContainer::IsEmpty()
   return m_models.size() == 0;
 }
 
+void ClientModelContainer::RemoveAt (uint32_t pos) {
+  m_models.erase(m_models.begin()+pos);
+}
+
+void ClientModelContainer::RemoveLogin (std::string id) {
+  int c=0;
+  Iterator i;
+  for (i = m_models.begin(); i != m_models.end(); ++i, ++c) {
+    if (std::strcmp((*i)->GetLogin().c_str(), id.c_str()) == 0) {
+      break;
+    }
+  }
+  if (i != m_models.end()) RemoveAt(uint32_t(c)); // nao remover se nao existe!
+}
+
 } // namespace ns3

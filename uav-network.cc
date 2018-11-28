@@ -21,19 +21,21 @@
 #include "uav-network.h"
 #include "ns3/simulator.h"
 #include "ns3/log.h"
-#include "uav-energy-source-helper.h"
-#include "uav-device-energy-model-helper.h"
-#include "uav-model.h"
 #include "ns3/wifi-radio-energy-model-helper.h"
 #include "ns3/wifi-radio-energy-model.h"
-#include "smartphone-application.h"
 #include "ns3/aodv-module.h"
 #include "ns3/olsr-module.h"
 #include "ns3/dsdv-module.h"
 #include "ns3/internet-apps-module.h"
 #include "ns3/dsr-module.h"
-#include "dhcp-helper-uav.h"
-#include "dhcp-server-uav.h"
+
+#include "uav-energy-source-helper.h"
+#include "uav-device-energy-model-helper.h"
+#include "uav-model.h"
+#include "smartphone-application.h"
+// #include "dhcp-helper-uav.h"
+// #include "dhcp-server-uav.h"
+
 #include <fstream>
 #include <cstdlib>
 #include <string>
@@ -517,7 +519,6 @@ void UavNetwork::ConfigureUav(int total)
   // DeviceEnergyModelContainer deviceModelsAdhoc = radioEnergyHelper.Install (adhoc, sources);
 
   // create and configure UAVApp and Sink application
-  DhcpHelperUav dhcpHelper;
   int c = 0;
   std::ostringstream oss, poolAddr, minAddr, maxAddr, serverAddr;
   for (NodeContainer::Iterator i = uav.Begin(); i != uav.End(); ++i, ++c)
@@ -591,15 +592,17 @@ void UavNetwork::ConfigureUav(int total)
     minAddr << "192.168." << (*i)->GetId() << ".2";
     maxAddr << "192.168." << (*i)->GetId() << ".254";
     poolAddr << "192.168." << (*i)->GetId() << ".0";
+    DhcpHelper dhcpHelper;
     Ipv4InterfaceContainer fixedNodes = dhcpHelper.InstallFixedAddress (wifi.Get (c), Ipv4Address (serverAddr.str().c_str()), Ipv4Mask ("/24"));
     // Not really necessary, IP forwarding is enabled by default in IPv4.
     fixedNodes.Get (0).first->SetAttribute ("IpForward", BooleanValue (true));
     // DHCP server
-    ApplicationContainer dhcpServerApp = dhcpHelper.InstallDhcpServerUav (wifi.Get (c),
+    ApplicationContainer dhcpServerApp = dhcpHelper.InstallDhcpServer (wifi.Get (c),
                         Ipv4Address (serverAddr.str().c_str()),
                         Ipv4Address (poolAddr.str().c_str()), Ipv4Mask ("/24"),
                         Ipv4Address (minAddr.str().c_str()), Ipv4Address (maxAddr.str().c_str()),
                         Ipv4Address (serverAddr.str().c_str()));
+    dhcpServerApp.Get(0)->TraceConnectWithoutContext ("TotalLeased", MakeCallback(&UavApplication::TotalLeasedTrace, uavApp));
     dhcpServerApp.Start (Seconds (0.0));
     dhcpServerApp.Stop (Seconds(m_simulationTime));
     m_uavAppContainer.Add(uavApp); // armazenando informacoes das aplicacoes dos UAVs para que os clientes possam obter informacoes necessarias para se conectar no UAV mais proximo!
@@ -694,7 +697,7 @@ void UavNetwork::ConfigureCli()
     app->SetStopTime(Seconds(m_simulationTime));
     (*i)->AddApplication (app);
 
-    DhcpHelperUav dhcpHelper;
+    DhcpHelper dhcpHelper;
     ApplicationContainer dhcpClients = dhcpHelper.InstallDhcpClient (devices.Get(c));
     dhcpClients.Start (Seconds (10.0));
     dhcpClients.Stop (Seconds(m_simulationTime));

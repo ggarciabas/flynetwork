@@ -141,6 +141,9 @@ private:
   Time m_renew;                          //!< The renewal time for an address
   Time m_rebind;                         //!< The rebinding time for an address
   EventId m_expiredEvent;                //!< The Event to trigger TimerHandler
+
+  /// This variable keeps track of the total leased address.
+  TracedValue<int> m_totalLeased;
 };
 
 } // namespace ns3
