@@ -31,6 +31,7 @@
 
 #include "uav-energy-source-helper.h"
 #include "uav-device-energy-model-helper.h"
+#include "client-device-energy-model-helper.h"
 #include "uav-model.h"
 #include "smartphone-application.h"
 // #include "dhcp-helper-uav.h"
@@ -500,7 +501,8 @@ void UavNetwork::ConfigureUav(int total)
   sourceHelper.Set("ScenarioName", StringValue(m_scenarioName));
   // install source
   EnergySourceContainer sources = sourceHelper.Install(uav);
-  /* device energy model */
+
+  /* uav device energy model */
   UavDeviceEnergyModelHelper energyHelper;
   energyHelper.Set("AverageVelocity", DoubleValue(18)); // m/s
   energyHelper.Set("ResistTime", DoubleValue(27*60)); // s
@@ -509,6 +511,11 @@ void UavNetwork::ConfigureUav(int total)
   energyHelper.Set("yCentral", DoubleValue(m_cy));
   // install device model
   DeviceEnergyModelContainer uavEnergyModels = energyHelper.Install(uav, sources);
+
+  /* client device energy model*/
+  ClientDeviceEnergyModelHelper cliHelper;
+  DeviceEnergyModelContainer cliEnergyModels = cliHelper.Install(uav, sources);
+
   /* device energy model */
   // WifiRadioEnergyModelHelper radioEnergyHelper;
   // configure radio energy model

@@ -23,6 +23,7 @@
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 #include "uav-device-energy-model.h"
+#include "client-device-energy-model.h"
 
 namespace ns3
 {
@@ -166,7 +167,7 @@ void UavApplication::StopApplication()
 void
 UavApplication::CourseChange (Ptr<const MobilityModel> mob)
 {
-  // verificar UavMobility para tirar duvidas, este somente é executado quando chega ao destino!
+  // Obs.: verificar UavMobility para tirar duvidas, este somente é executado quando chega ao destino!
   NS_LOG_INFO ("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " course changed!!! ---- ~~~~");
 
   Simulator::Remove(m_sendEvent);
@@ -190,12 +191,14 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   }
 
   int i = m_client.GetN()-1;
+  Ptr<ClientDeviceEnergyModel> c_dev = GetNode()->GetObject<ClientDeviceEnergyModel>();
   for (; i >= 0; i--)
   {
     NS_LOG_DEBUG ("\t- [" << i << "] Cliente " << m_client.Get(i)->GetLogin());
     if ((Simulator::Now().GetSeconds() - m_client.Get(i)->GetUpdatePos().GetSeconds()) > 60.0) {
       NS_LOG_DEBUG ("\t\t- removendo " << m_client.Get(i)->GetLogin());
       m_client.RemoveAt(i);
+      c_dev->RemoveClient();
     }
   }
 }
@@ -371,6 +374,8 @@ UavApplication::TracedCallbackRxAppInfra (Ptr<const Packet> packet, const Addres
         obj.Set("Login", StringValue(results.at(3)));
         cli = obj.Create()->GetObject<ClientModel>();
         m_client.Add(cli);
+        Ptr<ClientDeviceEnergyModel> c_dev = GetNode()->GetObject<ClientDeviceEnergyModel>();
+        c_dev->AddClient();
       }
       cli->SetPosition(pos.at(0), pos.at(1));
       cli->SetUpdatePos (Simulator::Now());

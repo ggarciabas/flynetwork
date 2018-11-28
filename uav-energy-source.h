@@ -79,8 +79,8 @@ public:
    * energy cost draw at the energy source and updates remaining energy. Called by
    * DeviceEnergyModel to inform EnergySource of a state change.
    */
-  virtual void UpdateEnergySourceMov(double);
   virtual void UpdateEnergySource (void);
+  virtual void UpdateEnergySource (double);
   virtual void UpdateEnergySourceHover (double energyToDecrease);
 
   /**

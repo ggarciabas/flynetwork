@@ -244,7 +244,7 @@ void UavDeviceEnergyModel::CourseChange (Ptr<const MobilityModel> mob)
 
   m_totalEnergyConsumption += energyToDecrease;
 
-  DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceMov(energyToDecrease);
+  DynamicCast<UavEnergySource> (m_source)->UpdateEnergySource(energyToDecrease);
 
   // salvando historico do consumo de bateria por movimentacao
   std::ostringstream os;

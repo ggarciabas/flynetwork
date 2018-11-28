@@ -156,12 +156,9 @@ UavEnergySource::UpdateEnergySource (void)
   NS_LOG_FUNCTION (this);
 }
 
-
-void UavEnergySource::UpdateEnergySourceMov (double energyToDecrease)
+void UavEnergySource::UpdateEnergySource (double energyToDecrease)
 {
   NS_LOG_FUNCTION(this);
-  NS_LOG_INFO("UavEnergySource:Updating remaining energy.");
-
   if (m_remainingEnergyJ < energyToDecrease)
   {
     m_remainingEnergyJ = 0; // energy never goes below 0
