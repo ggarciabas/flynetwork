@@ -184,15 +184,18 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   dev->StartHover();
 
   // clear ClientModelContainer based on last update time
-  NS_LOG_DEBUG ("UavApplication::CourseChange UAV " << m_id << " este cliente esta no container: ");
+  NS_LOG_DEBUG ("UavApplication::CourseChange UAV " << m_id << " total " << m_client.GetN());
   for (ClientModelContainer::Iterator it = m_client.Begin(); it != m_client.End(); ++it) {
      NS_LOG_DEBUG ("\t" << (*it)->GetLogin());
   }
-  for (ClientModelContainer::Iterator it = m_client.Begin(); it != m_client.End(); ++it) {
-    NS_LOG_DEBUG ("UavApplication::CourseChange avaliando Cliente " << (*it)->GetLogin());
-    if ((Simulator::Now().GetSeconds() - (*it)->GetUpdatePos().GetSeconds()) > 60.0) {
-      NS_LOG_DEBUG ("UavApplication::CourseChange removendo cliente " << (*it)->GetLogin());
-      m_client.RemoveLogin((*it)->GetLogin());
+
+  int i = m_client.GetN()-1;
+  for (; i >= 0; i--)
+  {
+    NS_LOG_DEBUG ("\t- [" << i << "] Cliente " << m_client.Get(i)->GetLogin());
+    if ((Simulator::Now().GetSeconds() - m_client.Get(i)->GetUpdatePos().GetSeconds()) > 60.0) {
+      NS_LOG_DEBUG ("\t\t- removendo " << m_client.Get(i)->GetLogin());
+      m_client.RemoveAt(i);
     }
   }
 }
