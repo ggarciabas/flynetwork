@@ -827,7 +827,9 @@ void ServerApplication::runAgendamento(void)
   PrintBij(b_ij, int(Simulator::Now().GetSeconds()));
 
   int print = 0;
-  PrintMij (m_ij, print++, 1.0);
+  std::ostringstream os;
+  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/" << int(Simulator::Now().GetSeconds()) << "/mij/mij_" << std::setfill ('0') << std::setw (7) << print++ << ".txt";
+  PrintMij (m_ij, 1.0, os.str());
 
   // Part A
   unsigned itA = 0;
@@ -902,7 +904,9 @@ void ServerApplication::runAgendamento(void)
       itB++;
     } while (!ValidateMijConvergency(copyB_mij, m_ij, siz) && itB < itB_max);
 
-    PrintMij (m_ij, print++, temp);
+    os.str("");
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/" << int(Simulator::Now().GetSeconds()) << "/mij/mij_" << std::setfill ('0') << std::setw (7) << print++ << ".txt";
+    PrintMij (m_ij, 1.0, os.str());
 
     temp *= m_rho;
     o_ij = m_ij;
@@ -911,13 +915,18 @@ void ServerApplication::runAgendamento(void)
   // permite sair dos lacos ao encontrar 1 para cada localizacao
   out:
 
+  os.str("");
+  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/" << int(Simulator::Now().GetSeconds()) << "/mij.txt";
+  PrintMij (m_ij, temp, os.str());
+
   NS_LOG_INFO("SERVER - Finalizada estrutura do DA para agendamento @" << Simulator::Now().GetSeconds());
 
   NS_LOG_INFO("SERVER - Atualizando posicionamento dos UAVs @" << Simulator::Now().GetSeconds());
   int id, i = 0;
   double t = 0.0;
   std::ofstream file;
-  std::ostringstream osbij, osloc, osuav, os;
+  std::ostringstream osbij, osloc, osuav;
+  os.str("");
   double val;
   for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
        u_i != m_uavContainer.End(); ++u_i, ++i)
@@ -1088,12 +1097,10 @@ ServerApplication::PrintCusto (vector<vector<double>> custo, int print)
 }
 
 void
-ServerApplication::PrintMij (vector<vector<double>> m_ij, int print, double temp)
+ServerApplication::PrintMij (vector<vector<double>> m_ij, double temp, std::string nameFile)
 {
-  std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/" << int(Simulator::Now().GetSeconds()) << "/mij/mij_" << std::setfill ('0') << std::setw (7) << print << ".txt";
   std::ofstream file;
-  file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
+  file.open(nameFile.c_str(), std::ofstream::out | std::ofstream::app);
   file << temp << std::endl;
   UavModelContainer::Iterator u_i = m_uavContainer.Begin();
   file << (*u_i)->GetId();

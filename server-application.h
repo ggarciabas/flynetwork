@@ -87,7 +87,7 @@ private:
   void ReplyAskCliData(Ptr<UavModel> uav);
 
   void PrintCusto (vector<vector<double>> custo, int print);
-  void PrintMij (vector<vector<double>> m_ij, int print, double temp);
+  void PrintMij (vector<vector<double>> m_ij, double temp, std::string nameFile);
   void PrintBij (vector<vector<double>> b_ij, int print);
 
   UavModelContainer   m_uavContainer;
