@@ -54,10 +54,10 @@ UavApplication::GetTypeId(void)
                                         DoubleValue(55.0),
                                         MakeDoubleAccessor(&UavApplication::m_cliUpdateTime),
                                         MakeDoubleChecker<double>())
-                          .AddAttribute("ScenarioName",
+                          .AddAttribute("PathData",
                                         "Name of scenario",
                                         StringValue("none"),
-                                        MakeStringAccessor(&UavApplication::m_scenarioName),
+                                        MakeStringAccessor(&UavApplication::m_pathData),
                                         MakeStringChecker())
                           .AddAttribute("Remote", "The address of the destination",
                                         Ipv4AddressValue(),
@@ -177,7 +177,7 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
   double energy = dev->ChangeThreshold(); // atualiza valor minimo para retorno na bateria
   std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/course_changed_" << m_id << ".txt";
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/course_changed_" << m_id << ".txt";
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << "," << energy << std::endl;

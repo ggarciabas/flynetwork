@@ -111,7 +111,8 @@ private:
   double m_rxGain;
   double m_powerLevel;
   double m_frequency;
-  std::string m_scenarioName;
+  std::string m_PathData;
+  std::string m_pathData;
 
   NodeContainer m_clientNode;
   vector<double> m_palcoPos; // posicao dos palcos para nao dar conflito no arquivo de conferencia

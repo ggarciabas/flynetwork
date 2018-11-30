@@ -146,7 +146,7 @@ private:
   Time m_lastUpdateTime;
   TracedValue<double> m_totalEnergyConsumption;
   std::ofstream m_file;
-  std::string m_scenarioName;
+  std::string m_pathData;
   double m_clientCost; // in Joules
   EventId m_cliEvent;
   Ptr<EnergySource> m_source;

@@ -45,10 +45,10 @@ UavDeviceEnergyModel::GetTypeId(void)
                                         DoubleValue(27*60), // s
                                         MakeDoubleAccessor(&UavDeviceEnergyModel::m_resistTime),
                                         MakeDoubleChecker<double>())
-                          .AddAttribute("ScenarioName",
+                          .AddAttribute("PathData",
                                         "Name of scenario",
                                         StringValue("none"),
-                                        MakeStringAccessor(&UavDeviceEnergyModel::m_scenarioName),
+                                        MakeStringAccessor(&UavDeviceEnergyModel::m_pathData),
                                         MakeStringChecker())
                           .AddAttribute("xCentral",
                                         "",
@@ -147,7 +147,7 @@ void UavDeviceEnergyModel::HandleEnergyDepletion(void)
  // energy to decrease = energy cost * distance from last position to the actual
  double energy = m_energyCost * distance;
  std::ostringstream os;
- os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_depletion_" << m_node->GetId() << ".txt";
+ os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_depletion_" << m_node->GetId() << ".txt";
  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
  m_file << Simulator::Now().GetSeconds() << "," << m_source->GetRemainingEnergy() - energy << std::endl;
  m_file.close();
@@ -175,7 +175,7 @@ void UavDeviceEnergyModel::SetEnergySource(Ptr<EnergySource> source)
   m_hoverCost = m_source->GetInitialEnergy() / m_resistTime;
 
   std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/cost_energy.txt";
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/cost_energy.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << "Energycost: " << m_energyCost << "\nHovercost: " << m_hoverCost << std::endl;
   m_file.close();
@@ -230,7 +230,7 @@ void UavDeviceEnergyModel::HoverConsumption(void)
 
   // salvando historico do consumo de bateria
   std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_hover_" << m_node->GetId() << ".txt";
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_hover_" << m_node->GetId() << ".txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease / m_source->GetInitialEnergy() << std::endl;
   m_file.close();
@@ -254,7 +254,7 @@ void UavDeviceEnergyModel::CourseChange (Ptr<const MobilityModel> mob)
 
   // salvando historico do consumo de bateria por movimentacao
   std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_move_" << m_node->GetId() << ".txt";
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_move_" << m_node->GetId() << ".txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease / m_source->GetInitialEnergy() << std::endl;
   m_file.close();

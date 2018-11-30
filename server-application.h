@@ -113,7 +113,7 @@ private:
   TracedCallback<int> m_printUavEnergy;
   TracedCallback<string> m_clientPosition;
   TracedCallback<std::string> m_packetTrace;
-  std::string m_scenarioName;
+  std::string m_pathData;
 
   int m_supplyPos;
   int m_totalCliGeral;

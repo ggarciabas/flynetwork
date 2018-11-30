@@ -169,7 +169,7 @@ private:
   double m_movAcum;
   double m_cliAcum;
 
-  std::string m_scenarioName;
+  std::string m_pathData;
 
 };
 

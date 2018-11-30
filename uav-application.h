@@ -108,11 +108,11 @@ private:
   Callback<void> m_setOffWifiPhyAdhoc; // turn off wifiphy
 
   ClientModelContainer m_client;
-  
+
   Ptr<WifiRadioEnergyModel> m_wifiRadioEnergyModel;
   Ptr<UavEnergySource> m_uavEnergySource;
 
-  std::string m_scenarioName;
+  std::string m_pathData;
 
   int m_totalLeased;
 

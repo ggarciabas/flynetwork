@@ -174,7 +174,7 @@ private:
   double m_hoverCost;
   double m_xCentral, m_yCentral;
   TracedValue<double> m_totalEnergyConsumption;
-  std::string m_scenarioName;
+  std::string m_pathData;
   /**
    * Callback type for Energy Depletion function. Devices uses this callbak to notify
    * the node about the energy depletion.

@@ -40,10 +40,10 @@ ClientDeviceEnergyModel::GetTypeId(void)
                           .SetParent<DeviceEnergyModel>()
                           .SetGroupName("Flynetwork-Energy")
                           .AddConstructor<ClientDeviceEnergyModel>()
-                          .AddAttribute("ScenarioName",
+                          .AddAttribute("PathData",
                                         "Name of scenario",
                                         StringValue("none"),
-                                        MakeStringAccessor(&ClientDeviceEnergyModel::m_scenarioName),
+                                        MakeStringAccessor(&ClientDeviceEnergyModel::m_pathData),
                                         MakeStringChecker())
                           .AddAttribute("ClientCost",
                                         "Cost for each client by seconds",
@@ -174,7 +174,7 @@ void ClientDeviceEnergyModel::ClientConsumption ()
   m_cliEvent.Cancel();
   double energyToDecrease =  UpdateConsumption();
   std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_client_" << m_node->GetId() << ".txt";
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_client_" << m_node->GetId() << ".txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease / m_source->GetInitialEnergy() << std::endl;
   m_file.close();

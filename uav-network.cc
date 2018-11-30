@@ -165,7 +165,7 @@ void UavNetwork::Run()
   NS_LOG_FUNCTION(this);
 
   std::ifstream scenario;
-  std::ostringstream ss;
+  std::ostringstream ss, ss_;
   switch (m_scenario)
   {
     case 0: // teste
@@ -205,28 +205,10 @@ void UavNetwork::Run()
       NS_LOG_ERROR("Não foi possivel identificar o cenario!");
       exit(-1);
   }
-  ss << "/cust_" << m_custo;
-  m_scenarioName = ss.str();
-  ss.str("");
-  ss << "rm -Rf ./scratch/flynetwork/data/output/" << m_scenarioName;
-  system(ss.str().c_str());
-  ss.str("");
-  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_scenarioName;
-  system(ss.str().c_str());
-  // ss.str("");
-  // ss << "./scratch/flynetwork/data/output/"<< m_scenarioName<<"/packet_trace_server.txt";
-  // m_filePacketServer = ss.str().c_str();
-  // ss.str("");
-  // ss << "./scratch/flynetwork/data/output/"<<m_scenarioName<<"/packet_trace_uav.txt";
-  // m_filePacketUav = ss.str().c_str();
-  // ss.str("");
-  // ss << "./scratch/flynetwork/data/output/"<<m_scenarioName<<"/packet_trace_client.txt";
-  // m_filePacketClient = ss.str().c_str();
-
   // ler informacoes do arquivo
-  ss.str("");
-  ss << "./scratch/flynetwork/data/scenarios/" << m_scenarioName << ".txt";
-  scenario.open(ss.str());
+  m_PathData = ss.str();
+  ss_ << "./scratch/flynetwork/data/scenarios/" << m_PathData << ".txt";
+  scenario.open(ss_.str());
   if (scenario.is_open())
   {
     std::string line;
@@ -241,12 +223,30 @@ void UavNetwork::Run()
   }
   else
   {
-    string s = ss.str();
-    ss.str("");
-    ss << "Não foi possível abrir o arquivo: " << s;
-    NS_LOG_ERROR(ss.str().c_str());
+    string s = ss_.str();
+    ss_.str("");
+    ss_ << "Não foi possível abrir o arquivo: " << s;
+    NS_LOG_ERROR(ss_.str().c_str());
     exit(-1);
   }
+
+  ss << "/custo_" << m_custo;
+  m_pathData = ss.str();
+  ss.str("");
+  ss << "rm -Rf ./scratch/flynetwork/data/output/" << m_pathData;
+  system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData;
+  system(ss.str().c_str());
+  // ss.str("");
+  // ss << "./scratch/flynetwork/data/output/"<< m_pathData<<"/packet_trace_server.txt";
+  // m_filePacketServer = ss.str().c_str();
+  // ss.str("");
+  // ss << "./scratch/flynetwork/data/output/"<<m_pathData<<"/packet_trace_uav.txt";
+  // m_filePacketUav = ss.str().c_str();
+  // ss.str("");
+  // ss << "./scratch/flynetwork/data/output/"<<m_pathData<<"/packet_trace_client.txt";
+  // m_filePacketClient = ss.str().c_str();
 
   // configure variables
   NS_LOG_INFO("Configurando variaveis");
@@ -349,7 +349,7 @@ void UavNetwork::ConfigureServer()
   obj.Set("ClientPort", UintegerValue(m_cliPort));
   obj.Set("MaxX", DoubleValue(m_xmax));
   obj.Set("MaxY", DoubleValue(m_ymax));
-  obj.Set("ScenarioName", StringValue(m_scenarioName));
+  obj.Set("PathData", StringValue(m_pathData));
 
   m_serverApp = obj.Create()->GetObject<ServerApplication>();
   m_serverApp->SetStartTime(Seconds(0.0));
@@ -419,7 +419,7 @@ void UavNetwork::NewUav(int total, bool update)
     }
 
     std::ostringstream os;
-    os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_network_log.txt";
+    os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_network_log.txt";
     m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
     m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << ",1" << std::endl;
     m_file.close();
@@ -457,7 +457,7 @@ void UavNetwork::RemoveUav(int id)
   source->Stop(); // recarregando
 
   std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_network_log.txt";
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_network_log.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << ",0" << std::endl;
   m_file.close();
@@ -501,7 +501,7 @@ void UavNetwork::ConfigureUav(int total)
   /** Energy Model **/
   /* energy source */
   UavEnergySourceHelper sourceHelper;
-  sourceHelper.Set("ScenarioName", StringValue(m_scenarioName));
+  sourceHelper.Set("PathData", StringValue(m_pathData));
   // install source
   EnergySourceContainer sources = sourceHelper.Install(uav);
 
@@ -509,7 +509,7 @@ void UavNetwork::ConfigureUav(int total)
   UavDeviceEnergyModelHelper energyHelper;
   energyHelper.Set("AverageVelocity", DoubleValue(18)); // m/s
   energyHelper.Set("ResistTime", DoubleValue(27*60)); // s
-  energyHelper.Set("ScenarioName", StringValue(m_scenarioName));
+  energyHelper.Set("PathData", StringValue(m_pathData));
   energyHelper.Set("xCentral", DoubleValue(m_cx)); // utilizado para calcular o threshold dinamicamente
   energyHelper.Set("yCentral", DoubleValue(m_cy));
   // install device model
@@ -562,7 +562,7 @@ void UavNetwork::ConfigureUav(int total)
     obj.Set("AdhocAddress", Ipv4AddressValue(addContainer.GetAddress(c)));
     obj.Set("ServerPort", UintegerValue(m_serverPort));
     obj.Set("ClientPort", UintegerValue(m_cliPort));
-    obj.Set("ScenarioName", StringValue(m_scenarioName));
+    obj.Set("PathData", StringValue(m_pathData));
 
     std::cout << "Uav #" << (*i)->GetId() << " IP " << addContainer.GetAddress(c) << std::endl;
 
@@ -630,7 +630,7 @@ void UavNetwork::ConfigureCli()
 
   std::ostringstream ss;
   std::ifstream scenario;
-  ss << "./scratch/flynetwork/data/scenarios/" << m_scenarioName << ".txt";
+  ss << "./scratch/flynetwork/data/scenarios/" << m_PathData << ".txt";
   scenario.open(ss.str());
   // ler informacoes dos arquivos
   if (scenario.is_open())
@@ -686,7 +686,7 @@ void UavNetwork::ConfigureCli()
   app_rand->SetAttribute ("Max", DoubleValue (4));
 
   std::ofstream cliLogin;
-  ss << "./scratch/flynetwork/data/output/" << m_scenarioName << "/client_login.txt";
+  ss << "./scratch/flynetwork/data/output/" << m_pathData << "/client_login.txt";
   cliLogin.open(ss.str().c_str());
   // aggregate SmartphoneApp on node and configure it!
   Ptr<UniformRandomVariable> e_ai = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
@@ -815,7 +815,7 @@ void UavNetwork::ConfigurePalcos() // TODO: poderia ser otimizada a leitura do a
   NS_LOG_FUNCTION(this);
   std::ostringstream ss;
   std::ifstream scenario;
-  ss << "./scratch/flynetwork/data/scenarios/" << m_scenarioName << ".txt";
+  ss << "./scratch/flynetwork/data/scenarios/" << m_PathData << ".txt";
   string file = ss.str();
   scenario.open(file);
   // ler informacoes dos arquivos
@@ -925,7 +925,7 @@ void UavNetwork::PrintUavEnergy (int i)
 {
   NS_LOG_FUNCTION(this);
   std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_energy.txt";
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_energy.txt";
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   for (UavNodeContainer::Iterator it = m_uavNodeActive.Begin(); it != m_uavNodeActive.End(); ++it) {
