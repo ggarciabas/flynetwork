@@ -356,6 +356,7 @@ void UavNetwork::ConfigureServer()
   m_serverApp->SetStopTime(Seconds(m_simulationTime));
 
   m_serverApp->TraceConnectWithoutContext("NewUav", MakeCallback(&UavNetwork::NewUav, this));// adicionando callback para criar UAVs
+  m_serverApp->TraceConnectWithoutContext("PrintUavEnergy", MakeCallback(&UavNetwork::PrintUavEnergy, this));
   m_serverApp->TraceConnectWithoutContext("RemoveUav", MakeCallback(&UavNetwork::RemoveUav, this));
   // m_serverApp->TraceConnectWithoutContext("PacketTrace", MakeCallback(&UavNetwork::PacketServer, this));
   m_serverApp->TraceConnectWithoutContext("ClientPositionTrace", MakeCallback(&UavNetwork::ClientPosition, this));
@@ -918,6 +919,20 @@ void UavNetwork::Configure()
                           "Ssid", SsidValue(Ssid("flynetwork")));
 
   m_addressHelperCli.SetBase("192.168.1.0", "255.255.255.0"); // wifi address
+}
+
+void UavNetwork::PrintUavEnergy (int i)
+{
+  NS_LOG_FUNCTION(this);
+  std::ostringstream os;
+  os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_energy.txt";
+  std::ofstream file;
+  file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  for (UavNodeContainer::Iterator it = m_uavNodeActive.Begin(); it != m_uavNodeActive.End(); ++it) {
+    Ptr<UavDeviceEnergyModel> dev = (*it)->GetObject<UavDeviceEnergyModel>();
+    file << (*it)->GetId()  << "," << dev->GetEnergySource()->GetRemainingEnergy() << "," << dev->GetEnergySource()->GetInitialEnergy() << std::endl;
+  }
+  file.close();
 }
 
 void UavNetwork::ClientPosition (string name)

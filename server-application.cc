@@ -95,10 +95,14 @@ ServerApplication::GetTypeId(void)
                                           "Ask for new UAVs",
                                           MakeTraceSourceAccessor(&ServerApplication::m_newUav),
                                           "ns3::UavNetwork::NewUavTrace")
-                            .AddTraceSource("RemoveUav",
+                          .AddTraceSource("RemoveUav",
                                             "Ask for remove UAVs",
                                             MakeTraceSourceAccessor(&ServerApplication::m_removeUav),
                                             "ns3::UavNetwork::RemoveUavTrace")
+                          .AddTraceSource("PrintUavEnergy",
+                                          "Used to print data used to compare",
+                                          MakeTraceSourceAccessor(&ServerApplication::m_printUavEnergy),
+                                          "ns3::UavNetwork::PrintTraceUavEnergy")
                           .AddTraceSource("PacketTrace",
                                           "Packet trace",
                                           MakeTraceSourceAccessor(&ServerApplication::m_packetTrace),
@@ -701,14 +705,17 @@ void ServerApplication::runAgendamento(void)
     }
   }
 
-  for (LocationModelContainer::Iterator l_j = m_locationContainer.Begin();
-       l_j != m_locationContainer.End(); ++l_j)
-  {
-    NS_LOG_INFO("-- " << (*l_j)->toString());
-  }
+  // for (LocationModelContainer::Iterator l_j = m_locationContainer.Begin();
+  //      l_j != m_locationContainer.End(); ++l_j)
+  // {
+  //   NS_LOG_INFO("-- " << (*l_j)->toString());
+  // }
 
   //  - calcular o CUSTO ENERGETICO de atribuição do uav para cada localizacao, criando uma matriz Bij
   NS_LOG_DEBUG("SERVER - Iniciando estrutura do DA para agendamento @" << Simulator::Now().GetSeconds());
+
+  m_printUavEnergy(0);
+
   vector<vector<double>> b_ij; // i - UAVs, j - localizacoes
   vector<vector<double>> custo_x; // i - UAVs, j - localizacoes x=1,2ou3
   int count = 0;
@@ -725,7 +732,6 @@ void ServerApplication::runAgendamento(void)
        u_i != m_uavContainer.End(); ++u_i, ++count)
   {
     NS_LOG_INFO ("UAV :: " << (*u_i)->toString());
-
     verify_uav = 0;
     b_ij.push_back(vector<double>());
     custo_x.push_back(vector<double>());
@@ -911,7 +917,7 @@ void ServerApplication::runAgendamento(void)
   int id, i = 0;
   double t = 0.0;
   std::ofstream file;
-  std::ostringstream osbij, os, osloc, osuav;
+  std::ostringstream osbij, osloc, osuav, os;
   double val;
   for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
        u_i != m_uavContainer.End(); ++u_i, ++i)

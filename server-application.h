@@ -110,6 +110,7 @@ private:
 
   TracedCallback<int, bool> m_newUav;
   TracedCallback<int> m_removeUav;
+  TracedCallback<int> m_printUavEnergy;
   TracedCallback<string> m_clientPosition;
   TracedCallback<std::string> m_packetTrace;
   std::string m_scenarioName;

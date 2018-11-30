@@ -74,10 +74,13 @@ public:
   typedef void (*PacketTraceServer)(std::string msg);
   typedef void (*PacketTraceUav)(std::string msg);
   typedef void (*PacketTraceClient)(std::string msg);
+  typedef void (*PrintTraceUavEnergy)(int i);
 
   void PacketUav(std::string);
   void PacketServer(std::string);
   void PacketClient(std::string);
+
+  void PrintUavEnergy (int i);
 
 private:
   void Configure();
