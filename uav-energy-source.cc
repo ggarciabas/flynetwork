@@ -85,6 +85,7 @@ UavEnergySource::UavEnergySource()
   m_node = 0;
 
   m_movAcum = 0.0;
+  m_cliAcum = 0.0;
   m_hoverAcum = 0.0;
 }
 
@@ -156,7 +157,7 @@ UavEnergySource::UpdateEnergySource (void)
   NS_LOG_FUNCTION (this);
 }
 
-void UavEnergySource::UpdateEnergySource (double energyToDecrease)
+void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
 {
   NS_LOG_FUNCTION(this);
   if (m_remainingEnergyJ < energyToDecrease)
@@ -176,13 +177,46 @@ void UavEnergySource::UpdateEnergySource (double energyToDecrease)
   // salvando historico do consumo de bateria por movimentacao
   if (m_node) {
     std::ostringstream os;
-    os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_battery_graphic_" << m_node->GetId() << ".txt";
+    os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_client_acum_" << m_node->GetId() << ".txt";
+    m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    m_cliAcum += energyToDecrease;
+    m_file << Simulator::Now().GetSeconds() << "," << m_cliAcum / m_initialEnergyJ << std::endl;
+    m_file.close();
+    os.str("");
+    os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_remaining_energy_" << m_node->GetId() << ".txt";
+    m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << std::endl;
+    m_file.close();
+  }
+}
+
+void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
+{
+  NS_LOG_FUNCTION(this);
+  if (m_remainingEnergyJ < energyToDecrease)
+  {
+    m_remainingEnergyJ = 0; // energy never goes below 0
+  }
+  else
+  {
+    m_remainingEnergyJ -= energyToDecrease;
+  }
+
+  if (!m_depleted && m_remainingEnergyJ <= m_lowBatteryTh * m_initialEnergyJ)
+  {
+    m_depleted = true;
+    HandleEnergyDrainedEvent();
+  }
+  // salvando historico do consumo de bateria por movimentacao
+  if (m_node) {
+    std::ostringstream os;
+    os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_moving_acum_" << m_node->GetId() << ".txt";
     m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
     m_movAcum += energyToDecrease;
     m_file << Simulator::Now().GetSeconds() << "," << m_movAcum / m_initialEnergyJ << std::endl;
     m_file.close();
     os.str("");
-    os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_battery_all_" << m_node->GetId() << ".txt";
+    os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_remaining_energy_" << m_node->GetId() << ".txt";
     m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
     m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << std::endl;
     m_file.close();
@@ -211,13 +245,13 @@ void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
   // salvando historico do consumo de bateria por movimentacao
   if (m_node) {
     std::ostringstream os;
-    os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_battery_hover_" << m_node->GetId() << ".txt";
+    os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_hover_acum_" << m_node->GetId() << ".txt";
     m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
     m_hoverAcum += energyToDecrease;
     m_file << Simulator::Now().GetSeconds() << "," << m_hoverAcum / m_initialEnergyJ << std::endl;
     m_file.close();
     os.str("");
-    os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_battery_all_" << m_node->GetId() << ".txt";
+    os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_remaining_energy_" << m_node->GetId() << ".txt";
     m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
     m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << std::endl;
     m_file.close();
@@ -267,6 +301,7 @@ void UavEnergySource::Reset () {
   m_lastPosition = m_node->GetObject<MobilityModel>()->GetPosition();
   m_remainingEnergyJ = m_initialEnergyJ;
   m_movAcum = 0.0;
+  m_cliAcum = 0.0;
   m_hoverAcum = 0.0;
   NotifyEnergyRecharged();
 }

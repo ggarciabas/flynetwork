@@ -83,8 +83,6 @@ public:
   void SetEnergyDepletionCallback(EnergyCallback callback);
   void SetEnergyRechargedCallback(EnergyCallback callback);
 
-  void UpdateConsumption ();
-
   /**
    * \brief Handles energy depletion.
    *
@@ -131,6 +129,8 @@ private:
   void DoDispose (void);
 
   void DoInitialize();
+
+  double UpdateConsumption ();
 
   /**
    * \returns Current draw of device, at current state.

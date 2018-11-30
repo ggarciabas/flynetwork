@@ -137,13 +137,14 @@ ClientDeviceEnergyModel::GetNode() const
   return m_node;
 }
 
-void ClientDeviceEnergyModel::UpdateConsumption () {
+double ClientDeviceEnergyModel::UpdateConsumption () {
   Time duration = Simulator::Now () - m_lastUpdateTime;
   double energyToDecrease = duration.GetSeconds () * (m_clientCost * m_clientCount);
-  DynamicCast<UavEnergySource> (m_source)->UpdateEnergySource (energyToDecrease);
+  DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceClient (energyToDecrease);
   // update last update time stamp
   this->m_lastUpdateTime = Simulator::Now ();
   m_totalEnergyConsumption += energyToDecrease;
+  return energyToDecrease;
 }
 
 double
@@ -171,11 +172,11 @@ void ClientDeviceEnergyModel::ClientConsumption ()
 {
   NS_LOG_FUNCTION(this);
   m_cliEvent.Cancel();
-  UpdateConsumption();
+  double energyToDecrease =  UpdateConsumption();
   std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/client_consumption_uav_" << m_node->GetId() << ".txt";
+  os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_client_" << m_node->GetId() << ".txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  m_file << Simulator::Now().GetSeconds() << "," << m_totalEnergyConsumption << std::endl;
+  m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease / m_source->GetInitialEnergy() << std::endl;
   m_file.close();
   m_cliEvent = Simulator::Schedule(Seconds(m_energyUpdateInterval), &ClientDeviceEnergyModel::ClientConsumption, this);
 }

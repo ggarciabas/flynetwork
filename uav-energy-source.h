@@ -80,7 +80,8 @@ public:
    * DeviceEnergyModel to inform EnergySource of a state change.
    */
   virtual void UpdateEnergySource (void);
-  virtual void UpdateEnergySource (double);
+  virtual void UpdateEnergySourceMove (double);
+  virtual void UpdateEnergySourceClient (double);
   virtual void UpdateEnergySourceHover (double energyToDecrease);
 
   /**
@@ -166,6 +167,7 @@ private:
 
   double m_hoverAcum;
   double m_movAcum;
+  double m_cliAcum;
 
   std::string m_scenarioName;
 

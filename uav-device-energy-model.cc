@@ -125,7 +125,7 @@ double UavDeviceEnergyModel::ChangeThreshold () {
   NS_ASSERT(distance >= 0);
   double thr = (m_energyCost * distance)/ m_source->GetInitialEnergy(); // % necessaria para voltar a central de onde está!
   DynamicCast<UavEnergySource>(m_source)->SetBasicEnergyLowBatteryThreshold(thr*1.02); // +2%!
-  return thr;
+  return m_energyCost * distance;
 }
 
 void UavDeviceEnergyModel::HandleEnergyRecharged (void)
@@ -147,7 +147,7 @@ void UavDeviceEnergyModel::HandleEnergyDepletion(void)
  // energy to decrease = energy cost * distance from last position to the actual
  double energy = m_energyCost * distance;
  std::ostringstream os;
- os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/depletion_" << m_node->GetId() << ".txt";
+ os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_depletion_" << m_node->GetId() << ".txt";
  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
  m_file << Simulator::Now().GetSeconds() << "," << m_source->GetRemainingEnergy() - energy << std::endl;
  m_file.close();
@@ -225,7 +225,15 @@ void UavDeviceEnergyModel::HoverConsumption(void)
 
   double diff_time = Simulator::Now().GetSeconds() - m_lastTime.GetSeconds();
   double energyToDecrease = m_hoverCost * diff_time;
+  m_totalEnergyConsumption += energyToDecrease;
   DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceHover(energyToDecrease);
+
+  // salvando historico do consumo de bateria
+  std::ostringstream os;
+  os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_hover_" << m_node->GetId() << ".txt";
+  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease / m_source->GetInitialEnergy() << std::endl;
+  m_file.close();
 
   m_lastTime = Simulator::Now();
   m_hoverEvent = Simulator::Schedule(m_energyUpdateInterval,
@@ -241,16 +249,14 @@ void UavDeviceEnergyModel::CourseChange (Ptr<const MobilityModel> mob)
   NS_ASSERT(distance >= 0);
   // energy to decrease = energy cost * distance from last position to the actual
   double energyToDecrease = m_energyCost * distance;
-
   m_totalEnergyConsumption += energyToDecrease;
-
-  DynamicCast<UavEnergySource> (m_source)->UpdateEnergySource(energyToDecrease);
+  DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceMove(energyToDecrease);
 
   // salvando historico do consumo de bateria por movimentacao
   std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_moving_" << m_node->GetId() << ".txt";
+  os << "./scratch/flynetwork/data/output/" << m_scenarioName << "/uav_move_" << m_node->GetId() << ".txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  m_file << Simulator::Now().GetSeconds() << "," << m_totalEnergyConsumption / m_source->GetInitialEnergy() << std::endl;
+  m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease / m_source->GetInitialEnergy() << std::endl;
   m_file.close();
 }
 

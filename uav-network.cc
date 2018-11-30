@@ -165,47 +165,49 @@ void UavNetwork::Run()
   NS_LOG_FUNCTION(this);
 
   std::ifstream scenario;
-
+  std::ostringstream ss;
   switch (m_scenario)
   {
     case 0: // teste
-      m_scenarioName = "teste";
+      ss << "teste";
       break;
     case 1: //Austin City Limits
-      m_scenarioName = "austincitylimits";
+      ss << "austincitylimits";
       break;
     case 2: //Lollapalooza
-      m_scenarioName = "lollapalooza";
+      ss << "lollapalooza";
       break;
     case 3: //Rock in Rio Brasil
-      m_scenarioName = "rockinriobrasil";
+      ss << "rockinriobrasil";
       break;
     case 4: //Rock in Rio Lisboa
-      m_scenarioName = "rockinriolisboa";
+      ss << "rockinriolisboa";
       break;
     case 5: //Rock in Rio USA
-      m_scenarioName = "rockinriousa";
+      ss << "rockinriousa";
       break;
     case 6: // Glastonburry
-      m_scenarioName = "glastonbury";
+      ss << "glastonbury";
       break;
     case 7: // teste_1
-      m_scenarioName = "teste_1";
+      ss << "teste_1";
       break;
     case 8: // teste_2
-      m_scenarioName = "teste_2";
+      ss << "teste_2";
       break;
     case 9: // teste_5
-      m_scenarioName = "teste_5";
+      ss << "teste_5";
       break;
     case 15: // teste_15
-      m_scenarioName = "teste_15";
+      ss << "teste_15";
       break;
     default:
       NS_LOG_ERROR("Não foi possivel identificar o cenario!");
       exit(-1);
   }
-  std::ostringstream ss;
+  ss << "/cust_" << m_custo;
+  m_scenarioName = ss.str();
+  ss.str("");
   ss << "rm -Rf ./scratch/flynetwork/data/output/" << m_scenarioName;
   system(ss.str().c_str());
   ss.str("");
