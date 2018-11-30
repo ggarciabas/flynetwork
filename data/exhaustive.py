@@ -44,6 +44,20 @@ for custo in custos:
             cont = cont + 1
         file.close()
 
+        try:
+            file = open(main_path+str(time)+"/mij.txt", 'r')
+        except IOError:
+            exit()
+        line = file.readline().strip()
+        line = file.readline().strip()
+        line = file.readline().strip()
+        data_mij = {}
+        cont = 0
+        for line in file:
+            data_mij[uavs_id[cont]] = [float(x) for x in line.split(',')] # read row from file
+            cont = cont + 1
+        file.close()
+
         if teste:
             print "Data_bij"
             print data_bij
@@ -79,33 +93,98 @@ for custo in custos:
         if teste:
             print "Min conf: "+str(min_conf)+" minV: "+str(min_value)
 
+        def toString(List):
+            return ','.join(List)
+
         f_file = open(main_path+str(time)+"/exaustive.txt", 'w')
-        for k in range(0,K,1):
-            f_file.write(str(Yj[k][0])+','+str(Yj[k][1])+'\n')
-            for u in uav_user_connected[k]:
-                f_file.write(str(id[u])+' ')
-            f_file.write('\n')
+        f_file.write(str(uavs_id[0]))
+        for u in uavs_id[1:]: ## imprime ignorando a primeira posicao
+            f_file.write(","+str(u))
+        f_file.write('\n')
+        f_file.write(str(locs_id[0]))
+        for l in locs_id[1:]: ## imprime ignorando a primeira posicao
+            f_file.write(","+str(l))
+        f_file.write('\n')
+        f_file.write(str(min_conf[0]))
+        for mc in min_conf[1:]: ## imprime ignorando a primeira posicao
+            f_file.write(","+str(mc))
+        f_file.write('\n')
         f_file.close()
 
         # criar as matrizes do exaustivo e do proposto
+        c_exaustive = np.zeros((len(uavs_id),len(locs_id)))
+        c=0
+        for l in min_conf:
+            c_exaustive[c][l] = data_bij[uavs_id[c]][l]
+            c=c+1
+
+        c_prop = np.zeros((len(uavs_id),len(locs_id)))
+        if teste:
+            print "MIJ: "+str(data_mij)
+            print "BIJ: "+str(data_bij)
+        c=0
+        for key, values in data_mij.iteritems():
+            l=0
+            for v in values:
+                c_prop[c][l] = v*data_bij[uavs_id[c]][l]
+                l=l+1
+            c=c+1
+
+        if teste:
+            print "C_EX: "+str(c_exaustive)+" \nC_PRO: " +str(c_prop)
+
         # pegar o maior valor para inserir no limite da barra para que fique padronizada e permita comparar melhor
+        m_e = c_exaustive.max()
+        m_p = c_prop.max()
+        m_v = max(m_e, m_p)
 
         # print exaustive heatmap
         plt.clf()
         cmap = sns.cubehelix_palette(50, hue=0.05, rot=0, light=0.9, dark=0, as_cmap=True)
         # Create a dataset
         if teste:
-            print data_bij[0]
-        df_bij = pd.DataFrame(data_bij, index=locs)
+            print c_exaustive
+        df_exh = pd.DataFrame(c_exaustive)
         if teste:
-            print df_bij[0]
+            print df_exh
         # Default heatmap: just a visualization of this square matrix
-        sns.heatmap(df_bij, cmap=cmap, vmin=0, vmax=1)
-        plt.ylabel("Localizacao") # TODO: validar se é assim ou o contrário!
-        plt.xlabel("UAV")
+        sns.heatmap(df_exh, cmap=cmap, vmin=0, vmax=m_v)
+        plt.xlabel(u"Localização")
+        plt.ylabel("UAV")
         # general title
         plt.title("Custo final exaustivo", fontsize=13, fontweight=0, color='black', style='italic')
-        plt.savefig(main_path+time+'/exaustive.svg')
-        plt.savefig(main_path+time+'/exaustive.png')
-        plt.savefig(main_path+time+'/exaustive.eps')
+        plt.savefig(main_path+str(time)+'/exaustive.svg')
+        plt.savefig(main_path+str(time)+'/exaustive.png')
+        plt.savefig(main_path+str(time)+'/exaustive.eps')
+
+        # print propose heatmap
+        plt.clf()
+        cmap = sns.cubehelix_palette(50, hue=0.05, rot=0, light=0.9, dark=0, as_cmap=True)
+        # Create a dataset
+        df_prop = pd.DataFrame(c_prop)
+        # Default heatmap: just a visualization of this square matrix
+        sns.heatmap(df_prop, cmap=cmap, vmin=0, vmax=m_v)
+        plt.xlabel(u"Localização")
+        plt.ylabel("UAV")
+        # general title
+        plt.title("Custo final algoritmo proposto", fontsize=13, fontweight=0, color='black', style='italic')
+        plt.savefig(main_path+str(time)+'/proposed.svg')
+        plt.savefig(main_path+str(time)+'/proposed.png')
+        plt.savefig(main_path+str(time)+'/proposed.eps')
+        plt.clf()
+
+        # bar plot > https://matplotlib.org/gallery/lines_bars_and_markers/bar_stacked.html#sphx-glr-gallery-lines-bars-and-markers-bar-stacked-py
+        ind = np.arange(1)
+        width = 0.35
+
+        p1 = plt.bar(ind, c_exaustive.sum(), width)
+        p2 = plt.bar(ind, c_prop.sum()-c_exaustive.sum(), width, bottom=c_exaustive.sum())
+
+        plt.ylabel('Custo total')
+        plt.title('Comparativo do custo total')
+        plt.legend((p1[0], p2[0]), ('Exaustivo', 'Proposto'))
+
+        plt.savefig(main_path+str(time)+'/bar_exh_prop.svg')
+        plt.savefig(main_path+str(time)+'/bar_exh_prop.png')
+        plt.savefig(main_path+str(time)+'/bar_exh_prop.eps')
         plt.clf()

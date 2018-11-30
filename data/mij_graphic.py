@@ -57,8 +57,8 @@ def mij(time, main_path, teste):
         pic = sns.heatmap(df_mij, cmap=cmap, vmin=0, vmax=1)
 
         plt.title("Mij - Temp. "+graphic_temp[0])
-        plt.ylabel("Localizacao")
-        plt.xlabel("UAV")
+        plt.xlabel("Localizacao")
+        plt.ylabel("UAV")
 
         plt.savefig(main_path+time+'/'+lfile+'.svg')
         plt.savefig(main_path+time+'/'+lfile+'.png')
@@ -71,8 +71,8 @@ def mij(time, main_path, teste):
         pic = sns.heatmap(df_mij, cmap=cmap)
 
         plt.title("Mij - Temp. "+graphic_temp[0])
-        plt.ylabel("Localizacao")
-        plt.xlabel("UAV")
+        plt.xlabel("Localizacao")
+        plt.ylabel("UAV")
 
         plt.savefig(main_path+time+'/'+lfile+'_.svg')
         plt.savefig(main_path+time+'/'+lfile+'_.png')

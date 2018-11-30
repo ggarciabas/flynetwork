@@ -40,8 +40,8 @@ def bij (time, main_path, teste):
     # Default heatmap: just a visualization of this square matrix
     sns.heatmap(df_bij, cmap=cmap, vmin=0, vmax=1)
 
-    plt.ylabel("Localizacao")
-    plt.xlabel("UAV")
+    plt.xlabel("Localizacao")
+    plt.ylabel("UAV")
 
     # general title
     plt.title("Bij", fontsize=13, fontweight=0, color='black', style='italic')
@@ -55,8 +55,8 @@ def bij (time, main_path, teste):
     # Default heatmap: just a visualization of this square matrix
     sns.heatmap(df_bij, cmap=cmap)
 
-    plt.ylabel("Localizacao")
-    plt.xlabel("UAV")
+    plt.xlabel("Localizacao")
+    plt.ylabel("UAV")
 
     # general title
     plt.title("Bij", fontsize=13, fontweight=0, color='black', style='italic')
