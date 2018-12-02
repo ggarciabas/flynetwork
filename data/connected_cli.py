@@ -31,23 +31,29 @@ for custo in range(0,len(custos)):
     time_folders.sort()
     t_cont = 0
     for time in time_folders[:-1]: # ignora o ultimo tempo
+        if teste:
+            print "Tempo: " + str(time)
         try:
             f_mij = open(main_path+str(time)+"/f_mij.txt", 'r')
         except IOError:
             print "Filed f_mij"
             exit()
         uav_loc = [] # each pos corresponds to an UAV, each value the location
+        line = f_mij.readline().strip() # ignore temp
         line = f_mij.readline().strip() # ignore UAVs ids
         line = f_mij.readline().strip()
         locs_id = [int(x) for x in line.split(',')]
         for line in f_mij:
             cont = 0
             for x in line.split(','):
-                if x == 1:
+                if int(x) == 1:
                     uav_loc.append(locs_id[cont])
                     break
                 cont = cont + 1
         f_mij.close()
+
+        if teste:
+            print "UavLoc: "+str(uav_loc)+" locs_id: "+str(locs_id)
 
         # ler total de energia disponível no Uav
         # obs. este total depende da execucao (avaliado para cada custo), assim deve ser analisado também outros fatores, como desperdício, por exemplo
@@ -60,7 +66,7 @@ for custo in range(0,len(custos)):
         uav_energy = []
         for line in f_energy:
             values = [x for x in line.split(',')] # UAV_ID, ATUAL_ENERGY, INITIAL_ENERGY
-            uav_energy.append(values[1])
+            uav_energy.append(float(values[1]))
         f_energy.close()
 
         # ler localizacoes
@@ -72,10 +78,13 @@ for custo in range(0,len(custos)):
         loc_cons = {}
         loc_cli = {}
         for line in f_location:
-            values = [x for x in line.strip(',')] # LOC_ID, TOTAL_CLI, TOTAL_CONSUMPTION
-            loc_cons[values[0]] = values[2]
-            loc_cli[values[0]] = values[1]
+            values = [x for x in line.split(',')] # LOC_ID, TOTAL_CLI, TOTAL_CONSUMPTION
+            loc_cons[str(values[0])] = float(values[2])
+            loc_cli[str(values[0])] = int(values[1])
         f_location.close()
+
+        if teste:
+            print "Cons: "+str(loc_cons)+" Cli: "+str(loc_cli)
 
         # verificar se o UAV finaliza sua energia antes do proximo ciclo
         # lembrando que o consumo da localizacao é por segundo!
@@ -83,20 +92,24 @@ for custo in range(0,len(custos)):
         diff_time = time_folders[t_cont+1] - time
 
         total_cli = 0
+        for i in uav_loc:
+            total_cli = total_cli + loc_cli.get(str(i))
+        data_c[c_name[custo]].append([time, total_cli]) # time, total_cli
+
         atual_cli = 0
         c=0
         for i in uav_loc:
-            total_cli = total_cli + loc_cli[i]
-            atual_cli = atual_cli + loc_cli[i]
-            sec = uav_energy[c]/loc_cons[i] # resist time in seconds
-            if sec < diff_time:
-                atual_cli = atual_cli - loc_cli[i]
-                data_c[c_name[custo]].append([time+sec, atual_cli])
+            atual_cli = atual_cli + loc_cli.get(str(i))
+            if loc_cons.get(str(i)) > 0:
+                sec = uav_energy[c]/loc_cons.get(str(i)) # resist time in seconds
+                if teste:
+                    print "Diff: "+str(diff_time)+" - Sec: " +str(sec)
+                if sec < diff_time:
+                    atual_cli = atual_cli - loc_cli.get(str(i))
+                    data_c[c_name[custo]].append([time+sec, atual_cli])
             c=c+1
 
-        data_c[c_name[custo]].append([time, total_cli]) # time, total_cli
-
-    t_cont = t_cont + 1
+        t_cont = t_cont + 1
 
 
 if teste:
