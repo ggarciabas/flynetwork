@@ -57,3 +57,10 @@ Custo 3 [matriz que contempla o custo 3]
 > LIST_OF_UAV_IDS
 > LIST_OF_LOCATION_IDS
 > MATRIX_OF_COST_OF_EACH_UAV_AND_LOCATION
+
+Client [para identificar a posicao dos clientes que o servidor conhece e a posicao real no cenario]
+> CLIENT_SERVER_X, CLIENT_SERVER_Y, CLIENT_SERVER_ID, [...]
+> CLIENT_REAL_X, CLIENT_REAL_Y, CLIENT_REAL_ID, [...]
+
+Localização e clientes [ para se ter uma relação do total de clientes e o consumo total de cada localização]
+> LOC_ID, TOTAL_CLI, TOTAL_CONSUMPTION

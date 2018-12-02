@@ -390,7 +390,7 @@ void UavApplication::SendCliData ()
   if (m_running) {
     Simulator::Remove(m_sendCliDataEvent);
     std::ostringstream msg;
-    msg << "DATA " << m_id << " " << GetNode()->GetObject<UavDeviceEnergyModel>()->GetEnergySource()->GetRemainingEnergy() << " 0";
+    msg << "DATA " << m_id << " " << GetNode()->GetObject<UavDeviceEnergyModel>()->GetEnergySource()->GetRemainingEnergy();
     // msg << "CONSUMPTION " << m_id << " " << GetNode()->GetObject<UavDeviceEnergyModel>()->GetEnergySource()->GetRemainingEnergy() << " " << m_meanConsumption;
     for (ClientModelContainer::Iterator it = m_client.Begin(); it != m_client.End(); ++it) {
         msg << " " << (*it)->GetLogin();

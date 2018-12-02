@@ -281,9 +281,8 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             uav->SetClientDataConfirmed(true); // recebeu confirmacao!
             uav->SetTotalEnergy(std::stod(results.at(2), &sz)); // atualiza energia total do UAV
             NS_LOG_INFO("SERVER - DATA confirmation ::: UAV #" << uav->GetId() << " @" << Simulator::Now().GetSeconds());
-            int i = 4; // 4 informacoes antes das informacoes dos clientes!
-            double consumo_mean = std::stod(results.at(3), &sz) / ((results.size() - 1 - i)/4.0); // blocos de 4 contemplam cada cliente!
-            for (; i < int(results.size()-1); i+=4) { // id time_update posx posy
+            int i = 3; // 3 informacoes antes das informacoes dos clientes! contemplam cada cliente!
+            for (; i < int(results.size()-1); i+=3) { // id time_update posx posy
               Ptr<ClientModel> cli = m_clientContainer.FindClientModel(results.at(i)); // id
               if (cli != NULL) { // caso já exista, atualiza somente posicao se o tempo de atualizacao for maior!
                 if (std::stod(results.at(i+1), &sz) > cli->GetUpdatePos().GetSeconds()) { // time - pega ultima posicao atualizada
@@ -306,7 +305,6 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
                 m_clientContainer.Add(cli);
                 pos.clear();
               }
-              cli->SetConsumption(cli->GetConsumption()+consumo_mean);
               NS_LOG_INFO ("ServerApplication::TracedCallbackRxApp \n" << cli->ToString());
             }
             // repply to UAV
@@ -584,6 +582,10 @@ void ServerApplication::runDAPython()
       obj.SetTypeId("ns3::LocationModel");
       uint32_t id = 0;
       m_locConsTotal = 0.0;
+      os.str("");
+      os <<"./scratch/flynetwork/data/output/" << m_pathData << "/" << int(Simulator::Now().GetSeconds()) << "/location_client.txt";
+      std::ofstream location_cli;
+      location_cli.open(os.str().c_str(), std::ofstream::in);
       while (getline(cenario_in, line))
       {
         sscanf(line.c_str(), "%lf,%lf\n", &x, &y); // new location
@@ -617,10 +619,13 @@ void ServerApplication::runDAPython()
         m_locationContainer.Add(loc);
         NS_LOG_INFO (loc->toString());
         m_locConsTotal += total; // atualiza total de consumo de todas as localizacoes
+
+        location_cli << loc->GetId() << "," << loc->GetTotalCli() << "," << loc->GetTotalConsumption() << std::endl;
       }
       if ( m_locConsTotal == 0) {
         m_locConsTotal = 1.0; // para nao dar problemas no calculo
       }
+      location_cli.close();
       cenario_in.close();
     }
     else

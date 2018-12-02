@@ -40,7 +40,12 @@ ClientModel::GetTypeId(void)
                                         "Login of the client node.",
                                         StringValue("none"),
                                         MakeStringAccessor(&ClientModel::m_login),
-                                        MakeStringChecker());
+                                        MakeStringChecker())
+                          .AddAttribute("Consumption",
+                                        "Consumption in joules per second.",
+                                        DoubleValue(0.34), // J/s
+                                        MakeDoubleAccessor(&ClientModel::m_consumption),
+                                        MakeDoubleChecker<double>());
   return tid;
 }
 
@@ -48,7 +53,6 @@ ClientModel::ClientModel() : m_position()
 {
   NS_LOG_FUNCTION(this);
   NS_LOG_DEBUG ("ClientModel::ClientModel @" << Simulator::Now().GetSeconds());
-  m_consumption = 0.0;
 }
 
 ClientModel::~ClientModel()
