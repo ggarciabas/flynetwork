@@ -915,10 +915,6 @@ void ServerApplication::runAgendamento(void)
   // permite sair dos lacos ao encontrar 1 para cada localizacao
   out:
 
-  os.str("");
-  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/" << int(Simulator::Now().GetSeconds()) << "/mij.txt";
-  PrintMij (m_ij, temp, os.str());
-
   NS_LOG_INFO("SERVER - Finalizada estrutura do DA para agendamento @" << Simulator::Now().GetSeconds());
 
   NS_LOG_INFO("SERVER - Atualizando posicionamento dos UAVs @" << Simulator::Now().GetSeconds());
@@ -927,6 +923,7 @@ void ServerApplication::runAgendamento(void)
   std::ofstream file;
   std::ostringstream osbij, osloc, osuav;
   os.str("");
+  vector<vector<double> > f_mij;
   double val;
   for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
        u_i != m_uavContainer.End(); ++u_i, ++i)
@@ -934,6 +931,7 @@ void ServerApplication::runAgendamento(void)
     NS_LOG_INFO("SERVER - UAV "<< (*u_i)->GetId() << " REF " << (*u_i)->GetReferenceCount());
     id = -1;
     val = -1;
+    f_mij.push_back(vector<double>());
     for (unsigned j = 0; j < siz; ++j)
     {
       NS_LOG_INFO("\tLOC \t" << m_locationContainer.Get(j)->toString());
@@ -942,11 +940,13 @@ void ServerApplication::runAgendamento(void)
         id = j;
         val = m_ij[i][j];
       }
+      f_mij[i].push_back(0.0);
     } // ao final selecionara a localizacao com maior valor de mij
+
+    f_mij[i][id] = 1.0;
 
     NS_LOG_DEBUG ("## ===> UAV " << (*u_i)->GetId() << " to LOC " << id);
     m_locationContainer.Get(id)->SetUsed(); // define como utilizada pelo UAV atual
-
 
     NS_LOG_INFO("SERVER - LOC "<< id << "\n\t" << m_locationContainer.Get(id)->toString());
 
@@ -978,6 +978,10 @@ void ServerApplication::runAgendamento(void)
   }
 
   os.str("");
+  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/" << int(Simulator::Now().GetSeconds()) << "/mij.txt";
+  PrintMij (f_mij, temp, os.str());
+
+  os.str("");
   os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/"<<int(Simulator::Now().GetSeconds())<<"/uav_loc.txt";
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
   Vector serv_pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
@@ -996,6 +1000,7 @@ void ServerApplication::runAgendamento(void)
       b_ij[i].clear();
       copyB_mij[i].clear();
       custo_x[i].clear();
+      f_mij[i].clear();
     }
   m_ij.clear();
   o_ij.clear();
@@ -1005,6 +1010,7 @@ void ServerApplication::runAgendamento(void)
   copyB_mij.clear();
   central_pos.clear();
   custo_x.clear();
+  f_mij.clear();
 }
 
 void

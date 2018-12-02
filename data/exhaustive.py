@@ -26,7 +26,7 @@ for custo in custos:
         print (list_folder)
     list_folder = np.array(list_folder)
     list_folder.sort()
-
+    data = {"Proposto": [], "Exaustivo":[]}
     for time in list_folder:
         # read bij
         try:
@@ -61,11 +61,33 @@ for custo in custos:
         if teste:
             print "Data_bij"
             print data_bij
+            print 'Uavs Ids'
+            print uavs_id
+            print 'Locs ids'
+            print locs_id
 
-        min_conf=locs_id[:]
+        min_conf=range(0, len(locs_id))
         min_value=9999.0
         if teste:
             print "Min conf: "+str(min_conf)+" minV: "+str(min_value)
+
+        c_prop = np.zeros((len(uavs_id),len(locs_id)))
+        if teste:
+            print "MIJ: "+str(data_mij)
+            print "BIJ: "+str(data_bij)
+        c=0
+        p_conf = []
+        for key, values in data_mij.iteritems():
+            l=0
+            for v in values:
+                c_prop[c][l] = v*data_bij[uavs_id[c]][l]
+                if v == 1.0:
+                    p_conf.append(l)
+                l=l+1
+            c=c+1
+
+        if teste:
+            print "Conf Proposta: " + str(p_conf)+ " > "+str(c_prop.sum())
 
         # thanks to: https://www.geeksforgeeks.org/write-a-c-program-to-print-all-permutations-of-a-given-string/
         def permute(uav_loc, start, end): # each positionof uav_loc corresponds to a UAV and each value in any position corresponds to the location, this relates an UAV to a Location
@@ -73,15 +95,15 @@ for custo in custos:
             global min_conf
             if start==end:
                 value = 0.0
-                c=0
+                p=0
                 for l in uav_loc:
-                    value = value + data_bij[uavs_id[c]][l]
-                    c=c+1
+                    value = value + data_bij[uavs_id[p]][l]
+                    p=p+1
                 if value < min_value:
-                    if teste:
-                        print "LOWER >> mv: "+str(min_value)+" v: "+str(value)
                     min_value = value
                     min_conf = uav_loc[:] # if do not use [:], both uav_loc and min_conf will corresponds to the same pointer in memory!
+                if teste:
+                    print 'Uav Loc: '+str(uav_loc)+' > '+str(value)
             else:
                 for i in xrange(start,end+1):
                     uav_loc[start], uav_loc[i] = uav_loc[i], uav_loc[start]
@@ -105,9 +127,11 @@ for custo in custos:
         for l in locs_id[1:]: ## imprime ignorando a primeira posicao
             f_file.write(","+str(l))
         f_file.write('\n')
-        f_file.write(str(min_conf[0]))
-        for mc in min_conf[1:]: ## imprime ignorando a primeira posicao
-            f_file.write(","+str(mc))
+        f_file.write(str(locs_id[0]))
+        for mc in min_conf[1:]:## imprime ignorando a primeira posicao
+            f_file.write(","+str(locs_id[mc]))
+        f_file.write('\n')
+        f_file.write(str(min_conf)) # para validar se esta gravando corretamente
         f_file.write('\n')
         f_file.close()
 
@@ -116,18 +140,6 @@ for custo in custos:
         c=0
         for l in min_conf:
             c_exaustive[c][l] = data_bij[uavs_id[c]][l]
-            c=c+1
-
-        c_prop = np.zeros((len(uavs_id),len(locs_id)))
-        if teste:
-            print "MIJ: "+str(data_mij)
-            print "BIJ: "+str(data_bij)
-        c=0
-        for key, values in data_mij.iteritems():
-            l=0
-            for v in values:
-                c_prop[c][l] = v*data_bij[uavs_id[c]][l]
-                l=l+1
             c=c+1
 
         if teste:
@@ -142,11 +154,7 @@ for custo in custos:
         plt.clf()
         cmap = sns.cubehelix_palette(50, hue=0.05, rot=0, light=0.9, dark=0, as_cmap=True)
         # Create a dataset
-        if teste:
-            print c_exaustive
         df_exh = pd.DataFrame(c_exaustive)
-        if teste:
-            print df_exh
         # Default heatmap: just a visualization of this square matrix
         sns.heatmap(df_exh, cmap=cmap, vmin=0, vmax=m_v)
         plt.xlabel(u"Localização")
@@ -173,18 +181,38 @@ for custo in custos:
         plt.savefig(main_path+str(time)+'/proposed.eps')
         plt.clf()
 
-        # bar plot > https://matplotlib.org/gallery/lines_bars_and_markers/bar_stacked.html#sphx-glr-gallery-lines-bars-and-markers-bar-stacked-py
-        ind = np.arange(1)
-        width = 0.35
+        data["Exaustivo"].append(c_exaustive.sum())
+        # data["Proposto"].append(c_prop.sum()-c_exaustive.sum()) # para apresentar a diferença
+        data["Proposto"].append(c_prop.sum()) # para apresentar a diferença
 
-        p1 = plt.bar(ind, c_exaustive.sum(), width)
-        p2 = plt.bar(ind, c_prop.sum()-c_exaustive.sum(), width, bottom=c_exaustive.sum())
+        if c_prop.sum() < c_exaustive.sum():
+            print 'ERROO'
+            input()
 
-        plt.ylabel('Custo total')
-        plt.title('Comparativo do custo total')
-        plt.legend((p1[0], p2[0]), ('Exaustivo', 'Proposto'))
+        if teste:
+            print '===================\n\n'
 
-        plt.savefig(main_path+str(time)+'/bar_exh_prop.svg')
-        plt.savefig(main_path+str(time)+'/bar_exh_prop.png')
-        plt.savefig(main_path+str(time)+'/bar_exh_prop.eps')
-        plt.clf()
+
+    # plot comparation all times [https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.plot.bar.html]
+    # stacked=True
+    index = list_folder[:]
+    df = pd.DataFrame(data, index=index)
+    # ax = df.plot.bar(stacked=True, rot=0)
+    ax = df.plot.bar(rot=0)
+
+    ax.set_title('Comparativo do custo total')
+    ax.set_ylabel('Custo total')
+    ax.set_xlabel('Tempo (s)')
+
+    plt.savefig(main_path+'/exh_proposto.svg')
+    plt.savefig(main_path+'/exh_proposto.png')
+    plt.savefig(main_path+'/exh_proposto.eps')
+    plt.clf()
+
+# >>> speed = [0.1, 17.5, 40, 48, 52, 69, 88]
+# >>> lifespan = [2, 8, 70, 1.5, 25, 12, 28]
+# >>> index = ['snail', 'pig', 'elephant',
+# ...          'rabbit', 'giraffe', 'coyote', 'horse']
+# >>> df = pd.DataFrame({'speed': speed,
+# ...                    'lifespan': lifespan}, index=index)
+# >>> ax = df.plot.bar(rot=0)
