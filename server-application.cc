@@ -282,7 +282,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             uav->SetTotalEnergy(std::stod(results.at(2), &sz)); // atualiza energia total do UAV
             NS_LOG_INFO("SERVER - DATA confirmation ::: UAV #" << uav->GetId() << " @" << Simulator::Now().GetSeconds());
             int i = 3; // 3 informacoes antes das informacoes dos clientes! contemplam cada cliente!
-            for (; i < int(results.size()-1); i+=3) { // id time_update posx posy
+            for (; i < int(results.size()-1); i+=4) { // id time_update posx posy
               Ptr<ClientModel> cli = m_clientContainer.FindClientModel(results.at(i)); // id
               if (cli != NULL) { // caso já exista, atualiza somente posicao se o tempo de atualizacao for maior!
                 if (std::stod(results.at(i+1), &sz) > cli->GetUpdatePos().GetSeconds()) { // time - pega ultima posicao atualizada
@@ -719,7 +719,7 @@ void ServerApplication::runAgendamento(void)
   //  - calcular o CUSTO ENERGETICO de atribuição do uav para cada localizacao, criando uma matriz Bij
   NS_LOG_DEBUG("SERVER - Iniciando estrutura do DA para agendamento @" << Simulator::Now().GetSeconds());
 
-  m_printUavEnergy(0);
+  m_printUavEnergy(int(Simulator::Now().GetSeconds()));
 
   vector<vector<double>> b_ij; // i - UAVs, j - localizacoes
   vector<vector<double>> custo_x; // i - UAVs, j - localizacoes x=1,2ou3
@@ -983,7 +983,7 @@ void ServerApplication::runAgendamento(void)
   }
 
   os.str("");
-  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/" << int(Simulator::Now().GetSeconds()) << "/mij.txt";
+  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/" << int(Simulator::Now().GetSeconds()) << "/f_mij.txt";
   PrintMij (f_mij, temp, os.str());
 
   os.str("");

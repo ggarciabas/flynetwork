@@ -921,11 +921,11 @@ void UavNetwork::Configure()
   m_addressHelperCli.SetBase("192.168.1.0", "255.255.255.0"); // wifi address
 }
 
-void UavNetwork::PrintUavEnergy (int i)
+void UavNetwork::PrintUavEnergy (int t)
 {
   NS_LOG_FUNCTION(this);
   std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_energy.txt";
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/" << t << "/uav_energy.txt";
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   for (UavNodeContainer::Iterator it = m_uavNodeActive.Begin(); it != m_uavNodeActive.End(); ++it) {
