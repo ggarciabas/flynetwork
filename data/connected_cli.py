@@ -20,7 +20,7 @@ data_c = {"Custo 1":[], "Custo 2":[], "Custo 3":[]}
 
 ## Custo
 for custo in range(0,len(custos)):
-    main_path = "./output/"+scenario+"/"+custos[custo]
+    main_path = "./output/"+scenario+"/"+custos[custo]+"/"
     time_folders = []
     if len(sys.argv) == 4: # folder number
         time_folders.append(int(sys.argv[3]))
@@ -34,6 +34,7 @@ for custo in range(0,len(custos)):
         try:
             f_mij = open(main_path+str(time)+"/f_mij.txt", 'r')
         except IOError:
+            print "Filed f_mij"
             exit()
         uav_loc = [] # each pos corresponds to an UAV, each value the location
         line = f_mij.readline().strip() # ignore UAVs ids
@@ -54,6 +55,7 @@ for custo in range(0,len(custos)):
         try:
             f_energy = open(main_path+str(time)+"/uav_energy.txt", 'r')
         except IOError:
+            print "Failed uav_energy"
             exit()
         uav_energy = []
         for line in f_energy:
@@ -65,6 +67,7 @@ for custo in range(0,len(custos)):
         try:
             f_location = open(main_path+str(time)+"/location_client.txt", 'r')
         except IOError:
+            print "Failed location_client"
             exit()
         loc_cons = {}
         loc_cli = {}
