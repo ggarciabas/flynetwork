@@ -1,4 +1,4 @@
-Uav Energy [utilizado para armazenar informacoes da energia (em Joules) atual do UAv bem como o total inicial, para fazer comparacoes enter os custos]
+Uav Energy [utilizado para armazenar informacoes da energia (em Joules) atual do UAv bem como o total inicial, para fazer comparacoes entre os custos]
 > UAV_ID, ATUAL_ENERGY, INITIAL_ENERGY
 
 Course Changed [energia necessária para voltar a central após chegar ao seu destino]
