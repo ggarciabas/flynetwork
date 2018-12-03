@@ -14,9 +14,7 @@ if sys.argv[1] == "False":
     teste = False
 scenario = sys.argv[2]
 
-custos = ["custo_1", "custo_2", "custo_3"]
-data_c = {"Custo 1":[],"Custo 2":[], "Custo 3":[]}
-index_c = []
+custos = ["custo_1", "custo_2", "custo_3", "custo_4"]
 for custo in custos:
     main_path = "./output/"+scenario+"/"+custo+"/"
     list_folder = []
@@ -37,6 +35,8 @@ for custo in custos:
         c_name = "Custo 2"
     elif custo == "custo_3":
         c_name = "Custo 3"
+    elif custo == "custo_4":
+        c_name = "Custo 4"
     data[c_name] = []
     for time in list_folder:
         # read bij
@@ -56,7 +56,7 @@ for custo in custos:
         file.close()
 
         try:
-            file = open(main_path+str(time)+"/mij.txt", 'r')
+            file = open(main_path+str(time)+"/f_mij.txt", 'r')
         except IOError:
             exit()
         line = file.readline().strip()
@@ -269,17 +269,12 @@ for custo in custos:
         data["Sequencial"].append(c_seq.sum())
         data["Aleatório"].append(c_ale.sum())
 
-        data_c[c_name].append(c_prop.sum())
-
         if c_prop.sum() < c_exaustive.sum():
             print 'ERROO'
             input()
 
         if teste:
             print '===================\n\n'
-
-        index_c = list_folder[:]
-
 
     # plot comparation all times [https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.plot.bar.html]
     # stacked=True
@@ -296,16 +291,3 @@ for custo in custos:
     plt.savefig(main_path+'/exh_'+str(custo)+'.png')
     plt.savefig(main_path+'/exh_'+str(custo)+'.eps')
     plt.clf()
-
-# plot comparation all cost
-# df = pd.DataFrame(data_c, index=index_c)
-# ax = df.plot.bar(rot=0)
-#
-# ax.set_title('Comparativo do custo total (sem sentido, bijs são diferentes)')
-# ax.set_ylabel('Custo total')
-# ax.set_xlabel('Tempo (s)')
-#
-# plt.savefig("./output/"+scenario+'/custos_comparativo.svg')
-# plt.savefig("./output/"+scenario+'/custos_comparativo.png')
-# plt.savefig("./output/"+scenario+'/custos_comparativo.eps')
-# plt.clf()

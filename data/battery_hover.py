@@ -17,9 +17,9 @@ def battery(main_path, teste, uavs_id, time_ini, time_end, activated, title_f):
         print uavs_id
     uav_files = {}
     ordered_uav_id = []
-    for name_file in glob.glob(main_path+'uav_battery_hover_*.txt'):
+    for name_file in glob.glob(main_path+'uav_hover_acum_*.txt'):
         base=os.path.basename(name_file)
-        id = os.path.splitext(base)[0].split("uav_battery_hover_")[-1]
+        id = os.path.splitext(base)[0].split("uav_hover_acum_")[-1]
         uav_files[id] = name_file
         ordered_uav_id.append(id)
 
@@ -108,6 +108,6 @@ def battery(main_path, teste, uavs_id, time_ini, time_end, activated, title_f):
     plt.xlabel('Tempo (s)')
     plt.ylabel('Bateria (%)')
 
-    plt.savefig(main_path+'battery_hover_'+str(title_f)+'.svg')
-    plt.savefig(main_path+'battery_hover_'+str(title_f)+'.eps')
-    plt.savefig(main_path+'battery_hover_'+str(title_f)+'.png')
+    plt.savefig(main_path+'uav_hover_acum_'+str(title_f)+'.svg')
+    plt.savefig(main_path+'uav_hover_acum_'+str(title_f)+'.eps')
+    plt.savefig(main_path+'uav_hover_acum_'+str(title_f)+'.png')

@@ -210,7 +210,7 @@ void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
   // salvando historico do consumo de bateria por movimentacao
   if (m_node) {
     std::ostringstream os;
-    os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_moving_acum_" << m_node->GetId() << ".txt";
+    os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_move_acum_" << m_node->GetId() << ".txt";
     m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
     m_movAcum += energyToDecrease;
     m_file << Simulator::Now().GetSeconds() << "," << m_movAcum / m_initialEnergyJ << std::endl;
