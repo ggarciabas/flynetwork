@@ -36,7 +36,7 @@ for custo in range(0,len(custos)):
         try:
             f_mij = open(main_path+str(time)+"/f_mij.txt", 'r')
         except IOError:
-            print "Filed f_mij"
+            print "Failed f_mij"
             exit()
         uav_loc = [] # each pos corresponds to an UAV, each value the location
         line = f_mij.readline().strip() # ignore temp

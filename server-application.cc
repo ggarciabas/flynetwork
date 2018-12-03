@@ -743,10 +743,11 @@ void ServerApplication::runAgendamento(void)
   for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
        u_i != m_uavContainer.End(); ++u_i, ++count)
   {
-    NS_LOG_INFO ("UAV :: " << (*u_i)->toString());
-    verify_uav = 0;
     b_ij.push_back(vector<double>());
     custo_x.push_back(vector<double>());
+    recalcule: // utilizado para permitir recalcular quando o UAV for suprido!
+    NS_LOG_INFO ("UAV :: " << (*u_i)->toString());
+    verify_uav = 0;
     for (LocationModelContainer::Iterator l_j = m_locationContainer.Begin();
          l_j != m_locationContainer.End(); ++l_j)
     {
@@ -796,6 +797,10 @@ void ServerApplication::runAgendamento(void)
       // criar um novo nó iniciando na região central, como sempre!
       m_supplyPos = count; // posicao que será suprida
       m_newUav(1, true); // true, pois está o solicitado para suprir uma posicao
+      NS_LOG_DEBUG ("ServerApplication::runAgendamento recalculando, novo UAV entra na rede para suprir um UAv que nao tem bateria para qualquer das localizações!");
+      custo_x[count].clear();
+      b_ij[count].clear();
+      goto recalcule;
     }
     NS_LOG_INFO (" ------------------------- ");
   }
@@ -948,10 +953,12 @@ void ServerApplication::runAgendamento(void)
   for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
        u_i != m_uavContainer.End(); ++u_i, ++i)
   {
+    f_mij.push_back(vector<double>());
+    
+    recalcule_2:
     NS_LOG_INFO("SERVER - UAV "<< (*u_i)->GetId() << " REF " << (*u_i)->GetReferenceCount());
     id = -1;
     val = -1;
-    f_mij.push_back(vector<double>());
     for (unsigned j = 0; j < siz; ++j)
     {
       NS_LOG_INFO("\tLOC \t" << m_locationContainer.Get(j)->toString());
@@ -962,6 +969,17 @@ void ServerApplication::runAgendamento(void)
       }
       f_mij[i].push_back(0.0);
     } // ao final selecionara a localizacao com maior valor de mij
+
+    if (b_ij[i][id] == 1.0) {
+      // Uav não tem bateria suficiente para ir até esta localização!
+      NS_LOG_DEBUG("ServerApplication::runAgendamento --> Enviar UAV " << (*u_i)->GetId() << " para a central  REF " << (*u_i)->GetReferenceCount());
+      // criar um novo nó iniciando na região central, como sempre!
+      m_supplyPos = count; // posicao que será suprida
+      m_newUav(1, true); // true, pois está o solicitando para suprir uma posicao
+      NS_LOG_DEBUG ("ServerApplication::runAgendamento recalculando, novo UAV entra na rede para suprir um UAv que nao tem bateria para qualquer das localizações!");
+      f_mij[i].clear();
+      goto recalcule_2;
+    }
 
     f_mij[i][id] = 1.0;
 
@@ -986,6 +1004,7 @@ void ServerApplication::runAgendamento(void)
       osbij << b_ij[i][id]; // b_ij, custo de deslocamento
     else
       osbij << "," << b_ij[i][id]; // b_ij, custo de deslocamento
+
 
     NS_LOG_INFO("SERVER - definindo novo posicionamento @" << Simulator::Now().GetSeconds());
     (*u_i)->SetNewPosition(m_locationContainer.Get(id)->GetPosition());
