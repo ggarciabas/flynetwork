@@ -86,9 +86,11 @@ private:
   void SendAskClientPacket(Ptr<UavModel> uav);
   void ReplyAskCliData(Ptr<UavModel> uav);
 
-  void PrintCusto (vector<vector<double>> custo, int print);
+  double CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, vector<double> central_pos);
+
+  void PrintCusto (vector<vector<double>> custo, int print, bool before);
   void PrintMij (vector<vector<double>> m_ij, double temp, std::string nameFile);
-  void PrintBij (vector<vector<double>> b_ij, int print);
+  void PrintBij (vector<vector<double>> b_ij, int print, bool before);
 
   UavModelContainer   m_uavContainer;
   LocationModelContainer m_locationContainer;

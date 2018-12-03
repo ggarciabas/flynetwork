@@ -726,8 +726,6 @@ void ServerApplication::runAgendamento(void)
   //  - calcular o CUSTO ENERGETICO de atribuição do uav para cada localizacao, criando uma matriz Bij
   NS_LOG_DEBUG("SERVER - Iniciando estrutura do DA para agendamento @" << Simulator::Now().GetSeconds());
 
-  m_printUavEnergy(int(Simulator::Now().GetSeconds()));
-
   vector<vector<double>> b_ij; // i - UAVs, j - localizacoes
   vector<vector<double>> custo_x; // i - UAVs, j - localizacoes x=1,2ou3
   int count = 0;
@@ -752,41 +750,7 @@ void ServerApplication::runAgendamento(void)
          l_j != m_locationContainer.End(); ++l_j)
     {
       NS_LOG_INFO ("LOC :: " << (*l_j)->toString());
-
-      double b_ui_atu = (*u_i)->GetTotalEnergy(); // bateria atual
-      double ce_ui_la_lj = (*u_i)->CalculateEnergyCost(CalculateDistance((*u_i)->GetPosition(), (*l_j)->GetPosition())); // custo energetico
-      double ce_ui_lj_lc = (*u_i)->CalculateEnergyCost(CalculateDistance((*l_j)->GetPosition(), central_pos));
-      double b_ui_tot = (*u_i)->GetTotalBattery();
-
-      double b_ui_res = b_ui_atu*0.98 - ce_ui_la_lj - ce_ui_lj_lc; // bateria residual
-
-      double c_lj = (*l_j)->GetTotalCli(); // total consumption seria melhor!
-      double c_total = m_totalCliGeral;
-
-      if (b_ui_res > 0) {
-        // sobre os custo ver: https://github.com/ggarciabas/Calculo-de-Posicionamento
-        switch (m_custo) {
-          case 1:
-            custo = (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot; // media do custo
-            break;
-          case 2:
-            custo = 1 - (c_lj/c_total + b_ui_res/b_ui_tot)/2.0;
-            break;
-          case 3:
-            custo = ((1 - (c_lj/c_total + b_ui_res/b_ui_tot)/2.0) + ((ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot))/2.0;
-          case 4:
-            double ce_te_lj = (*l_j)->GetTotalConsumption() * m_scheduleServer;
-            double P_te = b_ui_res/(ce_te_lj*m_scheduleServer);
-            custo = 1-P_te;
-            if (custo < 0.0) {
-              custo = 0.0;
-            }
-        }
-      } else {
-        NS_LOG_DEBUG("ServerApplication::runAgendamento --> Sem bateria para esta localizacao!");
-        custo = 1.0; // máximo, como se consumisse toda a bateria quando carregada!
-      }
-
+      custo = CalculateCusto((*u_i), (*l_j), central_pos);
       custo_x[count].push_back(custo);
       b_ij[count].push_back(custo);
       verify_uav += custo; // somando o valor dos custos, assim se ao final tiver o mesmo valor que o total de localizações, quer dizer que este UAV somente tem carga para voltar a central
@@ -806,7 +770,7 @@ void ServerApplication::runAgendamento(void)
   }
   NS_LOG_INFO ("FIM custo ---------------------------- @" << Simulator::Now().GetSeconds());
 
-  PrintCusto(custo_x, int(Simulator::Now().GetSeconds()));
+  PrintCusto (custo_x, int(Simulator::Now().GetSeconds()), true);
 
   // Inicializando
   NS_LOG_INFO ("SERVER - inicializando matrizes.");
@@ -849,7 +813,7 @@ void ServerApplication::runAgendamento(void)
   vector<vector<double>> copyC_mij;
   NS_LOG_INFO ("SERVER - iniciando execucao das partes A, B e C @" << Simulator::Now().GetSeconds());
 
-  PrintBij(b_ij, int(Simulator::Now().GetSeconds()));
+  PrintBij(b_ij, int(Simulator::Now().GetSeconds()), true);
 
   int print = 0;
   std::ostringstream os;
@@ -978,6 +942,9 @@ void ServerApplication::runAgendamento(void)
       m_newUav(1, true); // true, pois está o solicitando para suprir uma posicao
       NS_LOG_DEBUG ("ServerApplication::runAgendamento recalculando, novo UAV entra na rede para suprir um UAv que nao tem bateria para qualquer das localizações!");
       f_mij[i].clear();
+      custo = CalculateCusto((*u_i), m_locationContainer.Get(id), central_pos);
+      custo_x[i][id] = custo;
+      b_ij[i][id] = custo;
       goto recalcule_2;
     }
 
@@ -1027,6 +994,10 @@ void ServerApplication::runAgendamento(void)
   file << m_maxx << "," << m_maxy << std::endl << serv_pos.x << "," << serv_pos.y << std::endl << osuav.str() << std::endl << osloc.str() << std::endl << osbij.str() << std::endl;
   file.close();
 
+  PrintCusto (custo_x, int(Simulator::Now().GetSeconds()), false); // pode ter sido modificado no laco anterior, um UAv pode ter sido suprido
+  PrintBij(b_ij, int(Simulator::Now().GetSeconds()), false);
+  m_printUavEnergy(int(Simulator::Now().GetSeconds())); // esperando a solucao final, UAVs podem ser trocados
+
   NS_LOG_DEBUG ("-- Finalizado posicionamento dos UAVs @" << Simulator::Now().GetSeconds());
 
   // liberando memoria
@@ -1052,11 +1023,54 @@ void ServerApplication::runAgendamento(void)
   f_mij.clear();
 }
 
+double
+ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, vector<double> central_pos)
+{
+  double custo=1.0;
+  double b_ui_atu = uav->GetTotalEnergy(); // bateria atual
+  double ce_ui_la_lj = uav->CalculateEnergyCost(CalculateDistance(uav->GetPosition(), loc->GetPosition())); // custo energetico
+  double ce_ui_lj_lc = uav->CalculateEnergyCost(CalculateDistance(loc->GetPosition(), central_pos));
+  double b_ui_tot = uav->GetTotalBattery();
+
+  double b_ui_res = b_ui_atu*0.98 - ce_ui_la_lj - ce_ui_lj_lc; // bateria residual
+
+  double c_lj = loc->GetTotalCli(); // total consumption seria melhor!
+  double c_total = m_totalCliGeral;
+
+  if (b_ui_res > 0) {
+    // sobre os custo ver: https://github.com/ggarciabas/Calculo-de-Posicionamento
+    switch (m_custo) {
+      case 1:
+        custo = (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot; // media do custo
+        break;
+      case 2:
+        custo = 1 - (c_lj/c_total + b_ui_res/b_ui_tot)/2.0;
+        break;
+      case 3:
+        custo = ((1 - (c_lj/c_total + b_ui_res/b_ui_tot)/2.0) + ((ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot))/2.0;
+      case 4:
+        double ce_te_lj = loc->GetTotalConsumption() * m_scheduleServer;
+        double P_te = b_ui_res/(ce_te_lj*m_scheduleServer);
+        custo = 1-P_te;
+        if (custo < 0.0) {
+          custo = 0.0;
+        }
+    }
+  }
+
+  central_pos.clear();
+  return custo;
+}
+
 void
-ServerApplication::PrintBij (vector<vector<double>> b_ij, int print)
+ServerApplication::PrintBij (vector<vector<double>> b_ij, int print, bool before)
 {
   std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/"<<Simulator::Now().GetSeconds()<<"/bij.txt";
+  if (before) {
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/"<<Simulator::Now().GetSeconds()<<"/bij.txt";
+  } else {
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/"<<Simulator::Now().GetSeconds()<<"/bij_final.txt";
+  }
   std::ofstream file;
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
   UavModelContainer::Iterator u_i = m_uavContainer.Begin();
@@ -1096,10 +1110,14 @@ ServerApplication::PrintBij (vector<vector<double>> b_ij, int print)
 }
 
 void
-ServerApplication::PrintCusto (vector<vector<double>> custo, int print)
+ServerApplication::PrintCusto (vector<vector<double>> custo, int print, bool before)
 {
   std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/"<<Simulator::Now().GetSeconds()<<"/custo_" << m_custo << ".txt";
+  if (before) {
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/"<<Simulator::Now().GetSeconds()<<"/custo_" << m_custo << ".txt";
+  } else  {
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/"<<Simulator::Now().GetSeconds()<<"/custo_" << m_custo << "_final.txt";
+  }
   std::ofstream file;
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
   UavModelContainer::Iterator u_i = m_uavContainer.Begin();
