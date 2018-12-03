@@ -783,7 +783,7 @@ void ServerApplication::runAgendamento(void)
             }
         }
       } else {
-        NS_LOG_INFO("Sem bateria para esta localizacao!");
+        NS_LOG_DEBUG("ServerApplication::runAgendamento --> Sem bateria para esta localizacao!");
         custo = 1.0; // máximo, como se consumisse toda a bateria quando carregada!
       }
 
@@ -954,7 +954,7 @@ void ServerApplication::runAgendamento(void)
        u_i != m_uavContainer.End(); ++u_i, ++i)
   {
     f_mij.push_back(vector<double>());
-    
+
     recalcule_2:
     NS_LOG_INFO("SERVER - UAV "<< (*u_i)->GetId() << " REF " << (*u_i)->GetReferenceCount());
     id = -1;
@@ -1094,7 +1094,6 @@ ServerApplication::PrintBij (vector<vector<double>> b_ij, int print)
   }
   b_ij.clear();
 }
-
 
 void
 ServerApplication::PrintCusto (vector<vector<double>> custo, int print)
