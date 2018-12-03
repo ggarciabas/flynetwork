@@ -430,7 +430,7 @@ void ServerApplication::ValidateUavPosition()
     Run();
   } else {
     NS_LOG_INFO ("Server - [" << Simulator::Now().GetSeconds() << "] $$ [NÃO] estao prontos @" << Simulator::Now().GetSeconds());
-    Simulator::Schedule(Seconds(20.0), &ServerApplication::ValidateUavPosition, this);
+    Simulator::Schedule(Seconds(5.0), &ServerApplication::ValidateUavPosition, this);
   }
 }
 
@@ -1050,7 +1050,7 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
         custo = ((1 - (c_lj/c_total + b_ui_res/b_ui_tot)/2.0) + ((ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot))/2.0;
       case 4:
         double ce_te_lj = loc->GetTotalConsumption() * m_scheduleServer;
-        double P_te = b_ui_res/(ce_te_lj*m_scheduleServer);
+        double P_te = b_ui_res/ce_te_lj;
         custo = 1-P_te;
         if (custo < 0.0) {
           custo = 0.0;
