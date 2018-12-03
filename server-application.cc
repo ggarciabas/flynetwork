@@ -757,12 +757,13 @@ void ServerApplication::runAgendamento(void)
       double ce_ui_lj_lc = (*u_i)->CalculateEnergyCost(CalculateDistance((*l_j)->GetPosition(), central_pos));
       double b_ui_tot = (*u_i)->GetTotalBattery();
 
-      double b_ui_res = b_ui_atu - ce_ui_la_lj - ce_ui_lj_lc; // bateria residual
+      double b_ui_res = b_ui_atu*0.98 - ce_ui_la_lj - ce_ui_lj_lc; // bateria residual
 
-      double c_lj = (*l_j)->GetTotalCli();
+      double c_lj = (*l_j)->GetTotalCli(); // total consumption seria melhor!
       double c_total = m_totalCliGeral;
 
       if (b_ui_res > 0) {
+        // sobre os custo ver: https://github.com/ggarciabas/Calculo-de-Posicionamento
         switch (m_custo) {
           case 1:
             custo = (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot; // media do custo
@@ -772,6 +773,13 @@ void ServerApplication::runAgendamento(void)
             break;
           case 3:
             custo = ((1 - (c_lj/c_total + b_ui_res/b_ui_tot)/2.0) + ((ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot))/2.0;
+          case 4:
+            double ce_te_lj = (*l_j)->GetTotalConsumption() * m_scheduleServer;
+            double P_te = b_ui_res/(ce_te_lj*m_scheduleServer);
+            custo = 1-P_te;
+            if (custo < 0.0) {
+              custo = 0.0;
+            }
         }
       } else {
         NS_LOG_INFO("Sem bateria para esta localizacao!");
