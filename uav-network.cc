@@ -462,6 +462,13 @@ void UavNetwork::RemoveUav(int id)
   m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << ",0" << std::endl;
   m_file.close();
 
+  os.str("");
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/" << int(Simulator::Now().GetSeconds()) << "/uav_removed_energy.txt";
+  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  Ptr<UavDeviceEnergyModel> dev = n->GetObject<UavDeviceEnergyModel>();
+  m_file << dev->GetEnergySource()->GetRemainingEnergy() / dev->GetEnergySource()->GetInitialEnergy() << std::endl;
+  m_file.close();
+
   n = 0;
 }
 
