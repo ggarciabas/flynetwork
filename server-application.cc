@@ -430,7 +430,7 @@ void ServerApplication::ValidateUavPosition()
     Run();
   } else {
     NS_LOG_INFO ("Server - [" << Simulator::Now().GetSeconds() << "] $$ [NÃO] estao prontos @" << Simulator::Now().GetSeconds());
-    Simulator::Schedule(Seconds(5.0), &ServerApplication::ValidateUavPosition, this);
+    Simulator::Schedule(Seconds(5.00), &ServerApplication::ValidateUavPosition, this);
   }
 }
 
