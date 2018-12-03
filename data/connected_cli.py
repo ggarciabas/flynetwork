@@ -116,17 +116,27 @@ if teste:
     print data_c
 
 # plot
-# plt.clf()
-# cmap = sns.cubehelix_palette(50, hue=0.05, rot=0, light=0.9, dark=0, as_cmap=True)
-# # Create a dataset
-# df_ale = pd.DataFrame(c_ale)
-# # Default heatmap: just a visualization of this square matrix
-# sns.heatmap(df_ale, cmap=cmap, vmin=0, vmax=m_v)
-# plt.xlabel(u"Localização")
-# plt.ylabel("UAV")
-# # general title
-# plt.title(u"Custo final aleatório", fontsize=13, fontweight=0, color='black', style='italic')
-# plt.savefig(main_path+str(time)+'/ale_'+str(custo)+'.svg')
-# plt.savefig(main_path+str(time)+'/ale_'+str(custo)+'.png')
-# plt.savefig(main_path+str(time)+'/ale_'+str(custo)+'.eps')
-# plt.clf()
+plt.clf()
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+
+# create a color palette
+palette = plt.get_cmap('Set1')
+num=0
+for custo,value in data_c.iteritems():
+    num+=1
+    # Plot the lineplot
+    value=np.array(value)
+    plt.plot(value[:,0], value[:,1], marker='', color=palette(num), linewidth=2.4, alpha=0.9, label=custo)
+plt.xlabel(u"Tempo (s)")
+plt.ylabel("Total de clientes")
+# general title
+plt.title(u"Quantidade de clientes que podem estar ativos", fontsize=13, fontweight=0, color='black', style='italic')
+
+lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.17), fancybox=True, shadow=True, ncol=5)
+
+plt.savefig("./output/"+scenario+'/connected_cli.svg')
+plt.savefig("./output/"+scenario+'/connected_cli.png')
+plt.savefig("./output/"+scenario+'/connected_cli.eps')
+plt.clf()
