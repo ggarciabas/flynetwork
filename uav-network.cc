@@ -75,6 +75,10 @@ UavNetwork::GetTypeId(void)
                                         DoubleValue(10.0),
                                         MakeDoubleAccessor(&UavNetwork::m_zValue),
                                         MakeDoubleChecker<double>())
+                          .AddAttribute("ScheduleServer", "Time to schedule server method.",
+                                        DoubleValue(60.0),
+                                        MakeDoubleAccessor(&UavNetwork::m_scheduleServer),
+                                        MakeDoubleChecker<double>())
                           .AddAttribute("TxGain",
                                         "Transmitter gain",
                                         DoubleValue(3.0),
@@ -350,6 +354,7 @@ void UavNetwork::ConfigureServer()
   obj.Set("MaxX", DoubleValue(m_xmax));
   obj.Set("MaxY", DoubleValue(m_ymax));
   obj.Set("PathData", StringValue(m_pathData));
+  obj.Set("ScheduleServer", StringValue(m_scheduleServer));
 
   m_serverApp = obj.Create()->GetObject<ServerApplication>();
   m_serverApp->SetStartTime(Seconds(0.0));

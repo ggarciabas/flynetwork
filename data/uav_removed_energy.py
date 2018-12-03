@@ -27,6 +27,7 @@ for custo in range(0,len(custos)):
     else:
         for folder_name in glob.glob(main_path+'*/'):
             time_folders.append(int(os.path.dirname(folder_name).split('/')[-1]))
+
     time_folders = np.array(time_folders)
     time_folders.sort()
     for time in time_folders:

@@ -134,6 +134,8 @@ private:
   Ipv4ListRoutingHelper m_list;
   Ipv4InterfaceContainer m_serverAddress;
 
+  double m_scheduleServer;
+
   // AthstatsHelper m_athstats;
 
   std::string m_propagationLossCli;
