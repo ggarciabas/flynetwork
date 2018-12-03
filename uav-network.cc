@@ -354,7 +354,7 @@ void UavNetwork::ConfigureServer()
   obj.Set("MaxX", DoubleValue(m_xmax));
   obj.Set("MaxY", DoubleValue(m_ymax));
   obj.Set("PathData", StringValue(m_pathData));
-  obj.Set("ScheduleServer", StringValue(m_scheduleServer));
+  obj.Set("ScheduleServer", DoubleValue(m_scheduleServer));
 
   m_serverApp = obj.Create()->GetObject<ServerApplication>();
   m_serverApp->SetStartTime(Seconds(0.0));

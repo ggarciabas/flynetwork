@@ -67,7 +67,7 @@ int main (int argc, char *argv[])
 	obj.Set("Environment", UintegerValue(env));
 	obj.Set("Protocol", UintegerValue(protocol));
 	obj.Set("Custo", UintegerValue(custo));
-	obj.Set("ScheduleServer", StringValue(scheduleServer));
+	obj.Set("ScheduleServer", DoubleValue(scheduleServer));
 	Ptr<UavNetwork> net = obj.Create()->GetObject<UavNetwork>();
 	net->Run();
 	net->Dispose();
