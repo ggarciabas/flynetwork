@@ -585,7 +585,7 @@ void ServerApplication::runDAPython()
       os.str("");
       os <<"./scratch/flynetwork/data/output/" << m_pathData << "/" << int(Simulator::Now().GetSeconds()) << "/location_client.txt";
       std::ofstream location_cli;
-      location_cli.open(os.str().c_str(), std::ofstream::in);
+      location_cli.open(os.str().c_str(), std::ofstream::out);
       while (getline(cenario_in, line))
       {
         sscanf(line.c_str(), "%lf,%lf\n", &x, &y); // new location
@@ -645,6 +645,13 @@ void ServerApplication::CreateCentralLocation(void)
   Ptr<LocationModel> loc = fac.Create()->GetObject<LocationModel>();
   loc->SetPosition(pos.x, pos.y);
   m_locationContainer.Add(loc);
+
+  std::ostringstream os;
+  os <<"./scratch/flynetwork/data/output/" << m_pathData << "/" << int(Simulator::Now().GetSeconds()) << "/location_client.txt";
+  std::ofstream location_cli;
+  location_cli.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
+  location_cli << loc->GetId() << "," << loc->GetTotalCli() << "," << loc->GetTotalConsumption() << std::endl;
+  location_cli.close();
 }
 
 double

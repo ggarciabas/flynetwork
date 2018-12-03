@@ -49,6 +49,7 @@ LocationModel::LocationModel()
   NS_LOG_DEBUG ("LocationModel::LocationModel @" << Simulator::Now().GetSeconds());
   m_used = false;
   m_totaCli = 0;
+  m_totalConsumption = 0.0;
 }
 
 LocationModel::~LocationModel()
