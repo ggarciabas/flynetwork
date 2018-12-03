@@ -321,11 +321,13 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
               p.push_back(pos.x);
               p.push_back(pos.y);
               uav->SetNewPosition(p); // pegar posicao do servidor, ele é a central!
+              uav->CancelSendPositionEvent();
               uav->CancelSendDepletionEvent();
               uav->SetSendDepletionEvent(Simulator::ScheduleNow(&ServerApplication::SendDepletionPacket, this, uav));
               p.clear();
+              uav = 0;
               // solicitar novo UAV para a rede!
-              m_newUav(1, false); // solicita novo UAV
+              m_newUav(1, 2); // solicita novo UAV
               // atualizar o posicionamento do Uav na última posicao do vetor, mandando ele para a localização do UAV que esta saindo
               uav = m_uavContainer.GetLast();
               p.push_back(std::stod (results.at(2),&sz));
@@ -380,7 +382,7 @@ void ServerApplication::StartApplication(void)
 {
   NS_LOG_FUNCTION(this);
   m_rmax = std::sqrt(std::pow(m_maxx,2)+std::pow(m_maxy,2));
-  m_newUav(1,false); // inicia com um UAV
+  m_newUav(1,0); // inicia com um UAV
   ValidateUavPosition();
 }
 
@@ -706,7 +708,7 @@ void ServerApplication::runAgendamento(void)
   { // add new uav
     NS_LOG_DEBUG("SERVER - Solicitando novos UAVs @" << Simulator::Now().GetSeconds());
     // chamar callback para criar novos UAVs
-    m_newUav(diff, false); // chamando callback
+    m_newUav(diff, 0); // chamando callback
   }
   else if (diff < 0)
   { // add new loc
@@ -760,7 +762,7 @@ void ServerApplication::runAgendamento(void)
       NS_LOG_DEBUG("ServerApplication::runAgendamento --> Enviar UAV " << (*u_i)->GetId() << " para a central  REF " << (*u_i)->GetReferenceCount());
       // criar um novo nó iniciando na região central, como sempre!
       m_supplyPos = count; // posicao que será suprida
-      m_newUav(1, true); // true, pois está o solicitado para suprir uma posicao
+      m_newUav(1, 1); // true, pois está o solicitado para suprir uma posicao
       NS_LOG_DEBUG ("ServerApplication::runAgendamento recalculando, novo UAV entra na rede para suprir um UAv que nao tem bateria para qualquer das localizações!");
       custo_x[count].clear();
       b_ij[count].clear();
@@ -939,7 +941,7 @@ void ServerApplication::runAgendamento(void)
       NS_LOG_DEBUG("ServerApplication::runAgendamento --> Enviar UAV " << (*u_i)->GetId() << " para a central  REF " << (*u_i)->GetReferenceCount());
       // criar um novo nó iniciando na região central, como sempre!
       m_supplyPos = count; // posicao que será suprida
-      m_newUav(1, true); // true, pois está o solicitando para suprir uma posicao
+      m_newUav(1, 1); // true, pois está o solicitando para suprir uma posicao
       NS_LOG_DEBUG ("ServerApplication::runAgendamento recalculando, novo UAV entra na rede para suprir um UAv que nao tem bateria para qualquer das localizações!");
       f_mij[i].clear();
       custo = CalculateCusto((*u_i), m_locationContainer.Get(id), central_pos);

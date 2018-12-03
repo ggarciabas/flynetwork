@@ -376,7 +376,7 @@ void UavNetwork::ConfigureServer()
   m_serverNode.Get(0)->AddApplication(m_serverApp);
 }
 
-void UavNetwork::NewUav(int total, bool update)
+void UavNetwork::NewUav(int total, int update)
 {
   NS_LOG_DEBUG ("UavNetwork::NewUav " << total << " " << update << " @" << Simulator::Now().GetSeconds());
   // validar se ainda existem UAVs
@@ -416,7 +416,7 @@ void UavNetwork::NewUav(int total, bool update)
     // Adicionando informacoes na aplicacao servidor!
     Ipv4Address addr = n->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();
     NS_LOG_DEBUG("IP " << addr << " -------------");
-    if (update) {
+    if (update == 1 || update == 2) {
       // envia ao servidor informacoes do UAV substituto
       m_serverApp->AddSupplyUav(n->GetId(), addr, source->GetRemainingEnergy(), n->GetObject<UavDeviceEnergyModel>()->GetEnergyCost(), source->GetInitialEnergy(), n->GetObject<MobilityModel>());
     } else { // adiciona um novo UAV no servidor
@@ -426,7 +426,11 @@ void UavNetwork::NewUav(int total, bool update)
     std::ostringstream os;
     os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_network_log.txt";
     m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-    m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << ",1" << std::endl;
+    if (update == 2) {
+      m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << ",2" << std::endl;
+    } else  {
+      m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << ",1" << std::endl;
+    }
     m_file.close();
 
     n = 0;

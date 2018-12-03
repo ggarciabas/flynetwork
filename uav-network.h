@@ -57,14 +57,14 @@ public:
   void Run();
   void ClientPosition (string name);
 
-  void NewUav (int total, bool update);
+  void NewUav (int total, int update);
   void RemoveUav(int id);
 
   /**
    * TracedCallback signature.
    */
   typedef void (*RemoveUavTrace) (int id);
-  typedef void (*NewUavTrace)(int total, bool update);
+  typedef void (*NewUavTrace)(int total, int update);
   typedef void (*ClientPositionTrace)(string name);
 
 

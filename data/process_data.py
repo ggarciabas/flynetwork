@@ -65,6 +65,8 @@ for custo in custos:
             activated[str("UAV "+sep[1])][float(sep[0])] = 'k'
         elif int(sep[2]) == 0:
             activated[str("UAV "+sep[1])][float(sep[0])] = 'r'
+        elif int(sep[2]) == 2:
+            activated[str("UAV "+sep[1])][float(sep[0])] = 'g'
 
     if teste:
         print activated

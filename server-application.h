@@ -110,7 +110,7 @@ private:
   double m_locConsTotal; // total de consumo das localizacoes
   Ipv4Address m_address;
 
-  TracedCallback<int, bool> m_newUav;
+  TracedCallback<int, int> m_newUav;
   TracedCallback<int> m_removeUav;
   TracedCallback<int> m_printUavEnergy;
   TracedCallback<string> m_clientPosition;
