@@ -34,7 +34,7 @@ for custo in range(0,len(custos)):
         if teste:
             print "Tempo: " + str(time)
         try:
-            f_mij = open(main_path+str(time)+"/f_mij.txt", 'r')
+            f_mij = open(main_path+'etapa/'+str(time)+"/f_mij.txt", 'r')
         except IOError:
             print "Failed f_mij"
             exit()
@@ -59,7 +59,7 @@ for custo in range(0,len(custos)):
         # obs. este total depende da execucao (avaliado para cada custo), assim deve ser analisado também outros fatores, como desperdício, por exemplo
         # uav_energy.txt
         try:
-            f_energy = open(main_path+str(time)+"/uav_energy.txt", 'r')
+            f_energy = open(main_path+'etapa/'+str(time)+"/uav_energy.txt", 'r')
         except IOError:
             print "Failed uav_energy"
             exit()
@@ -71,7 +71,7 @@ for custo in range(0,len(custos)):
 
         # ler localizacoes
         try:
-            f_location = open(main_path+str(time)+"/location_client.txt", 'r')
+            f_location = open(main_path+'etapa/'+str(time)+"/location_client.txt", 'r')
         except IOError:
             print "Failed location_client"
             exit()

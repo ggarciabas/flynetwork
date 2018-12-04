@@ -9,7 +9,7 @@ teste = False
 
 time = sys.argv[1]
 
-f_cen = open('./scratch/flynetwork/data/"+scenario+"/radar_uav_loc_'+time+'.txt','r')
+f_cen = open('./scratch/flynetwork/data/"+scenario+"/radar_uav_loc_'+'etapa/'+time+'.txt','r')
 # f_cen = open('radar_uav_loc_0.txt','r')
 data = {}
 # read LOCs ids
@@ -76,5 +76,5 @@ for i in range(0, len(locs)-1):
 # Add legend
 plt.legend(loc='upper right', bbox_to_anchor=(0.1, 0.1))
 
-plt.savefig('./scratch/flynetwork/data/da/radar_uav_loc_'+time+'.svg')
+plt.savefig('./scratch/flynetwork/data/da/radar_uav_loc_'+'etapa/'+time+'.svg')
 # plt.savefig('teste.svg')

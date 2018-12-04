@@ -32,7 +32,7 @@ for custo in range(0,len(custos)):
     time_folders.sort()
     for time in time_folders:
         try:
-            f_removed = open(main_path+str(time)+"/uav_removed_energy.txt", 'r')
+            f_removed = open(main_path+'etapa/'+str(time)+"/uav_removed_energy.txt", 'r')
             total = 0.0
             for line in f_removed:
                 total = total + float(line.strip())

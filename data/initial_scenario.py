@@ -10,7 +10,7 @@ colors = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
 
 def scenario (time, main_path, teste):
     try:
-        f_cen = open(main_path+time+'/uav_loc.txt','r')
+        f_cen = open(main_path+'etapa/'+time+'/uav_loc.txt','r')
     except IOError:
         return
     # read LIMITS
@@ -39,7 +39,7 @@ def scenario (time, main_path, teste):
     f_cen.close()
     point_value = range(0,len(value)*2)
 
-    f_cen = open(main_path+time+'/client.txt','r')
+    f_cen = open(main_path+'etapa/'+time+'/client.txt','r')
     # read CLIENTS
     line = f_cen.readline().strip()
     cli = [x for x in line.split(',')] # position that server knows

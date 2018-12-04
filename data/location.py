@@ -14,7 +14,7 @@ def scenario (time, main_path, teste):
     if teste:
         print time
     try:
-        f_cen = open(main_path+time+'/uav_loc.txt','r')
+        f_cen = open(main_path+'etapa/'+time+'/uav_loc.txt','r')
     except IOError:
         return
     # read LIMITS
@@ -44,7 +44,7 @@ def scenario (time, main_path, teste):
     point_value = range(0,len(value)*2)
 
     try:
-        f_cen = open(main_path+time+'/client.txt','r')
+        f_cen = open(main_path+'etapa/'+time+'/client.txt','r')
     except IOError:
         return
     # read CLIENTS
@@ -117,11 +117,11 @@ def scenario (time, main_path, teste):
     plt.ylim([0,lim[1]])
     plt.xlabel('X (m)')
     plt.ylabel('Y (m)')
-    plt.title("Cenario @"+time+"s")
+    plt.title("Cenario @"+'etapa/'+time+"s")
 
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.23), fancybox=True, shadow=True, ncol=5)
 
-    plt.savefig(main_path+time+'/location.svg', bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.savefig(main_path+time+'/location.eps', bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.savefig(main_path+time+'/location.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+'etapa/'+time+'/location.svg', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+'etapa/'+time+'/location.eps', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+'etapa/'+time+'/location.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
     # plt.savefig('teste.svg')

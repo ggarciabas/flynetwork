@@ -41,7 +41,7 @@ for custo in custos:
     for time in list_folder:
         # read bij
         try:
-            file = open(main_path+str(time)+"/bij.txt", 'r')
+            file = open(main_path+'etapa/'+str(time)+"/bij.txt", 'r')
         except IOError:
             exit()
         line = file.readline().strip()
@@ -56,7 +56,7 @@ for custo in custos:
         file.close()
 
         try:
-            file = open(main_path+str(time)+"/f_mij.txt", 'r')
+            file = open(main_path+'etapa/'+str(time)+"/f_mij.txt", 'r')
         except IOError:
             exit()
         line = file.readline().strip()
@@ -111,9 +111,9 @@ for custo in custos:
         def toString(List):
             return ','.join(List)
 
-        f_file = open(main_path+str(time)+"/exaustive.txt", 'w')
-        f_file_s = open(main_path+str(time)+"/sequential.txt", 'w')
-        f_file_a = open(main_path+str(time)+"/random.txt", 'w')
+        f_file = open(main_path+'etapa/'+str(time)+"/exaustive.txt", 'w')
+        f_file_s = open(main_path+'etapa/'+str(time)+"/sequential.txt", 'w')
+        f_file_a = open(main_path+'etapa/'+str(time)+"/random.txt", 'w')
 
         f_file.write(str(uavs_id[0]))
         f_file_a.write(str(uavs_id[0]))
@@ -211,9 +211,9 @@ for custo in custos:
         plt.ylabel("UAV")
         # general title
         plt.title("Custo final exaustivo", fontsize=13, fontweight=0, color='black', style='italic')
-        plt.savefig(main_path+str(time)+'/exaustive_'+str(custo)+'.svg')
-        plt.savefig(main_path+str(time)+'/exaustive_'+str(custo)+'.png')
-        plt.savefig(main_path+str(time)+'/exaustive_'+str(custo)+'.eps')
+        plt.savefig(main_path+'etapa/'+str(time)+'/exaustive_'+str(custo)+'.svg')
+        plt.savefig(main_path+'etapa/'+str(time)+'/exaustive_'+str(custo)+'.png')
+        plt.savefig(main_path+'etapa/'+str(time)+'/exaustive_'+str(custo)+'.eps')
 
         # print propose heatmap
         plt.clf()
@@ -226,9 +226,9 @@ for custo in custos:
         plt.ylabel("UAV")
         # general title
         plt.title("Custo final algoritmo proposto", fontsize=13, fontweight=0, color='black', style='italic')
-        plt.savefig(main_path+str(time)+'/'+str(custo)+'.svg')
-        plt.savefig(main_path+str(time)+'/'+str(custo)+'.png')
-        plt.savefig(main_path+str(time)+'/'+str(custo)+'.eps')
+        plt.savefig(main_path+'etapa/'+str(time)+'/'+str(custo)+'.svg')
+        plt.savefig(main_path+'etapa/'+str(time)+'/'+str(custo)+'.png')
+        plt.savefig(main_path+'etapa/'+str(time)+'/'+str(custo)+'.eps')
         plt.clf()
 
         # print sequential heatmap
@@ -242,9 +242,9 @@ for custo in custos:
         plt.ylabel("UAV")
         # general title
         plt.title("Custo final sequencial", fontsize=13, fontweight=0, color='black', style='italic')
-        plt.savefig(main_path+str(time)+'/seq_'+str(custo)+'.svg')
-        plt.savefig(main_path+str(time)+'/seq_'+str(custo)+'.png')
-        plt.savefig(main_path+str(time)+'/seq_'+str(custo)+'.eps')
+        plt.savefig(main_path+'etapa/'+str(time)+'/seq_'+str(custo)+'.svg')
+        plt.savefig(main_path+'etapa/'+str(time)+'/seq_'+str(custo)+'.png')
+        plt.savefig(main_path+'etapa/'+str(time)+'/seq_'+str(custo)+'.eps')
         plt.clf()
 
         # print aletorio heatmap
@@ -258,9 +258,9 @@ for custo in custos:
         plt.ylabel("UAV")
         # general title
         plt.title(u"Custo final aleatório", fontsize=13, fontweight=0, color='black', style='italic')
-        plt.savefig(main_path+str(time)+'/ale_'+str(custo)+'.svg')
-        plt.savefig(main_path+str(time)+'/ale_'+str(custo)+'.png')
-        plt.savefig(main_path+str(time)+'/ale_'+str(custo)+'.eps')
+        plt.savefig(main_path+'etapa/'+str(time)+'/ale_'+str(custo)+'.svg')
+        plt.savefig(main_path+'etapa/'+str(time)+'/ale_'+str(custo)+'.png')
+        plt.savefig(main_path+'etapa/'+str(time)+'/ale_'+str(custo)+'.eps')
         plt.clf()
 
         data["Exaustivo"].append(c_exaustive.sum())

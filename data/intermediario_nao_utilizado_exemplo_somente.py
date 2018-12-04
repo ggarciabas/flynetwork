@@ -13,16 +13,16 @@ import sys
 def slide (time, main_path, teste, title, folder):
     print "Executando intermediario "+str(time)
     # validando existencia de arquivos
-    if len(glob.glob(main_path+time+'/bat_.eps')) == 0:
+    if len(glob.glob(main_path+'etapa/'+time+'/bat_.eps')) == 0:
         return
-    if len(glob.glob(main_path+time+'/cli_.eps')) == 0:
+    if len(glob.glob(main_path+'etapa/'+time+'/cli_.eps')) == 0:
         return
-    if len(glob.glob(main_path+time+'/bij_.eps')) == 0:
+    if len(glob.glob(main_path+'etapa/'+time+'/bij_.eps')) == 0:
         return
 
-    bat_file = os.path.basename(glob.glob(main_path+time+'/bat_.eps')[-1])
-    bij_file = os.path.basename(glob.glob(main_path+time+'/bij_.eps')[-1])
-    cli_file = os.path.basename(glob.glob(main_path+time+'/cli_.eps')[-1])
+    bat_file = os.path.basename(glob.glob(main_path+'etapa/'+time+'/bat_.eps')[-1])
+    bij_file = os.path.basename(glob.glob(main_path+'etapa/'+time+'/bij_.eps')[-1])
+    cli_file = os.path.basename(glob.glob(main_path+'etapa/'+time+'/cli_.eps')[-1])
 
     if teste:
         print bat_file
@@ -30,16 +30,16 @@ def slide (time, main_path, teste, title, folder):
         print cli_file
 
     #copiar imagens para a pasta
-    copyfile(main_path+time+'/'+cli_file, main_path+'../'+folder+'/'+str(time)+'_'+cli_file)
-    copyfile(main_path+time+'/'+bij_file, main_path+'../'+folder+'/'+str(time)+'_'+bij_file)
-    copyfile(main_path+time+'/'+bat_file, main_path+'../'+folder+'/'+str(time)+'_'+bat_file)
+    copyfile(main_path+'etapa/'+time+'/'+cli_file, main_path+'../'+folder+'/'+'etapa/'+str(time)+'_'+cli_file)
+    copyfile(main_path+'etapa/'+time+'/'+bij_file, main_path+'../'+folder+'/'+'etapa/'+str(time)+'_'+bij_file)
+    copyfile(main_path+'etapa/'+time+'/'+bat_file, main_path+'../'+folder+'/'+'etapa/'+str(time)+'_'+bat_file)
 
 
-    if len(glob.glob(main_path+time+'/dist_.eps')) == 0:
-        if len(glob.glob(main_path+time+'/mij_*_.eps')) == 0:
+    if len(glob.glob(main_path+'etapa/'+time+'/dist_.eps')) == 0:
+        if len(glob.glob(main_path+'etapa/'+time+'/mij_*_.eps')) == 0:
             return
         list_file=[]
-        for file_path in glob.glob(main_path+time+'/mij_*_.eps'):
+        for file_path in glob.glob(main_path+'etapa/'+time+'/mij_*_.eps'):
             file_name = os.path.basename(file_path)
             list_file.append(file_name)
 
@@ -52,55 +52,55 @@ def slide (time, main_path, teste, title, folder):
         mij_file = list_file[-1]
         if teste:
             print (mij_file)
-        copyfile(main_path+time+'/'+mij_file, main_path+'../'+folder+'/'+str(time)+'_mij.eps')
-        f_file = open(main_path+'../'+folder+'/slide_intermediario_'+str(time)+'.tex', 'w')
+        copyfile(main_path+'etapa/'+time+'/'+mij_file, main_path+'../'+folder+'/'+'etapa/'+str(time)+'_mij.eps')
+        f_file = open(main_path+'../'+folder+'/slide_intermediario_'+'etapa/'+str(time)+'.tex', 'w')
         f_file.write("""\\begin{frame}{"""+title+"""}
             \\begin{columns}
                 \\begin{column}{0.45\\textwidth}
                    \\begin{figure}[!htb]
-                        \\includegraphics[width=\\textwidth]{"""+folder+'/'+str(time)+'_'+bij_file+"""}
+                        \\includegraphics[width=\\textwidth]{"""+folder+'/'+'etapa/'+str(time)+'_'+bij_file+"""}
                     \\end{figure}
                     \\vspace{-0.5cm}
                    \\begin{figure}[!htb]
-                        \\includegraphics[width=\\textwidth]{"""+folder+'/'+str(time)+"""_mij.eps}
+                        \\includegraphics[width=\\textwidth]{"""+folder+'/'+'etapa/'+str(time)+"""_mij.eps}
                     \\end{figure}
                 \\end{column}
                 \\begin{column}{0.45\\textwidth}
                    \\begin{figure}[!htb]
-                        \\includegraphics[width=\\textwidth]{"""+folder+'/'+str(time)+'_'+bat_file+"""}
+                        \\includegraphics[width=\\textwidth]{"""+folder+'/'+'etapa/'+str(time)+'_'+bat_file+"""}
                     \\end{figure}
                     \\vspace{-0.5cm}
                    \\begin{figure}[!htb]
-                        \\includegraphics[width=\\textwidth]{"""+folder+'/'+str(time)+'_'+cli_file+"""}
+                        \\includegraphics[width=\\textwidth]{"""+folder+'/'+'etapa/'+str(time)+'_'+cli_file+"""}
                     \\end{figure}
                 \\end{column}
             \\end{columns}
         \\end{frame}""")
         f_file.close()
     else:
-        dist_file = os.path.basename(glob.glob(main_path+time+'/dist_.eps')[-1])
+        dist_file = os.path.basename(glob.glob(main_path+'etapa/'+time+'/dist_.eps')[-1])
         if teste:
             print dist_file
-        copyfile(main_path+time+'/'+dist_file, main_path+'../'+folder+'/'+str(time)+'_'+dist_file)
-        f_file = open(main_path+'../'+folder+'/slide_intermediario_'+str(time)+'.tex', 'w')
+        copyfile(main_path+'etapa/'+time+'/'+dist_file, main_path+'../'+folder+'/'+'etapa/'+str(time)+'_'+dist_file)
+        f_file = open(main_path+'../'+folder+'/slide_intermediario_'+'etapa/'+str(time)+'.tex', 'w')
         f_file.write("""\\begin{frame}{"""+title+"""}
             \\begin{columns}
                 \\begin{column}{0.45\\textwidth}
                    \\begin{figure}[!htb]
-                        \\includegraphics[width=\\textwidth]{"""+folder+'/'+str(time)+'_'+bat_file+"""}
+                        \\includegraphics[width=\\textwidth]{"""+folder+'/'+'etapa/'+str(time)+'_'+bat_file+"""}
                     \\end{figure}
                     \\vspace{-0.5cm}
                    \\begin{figure}[!htb]
-                        \\includegraphics[width=\\textwidth]{"""+folder+'/'+str(time)+'_'+cli_file+"""}
+                        \\includegraphics[width=\\textwidth]{"""+folder+'/'+'etapa/'+str(time)+'_'+cli_file+"""}
                     \\end{figure}
                 \\end{column}
                 \\begin{column}{0.45\\textwidth}
                    \\begin{figure}[!htb]
-                        \\includegraphics[width=\\textwidth]{"""+folder+'/'+str(time)+'_'+bij_file+"""}
+                        \\includegraphics[width=\\textwidth]{"""+folder+'/'+'etapa/'+str(time)+'_'+bij_file+"""}
                     \\end{figure}
                     \\vspace{-0.5cm}
                    \\begin{figure}[!htb]
-                        \\includegraphics[width=\\textwidth]{"""+folder+'/'+str(time)+'_'+dist_file+"""}
+                        \\includegraphics[width=\\textwidth]{"""+folder+'/'+'etapa/'+str(time)+'_'+dist_file+"""}
                     \\end{figure}
                 \\end{column}
             \\end{columns}

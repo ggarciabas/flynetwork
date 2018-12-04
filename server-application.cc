@@ -443,7 +443,7 @@ void ServerApplication::Run ()
   {
     NS_LOG_DEBUG("SERVER - Iniciando execução dos DAs @" << Simulator::Now().GetSeconds());
     std::ostringstream ss;
-    ss << "mkdir -p ./scratch/flynetwork/data/output/"<<m_pathData<<"/" << int(Simulator::Now().GetSeconds()) << "/mij";
+    ss << "mkdir -p ./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij";
     system(ss.str().c_str());
     ss.str("");
     runDAPython();
@@ -517,7 +517,7 @@ void ServerApplication::runDAPython()
   std::ofstream cenario, file;
   std::ostringstream os;
   os.str("");
-  os <<"./scratch/flynetwork/data/output/" << m_pathData << "/" << int(Simulator::Now().GetSeconds()) << "/cenario_in.txt";
+  os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/cenario_in.txt";
   cenario.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
 
   if (cenario.is_open())
@@ -528,7 +528,7 @@ void ServerApplication::runDAPython()
     cenario << pos.x << "," << pos.y;
 
     os.str("");
-    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/"<<int(Simulator::Now().GetSeconds())<<"/client.txt";
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/"<<int(Simulator::Now().GetSeconds())<<"/client.txt";
     file.open(os.str().c_str(), std::ofstream::out);
     bool first = true;
     for (ClientModelContainer::Iterator i = m_clientContainer.Begin(); i != m_clientContainer.End(); ++i)
@@ -564,7 +564,7 @@ void ServerApplication::runDAPython()
   m_totalCliGeral = 0;
 
   os.str ("");
-  os << "python ./scratch/flynetwork/da_python " << m_pathData << " " << int(Simulator::Now().GetSeconds()) << " > ./scratch/flynetwork/data/output/" << m_pathData << "/" << int(Simulator::Now().GetSeconds()) << "/python_log.txt";
+  os << "python ./scratch/flynetwork/da_python " << m_pathData << " " << int(Simulator::Now().GetSeconds()) << " > ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/python_log.txt";
   int status = system(os.str().c_str());
   if (status < 0)
   {
@@ -574,7 +574,7 @@ void ServerApplication::runDAPython()
   {
     std::ifstream cenario_in;
     os.str("");
-    os <<"./scratch/flynetwork/data/output/" << m_pathData << "/" << int(Simulator::Now().GetSeconds()) << "/cenario_out.txt";
+    os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/cenario_out.txt";
     cenario_in.open(os.str().c_str(), std::ofstream::in);
     if (cenario_in.is_open())
     {
@@ -585,7 +585,7 @@ void ServerApplication::runDAPython()
       uint32_t id = 0;
       m_locConsTotal = 0.0;
       os.str("");
-      os <<"./scratch/flynetwork/data/output/" << m_pathData << "/" << int(Simulator::Now().GetSeconds()) << "/location_client.txt";
+      os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/location_client.txt";
       std::ofstream location_cli;
       location_cli.open(os.str().c_str(), std::ofstream::out);
       while (getline(cenario_in, line))
@@ -649,7 +649,7 @@ void ServerApplication::CreateCentralLocation(void)
   m_locationContainer.Add(loc);
 
   std::ostringstream os;
-  os <<"./scratch/flynetwork/data/output/" << m_pathData << "/" << int(Simulator::Now().GetSeconds()) << "/location_client.txt";
+  os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/location_client.txt";
   std::ofstream location_cli;
   location_cli.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
   location_cli << loc->GetId() << "," << loc->GetTotalCli() << "," << loc->GetTotalConsumption() << std::endl;
@@ -819,7 +819,7 @@ void ServerApplication::runAgendamento(void)
 
   int print = 0;
   std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/" << int(Simulator::Now().GetSeconds()) << "/mij/mij_" << std::setfill ('0') << std::setw (7) << print++ << ".txt";
+  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/mij_" << std::setfill ('0') << std::setw (7) << print++ << ".txt";
   PrintMij (m_ij, 1.0, os.str());
 
   // Part A
@@ -896,7 +896,7 @@ void ServerApplication::runAgendamento(void)
     } while (!ValidateMijConvergency(copyB_mij, m_ij, siz) && itB < itB_max);
 
     os.str("");
-    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/" << int(Simulator::Now().GetSeconds()) << "/mij/mij_" << std::setfill ('0') << std::setw (7) << print++ << ".txt";
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/mij_" << std::setfill ('0') << std::setw (7) << print++ << ".txt";
     PrintMij (m_ij, 1.0, os.str());
 
     temp *= m_rho;
@@ -986,11 +986,11 @@ void ServerApplication::runAgendamento(void)
   }
 
   os.str("");
-  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/" << int(Simulator::Now().GetSeconds()) << "/f_mij.txt";
+  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/f_mij.txt";
   PrintMij (f_mij, temp, os.str());
 
   os.str("");
-  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/"<<int(Simulator::Now().GetSeconds())<<"/uav_loc.txt";
+  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/"<<int(Simulator::Now().GetSeconds())<<"/uav_loc.txt";
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
   Vector serv_pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
   file << m_maxx << "," << m_maxy << std::endl << serv_pos.x << "," << serv_pos.y << std::endl << osuav.str() << std::endl << osloc.str() << std::endl << osbij.str() << std::endl;
@@ -1069,9 +1069,9 @@ ServerApplication::PrintBij (vector<vector<double>> b_ij, int print, bool before
 {
   std::ostringstream os;
   if (before) {
-    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/"<<Simulator::Now().GetSeconds()<<"/bij.txt";
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/"<<int(Simulator::Now().GetSeconds())<<"/bij.txt";
   } else {
-    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/"<<Simulator::Now().GetSeconds()<<"/bij_final.txt";
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/"<<int(Simulator::Now().GetSeconds())<<"/bij_final.txt";
   }
   std::ofstream file;
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
@@ -1116,9 +1116,9 @@ ServerApplication::PrintCusto (vector<vector<double>> custo, int print, bool bef
 {
   std::ostringstream os;
   if (before) {
-    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/"<<Simulator::Now().GetSeconds()<<"/custo_" << m_custo << ".txt";
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/"<<int(Simulator::Now().GetSeconds())<<"/custo_" << m_custo << ".txt";
   } else  {
-    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/"<<Simulator::Now().GetSeconds()<<"/custo_" << m_custo << "_final.txt";
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/"<<int(Simulator::Now().GetSeconds())<<"/custo_" << m_custo << "_final.txt";
   }
   std::ofstream file;
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);

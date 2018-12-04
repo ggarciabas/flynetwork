@@ -14,7 +14,7 @@ def bij (custo, time, main_path, teste):
     uav_mov = {}
     data_bij = {}
     try:
-        file = open(main_path+custo+'/'+time+"/bij.txt", 'r')
+        file = open(main_path+custo+'/'+'etapa/'+time+"/bij.txt", 'r')
     except IOError:
         return
     line = file.readline().strip()
@@ -46,9 +46,9 @@ def bij (custo, time, main_path, teste):
     # general title
     plt.title("Bij", fontsize=13, fontweight=0, color='black', style='italic')
 
-    plt.savefig(main_path+custo+'/'+time+'/bij.svg')
-    plt.savefig(main_path+custo+'/'+time+'/bij.png')
-    plt.savefig(main_path+custo+'/'+time+'/bij.eps')
+    plt.savefig(main_path+custo+'/'+'etapa/'+time+'/bij.svg')
+    plt.savefig(main_path+custo+'/'+'etapa/'+time+'/bij.png')
+    plt.savefig(main_path+custo+'/'+'etapa/'+time+'/bij.eps')
 
     plt.clf()
     cmap = sns.cubehelix_palette(50, hue=0.05, rot=0, light=0.9, dark=0, as_cmap=True)
@@ -61,8 +61,8 @@ def bij (custo, time, main_path, teste):
     # general title
     plt.title("Bij", fontsize=13, fontweight=0, color='black', style='italic')
 
-    plt.savefig(main_path+custo+'/'+time+'/bij_.svg')
-    plt.savefig(main_path+custo+'/'+time+'/bij_.png')
-    plt.savefig(main_path+custo+'/'+time+'/bij_.eps')
+    plt.savefig(main_path+custo+'/'+'etapa/'+time+'/bij_.svg')
+    plt.savefig(main_path+custo+'/'+'etapa/'+time+'/bij_.png')
+    plt.savefig(main_path+custo+'/'+'etapa/'+time+'/bij_.eps')
 
     return (uavs, uav_mov)

@@ -11,7 +11,7 @@ import sys
 
 def mij(time, main_path, teste):
     data_mij = {}
-    file = open(main_path+time+'/f_mij.txt', 'r')
+    file = open(main_path+'etapa/'+time+'/f_mij.txt', 'r')
     line = file.readline().strip()
     graphic_temp = [x for x in line.split(',')]
     line = file.readline().strip()
@@ -37,9 +37,9 @@ def mij(time, main_path, teste):
     plt.xlabel("Localizacao")
     plt.ylabel("UAV")
 
-    plt.savefig(main_path+time+'/f_mij.svg')
-    plt.savefig(main_path+time+'/f_mij.png')
-    plt.savefig(main_path+time+'/f_mij.eps')
+    plt.savefig(main_path+'etapa/'+time+'/f_mij.svg')
+    plt.savefig(main_path+'etapa/'+time+'/f_mij.png')
+    plt.savefig(main_path+'etapa/'+time+'/f_mij.eps')
 
     plt.clf()
     cmap = sns.cubehelix_palette(50, hue=0.05, rot=0, light=0.9, dark=0, as_cmap=True)
@@ -51,6 +51,6 @@ def mij(time, main_path, teste):
     plt.xlabel("Localizacao")
     plt.ylabel("UAV")
 
-    plt.savefig(main_path+time+'/f_mij_.svg')
-    plt.savefig(main_path+time+'/f_mij_.png')
-    plt.savefig(main_path+time+'/f_mij_.eps')
+    plt.savefig(main_path+'etapa/'+time+'/f_mij_.svg')
+    plt.savefig(main_path+'etapa/'+time+'/f_mij_.png')
+    plt.savefig(main_path+'etapa/'+time+'/f_mij_.eps')

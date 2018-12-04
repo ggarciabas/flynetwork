@@ -257,6 +257,9 @@ void UavNetwork::Run()
   ss.str("");
   ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_energy_threshold";
   system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/etapa";
+  system(ss.str().c_str());
   // ss.str("");
   // ss << "./scratch/flynetwork/data/output/"<< m_pathData<<"/packet_trace_server.txt";
   // m_filePacketServer = ss.str().c_str();
@@ -395,14 +398,24 @@ void UavNetwork::NewUav(int total, int update)
 {
   NS_LOG_DEBUG ("UavNetwork::NewUav " << total << " " << update << " @" << Simulator::Now().GetSeconds());
   // validar se ainda existem UAVs
-  if (m_uavNode.GetN() < uint32_t(total)) {// Caso nao, configurar um novo
-    ConfigureUav(total - m_uavNode.GetN()); // diferenca
+  int uav_in_central = 0;
+  for (UavNodeContainer::Iterator i = m_uavNode.Begin(); i != m_uavNode.End(); ++i) {
+    MobilityModel mob = (*i)->GetObject<MobilityModel>();
+    if (mob->GetPosition().x == m_cx && mob->GetPosition().y == m_cy) { /// somente considera o UAV que está na central!
+      uav_in_central++
+    }
   }
-  // uint32_t sz = m_uavNode.GetN();
-  // for (uint32_t i = sz-1; i >= (sz-total); i = i - 1) {
+  if (uav_in_central < uint32_t(total)) {// Caso nao, configurar um novo
+    ConfigureUav(total - uav_in_central); // diferenca
+  }
   while (total--) {
-    NS_LOG_DEBUG("Id " << m_uavNode.Get(0)->GetId() << " REF " << m_uavNode.Get(0)->GetReferenceCount());
-    Ptr<Node> n = m_uavNode.RemoveAt(0);
+    int p = -1;
+    do {
+      MobilityModel mob = m_uavNode.Get(++p)->GetObject<MobilityModel>();
+    } while (!(mob->GetPosition().x == m_cx && mob->GetPosition().y == m_cy); // somente se estiver na central
+
+    NS_LOG_DEBUG("Id " << m_uavNode.Get(p)->GetId() << " REF " << m_uavNode.Get(p)->GetReferenceCount());
+    Ptr<Node> n = m_uavNode.RemoveAt(p);
 
     NS_LOG_DEBUG("->REF " << n->GetReferenceCount());
     m_uavNodeActive.Add(n);
@@ -424,7 +437,7 @@ void UavNetwork::NewUav(int total, int update)
     do {
       uavApp = DynamicCast<UavApplication>(n->GetApplication(app));
       --app;
-    } while (uavApp==NULL && app >= 0);
+    } while (uavApp == NULL && app >= 0);
     NS_ASSERT (uavApp != NULL);
     uavApp->Start(m_simulationTime);
 
@@ -487,7 +500,7 @@ void UavNetwork::RemoveUav(int id)
   m_file.close();
 
   os.str("");
-  os << "./scratch/flynetwork/data/output/" << m_pathData << "/" << int(Simulator::Now().GetSeconds()) << "/uav_removed_energy.txt";
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/uav_removed_energy.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   Ptr<UavDeviceEnergyModel> dev = n->GetObject<UavDeviceEnergyModel>();
   m_file << dev->GetEnergySource()->GetRemainingEnergy() / dev->GetEnergySource()->GetInitialEnergy() << std::endl;
@@ -956,7 +969,7 @@ void UavNetwork::PrintUavEnergy (int t)
 {
   NS_LOG_FUNCTION(this);
   std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/" << m_pathData << "/" << t << "/uav_energy.txt";
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << t << "/uav_energy.txt";
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   for (UavNodeContainer::Iterator it = m_uavNodeActive.Begin(); it != m_uavNodeActive.End(); ++it) {

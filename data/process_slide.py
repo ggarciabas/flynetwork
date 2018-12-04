@@ -36,7 +36,7 @@ for custo in custos:
     list_folder = []
 
     if int(sys.argv[3]) == -1: # folder number
-        for folder_name in glob.glob(main_path+custo+'/*/'):
+        for folder_name in glob.glob(main_path+custo+'/etapa/*/'):
             list_folder.append(int(os.path.dirname(folder_name).split('/')[-1]))
     else:
         list_folder.append(int(sys.argv[3]))
@@ -56,6 +56,6 @@ for custo in custos:
 
     file = open(main_path+'..'+'/slide/slide_'+folder+'.tex', 'w')
     for time in list_folder:
-        if len(glob.glob(main_path+'../slide/'+folder+'/slide_'+str(time)+'.tex'))>0:
-            file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+folder+'/slide_'+str(time)+'.tex')[0])+"}\n")
+        if len(glob.glob(main_path+'../slide/'+folder+'/slide_'+'etapa/'+str(time)+'.tex'))>0:
+            file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+folder+'/slide_'+'etapa/'+str(time)+'.tex')[0])+"}\n")
     file.close()
