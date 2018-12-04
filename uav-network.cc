@@ -398,11 +398,11 @@ void UavNetwork::NewUav(int total, int update)
 {
   NS_LOG_DEBUG ("UavNetwork::NewUav " << total << " " << update << " @" << Simulator::Now().GetSeconds());
   // validar se ainda existem UAVs
-  int uav_in_central = 0;
+  uint32_t uav_in_central = 0;
   for (UavNodeContainer::Iterator i = m_uavNode.Begin(); i != m_uavNode.End(); ++i) {
-    MobilityModel mob = (*i)->GetObject<MobilityModel>();
+    Ptr<MobilityModel> mob = (*i)->GetObject<MobilityModel>();
     if (mob->GetPosition().x == m_cx && mob->GetPosition().y == m_cy) { /// somente considera o UAV que está na central!
-      uav_in_central++
+      uav_in_central++;
     }
   }
   if (uav_in_central < uint32_t(total)) {// Caso nao, configurar um novo
@@ -410,9 +410,10 @@ void UavNetwork::NewUav(int total, int update)
   }
   while (total--) {
     int p = -1;
+    Ptr<MobilityModel> mob = 0;
     do {
-      MobilityModel mob = m_uavNode.Get(++p)->GetObject<MobilityModel>();
-    } while (!(mob->GetPosition().x == m_cx && mob->GetPosition().y == m_cy); // somente se estiver na central
+      mob = m_uavNode.Get(++p)->GetObject<MobilityModel>();
+    } while (!(mob->GetPosition().x == m_cx && mob->GetPosition().y == m_cy)); // somente se estiver na central
 
     NS_LOG_DEBUG("Id " << m_uavNode.Get(p)->GetId() << " REF " << m_uavNode.Get(p)->GetReferenceCount());
     Ptr<Node> n = m_uavNode.RemoveAt(p);
