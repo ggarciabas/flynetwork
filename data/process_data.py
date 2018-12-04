@@ -8,6 +8,7 @@ import uav_loc_graphic
 import bij_graphic
 import mij_graphic
 import moving_graphic
+import battery_threshold
 import initial_scenario
 import client
 import location
@@ -107,3 +108,4 @@ for custo in custos:
     battery_all.battery(main_path+custo+'/', teste, all_uav, 0, t_ini+10, activated, 'all')
     battery_mov.battery(main_path+custo+'/', teste, [], 0, t_ini+10, activated, 'all')
     battery_hover.battery(main_path+custo+'/', teste, all_uav, 0, t_ini+10, activated, 'all')
+    battery_threshold.battery(main_path+custo+'/', teste, all_uav, 0, t_ini+10, activated, '')
