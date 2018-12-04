@@ -130,6 +130,11 @@ double UavDeviceEnergyModel::ChangeThreshold () {
 
 void UavDeviceEnergyModel::HandleEnergyRecharged (void)
 {
+  std::ostringstream os;
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_recharged.txt";
+  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  m_file << Simulator::Now().GetSeconds() << "," << m_node->GetId() << "," << m_source->GetRemainingEnergy() << std::endl;
+  m_file.close();
   m_energyRechargedCallback();
   m_totalEnergyConsumption = 0.0;
   m_lastPosition = m_node->GetObject<MobilityModel>()->GetPosition();
