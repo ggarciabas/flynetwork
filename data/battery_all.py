@@ -17,7 +17,7 @@ def battery(main_path, teste, uavs_id, time_ini, time_end, activated, title_f):
         print uavs_id
     uav_files = {}
     ordered_uav_id = []
-    for name_file in glob.glob(main_path+'uav_remaining_energy_*.txt'):
+    for name_file in glob.glob(main_path+'uav_remaining_energy/uav_remaining_energy_*.txt'):
         base=os.path.basename(name_file)
         id = os.path.splitext(base)[0].split("uav_remaining_energy_")[-1]
         uav_files[id] = name_file
@@ -105,9 +105,9 @@ def battery(main_path, teste, uavs_id, time_ini, time_end, activated, title_f):
     plt.xlabel('Tempo (s)')
     plt.ylabel('Bateria (%)')
 
-    plt.savefig(main_path+'uav_remaining_energy_'+str(title_f)+'.svg')
-    plt.savefig(main_path+'uav_remaining_energy_'+str(title_f)+'.eps')
-    plt.savefig(main_path+'uav_remaining_energy_'+str(title_f)+'.png')
+    plt.savefig(main_path+'uav_remaining_energy/uav_remaining_energy_'+str(title_f)+'.svg')
+    plt.savefig(main_path+'uav_remaining_energy/uav_remaining_energy_'+str(title_f)+'.eps')
+    plt.savefig(main_path+'uav_remaining_energy/uav_remaining_energy_'+str(title_f)+'.png')
 
 
     # multiple line plot
@@ -142,6 +142,6 @@ def battery(main_path, teste, uavs_id, time_ini, time_end, activated, title_f):
         plt.xlabel('Tempo (s)')
         plt.ylabel('Bateria (%)')
 
-        plt.savefig(main_path+'uav_remaining_energy_'+str(title_f)+'_'+str(num)+'.svg')
-        plt.savefig(main_path+'uav_remaining_energy_'+str(title_f)+'_'+str(num)+'.eps')
-        plt.savefig(main_path+'uav_remaining_energy_'+str(title_f)+'_'+str(num)+'.png')
+        plt.savefig(main_path+'uav_remaining_energy/uav_remaining_energy_'+str(title_f)+'_'+str(num)+'.svg')
+        plt.savefig(main_path+'uav_remaining_energy/uav_remaining_energy_'+str(title_f)+'_'+str(num)+'.eps')
+        plt.savefig(main_path+'uav_remaining_energy/uav_remaining_energy_'+str(title_f)+'_'+str(num)+'.png')
