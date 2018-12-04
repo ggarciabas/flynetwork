@@ -145,6 +145,7 @@ UavNetwork::GetTypeId(void)
 UavNetwork::UavNetwork() //: m_filePacketServer("./scratch/flynetwork/data/output/packet_trace_server.txt"), m_filePacketUav("./scratch/flynetwork/data/output/packet_trace_uav.txt"), m_filePacketClient("./scratch/flynetwork/data/output/packet_trace_client.txt")
 {
   NS_LOG_FUNCTION(this);
+  m_iniX = m_iniY = -2000;
 }
 
 void UavNetwork::DoDispose ()
@@ -398,22 +399,22 @@ void UavNetwork::NewUav(int total, int update)
 {
   NS_LOG_DEBUG ("UavNetwork::NewUav " << total << " " << update << " @" << Simulator::Now().GetSeconds());
   // validar se ainda existem UAVs
-  uint32_t uav_in_central = 0;
+  uint32_t uav_livre = 0;
   for (UavNodeContainer::Iterator i = m_uavNode.Begin(); i != m_uavNode.End(); ++i) {
     Ptr<MobilityModel> mob = (*i)->GetObject<MobilityModel>();
-    if (mob->GetPosition().x == m_cx && mob->GetPosition().y == m_cy) { /// somente considera o UAV que está na central!
-      uav_in_central++;
+    if (mob->GetPosition().x == m_iniX && mob->GetPosition().y == m_iniY) { // somente se estiver na "posicao inicial"
+      uav_livre++;
     }
   }
-  if (uav_in_central < uint32_t(total)) {// Caso nao, configurar um novo
-    ConfigureUav(total - uav_in_central); // diferenca
+  if (uav_livre < uint32_t(total)) {// Caso nao, configurar um novo
+    ConfigureUav(total - uav_livre); // diferenca
   }
   while (total--) {
     int p = -1;
     Ptr<MobilityModel> mob = 0;
     do {
       mob = m_uavNode.Get(++p)->GetObject<MobilityModel>();
-    } while (!(mob->GetPosition().x == m_cx && mob->GetPosition().y == m_cy)); // somente se estiver na central
+    } while (!(mob->GetPosition().x == m_iniX && mob->GetPosition().y == m_iniY)); // somente se estiver na "posicao inicial"
 
     NS_LOG_DEBUG("Id " << m_uavNode.Get(p)->GetId() << " REF " << m_uavNode.Get(p)->GetReferenceCount());
     Ptr<Node> n = m_uavNode.RemoveAt(p);
@@ -486,7 +487,7 @@ void UavNetwork::RemoveUav(int id)
   uavApp->Stop();
 
   // modificando posicionamento para fora do cenario
-  Vector v (2000,2000,0);
+  Vector v (m_iniX, m_iniY,0);
   Ptr<UavMobilityModel> model = n->GetObject<UavMobilityModel>();
   model->SetFirstPosition(v); // manda para perto da central!
 
@@ -536,7 +537,7 @@ void UavNetwork::ConfigureUav(int total)
     ObjectFactory objFacMobUAV;
     objFacMobUAV.SetTypeId("ns3::UavMobilityModel");
     objFacMobUAV.Set("Speed", DoubleValue(m_speedUav));
-    Vector v(2000,2000,0); // longe, bem longe! Para nao influenciar nos resultados!
+    Vector v(m_iniX, m_iniY,0); // longe, bem longe! Para nao influenciar nos resultados!
     objFacMobUAV.Set("FirstPosition", VectorValue(v));// modificando posicionamento inicial do UAV
     Ptr<MobilityModel> model = objFacMobUAV.Create()->GetObject<MobilityModel>();
     Ptr<Object> object = (*i);

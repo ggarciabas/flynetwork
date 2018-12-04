@@ -133,7 +133,7 @@ private:
   std::string m_protocolName;
   Ipv4ListRoutingHelper m_list;
   Ipv4InterfaceContainer m_serverAddress;
-
+  double m_iniX, m_iniY; // posicao inicial do UAV para nao interferir nos resultados!
   double m_scheduleServer;
 
   // AthstatsHelper m_athstats;
