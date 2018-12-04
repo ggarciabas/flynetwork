@@ -93,6 +93,7 @@ private:
   void PrintBij (vector<vector<double>> b_ij, int print, bool before);
 
   UavModelContainer   m_uavContainer;
+  UavModelContainer   m_uavGoToCentral; // UAVs enviados para central
   LocationModelContainer m_locationContainer;
   ClientModelContainer          m_fixedClientContainer; // utilizando o container de clientes diretamente só mudando o 'login' destes 'nos'
   ClientModelContainer m_clientContainer;

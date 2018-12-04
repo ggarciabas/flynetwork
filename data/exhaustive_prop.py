@@ -21,7 +21,9 @@ for custo in custos:
     if len(sys.argv) == 4: # folder number
         list_folder.append(int(sys.argv[3]))
     else:
-        for folder_name in glob.glob(main_path+'*/'):
+        for folder_name in glob.glob(main_path+'etapa/*/'):
+            if teste:
+                print "folder_name: "+str(folder_name)
             list_folder.append(int(os.path.dirname(folder_name).split('/')[-1]))
     if teste:
         print (list_folder)

@@ -25,7 +25,9 @@ for custo in range(0,len(custos)):
     if len(sys.argv) == 4: # folder number
         time_folders.append(int(sys.argv[3]))
     else:
-        for folder_name in glob.glob(main_path+'*/'):
+        for folder_name in glob.glob(main_path+'etapa/*/'):
+            if teste:
+                print "folder_name: "+str(folder_name)
             time_folders.append(int(os.path.dirname(folder_name).split('/')[-1]))
 
     time_folders = np.array(time_folders)
