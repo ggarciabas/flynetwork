@@ -112,9 +112,7 @@ public:
    */
   Time GetEnergyUpdateInterval (void) const;
 
-  void SetBasicEnergyLowBatteryThreshold (double thr) {
-    m_lowBatteryTh = thr;
-  }
+  void SetBasicEnergyLowBatteryThreshold (double thr);
 
   void Reset ();
   void Stop (); // stop, UAV fora da rede

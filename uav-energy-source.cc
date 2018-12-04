@@ -116,6 +116,18 @@ UavEnergySource::SetEnergyUpdateInterval (Time interval)
   m_energyUpdateInterval = interval;
 }
 
+void
+UavEnergySource::SetBasicEnergyLowBatteryThreshold (double thr)
+{
+  NS_LOG_FUNCTION (this << interval);
+  m_lowBatteryTh = thr;
+  std::ostringstream os;
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_energy_threshold_" << m_node->GetId() << ".txt";
+  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  m_file << Simulator::Now().GetSeconds() << "," << m_lowBatteryTh << std::endl;
+  m_file.close();
+}
+
 Time
 UavEnergySource::GetEnergyUpdateInterval (void) const
 {
