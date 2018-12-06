@@ -186,7 +186,7 @@ void ServerApplication::AddSupplyUav(uint32_t id, Ipv4Address addrAdhoc, double 
   supplied->SetNewPosition(mob->GetPosition().x, mob->GetPosition().y); // para nao dar erro ao validar posicionamento
   supplied->NotConfirmed(); // atualiza o valor para identificar se o UAV chegou a posicao correta
   supplied->CancelSendPositionEvent();
-  supplied->SetSendPositionEvent(Simulator::Schedule(Seconds(t), &ServerApplication::SendUavPacket, this, supplied));
+  supplied->SetSendPositionEvent(Simulator::ScheduleNow(&ServerApplication::SendUavPacket, this, supplied));
 
   m_uavGoToCentral.Add(supplied);
   m_uavContainer.RemoveUav(supplied);
