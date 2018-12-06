@@ -72,6 +72,9 @@ public:
   void SetSendPositionEvent (EventId);
   void CancelSendPositionEvent();
 
+  void SetSendSupplyEvent (EventId);
+  void CancelSendSupplyEvent();
+
   void SetSendDepletionEvent (EventId);
   void CancelSendDepletionEvent();
 
@@ -95,6 +98,7 @@ private:
   EventId m_sendPosition;
   EventId m_sendDepletion;
   EventId m_askCliData;
+  EventId m_sendSupply;
   Ipv4Address m_addressAdhoc;
   double m_totalEnergy; // total de bateria atual do UAV
   double m_energyCost;

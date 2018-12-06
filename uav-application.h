@@ -75,14 +75,14 @@ public:
   void Start(double);
   void Stop();
 
-  void ReplyServerDepletion ();
-
 private:
   void DoDispose();
   virtual void StartApplication(void);
   virtual void StopApplication(void);
 
   void ReplyServer ();
+  void ReplyServerDepletion ();
+  void ReplyServerSupply ();
 
   void ScheduleTx(void);
   void SendPacket(void);

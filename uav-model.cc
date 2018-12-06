@@ -107,6 +107,18 @@ void UavModel::SetAskCliDataEvent (EventId id)
   m_askCliData = id;
 }
 
+void
+UavModel::SetSendSupplyEvent (EventId id)
+{
+  m_sendSupply = id;
+}
+
+void
+UavModel::CancelSendSupplyEvent()
+{
+  Simulator::Remove(m_sendSupply);
+}
+
 void UavModel::CancelAskCliDataEvent()
 {
   Simulator::Remove(m_askCliData);

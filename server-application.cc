@@ -161,7 +161,7 @@ void ServerApplication::AddSupplyUav(uint32_t id, Ipv4Address addrAdhoc, double 
 {
   NS_LOG_FUNCTION(this);
 
-  NS_LOG_DEBUG("Criando supply uav: " << id);
+  NS_LOG_DEBUG("Criando supply uav: " << id << " last: " << m_supplyPos);
 
   Ptr<Socket> socket = Socket::CreateSocket(GetNode(), UdpSocketFactory::GetTypeId());
 
@@ -185,8 +185,8 @@ void ServerApplication::AddSupplyUav(uint32_t id, Ipv4Address addrAdhoc, double 
   Ptr<UavModel> supplied = m_uavContainer.Get(m_supplyPos);
   supplied->SetNewPosition(mob->GetPosition().x, mob->GetPosition().y); // para nao dar erro ao validar posicionamento
   supplied->NotConfirmed(); // atualiza o valor para identificar se o UAV chegou a posicao correta
-  supplied->CancelSendPositionEvent();
-  supplied->SetSendPositionEvent(Simulator::ScheduleNow(&ServerApplication::SendUavPacket, this, supplied));
+  supplied->CancelSendSupplyEvent();
+  supplied->SetSendSupplyEvent(Simulator::ScheduleNow(&ServerApplication::SendSupplyPacket, this, supplied));
 
   m_uavGoToCentral.Add(supplied);
   m_uavContainer.RemoveUav(supplied);
@@ -230,7 +230,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
     mm << "SERVER\t-1\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tUAV";
     m_packetTrace(mm.str());
     pos.push_back(std::stod(results.at(3), &sz)); // UAV tem posição 3D
-    if (CalculateDistanceCentral(pos)==0.0) { // caso o UAv esteja na central, desligar!
+    if (CalculateDistanceCentral(pos)==0.0) { // caso o UAV esteja na central, desligar!
       Ptr<UavModel> uav = m_uavGoToCentral.FindUavModel(std::stoi(results.at(4), &sz));
       if (uav != NULL)
       {
@@ -274,7 +274,18 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             {
               NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [UAVRECEIVED] --- fora da rede?! ID " << results.at(1));
             }
-      } else if (results.at(0).compare("CENTRALOK") == 0)  {
+      } else if (results.at(0).compare("CENTRALOKSUPPLY") == 0)  {
+               Ptr<UavModel> uav = m_uavGoToCentral.FindUavModel(std::stoi(results.at(1), &sz));
+               if (uav != NULL)
+               {
+                 uav->CancelSendSupplyEvent(); // recebida confirmacao do UAV
+                 uav = 0;
+                 NS_LOG_INFO("SERVER - CENTRALOKSUPPLY ::: UAV going to central @" << Simulator::Now().GetSeconds());
+               } else
+               {
+                 NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [CENTRALOKSUPPLY] --- fora da rede?! ID " << results.at(1));
+               }
+        } else if (results.at(0).compare("CENTRALOK") == 0)  {
                Ptr<UavModel> uav = m_uavContainer.FindUavModel(std::stoi(results.at(1), &sz));
                if (uav != NULL)
                {
@@ -357,11 +368,11 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             }
             uav = 0;
           } else {
-            std::ostringstream mm;
-            mm << "SERVER\t-1\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tCLIENT";
-            m_packetTrace(mm.str());
-            NS_LOG_INFO("SERVER -- CLIENT ::: recebida informacoes de aplicacao do cliente no endereco " << add.GetIpv4());
-          }
+              std::ostringstream mm;
+              mm << "SERVER\t-1\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tCLIENT";
+              m_packetTrace(mm.str());
+              NS_LOG_INFO("SERVER -- CLIENT ::: recebida informacoes de aplicacao do cliente no endereco " << add.GetIpv4());
+            }
     results.clear();
 }
 
@@ -473,6 +484,32 @@ void ServerApplication::Run ()
     NS_FATAL_ERROR("SERVER - $$$$ [NÃO] existem clientes identificados no servidor, ignorando execução dos DAs -- Se isso ocorre existe erro no cadastro de clientes fixos (que seriam os palcos)!");
   }
   m_serverEvent = Simulator::Schedule(Seconds(m_scheduleServer), &ServerApplication::AskClientData, this);
+}
+
+void ServerApplication::SendSupplyPacket(Ptr<UavModel> uav)
+{
+  uav->CancelSendSupplyEvent();
+  NS_ASSERT(uav != 0);
+  NS_LOG_FUNCTION(this);
+  std::vector<double> pos = uav->GetNewPosition();
+  std::ostringstream msg;
+  msg << "GOTOCENTRALSUPPLY " << pos.at(0) << " " << pos.at(1) << " 10.0" << '\0';
+  uint16_t packetSize = msg.str().length() + 1;
+  Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
+  if (uav->GetSocket()->Send(packet, 0) == packetSize) {
+    NS_LOG_INFO ("SERVER - UAV [" << Simulator::Now().GetSeconds() << "] ::: enviando informacoes da CENTRAL/supply para o UAV #" << uav->GetId());
+    msg.str("");
+    msg << "SERVER\t-1\tSENT\t" << Simulator::Now().GetSeconds() << "\tUAV";
+    m_packetTrace(msg.str());
+  } else {
+    NS_FATAL_ERROR("SERVER - $$$$ [NÃO] conseguiu enviar informacoes da CENTRAL/supply para o UAV.");
+    uav->SetSendSupplyEvent(Simulator::Schedule(Seconds(0.01), &ServerApplication::SendSupplyPacket, this, uav));
+    pos.clear();
+    return;
+  }
+  uav->SetSendSupplyEvent(Simulator::Schedule(Seconds(5.0), &ServerApplication::SendSupplyPacket, this, uav));
+  NS_LOG_INFO (" ------------ SendSupplyPacket end @" << Simulator::Now().GetSeconds());
+  pos.clear();
 }
 
 void ServerApplication::SendDepletionPacket(Ptr<UavModel> uav)

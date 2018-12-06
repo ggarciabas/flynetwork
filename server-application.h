@@ -74,6 +74,7 @@ private:
   void ValidateUavPosition (); // utilizada para garantir que os UAVs esteja no posicionamento desejado
   void SendUavPacket(Ptr<UavModel> uav);
   void SendDepletionPacket(Ptr<UavModel> uav);
+  void SendSupplyPacket(Ptr<UavModel> uav);
   void runDAPython();
   void runAgendamento(void);
   void CreateCentralLocation(void);
