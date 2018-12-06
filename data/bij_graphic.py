@@ -20,16 +20,23 @@ def bij (custo, time, main_path, teste):
     line = file.readline().strip()
     uavs = [x for x in line.split(',')]
 
+    print "Uavs:"+str(uavs)
+
     for i in uavs:
         uav_mov[str("uav_moving_"+str(int(i)))] = 1
 
     line = file.readline().strip()
     locs = [x for x in line.split(',')]
+
+    print "Locs:"+str(locs)
+
     cont = 0
     for line in file:
         data_bij[uavs[cont]] = [float(x) for x in line.split(',')] # read row from file
         cont = cont + 1
     file.close()
+
+    print data_bij
 
     plt.clf()
     cmap = sns.cubehelix_palette(50, hue=0.05, rot=0, light=0.9, dark=0, as_cmap=True)

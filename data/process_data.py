@@ -103,9 +103,17 @@ for custo in custos:
 
         all_uav.extend(uavs_id[:])
 
+
     if teste:
         print all_uav
     battery_all.battery(main_path+custo+'/', teste, all_uav, 0, t_ini+10, activated, 'all')
+    # print 'battery_all ok'
+    # input()
     battery_mov.battery(main_path+custo+'/', teste, [], 0, t_ini+10, activated, 'all')
+    # print "battery_mov Ok"
+    # input()
     battery_hover.battery(main_path+custo+'/', teste, all_uav, 0, t_ini+10, activated, 'all')
+    # print 'battery_hover ok'
+    # input()
     battery_threshold.battery(main_path+custo+'/', teste, all_uav, 0, t_ini+10, activated, '')
+    # print "battery_threshold ok"

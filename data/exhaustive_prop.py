@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 teste = True
-if sys.argv[1] == "False":
-    teste = False
+# if sys.argv[1] == "False":
+#     teste = False
 scenario = sys.argv[2]
 
 custos = ["custo_1", "custo_2", "custo_3", "custo_4"]

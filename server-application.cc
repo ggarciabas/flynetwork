@@ -751,7 +751,7 @@ void ServerApplication::runAgendamento(void)
   central_pos.push_back(vp.y);
 
   int verify_uav; // utilizado para verificar se um UAV não possui carga suficiente para se direcionar a alguma das localizações, isto acontece quando um UAV possui para todas as localizações o valor 1.!
-
+  bool l_id = true;
   NS_LOG_INFO ("Calculando custo ---------------------------- @" << Simulator::Now().GetSeconds());
   for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
        u_i != m_uavContainer.End(); ++u_i, ++count)
@@ -766,12 +766,13 @@ void ServerApplication::runAgendamento(void)
          l_j != m_locationContainer.End(); ++l_j)
     {
       NS_LOG_INFO ("LOC :: " << (*l_j)->toString());
-      if (count == 0) loc_ids.push_back((*u_i)->GetId());
+      if (l_id) loc_ids.push_back((*l_j)->GetId());
       custo = CalculateCusto((*u_i), (*l_j), central_pos);
       custo_x[count].push_back(custo);
       b_ij[count].push_back(custo);
       verify_uav += custo; // somando o valor dos custos, assim se ao final tiver o mesmo valor que o total de localizações, quer dizer que este UAV somente tem carga para voltar a central
     }
+    l_id = false;
 
     if (verify_uav == int(m_locationContainer.GetN())) {
       NS_LOG_DEBUG("ServerApplication::runAgendamento --> Enviar UAV " << (*u_i)->GetId() << " para a central  REF " << (*u_i)->GetReferenceCount());
