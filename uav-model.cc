@@ -91,32 +91,20 @@ UavModel::CancelSendPositionEvent()
 }
 
 void
-UavModel::SetSendDepletionEvent (EventId id)
+UavModel::SetSendCentralEvent (EventId id)
 {
-  m_sendDepletion = id;
+  m_sendCentral = id;
 }
 
 void
-UavModel::CancelSendDepletionEvent()
+UavModel::CancelSendCentralEvent()
 {
-  Simulator::Remove(m_sendDepletion);
+  Simulator::Remove(m_sendCentral);
 }
 
 void UavModel::SetAskCliDataEvent (EventId id)
 {
   m_askCliData = id;
-}
-
-void
-UavModel::SetSendSupplyEvent (EventId id)
-{
-  m_sendSupply = id;
-}
-
-void
-UavModel::CancelSendSupplyEvent()
-{
-  Simulator::Remove(m_sendSupply);
 }
 
 void UavModel::CancelAskCliDataEvent()

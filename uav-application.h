@@ -81,8 +81,7 @@ private:
   virtual void StopApplication(void);
 
   void ReplyServer ();
-  void ReplyServerDepletion ();
-  void ReplyServerSupply ();
+  void ReplyServerCentral ();
 
   void ScheduleTx(void);
   void SendPacket(void);

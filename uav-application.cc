@@ -291,21 +291,8 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
           dev->StopHover();
           GetNode()->GetObject<MobilityModel>()->SetPosition(Vector(std::stod(results.at(1), &sz), std::stod(results.at(2), &sz), (z > 0) ? z : 0.0)); // Verficar necessidade de subir em no eixo Z
           // repply to server
-          ReplyServerDepletion();
-        } else if (results.at(0).compare("GOTOCENTRALSUPPLY") == 0)
-          {
-            m_packetDepletion.Cancel();
-            std::ostringstream mm;
-            mm << "UAV\t" << m_id << "\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tGOTOCENTRALSUPPLY";
-            m_packetTrace(mm.str());
-            double z = std::stod(results.at(3), &sz) - GetNode()->GetObject<MobilityModel>()->GetPosition().z;
-            // mudar o posicionamento do UAV
-            Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
-            dev->StopHover();
-            GetNode()->GetObject<MobilityModel>()->SetPosition(Vector(std::stod(results.at(1), &sz), std::stod(results.at(2), &sz), (z > 0) ? z : 0.0)); // Verficar necessidade de subir em no eixo Z
-            // repply to server
-            ReplyServerSupply();
-          } else if (results.at(0).compare("SERVERDATA") == 0)
+          ReplyServerCentral();
+        } else if (results.at(0).compare("SERVERDATA") == 0)
           {
             SendCliData();
           }
@@ -315,30 +302,7 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
 }
 
 void
-UavApplication::ReplyServerSupply ()
-{ // confirma recebimento do posicionamento para o servidor
-  if (m_running) {
-    std::ostringstream m;
-    m << "CENTRALOKSUPPLY " << m_id << "\0";
-    uint16_t packetSize = m.str().length() + 1;
-    Ptr<Packet> packet = Create<Packet>((uint8_t *)m.str().c_str(), packetSize);
-    if (m_sendSck && m_sendSck->Send(packet) == packetSize)
-    {
-      m.str("");
-      m << "UAV\t" << m_id << "\tSENT\t" << Simulator::Now().GetSeconds() << "\tCENTRALOKSUPPLY";
-      m_packetTrace(m.str());
-      NS_LOG_INFO("UAV #" << m_id << " enviando CENTRALOKSUPPLY");
-    }
-    else
-    {
-      NS_LOG_ERROR("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " [NÃO] CENTRALOKSUPPLY");
-      Simulator::Schedule(Seconds(0.5), &UavApplication::ReplyServerSupply, this);
-    }
-  }
-}
-
-void
-UavApplication::ReplyServerDepletion ()
+UavApplication::ReplyServerCentral ()
 { // confirma recebimento do posicionamento para o servidor
   if (m_running) {
     std::ostringstream m;
@@ -348,14 +312,14 @@ UavApplication::ReplyServerDepletion ()
     if (m_sendSck && m_sendSck->Send(packet) == packetSize)
     {
       m.str("");
-      m << "UAV\t" << m_id << "\tSENT\t" << Simulator::Now().GetSeconds() << "\tUAVRECEIVED";
+      m << "UAV\t" << m_id << "\tSENT\t" << Simulator::Now().GetSeconds() << "\tCENTRALOK";
       m_packetTrace(m.str());
-      NS_LOG_INFO("UAV #" << m_id << " enviando UAVRECEIVED");
+      NS_LOG_INFO("UAV #" << m_id << " enviando CENTRALOK");
     }
     else
     {
-      NS_LOG_ERROR("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " [NÃO] UAVRECEIVED");
-      Simulator::Schedule(Seconds(0.5), &UavApplication::ReplyServerDepletion, this);
+      NS_LOG_ERROR("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " [NÃO] CENTRALOK");
+      Simulator::Schedule(Seconds(0.5), &UavApplication::ReplyServerCentral, this);
     }
   }
 }
