@@ -1091,13 +1091,15 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
         break;
       case 3:
         custo = ((1 - (c_lj/c_total + b_ui_res/b_ui_tot)/2.0) + ((ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot))/2.0;
+        break;
       case 4:
         double ce_te_lj = loc->GetTotalConsumption() * m_scheduleServer;
         double P_te = b_ui_res/ce_te_lj;
         custo = 1-P_te;
-        if (custo < 0.0) {
+        if (custo < 0.0) { // Verificar isto! Colocar um outro parâmetro aqui para ajudar          
           custo = 0.0;
         }
+        break;
     }
   }
 
