@@ -100,8 +100,6 @@ public:
    */
   void Add(Ptr<UavModel> model);
 
-  void Add(Ptr<UavModel> model, uint32_t pos);
-
   /**
    * \brief Append a single Ptr<UavModel> referred to by its object
    * name to the end of this container.

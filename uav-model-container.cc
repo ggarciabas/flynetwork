@@ -127,12 +127,6 @@ void UavModelContainer::Add(std::string modelName)
   m_models.push_back(model);
 }
 
-void UavModelContainer::Add(Ptr<UavModel> model, uint32_t pos)
-{
-  RemoveAt(pos);
-  Add(model);
-}
-
 void UavModelContainer::Clear(void)
 {
   NS_LOG_FUNCTION(this);

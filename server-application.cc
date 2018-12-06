@@ -182,11 +182,17 @@ void ServerApplication::AddSupplyUav(uint32_t id, Ipv4Address addrAdhoc, double 
     NS_FATAL_ERROR("Servidor nao conseguiu se conectar com o UAV!");
   }
 
-  Ptr<UavModel> removed = m_uavContainer.Get(m_supplyPos);
-  m_removeUav(removed->GetId());
-  removed->Dispose();
-  removed = 0;
-  m_uavContainer.Add(uav, m_supplyPos); // metodo manda remover do container a posição a ser suprida, e adiciona no final!
+  Ptr<UavModel> supplied = m_uavContainer.Get(m_supplyPos);
+  supplied->SetNewPosition(mob->GetPosition().x, mob->GetPosition().y); // para nao dar erro ao validar posicionamento
+  supplied->NotConfirmed(); // atualiza o valor para identificar se o UAV chegou a posicao correta
+  supplied->CancelSendPositionEvent();
+  supplied->SetSendPositionEvent(Simulator::Schedule(Seconds(t), &ServerApplication::SendUavPacket, this, supplied));
+
+  m_uavGoToCentral.Add(supplied);
+  m_uavContainer.RemoveUav(supplied);
+  supplied = 0;
+
+  m_uavContainer.Add(uav);
 }
 
 void ServerApplication::AddNewFixedClient(string login, double x, double y)
@@ -756,10 +762,10 @@ void ServerApplication::runAgendamento(void)
   for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
        u_i != m_uavContainer.End(); ++u_i, ++count)
   {
-    uav_ids.push_back((*u_i)->GetId());
     b_ij.push_back(vector<double>());
     custo_x.push_back(vector<double>());
     recalcule: // utilizado para permitir recalcular quando o UAV for suprido!
+    uav_ids.push_back((*u_i)->GetId());
     NS_LOG_INFO ("UAV :: " << (*u_i)->toString());
     verify_uav = 0;
     for (LocationModelContainer::Iterator l_j = m_locationContainer.Begin();
@@ -779,6 +785,7 @@ void ServerApplication::runAgendamento(void)
       // criar um novo nó iniciando na região central, como sempre!
       m_supplyPos = count; // posicao que será suprida
       m_newUav(1, 1); // true, pois está o solicitado para suprir uma posicao
+      uav_ids.pop_back(); // remove o id anteior, caso tenha sido trocado por um novo UAV
       NS_LOG_DEBUG ("ServerApplication::runAgendamento recalculando, novo UAV entra na rede para suprir um UAv que nao tem bateria para qualquer das localizações!");
       custo_x[count].clear();
       b_ij[count].clear();
