@@ -1,7 +1,7 @@
 # $1 - True or False (debug)
 # $2 - Scenario (name)
 
-python process_data.py $1 $2
-# python uav_removed_energy.py $1 $2
-# python connected_cli.py $1 $2
-# python exhaustive_prop.py $1 $2
+# python process_data.py $1 $2
+python uav_removed_energy.py $1 $2
+python connected_cli.py $1 $2
+python exhaustive_prop.py $1 $2
