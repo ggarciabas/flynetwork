@@ -16,11 +16,15 @@ def mij(time, main_path, teste):
     graphic_temp = [x for x in line.split(',')]
     line = file.readline().strip()
     uavs = [x for x in line.split(',')]
+    print uavs
     line = file.readline().strip()
     locs = [x for x in line.split(',')]
     cont = 0
     for line in file:
-        data_mij[uavs[cont]] = [float(x) for x in line.split(',')] # read row from file
+        print line
+        val = line.split(',')
+        print val
+        data_mij[uavs[cont]] = [float(x) for x in val] # read row from file
         cont = cont + 1
     file.close()
 

@@ -88,9 +88,9 @@ private:
 
   double CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, vector<double> central_pos);
 
-  void PrintCusto (vector<vector<double>> custo, int print, bool before);
-  void PrintMij (vector<vector<double>> m_ij, double temp, std::string nameFile);
-  void PrintBij (vector<vector<double>> b_ij, int print, bool before);
+  void PrintCusto (vector<vector<double>> custo, int print, bool before, vector<int> uav_ids, vector<int> loc_ids);
+  void PrintMij (vector<vector<double>> m_ij, double temp, std::string nameFile, vector<int> uav_ids, vector<int> loc_ids);
+  void PrintBij (vector<vector<double>> b_ij, int print, bool before, vector<int> uav_ids, vector<int> loc_ids);
 
   UavModelContainer   m_uavContainer;
   UavModelContainer   m_uavGoToCentral; // UAVs enviados para central

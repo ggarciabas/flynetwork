@@ -739,6 +739,10 @@ void ServerApplication::runAgendamento(void)
 
   vector<vector<double>> b_ij; // i - UAVs, j - localizacoes
   vector<vector<double>> custo_x; // i - UAVs, j - localizacoes x=1,2ou3
+  // Uav id
+  vector<int> uav_ids;
+  // Loc id
+  vector<int> loc_ids;
   int count = 0;
   double custo;
   vector<double> central_pos;
@@ -752,6 +756,7 @@ void ServerApplication::runAgendamento(void)
   for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
        u_i != m_uavContainer.End(); ++u_i, ++count)
   {
+    uav_ids.push_back((*u_i)->GetId());
     b_ij.push_back(vector<double>());
     custo_x.push_back(vector<double>());
     recalcule: // utilizado para permitir recalcular quando o UAV for suprido!
@@ -761,6 +766,7 @@ void ServerApplication::runAgendamento(void)
          l_j != m_locationContainer.End(); ++l_j)
     {
       NS_LOG_INFO ("LOC :: " << (*l_j)->toString());
+      if (count == 0) loc_ids.push_back((*u_i)->GetId());
       custo = CalculateCusto((*u_i), (*l_j), central_pos);
       custo_x[count].push_back(custo);
       b_ij[count].push_back(custo);
@@ -781,7 +787,7 @@ void ServerApplication::runAgendamento(void)
   }
   NS_LOG_INFO ("FIM custo ---------------------------- @" << Simulator::Now().GetSeconds());
 
-  PrintCusto (custo_x, int(Simulator::Now().GetSeconds()), true);
+  PrintCusto (custo_x, int(Simulator::Now().GetSeconds()), true, uav_ids, loc_ids);
 
   // Inicializando
   NS_LOG_INFO ("SERVER - inicializando matrizes.");
@@ -824,12 +830,12 @@ void ServerApplication::runAgendamento(void)
   vector<vector<double>> copyC_mij;
   NS_LOG_INFO ("SERVER - iniciando execucao das partes A, B e C @" << Simulator::Now().GetSeconds());
 
-  PrintBij(b_ij, int(Simulator::Now().GetSeconds()), true);
+  PrintBij(b_ij, int(Simulator::Now().GetSeconds()), true, uav_ids, loc_ids);
 
   int print = 0;
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/mij_" << std::setfill ('0') << std::setw (7) << print++ << ".txt";
-  PrintMij (m_ij, 1.0, os.str());
+  PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
 
   // Part A
   unsigned itA = 0;
@@ -906,7 +912,7 @@ void ServerApplication::runAgendamento(void)
 
     os.str("");
     os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/mij_" << std::setfill ('0') << std::setw (7) << print++ << ".txt";
-    PrintMij (m_ij, 1.0, os.str());
+    PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
 
     temp *= m_rho;
     o_ij = m_ij;
@@ -1004,7 +1010,7 @@ void ServerApplication::runAgendamento(void)
 
   os.str("");
   os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/f_mij.txt";
-  PrintMij (f_mij, temp, os.str());
+  PrintMij (f_mij, temp, os.str(), uav_ids, loc_ids);
 
   os.str("");
   os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/"<<int(Simulator::Now().GetSeconds())<<"/uav_loc.txt";
@@ -1013,8 +1019,8 @@ void ServerApplication::runAgendamento(void)
   file << m_maxx << "," << m_maxy << std::endl << serv_pos.x << "," << serv_pos.y << std::endl << osuav.str() << std::endl << osloc.str() << std::endl << osbij.str() << std::endl;
   file.close();
 
-  PrintCusto (custo_x, int(Simulator::Now().GetSeconds()), false); // pode ter sido modificado no laco anterior, um UAv pode ter sido suprido
-  PrintBij(b_ij, int(Simulator::Now().GetSeconds()), false);
+  PrintCusto (custo_x, int(Simulator::Now().GetSeconds()), false, uav_ids, loc_ids); // pode ter sido modificado no laco anterior, um UAv pode ter sido suprido
+  PrintBij(b_ij, int(Simulator::Now().GetSeconds()), false, uav_ids, loc_ids);
   m_printUavEnergy(int(Simulator::Now().GetSeconds())); // esperando a solucao final, UAVs podem ser trocados
 
   NS_LOG_DEBUG ("-- Finalizado posicionamento dos UAVs @" << Simulator::Now().GetSeconds());
@@ -1082,7 +1088,7 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
 }
 
 void
-ServerApplication::PrintBij (vector<vector<double>> b_ij, int print, bool before)
+ServerApplication::PrintBij (vector<vector<double>> b_ij, int print, bool before, vector<int> uav_ids, vector<int> loc_ids)
 {
   std::ostringstream os;
   if (before) {
@@ -1092,20 +1098,20 @@ ServerApplication::PrintBij (vector<vector<double>> b_ij, int print, bool before
   }
   std::ofstream file;
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
-  UavModelContainer::Iterator u_i = m_uavContainer.Begin();
-  file << (*u_i)->GetId();
+  vector<int>::iterator u_i = uav_ids.begin();
+  file << (*u_i);
   u_i++;
-  for (; u_i != m_uavContainer.End(); ++u_i)
+  for (; u_i != uav_ids.end(); ++u_i)
   {
-    file << "," << (*u_i)->GetId();
+    file << "," << (*u_i);
   }
   file << std::endl;
-  LocationModelContainer::Iterator l_j = m_locationContainer.Begin();
-  file << (*l_j)->GetId();
+  vector<int>::iterator l_j = loc_ids.begin();
+  file << (*l_j);
   l_j++;
-  for (; l_j != m_locationContainer.End(); ++l_j)
+  for (; l_j != loc_ids.end(); ++l_j)
   {
-    file << "," << (*l_j)->GetId();
+    file << "," << (*l_j);
   }
   file << std::endl;
   for (vector<vector<double>>::iterator i = b_ij.begin(); i != b_ij.end(); ++i)
@@ -1129,7 +1135,7 @@ ServerApplication::PrintBij (vector<vector<double>> b_ij, int print, bool before
 }
 
 void
-ServerApplication::PrintCusto (vector<vector<double>> custo, int print, bool before)
+ServerApplication::PrintCusto (vector<vector<double>> custo, int print, bool before, vector<int> uav_ids, vector<int> loc_ids)
 {
   std::ostringstream os;
   if (before) {
@@ -1139,20 +1145,20 @@ ServerApplication::PrintCusto (vector<vector<double>> custo, int print, bool bef
   }
   std::ofstream file;
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
-  UavModelContainer::Iterator u_i = m_uavContainer.Begin();
-  file << (*u_i)->GetId();
+  vector<int>::iterator u_i = uav_ids.begin();
+  file << (*u_i);
   u_i++;
-  for (; u_i != m_uavContainer.End(); ++u_i)
+  for (; u_i != uav_ids.end(); ++u_i)
   {
-    file << "," << (*u_i)->GetId();
+    file << "," << (*u_i);
   }
   file << std::endl;
-  LocationModelContainer::Iterator l_j = m_locationContainer.Begin();
-  file << (*l_j)->GetId();
+  vector<int>::iterator l_j = loc_ids.begin();
+  file << (*l_j);
   l_j++;
-  for (; l_j != m_locationContainer.End(); ++l_j)
+  for (; l_j != loc_ids.end(); ++l_j)
   {
-    file << "," << (*l_j)->GetId();
+    file << "," << (*l_j);
   }
   file << std::endl;
   for (vector<vector<double>>::iterator i = custo.begin(); i != custo.end(); ++i) {
@@ -1178,25 +1184,25 @@ ServerApplication::PrintCusto (vector<vector<double>> custo, int print, bool bef
 }
 
 void
-ServerApplication::PrintMij (vector<vector<double>> m_ij, double temp, std::string nameFile)
+ServerApplication::PrintMij (vector<vector<double>> m_ij, double temp, std::string nameFile, vector<int> uav_ids, vector<int> loc_ids)
 {
   std::ofstream file;
   file.open(nameFile.c_str(), std::ofstream::out | std::ofstream::app);
   file << temp << std::endl;
-  UavModelContainer::Iterator u_i = m_uavContainer.Begin();
-  file << (*u_i)->GetId();
+  vector<int>::iterator u_i = uav_ids.begin();
+  file << (*u_i);
   u_i++;
-  for (; u_i != m_uavContainer.End(); ++u_i)
+  for (; u_i != uav_ids.end(); ++u_i)
   {
-    file << "," << (*u_i)->GetId();
+    file << "," << (*u_i);
   }
   file << std::endl;
-  LocationModelContainer::Iterator l_j = m_locationContainer.Begin();
-  file << (*l_j)->GetId();
+  vector<int>::iterator l_j = loc_ids.begin();
+  file << (*l_j);
   l_j++;
-  for (; l_j != m_locationContainer.End(); ++l_j)
+  for (; l_j != loc_ids.end(); ++l_j)
   {
-    file << "," << (*l_j)->GetId();
+    file << "," << (*l_j);
   }
   file << std::endl;
   for (vector<vector<double>>::iterator i = m_ij.begin(); i != m_ij.end(); ++i)
