@@ -479,7 +479,7 @@ void ServerApplication::Run ()
 
 void ServerApplication::SendCentralPacket(Ptr<UavModel> uav)
 {
-  NS_LOG_DEBUG ("ServerApplication::SendCentralPacket @" << Simulator::Now().GetSeconds());
+  NS_LOG_DEBUG ("ServerApplication::SendCentralPacket @" << Simulator::Now().GetSeconds() << " Id: " << uav->GetId());
   uav->CancelSendCentralEvent();
   NS_ASSERT(uav != 0);
   NS_LOG_FUNCTION(this);
@@ -1015,10 +1015,10 @@ void ServerApplication::runAgendamento(void)
     (*u_i)->NotConfirmed(); // atualiza o valor para identificar se o UAV chegou a posicao correta
     (*u_i)->CancelSendPositionEvent();
     if (CalculateDistanceCentral(m_locationContainer.Get(id)->GetPosition())==0.0) {
-        m_uavGoToCentral.Add((*u_i));
-        m_uavContainer.RemoveUav((*u_i));
-        (*u_i)->SetSendCentralEvent(Simulator::Schedule(Seconds(t), &ServerApplication::SendCentralPacket, this, (*u_i)));
-        --u_i;
+      (*u_i)->SetSendCentralEvent(Simulator::Schedule(Seconds(t), &ServerApplication::SendCentralPacket, this, (*u_i)));
+      m_uavGoToCentral.Add((*u_i));
+      m_uavContainer.RemoveUav((*u_i));
+      --u_i;
     } else {
       (*u_i)->SetSendPositionEvent(Simulator::Schedule(Seconds(t), &ServerApplication::SendUavPacket, this, (*u_i)));
     }
