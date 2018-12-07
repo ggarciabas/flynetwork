@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 # libraries and data
 import uav_loc_slide
+import uav_bat_slide
 import intermediario
 import glob
 import os
@@ -51,11 +52,22 @@ for custo in custos:
     if not os.path.exists(main_path+'../slide/'+folder):
         os.mkdir(main_path+'../slide/'+folder)
 
-    for time in list_folder:
-        uav_loc_slide.slide (str(time), main_path+custo+'/', teste, title, folder)
-
+    # UAV LOC Slide
     file = open(main_path+'..'+'/slide/slide_'+folder+'.tex', 'w')
     for time in list_folder:
+        uav_loc_slide.slide (str(time), main_path+custo+'/', teste, title, folder)
         if len(glob.glob(main_path+'../slide/'+folder+'/slide_'+str(time)+'.tex'))>0:
             file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+folder+'/slide_'+str(time)+'.tex')[0])+"}\n")
+
+    # UAV BATTERY SLIDES
+    uav_bat_slide.slide(main_path+custo+'/', teste, title, folder)
+    if len(glob.glob(main_path+'../slide/'+folder+'/slide_uav_energy_threshold.tex'))>0:
+        file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+folder+'/slide_uav_energy_threshold.tex')[0])+"}\n")
+    if len(glob.glob(main_path+'../slide/'+folder+'/slide_uav_hover.tex'))>0:
+        file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+folder+'/slide_uav_hover.tex')[0])+"}\n")
+    if len(glob.glob(main_path+'../slide/'+folder+'/slide_uav_move.tex'))>0:
+        file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+folder+'/slide_uav_move.tex')[0])+"}\n")
+    if len(glob.glob(main_path+'../slide/'+folder+'/slide_uav_remaining_energy.tex'))>0:
+        file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+folder+'/slide_uav_remaining_energy.tex')[0])+"}\n")
+
     file.close()
