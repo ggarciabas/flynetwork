@@ -134,14 +134,14 @@ def battery(main_path, teste, uavs_id, time_ini, time_end, activated, title_f):
                 plt.axvline(x=time, c=cor)
 
             # Add title
-            plt.title(str(uav), loc='left', fontsize=7, fontweight=0, color=palette(num), y=0.92)
+            plt.title(str(uav), loc='left', fontsize=7, fontweight=0, color=palette(num), y=1.0)
 
             # general title
-            plt.suptitle("Consumo de bateria por flutuar do UAV ["+str(uav)+"]", fontsize=13, fontweight=0, color='black', style='italic')
+            plt.suptitle("Consumo de bateria por flutuar do "+str(uav), fontsize=13, fontweight=0, color='black', style='italic')
 
             plt.xlabel('Tempo (s)')
             plt.ylabel('Bateria (%)')
 
-            plt.savefig(main_path+'uav_hover/uav_hover_acum_'+str(uav)+'.svg')
-            plt.savefig(main_path+'uav_hover/uav_hover_acum_'+str(uav)+'.eps')
-            plt.savefig(main_path+'uav_hover/uav_hover_acum_'+str(uav)+'.png')
+            plt.savefig(main_path+'uav_hover/uav_hover_acum_uav_'+str(num)+'.svg')
+            plt.savefig(main_path+'uav_hover/uav_hover_acum_uav_'+str(num)+'.eps')
+            plt.savefig(main_path+'uav_hover/uav_hover_acum_uav_'+str(num)+'.png')
