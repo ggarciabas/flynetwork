@@ -327,7 +327,9 @@ void UavEnergySource::Start () {
 
 void UavEnergySource::Stop () {
   m_depleted = true;
-  HandleEnergyDrainedEvent();
+  NotifyEnergyChanged();
 }
+
+
 
 } // namespace ns3

@@ -129,10 +129,7 @@ public:
    *
    * Not implemented
    */
-  virtual void HandleEnergyChanged (void)
-  {
-  }
-
+  virtual void HandleEnergyChanged (void);
   void CourseChange (Ptr<const MobilityModel> mob);
 
   void HoverConsumption(void);
