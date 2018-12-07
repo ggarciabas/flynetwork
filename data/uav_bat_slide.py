@@ -48,6 +48,17 @@ def slide (main_path, teste, title, folder, list_folder):
         \\end{frame}""")
         f_file.close()
 
+    f_file = open(main_path+'../../slide/'+folder+'/slide_uav_hover_acum_uav.tex', 'w')
+    if len(glob.glob(main_path+'uav_hover/uav_hover_acum_UAV*.eps')) > 0:
+        for f_name in glob.glob(main_path+'uav_hover/uav_hover_acum_UAV*.eps'):
+            copyfile(f_name, main_path+'../../slide/'+folder+'/'+os.path.basename(f_name))
+            f_file.write("""\\begin{frame}{"""+title+""" - Hover}
+                \\begin{figure}[!htb]
+                     \\includegraphics[width=\\textwidth]{"""+folder+'/'+os.path.basename(f_name)+"""}
+                 \\end{figure}
+            \\end{frame}""")
+    f_file.close()
+
     # MOVE -- validando existencia de arquivos
     if len(glob.glob(main_path+'uav_move/uav_move_acum_all.eps')) > 0:
         um_file = os.path.basename(glob.glob(main_path+'uav_move/uav_move_acum_all.eps')[-1])
@@ -65,6 +76,17 @@ def slide (main_path, teste, title, folder, list_folder):
              \\end{figure}
         \\end{frame}""")
         f_file.close()
+
+    f_file = open(main_path+'../../slide/'+folder+'/slide_uav_move_acum_uav.tex', 'w')
+    if len(glob.glob(main_path+'uav_move/uav_move_acum_UAV*.eps')) > 0:
+        for f_name in glob.glob(main_path+'uav_move/uav_move_acum_UAV*.eps'):
+            copyfile(f_name, main_path+'../../slide/'+folder+'/'+os.path.basename(f_name))
+            f_file.write("""\\begin{frame}{"""+title+""" - Move}
+                \\begin{figure}[!htb]
+                     \\includegraphics[width=\\textwidth]{"""+folder+'/'+os.path.basename(f_name)+"""}
+                 \\end{figure}
+            \\end{frame}""")
+    f_file.close()
 
     # REMAINING ENERGY -- validando existencia de arquivos
     if len(glob.glob(main_path+'uav_remaining_energy/uav_remaining_energy_all.eps')) > 0:
