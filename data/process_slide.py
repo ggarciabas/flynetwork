@@ -60,7 +60,7 @@ for custo in custos:
             file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+folder+'/slide_'+str(time)+'.tex')[0])+"}\n")
 
     # UAV BATTERY SLIDES
-    uav_bat_slide.slide(main_path+custo+'/', teste, title, folder)
+    uav_bat_slide.slide(main_path+custo+'/', teste, title, folder, list_folder)
     if len(glob.glob(main_path+'../slide/'+folder+'/slide_uav_energy_threshold.tex'))>0:
         file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+folder+'/slide_uav_energy_threshold.tex')[0])+"}\n")
     if len(glob.glob(main_path+'../slide/'+folder+'/slide_uav_hover.tex'))>0:
@@ -69,5 +69,7 @@ for custo in custos:
         file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+folder+'/slide_uav_move.tex')[0])+"}\n")
     if len(glob.glob(main_path+'../slide/'+folder+'/slide_uav_remaining_energy.tex'))>0:
         file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+folder+'/slide_uav_remaining_energy.tex')[0])+"}\n")
+    if len(glob.glob(main_path+'../slide/'+folder+'/slide_uav_remaining_energy_time.tex'))>0:
+        file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+folder+'/slide_uav_remaining_energy_time.tex')[0])+"}\n")
 
     file.close()
