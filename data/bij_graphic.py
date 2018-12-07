@@ -36,8 +36,6 @@ def bij (custo, time, main_path, teste):
         cont = cont + 1
     file.close()
 
-    print data_bij
-
     plt.clf()
     cmap = sns.cubehelix_palette(50, hue=0.05, rot=0, light=0.9, dark=0, as_cmap=True)
 
@@ -47,8 +45,8 @@ def bij (custo, time, main_path, teste):
     # Default heatmap: just a visualization of this square matrix
     sns.heatmap(df_bij, cmap=cmap, vmin=0, vmax=1)
 
-    plt.xlabel("Localizacao")
-    plt.ylabel("UAV")
+    plt.xlabel("UAV")
+    plt.ylabel(u"Localização")
 
     # general title
     plt.title("Bij", fontsize=13, fontweight=0, color='black', style='italic')
@@ -62,8 +60,8 @@ def bij (custo, time, main_path, teste):
     # Default heatmap: just a visualization of this square matrix
     sns.heatmap(df_bij, cmap=cmap)
 
-    plt.xlabel("Localizacao")
-    plt.ylabel("UAV")
+    plt.xlabel("UAV")
+    plt.ylabel(u"Localização")
 
     # general title
     plt.title("Bij", fontsize=13, fontweight=0, color='black', style='italic')

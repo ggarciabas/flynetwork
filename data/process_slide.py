@@ -56,6 +56,6 @@ for custo in custos:
 
     file = open(main_path+'..'+'/slide/slide_'+folder+'.tex', 'w')
     for time in list_folder:
-        if len(glob.glob(main_path+'../slide/'+folder+'/slide_'+'etapa/'+str(time)+'.tex'))>0:
-            file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+folder+'/slide_'+'etapa/'+str(time)+'.tex')[0])+"}\n")
+        if len(glob.glob(main_path+'../slide/'+folder+'/slide_'+str(time)+'.tex'))>0:
+            file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+folder+'/slide_'+str(time)+'.tex')[0])+"}\n")
     file.close()

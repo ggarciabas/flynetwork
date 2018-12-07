@@ -209,8 +209,8 @@ for custo in custos:
         df_exh = pd.DataFrame(c_exaustive)
         # Default heatmap: just a visualization of this square matrix
         sns.heatmap(df_exh, cmap=cmap, vmin=0, vmax=m_v)
-        plt.xlabel(u"Localização")
-        plt.ylabel("UAV")
+        plt.xlabel("UAV")
+        plt.ylabel(u"Localização")
         # general title
         plt.title("Custo final exaustivo", fontsize=13, fontweight=0, color='black', style='italic')
         plt.savefig(main_path+'etapa/'+str(time)+'/exaustive_'+str(custo)+'.svg')
@@ -224,8 +224,8 @@ for custo in custos:
         df_prop = pd.DataFrame(c_prop)
         # Default heatmap: just a visualization of this square matrix
         sns.heatmap(df_prop, cmap=cmap, vmin=0, vmax=m_v)
-        plt.xlabel(u"Localização")
-        plt.ylabel("UAV")
+        plt.xlabel("UAV")
+        plt.ylabel(u"Localização")
         # general title
         plt.title("Custo final algoritmo proposto", fontsize=13, fontweight=0, color='black', style='italic')
         plt.savefig(main_path+'etapa/'+str(time)+'/'+str(custo)+'.svg')
@@ -240,8 +240,8 @@ for custo in custos:
         df_seq = pd.DataFrame(c_seq)
         # Default heatmap: just a visualization of this square matrix
         sns.heatmap(df_seq, cmap=cmap, vmin=0, vmax=m_v)
-        plt.xlabel(u"Localização")
-        plt.ylabel("UAV")
+        plt.xlabel("UAV")
+        plt.ylabel(u"Localização")
         # general title
         plt.title("Custo final sequencial", fontsize=13, fontweight=0, color='black', style='italic')
         plt.savefig(main_path+'etapa/'+str(time)+'/seq_'+str(custo)+'.svg')
@@ -256,8 +256,8 @@ for custo in custos:
         df_ale = pd.DataFrame(c_ale)
         # Default heatmap: just a visualization of this square matrix
         sns.heatmap(df_ale, cmap=cmap, vmin=0, vmax=m_v)
-        plt.xlabel(u"Localização")
-        plt.ylabel("UAV")
+        plt.xlabel("UAV")
+        plt.ylabel(u"Localização")
         # general title
         plt.title(u"Custo final aleatório", fontsize=13, fontweight=0, color='black', style='italic')
         plt.savefig(main_path+'etapa/'+str(time)+'/ale_'+str(custo)+'.svg')

@@ -30,25 +30,25 @@ def slide (time, main_path, teste, title, folder):
         print uav_loc_file
 
     #copiar imagens para a pasta
-    copyfile(main_path+'etapa/'+time+'/'+mij_file, main_path+'../../slide/'+folder+'/'+'etapa/'+str(time)+'_'+mij_file)
-    copyfile(main_path+'etapa/'+time+'/'+bij_file, main_path+'../../slide/'+folder+'/'+'etapa/'+str(time)+'_'+bij_file)
-    copyfile(main_path+'etapa/'+time+'/'+uav_loc_file, main_path+'../../slide/'+folder+'/'+'etapa/'+str(time)+'_'+uav_loc_file)
+    copyfile(main_path+'etapa/'+time+'/'+mij_file, main_path+'../../slide/'+folder+'/'+str(time)+'_'+mij_file)
+    copyfile(main_path+'etapa/'+time+'/'+bij_file, main_path+'../../slide/'+folder+'/'+str(time)+'_'+bij_file)
+    copyfile(main_path+'etapa/'+time+'/'+uav_loc_file, main_path+'../../slide/'+folder+'/'+str(time)+'_'+uav_loc_file)
 
-    f_file = open(main_path+'../../slide/'+folder+'/slide_'+'etapa/'+str(time)+'.tex', 'w')
+    f_file = open(main_path+'../../slide/'+folder+'/slide_'+str(time)+'.tex', 'w')
     f_file.write("""\\begin{frame}{"""+title+"""}
         \\begin{columns}
             \\begin{column}{0.65\\textwidth}
                \\begin{figure}[!htb]
-                    \\includegraphics[width=\\textwidth]{"""+folder+'/'+'etapa/'+str(time)+'_'+uav_loc_file+"""}
+                    \\includegraphics[width=\\textwidth]{"""+folder+'/'+str(time)+'_'+uav_loc_file+"""}
                 \\end{figure}
             \\end{column}
             \\begin{column}{0.45\\textwidth}
                \\begin{figure}[!htb]
-                    \\includegraphics[width=\\textwidth]{"""+folder+'/'+'etapa/'+str(time)+'_'+bij_file+"""}
+                    \\includegraphics[width=\\textwidth]{"""+folder+'/'+str(time)+'_'+bij_file+"""}
                 \\end{figure}
                 \\vspace{-0.5cm}
                \\begin{figure}[!htb]
-                    \\includegraphics[width=\\textwidth]{"""+folder+'/'+'etapa/'+str(time)+'_'+mij_file+"""}
+                    \\includegraphics[width=\\textwidth]{"""+folder+'/'+str(time)+'_'+mij_file+"""}
                 \\end{figure}
             \\end{column}
         \\end{columns}
