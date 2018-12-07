@@ -112,3 +112,36 @@ def battery(main_path, teste, uavs_id, time_ini, time_end, activated, title_f):
     plt.savefig(main_path+'uav_move/uav_move_acum_'+str(title_f)+'.svg')
     plt.savefig(main_path+'uav_move/uav_move_acum_'+str(title_f)+'.eps')
     plt.savefig(main_path+'uav_move/uav_move_acum_'+str(title_f)+'.png')
+
+    if len(uavs_id)==0:
+        num=0
+        first = 0
+        for uav in uavs:
+            num+=1
+            plt.clf()
+            # plot every groups, but discreet
+            for key, value in data.iteritems():
+                plt.plot(value[0], value[1], marker='', color='grey', linewidth=0.6, alpha=0.3)
+
+            # Plot the lineplot
+            plt.plot(data[uav][0], data[uav][1], marker='', color=palette(num), linewidth=2.4, alpha=0.9, label=uav)
+
+            values = activated[uav]
+            for time,cor in values.iteritems():
+                # lb = 'ativado'
+                # if cor == 'r':
+                #     lb = 'desativado'
+                plt.axvline(x=time, c=cor)
+
+            # Add title
+            plt.title(str(uav), loc='left', fontsize=7, fontweight=0, color=palette(num), y=0.92)
+
+            # general title
+            plt.suptitle("Consumo de bateria por movimento do UAV ["+str(uav)+"]", fontsize=13, fontweight=0, color='black', style='italic')
+
+            plt.xlabel('Tempo (s)')
+            plt.ylabel('Bateria (%)')
+
+            plt.savefig(main_path+'uav_move/uav_move_acum_'+str(uav)+'.svg')
+            plt.savefig(main_path+'uav_move/uav_move_acum_'+str(uav)+'.eps')
+            plt.savefig(main_path+'uav_move/uav_move_acum_'+str(uav)+'.png')

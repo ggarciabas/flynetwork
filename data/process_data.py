@@ -82,7 +82,6 @@ for custo in custos:
             print uavs_id
         # Battery
         if t_ini > -1:
-            # battery_mov.battery(main_path, teste, uavs_id, t_ini, time)
             battery_hover.battery(main_path+custo+'/', teste, uavs_id, t_ini, time, activated, time)
             battery_all.battery(main_path+custo+'/', teste, uavs_id, t_ini, time, activated, time)
             t_ini = time
@@ -110,6 +109,7 @@ for custo in custos:
     # print 'battery_all ok'
     # input()
     battery_mov.battery(main_path+custo+'/', teste, [], 0, t_ini+10, activated, 'all')
+    battery_hover.battery(main_path+custo+'/', teste, [], 0, t_ini+10, activated, 'all')
     # print "battery_mov Ok"
     # input()
     battery_hover.battery(main_path+custo+'/', teste, all_uav, 0, t_ini+10, activated, 'all')
