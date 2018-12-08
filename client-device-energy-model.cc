@@ -150,7 +150,7 @@ ClientDeviceEnergyModel::GetNode() const
 }
 
 double ClientDeviceEnergyModel::UpdateConsumption () {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   Time duration = Simulator::Now () - m_lastUpdateTime;
   double energyToDecrease = duration.GetSeconds () * (m_clientCost * m_clientCount);
   DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceClient (energyToDecrease);
@@ -185,7 +185,7 @@ void ClientDeviceEnergyModel::RemoveClient()
 
 void ClientDeviceEnergyModel::ClientConsumption ()
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_cliEvent.Cancel();
   double energyToDecrease =  UpdateConsumption();
   std::ostringstream os;

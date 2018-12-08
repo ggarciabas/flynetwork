@@ -238,7 +238,7 @@ UavDeviceEnergyModel::GetTotalEnergyConsumption (void) const
 
 void UavDeviceEnergyModel::HoverConsumption(void)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG("UavDeviceEnergyModel:HoverConsumption.");
 
   // do not update if simulation has finished
@@ -269,7 +269,7 @@ void UavDeviceEnergyModel::HoverConsumption(void)
 
 void UavDeviceEnergyModel::CourseChange (Ptr<const MobilityModel> mob)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   Vector actual = m_node->GetObject<MobilityModel>()->GetPosition();
   double distance = std::sqrt(std::pow(m_lastPosition.x - actual.x, 2) + std::pow(m_lastPosition.y - actual.y, 2));
   NS_ASSERT(distance >= 0);

@@ -138,7 +138,7 @@ UavEnergySource::GetEnergyUpdateInterval (void) const
 double
 UavEnergySource::GetInitialEnergy(void) const
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_initialEnergyJ;
 }
 
@@ -152,7 +152,7 @@ UavEnergySource::GetSupplyVoltage (void) const
 double
 UavEnergySource::GetRemainingEnergy(void)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_remainingEnergyJ;
 }
 
@@ -171,7 +171,7 @@ UavEnergySource::UpdateEnergySource (void)
 
 void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << energyToDecrease);
+  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << energyToDecrease);
   if (m_remainingEnergyJ < energyToDecrease)
   {
     m_remainingEnergyJ = 0; // energy never goes below 0
@@ -204,7 +204,7 @@ void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
 
 void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << energyToDecrease);
+  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << energyToDecrease);
   if (m_remainingEnergyJ < energyToDecrease)
   {
     m_remainingEnergyJ = 0; // energy never goes below 0
@@ -237,7 +237,7 @@ void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
 
 void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << energyToDecrease);
+  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << energyToDecrease);
   NS_LOG_INFO("UavEnergySource:UpdateEnergySourceHover.");
 
   if (m_remainingEnergyJ < energyToDecrease)

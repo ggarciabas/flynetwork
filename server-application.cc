@@ -695,7 +695,7 @@ ServerApplication::CalculateDistance(const std::vector<double> pos1, const std::
 
 bool ServerApplication::ValidateMijConvergency(vector<vector<double>> vec, vector<vector<double>> m_ij, unsigned siz)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << vec << m_ij << siz);
+  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << vec << m_ij << siz);
   for (unsigned i = 0; i < siz; ++i)
   {
     for (unsigned j = 0; j < siz; ++j)

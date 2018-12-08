@@ -86,7 +86,7 @@ void ClientModel::SetLogin(std::string str)
 std::string
 ClientModel::GetLogin()
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_login;
 }
 
