@@ -61,11 +61,13 @@ UavMobilityModel::GetTypeId(void)
 
 void UavMobilityModel::SetFirstPosition(const Vector &position)
 {
+  NS_LOG_FUNCTION(this << position);
   m_helper.SetPosition(position);
 }
 
 void UavMobilityModel::DoInitializePrivate(void)
 {
+  NS_LOG_FUNCTION(this);
   m_helper.Update(); // atualiza o constantvelociyt model
   Vector position = m_helper.GetCurrentPosition();
 
@@ -89,6 +91,7 @@ void UavMobilityModel::DoInitializePrivate(void)
 
 void UavMobilityModel::DoStop()
 {
+  NS_LOG_FUNCTION(this);
   m_helper.Update();
   m_helper.Pause(); // set the vector to 0.0 and block Update method
   m_envPos.Cancel();
@@ -103,6 +106,7 @@ void UavMobilityModel::DoStop()
 
 void UavMobilityModel::UpdatePosition()
 {
+  NS_LOG_FUNCTION(this);
   m_helper.Update(); // https://www.nsnam.org/doxygen/constant-velocity-helper_8cc_source.html#l00080
   m_envPos = Simulator::Schedule(m_updatePosition, &UavMobilityModel::UpdatePosition, this);
 }
@@ -110,12 +114,14 @@ void UavMobilityModel::UpdatePosition()
 Vector
 UavMobilityModel::DoGetPosition(void) const
 {
+  NS_LOG_FUNCTION(this);
   m_helper.Update();
   return m_helper.GetCurrentPosition();
 }
 
 void UavMobilityModel::DoSetPosition(const Vector &position)
 {
+  NS_LOG_FUNCTION(this<<position);
   if (CalculateDistance(m_goTo, position)) {
     m_goTo = position; // posicao destino
     // // std::cout << "Vá para a posição: " << position.x << " " << position.y << std::endl;
@@ -131,21 +137,25 @@ void UavMobilityModel::DoSetPosition(const Vector &position)
 Vector
 UavMobilityModel::DoGetVelocity(void) const
 {
+  NS_LOG_FUNCTION(this);
   return m_helper.GetVelocity();
 }
 
 void UavMobilityModel::SetSpeed(double speed)
 {
+  NS_LOG_FUNCTION(this<<speed);
   m_speed = speed;
 }
 
 double
 UavMobilityModel::GetSpeed() const
 {
+  NS_LOG_FUNCTION(this);
   return m_speed;
 }
 
 void UavMobilityModel::DoDispose() {
+  NS_LOG_FUNCTION(this);
   NS_LOG_DEBUG ("UavMobilityModel::DoDispose");
 
   m_helper.Pause();

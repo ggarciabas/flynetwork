@@ -70,12 +70,14 @@ void UavNodeContainer::Clear() {
 }
 
 Ptr<Node> UavNodeContainer::RemoveAt (uint32_t pos) {
+  NS_LOG_FUNCTION(this<<pos);
   Ptr<Node> n = m_nodes[pos];
   m_nodes.erase(m_nodes.begin()+pos);
   return n;
 }
 
 Ptr<Node> UavNodeContainer::RemoveId (uint32_t id) {
+  NS_LOG_FUNCTION(this<<id);
   int c=0;
   for (Iterator i = m_nodes.begin(); i != m_nodes.end(); ++i, ++c) {
     if ((*i)->GetId() == id) {

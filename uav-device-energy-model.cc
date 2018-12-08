@@ -100,7 +100,7 @@ double UavDeviceEnergyModel::GetEnergyCost ()
 void UavDeviceEnergyModel::SetEnergyDepletionCallback(
    EnergyCallback callback)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << &callback);
   if (callback.IsNull())
   {
     NS_LOG_DEBUG("EnergyDepletionCallback:Setting NULL energy depletion callback!");
@@ -111,7 +111,7 @@ void UavDeviceEnergyModel::SetEnergyDepletionCallback(
 void UavDeviceEnergyModel::SetEnergyRechargedCallback(
    EnergyCallback callback)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << &callback);
   if (callback.IsNull())
   {
     NS_LOG_DEBUG("EnergyRechargedCallback:Setting NULL energy Recharged callback!");
@@ -120,6 +120,7 @@ void UavDeviceEnergyModel::SetEnergyRechargedCallback(
 }
 
 double UavDeviceEnergyModel::ChangeThreshold () {
+  NS_LOG_FUNCTION(this);
   Vector actual = m_node->GetObject<MobilityModel>()->GetPosition();
   double distance = std::sqrt(std::pow(m_xCentral - actual.x, 2) + std::pow(m_yCentral - actual.y, 2));
   NS_ASSERT(distance >= 0);
@@ -130,6 +131,7 @@ double UavDeviceEnergyModel::ChangeThreshold () {
 
 void UavDeviceEnergyModel::HandleEnergyRecharged (void)
 {
+  NS_LOG_FUNCTION(this);
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_recharged/uav_recharged.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
@@ -146,6 +148,7 @@ void UavDeviceEnergyModel::HandleEnergyRecharged (void)
 
 void UavDeviceEnergyModel::HandleEnergyDepletion(void)
 {
+  NS_LOG_FUNCTION(this);
  Vector actual = m_node->GetObject<MobilityModel>()->GetPosition();
  double distance = std::sqrt(std::pow(m_xCentral - actual.x, 2) + std::pow(m_yCentral - actual.y, 2));
  NS_ASSERT(distance >= 0);
@@ -189,6 +192,7 @@ void UavDeviceEnergyModel::SetEnergySource(Ptr<EnergySource> source)
 const Ptr<EnergySource>
 UavDeviceEnergyModel::GetEnergySource()
 {
+  NS_LOG_FUNCTION(this);
   return m_source;
 }
 
@@ -267,12 +271,14 @@ void UavDeviceEnergyModel::CourseChange (Ptr<const MobilityModel> mob)
 
 void UavDeviceEnergyModel::StopHover()
 {
+  NS_LOG_FUNCTION(this);
   m_hoverEvent.Cancel();
   HoverConsumption();
 }
 
 void UavDeviceEnergyModel::StartHover()
 {
+  NS_LOG_FUNCTION(this);
   m_lastTime = Simulator::Now();
   m_hoverEvent = Simulator::Schedule(m_energyUpdateInterval,
                                           &UavDeviceEnergyModel::HoverConsumption,
@@ -287,6 +293,7 @@ UavDeviceEnergyModel::DoGetEnergyCost(void) const
 }
 
 void UavDeviceEnergyModel::DoDispose (void) {
+  NS_LOG_FUNCTION(this);
   NS_LOG_DEBUG("UavDeviceEnergyModel::DoDispose");
   m_source = 0;
   m_node = 0;

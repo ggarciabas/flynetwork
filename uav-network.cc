@@ -398,6 +398,7 @@ void UavNetwork::ConfigureServer()
 
 void UavNetwork::NewUav(int total, int update)
 {
+  NS_LOG_FUNCTION(this<<total<<update);
   NS_LOG_DEBUG ("UavNetwork::NewUav " << total << " " << update << " @" << Simulator::Now().GetSeconds());
   // validar se ainda existem UAVs
   uint32_t uav_livre = 0;
@@ -472,6 +473,7 @@ void UavNetwork::NewUav(int total, int update)
 
 void UavNetwork::RemoveUav(int id)
 {
+  NS_LOG_FUNCTION(this<<id);
   NS_LOG_DEBUG ("UavNetwork::RemoveUav [" << id << "]");
   Ptr<Node> n = m_uavNodeActive.RemoveId(id);
   m_uavNode.Add(n);
@@ -514,7 +516,7 @@ void UavNetwork::RemoveUav(int id)
 
 void UavNetwork::ConfigureUav(int total)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this<<total);
   NodeContainer uav;
   uav.Create(total);
   m_uavNode.Add(uav);
@@ -970,7 +972,7 @@ void UavNetwork::Configure()
 
 void UavNetwork::PrintUavEnergy (int t)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this<<t);
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << t << "/uav_energy.txt";
   std::ofstream file;
@@ -984,6 +986,7 @@ void UavNetwork::PrintUavEnergy (int t)
 
 void UavNetwork::ClientPosition (string name)
 {
+  NS_LOG_FUNCTION(this<<name);
   std::ofstream file;
   file.open(name, std::ofstream::out | std::ofstream::app);
   for (vector<double>::iterator i = m_palcoPos.begin(); i != m_palcoPos.end();)
@@ -1015,22 +1018,5 @@ void UavNetwork::ClientPosition (string name)
   file.close();
 }
 
-// void UavNetwork::PacketServer(std::string msg)
-// {
-//   // NS_LOG_FUNCTION(this);
-//   m_filePacketServer << msg << std::endl;
-// }
-//
-// void UavNetwork::PacketUav(std::string msg)
-// {
-//   // NS_LOG_FUNCTION(this);
-//   m_filePacketUav << msg << std::endl;
-// }
-//
-// void UavNetwork::PacketClient(std::string msg)
-// {
-//   // NS_LOG_FUNCTION(this);
-//   m_filePacketClient << msg << std::endl;
-// }
 
 } // namespace ns3

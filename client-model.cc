@@ -64,6 +64,7 @@ ClientModel::~ClientModel()
 
 void ClientModel::SetPosition(double x, double y)
 {
+  NS_LOG_FUNCTION(this<<x<<y);
   m_position.clear();
   m_position.push_back(x);
   m_position.push_back(y);
@@ -72,50 +73,60 @@ void ClientModel::SetPosition(double x, double y)
 const std::vector<double>
 ClientModel::GetPosition()
 {
+  NS_LOG_FUNCTION(this);
   return m_position;
 }
 
 void ClientModel::SetLogin(std::string str)
 {
+  NS_LOG_FUNCTION(this<<str);
   m_login = str;
 }
 
 std::string
 ClientModel::GetLogin()
 {
+  NS_LOG_FUNCTION(this);
   return m_login;
 }
 
 double
 ClientModel::GetConsumption ()
 {
+  NS_LOG_FUNCTION(this);
   return m_consumption;
 }
 
 void ClientModel::SetConsumption (double c)
 {
+  NS_LOG_FUNCTION(this<<c);
   m_consumption = c;
 }
 
 void ClientModel::SetIp (Ipv4Address ip) {
+  NS_LOG_FUNCTION(this<<ip);
   m_addr = ip;
 }
 
 Ipv4Address ClientModel::GetIp () {
+  NS_LOG_FUNCTION(this);
   return m_addr;
 }
 
 void ClientModel::SetUpdatePos (Time t)
 {
+  NS_LOG_FUNCTION(this<<t);
   m_updatePos = t;
 }
 
 Time ClientModel::GetUpdatePos ()
 {
+  NS_LOG_FUNCTION(this);
   return m_updatePos;
 }
 
 void ClientModel::DoDispose () {
+  NS_LOG_FUNCTION(this);
   NS_LOG_DEBUG ("ClientModel::Dispose login " << m_login << " REF " << GetReferenceCount() << " @" << Simulator::Now().GetSeconds());
 }
 

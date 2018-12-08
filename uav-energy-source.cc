@@ -171,7 +171,7 @@ UavEnergySource::UpdateEnergySource (void)
 
 void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << energyToDecrease);
   if (m_remainingEnergyJ < energyToDecrease)
   {
     m_remainingEnergyJ = 0; // energy never goes below 0
@@ -204,7 +204,7 @@ void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
 
 void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << energyToDecrease);
   if (m_remainingEnergyJ < energyToDecrease)
   {
     m_remainingEnergyJ = 0; // energy never goes below 0
@@ -237,7 +237,7 @@ void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
 
 void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << energyToDecrease);
   NS_LOG_INFO("UavEnergySource:UpdateEnergySourceHover.");
 
   if (m_remainingEnergyJ < energyToDecrease)
@@ -302,11 +302,13 @@ UavEnergySource::DoInitialize (void)
 }
 
 void UavEnergySource::DoDispose() {
+  NS_LOG_FUNCTION(this);
   NS_LOG_DEBUG ("UavEnergySource::DoDispose REF " << GetReferenceCount() << " @" << Simulator::Now().GetSeconds());
   m_energyUpdateEvent.Cancel();
 }
 
 void UavEnergySource::Reset () {
+  NS_LOG_FUNCTION(this);
   NS_ASSERT(m_node != NULL);
   m_lastUpdateTime = Simulator::Now();
   m_depleted = false;
@@ -319,6 +321,7 @@ void UavEnergySource::Reset () {
 }
 
 void UavEnergySource::Start () {
+  NS_LOG_FUNCTION(this);
   NS_ASSERT(m_node != NULL);
   Ptr<MobilityModel> mob = m_node->GetObject<MobilityModel>();
   NS_ASSERT(mob != NULL);
@@ -326,6 +329,7 @@ void UavEnergySource::Start () {
 }
 
 void UavEnergySource::Stop () {
+  NS_LOG_FUNCTION(this);
   m_depleted = true;
   HandleEnergyDrainedEvent();
 }

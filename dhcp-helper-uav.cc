@@ -41,6 +41,7 @@ void DhcpHelperUav::SetClientAttribute (
   std::string name,
   const AttributeValue &value)
 {
+  NS_LOG_FUNCTION(this<<&value);
   m_clientFactory.Set (name, value);
 }
 
@@ -48,16 +49,19 @@ void DhcpHelperUav::SetServerAttribute (
   std::string name,
   const AttributeValue &value)
 {
+  NS_LOG_FUNCTION(this<<&value);
   m_serverFactory.Set (name, value);
 }
 
 ApplicationContainer DhcpHelperUav::InstallDhcpClient (Ptr<NetDevice> netDevice) const
 {
+  NS_LOG_FUNCTION(this);
   return ApplicationContainer (InstallDhcpClientPriv (netDevice));
 }
 
 ApplicationContainer DhcpHelperUav::InstallDhcpClient (NetDeviceContainer netDevices) const
 {
+  NS_LOG_FUNCTION(this);
   ApplicationContainer apps;
   for (NetDeviceContainer::Iterator i = netDevices.Begin (); i != netDevices.End (); ++i)
     {
@@ -68,6 +72,7 @@ ApplicationContainer DhcpHelperUav::InstallDhcpClient (NetDeviceContainer netDev
 
 Ptr<Application> DhcpHelperUav::InstallDhcpClientPriv (Ptr<NetDevice> netDevice) const
 {
+  NS_LOG_FUNCTION(this<<netDevice);
   Ptr<Node> node = netDevice->GetNode ();
   NS_ASSERT_MSG (node != 0, "DhcpClientHelper: NetDevice is not not associated with any node -> fail");
 
@@ -109,6 +114,7 @@ ApplicationContainer DhcpHelperUav::InstallDhcpServerUav (Ptr<NetDevice> netDevi
                                                     Ipv4Address minAddr, Ipv4Address maxAddr,
                                                     Ipv4Address gateway)
 {
+  NS_LOG_FUNCTION(this<<netDevice<<serverAddr<<poolAddr<<poolMask<<minAddr<<maxAddr<<gateway);
   m_serverFactory.Set ("PoolAddresses", Ipv4AddressValue (poolAddr));
   m_serverFactory.Set ("PoolMask", Ipv4MaskValue (poolMask));
   m_serverFactory.Set ("FirstAddress", Ipv4AddressValue (minAddr));
@@ -166,6 +172,7 @@ ApplicationContainer DhcpHelperUav::InstallDhcpServerUav (Ptr<NetDevice> netDevi
 
 Ipv4InterfaceContainer DhcpHelperUav::InstallFixedAddress (Ptr<NetDevice> netDevice, Ipv4Address addr, Ipv4Mask mask)
 {
+  NS_LOG_FUNCTION(this<<netDevice<<addr<<mask);
   Ipv4InterfaceContainer retval;
 
   Ptr<Node> node = netDevice->GetNode ();

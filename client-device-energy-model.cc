@@ -76,7 +76,7 @@ ClientDeviceEnergyModel::~ClientDeviceEnergyModel()
 
 void ClientDeviceEnergyModel::SetEnergyDepletionCallback(EnergyCallback callback)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this<<&callback);
   if (callback.IsNull())
   {
     NS_LOG_DEBUG("EnergyDepletionCallback:Setting NULL energy depletion callback!");
@@ -86,7 +86,7 @@ void ClientDeviceEnergyModel::SetEnergyDepletionCallback(EnergyCallback callback
 
 void ClientDeviceEnergyModel::SetEnergyRechargedCallback(EnergyCallback callback)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this<<&callback);
   if (callback.IsNull())
   {
     NS_LOG_DEBUG("EnergyRechargedCallback:Setting NULL energy Recharged callback!");
@@ -96,11 +96,13 @@ void ClientDeviceEnergyModel::SetEnergyRechargedCallback(EnergyCallback callback
 
 void ClientDeviceEnergyModel::HandleEnergyRecharged (void)
 {
+  NS_LOG_FUNCTION(this);
   m_energyRechargedCallback();
 }
 
 void ClientDeviceEnergyModel::HandleEnergyDepletion(void)
 {
+  NS_LOG_FUNCTION(this);
   m_energyDepletionCallback();
 }
 
@@ -138,6 +140,7 @@ ClientDeviceEnergyModel::GetNode() const
 }
 
 double ClientDeviceEnergyModel::UpdateConsumption () {
+  NS_LOG_FUNCTION(this);
   Time duration = Simulator::Now () - m_lastUpdateTime;
   double energyToDecrease = duration.GetSeconds () * (m_clientCost * m_clientCount);
   DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceClient (energyToDecrease);
@@ -156,6 +159,7 @@ ClientDeviceEnergyModel::GetTotalEnergyConsumption (void) const
 
 void ClientDeviceEnergyModel::AddClient ()
 {
+  NS_LOG_FUNCTION(this);
   m_cliEvent.Cancel();
   ClientConsumption(); // update battery
   m_clientCount++;
@@ -163,6 +167,7 @@ void ClientDeviceEnergyModel::AddClient ()
 
 void ClientDeviceEnergyModel::RemoveClient()
 {
+  NS_LOG_FUNCTION(this);
   m_cliEvent.Cancel();
   ClientConsumption(); // update battery
   m_clientCount--;
@@ -189,6 +194,7 @@ void ClientDeviceEnergyModel::Reset()
 
 void ClientDeviceEnergyModel::DoDispose (void)
 {
+  NS_LOG_FUNCTION(this);
   NS_LOG_DEBUG("ClientDeviceEnergyModel::DoDispose");
   m_source = 0;
   m_cliEvent.Cancel();

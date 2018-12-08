@@ -26,6 +26,7 @@
 namespace ns3
 {
 
+NS_LOG_COMPONENT_DEFINE("ClientDeviceEnergyModelHelper");
 NS_OBJECT_ENSURE_REGISTERED(ClientDeviceEnergyModelHelper);
 
 TypeId
@@ -40,15 +41,18 @@ ClientDeviceEnergyModelHelper::GetTypeId(void)
 
 ClientDeviceEnergyModelHelper::ClientDeviceEnergyModelHelper()
 {
+  NS_LOG_FUNCTION(this);
   m_energyModel.SetTypeId("ns3::ClientDeviceEnergyModel");
 }
 
 ClientDeviceEnergyModelHelper::~ClientDeviceEnergyModelHelper()
 {
+  NS_LOG_FUNCTION(this);
 }
 
 void ClientDeviceEnergyModelHelper::Set(std::string name, const AttributeValue &v)
 {
+  NS_LOG_FUNCTION(this<<name<<&v);
   m_energyModel.Set(name, v);
 }
 
@@ -56,6 +60,7 @@ DeviceEnergyModelContainer
 ClientDeviceEnergyModelHelper::Install(Ptr<Node> node,
                                     Ptr<EnergySource> source) const
 {
+  NS_LOG_FUNCTION(this<<node<<source);
   NS_ASSERT(node != NULL);
   NS_ASSERT(source != NULL);
   // check to make sure source and net node are on the same node
@@ -68,6 +73,7 @@ DeviceEnergyModelContainer
 ClientDeviceEnergyModelHelper::Install(NodeContainer nodeContainer,
                                     EnergySourceContainer sourceContainer) const
 {
+  NS_LOG_FUNCTION(this);
   NS_ASSERT(nodeContainer.GetN() <= sourceContainer.GetN());
   DeviceEnergyModelContainer container;
   NodeContainer::Iterator node = nodeContainer.Begin();
@@ -87,6 +93,7 @@ ClientDeviceEnergyModelHelper::Install(NodeContainer nodeContainer,
 Ptr<ClientDeviceEnergyModel>
 ClientDeviceEnergyModelHelper::DoInstall(Ptr<Node> node, Ptr<EnergySource> source) const
 {
+  NS_LOG_FUNCTION(this<<node<<source);
   NS_ASSERT(node != NULL);
   NS_ASSERT(source != NULL);
   Ptr<ClientDeviceEnergyModel> model = m_energyModel.Create()->GetObject<ClientDeviceEnergyModel>();

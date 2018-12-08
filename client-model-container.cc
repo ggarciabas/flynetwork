@@ -50,7 +50,7 @@ ClientModelContainer::ClientModelContainer(std::string modelName)
 
 ClientModelContainer::ClientModelContainer(const ClientModelContainer &a, const ClientModelContainer &b)
 {
-  NS_LOG_FUNCTION(this << &a << &b);
+  NS_LOG_FUNCTION(this);
   *this = a;
   Add(b);
 }
@@ -85,7 +85,7 @@ ClientModelContainer::Get(uint32_t i) const
 
 void ClientModelContainer::Add(ClientModelContainer container)
 {
-  NS_LOG_FUNCTION(this << &container);
+  NS_LOG_FUNCTION(this);
   for (Iterator i = container.Begin(); i != container.End(); i++)
   {
     m_models.push_back(*i);
@@ -110,7 +110,7 @@ void ClientModelContainer::Add(std::string modelName)
 Ptr<ClientModel>
 ClientModelContainer::FindClientModel(std::string login)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this<<login);
   for (Iterator i = m_models.begin(); i != m_models.end(); i++)
   {
     if ((*i)->GetLogin().compare(login) == 0)
@@ -126,7 +126,7 @@ ClientModelContainer::FindClientModel(std::string login)
 Ptr<ClientModel>
 ClientModelContainer::FindClientModel(Ipv4Address ip)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this<<ip);
   for (Iterator i = m_models.begin(); i != m_models.end(); i++)
   {
     if ((*i)->GetIp() == ip)
@@ -153,14 +153,17 @@ void ClientModelContainer::Clear()
 
 bool ClientModelContainer::IsEmpty()
 {
+  NS_LOG_FUNCTION(this);
   return m_models.size() == 0;
 }
 
 void ClientModelContainer::RemoveAt (uint32_t pos) {
+  NS_LOG_FUNCTION(this<<pos);
   m_models.erase(m_models.begin()+pos);
 }
 
 void ClientModelContainer::RemoveLogin (std::string id) {
+  NS_LOG_FUNCTION(this<<id);
   int c=0;
   Iterator i;
   for (i = m_models.begin(); i != m_models.end(); ++i, ++c) {

@@ -58,13 +58,14 @@ UavModelContainer::UavModelContainer(const UavModelContainer &a, const UavModelC
 Ptr<UavModel>
 UavModelContainer::GetLast()
 {
+  NS_LOG_FUNCTION(this);
   return m_models.back();
 }
 
 Ptr<UavModel>
 UavModelContainer::FindUavModel(uint32_t id)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this<<id);
   for (Iterator i = m_models.begin(); i != m_models.end(); i++)
   {
     if ((*i)->GetId() == id)
@@ -140,12 +141,14 @@ void UavModelContainer::Clear(void)
 }
 
 Ptr<UavModel> UavModelContainer::RemoveAt (uint32_t pos) {
+  NS_LOG_FUNCTION(this<<pos);
   Ptr<UavModel> n = m_models[pos];
   m_models.erase(m_models.begin()+pos);
   return n;
 }
 
 void UavModelContainer::RemoveUav (Ptr<UavModel> uav) {
+  NS_LOG_FUNCTION(this<<uav);
   int c = 0;
   for (Iterator i = m_models.begin(); i != m_models.end(); i++, c++)
   {
