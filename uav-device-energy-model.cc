@@ -79,7 +79,7 @@ UavDeviceEnergyModel::GetTypeId(void)
 
 UavDeviceEnergyModel::UavDeviceEnergyModel()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_source = 0;
   m_energyCost = 0.0;
   m_totalEnergyConsumption = 0.0;
@@ -88,19 +88,19 @@ UavDeviceEnergyModel::UavDeviceEnergyModel()
 
 UavDeviceEnergyModel::~UavDeviceEnergyModel()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
 }
 
 double UavDeviceEnergyModel::GetEnergyCost ()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_energyCost;
 }
 
 void UavDeviceEnergyModel::SetEnergyDepletionCallback(
    EnergyCallback callback)
 {
-  NS_LOG_FUNCTION(this << &callback);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << &callback);
   if (callback.IsNull())
   {
     NS_LOG_DEBUG("EnergyDepletionCallback:Setting NULL energy depletion callback!");
@@ -111,7 +111,7 @@ void UavDeviceEnergyModel::SetEnergyDepletionCallback(
 void UavDeviceEnergyModel::SetEnergyRechargedCallback(
    EnergyCallback callback)
 {
-  NS_LOG_FUNCTION(this << &callback);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << &callback);
   if (callback.IsNull())
   {
     NS_LOG_DEBUG("EnergyRechargedCallback:Setting NULL energy Recharged callback!");
@@ -120,7 +120,7 @@ void UavDeviceEnergyModel::SetEnergyRechargedCallback(
 }
 
 double UavDeviceEnergyModel::ChangeThreshold () {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   Vector actual = m_node->GetObject<MobilityModel>()->GetPosition();
   double distance = std::sqrt(std::pow(m_xCentral - actual.x, 2) + std::pow(m_yCentral - actual.y, 2));
   NS_ASSERT(distance >= 0);
@@ -131,7 +131,7 @@ double UavDeviceEnergyModel::ChangeThreshold () {
 
 void UavDeviceEnergyModel::HandleEnergyRecharged (void)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_recharged/uav_recharged.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
@@ -148,7 +148,7 @@ void UavDeviceEnergyModel::HandleEnergyRecharged (void)
 
 void UavDeviceEnergyModel::HandleEnergyChanged(void)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_hoverEvent.Cancel();
   HoverConsumption();
   Vector actual = m_node->GetObject<MobilityModel>()->GetPosition();
@@ -165,7 +165,7 @@ void UavDeviceEnergyModel::HandleEnergyChanged(void)
 
 void UavDeviceEnergyModel::HandleEnergyDepletion(void)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
  Vector actual = m_node->GetObject<MobilityModel>()->GetPosition();
  double distance = std::sqrt(std::pow(m_xCentral - actual.x, 2) + std::pow(m_yCentral - actual.y, 2));
  NS_ASSERT(distance >= 0);
@@ -181,19 +181,19 @@ void UavDeviceEnergyModel::HandleEnergyDepletion(void)
 
 void UavDeviceEnergyModel::SetEnergyUpdateInterval(Time interval)
 {
-  NS_LOG_FUNCTION(this << interval);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << interval);
   m_energyUpdateInterval = interval;
 }
 
 Time UavDeviceEnergyModel::GetEnergyUpdateInterval(void) const
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_energyUpdateInterval;
 }
 
 void UavDeviceEnergyModel::SetEnergySource(Ptr<EnergySource> source)
 {
-  NS_LOG_FUNCTION(this << source);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << source);
   NS_ASSERT(source != NULL);
   m_source = source;
   m_energyCost = m_source->GetInitialEnergy() / (m_resistTime * m_avgVel); // joule/meter
@@ -209,13 +209,13 @@ void UavDeviceEnergyModel::SetEnergySource(Ptr<EnergySource> source)
 const Ptr<EnergySource>
 UavDeviceEnergyModel::GetEnergySource()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_source;
 }
 
 void UavDeviceEnergyModel::SetNode(Ptr<Node> node)
 {
-  NS_LOG_FUNCTION(this << node);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << node);
   NS_ASSERT(node != NULL);
   m_node = node;
   m_lastPosition = node->GetObject<MobilityModel>()->GetPosition();
@@ -225,7 +225,7 @@ void UavDeviceEnergyModel::SetNode(Ptr<Node> node)
 Ptr<Node>
 UavDeviceEnergyModel::GetNode() const
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_node;
 }
 
@@ -238,7 +238,7 @@ UavDeviceEnergyModel::GetTotalEnergyConsumption (void) const
 
 void UavDeviceEnergyModel::HoverConsumption(void)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG("UavDeviceEnergyModel:HoverConsumption.");
 
   // do not update if simulation has finished
@@ -269,7 +269,7 @@ void UavDeviceEnergyModel::HoverConsumption(void)
 
 void UavDeviceEnergyModel::CourseChange (Ptr<const MobilityModel> mob)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   Vector actual = m_node->GetObject<MobilityModel>()->GetPosition();
   double distance = std::sqrt(std::pow(m_lastPosition.x - actual.x, 2) + std::pow(m_lastPosition.y - actual.y, 2));
   NS_ASSERT(distance >= 0);
@@ -288,14 +288,14 @@ void UavDeviceEnergyModel::CourseChange (Ptr<const MobilityModel> mob)
 
 void UavDeviceEnergyModel::StopHover()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_hoverEvent.Cancel();
   HoverConsumption();
 }
 
 void UavDeviceEnergyModel::StartHover()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_lastTime = Simulator::Now();
   m_hoverEvent = Simulator::Schedule(m_energyUpdateInterval,
                                           &UavDeviceEnergyModel::HoverConsumption,
@@ -305,12 +305,12 @@ void UavDeviceEnergyModel::StartHover()
 double
 UavDeviceEnergyModel::DoGetEnergyCost(void) const
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_energyCost;
 }
 
 void UavDeviceEnergyModel::DoDispose (void) {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG("UavDeviceEnergyModel::DoDispose");
   m_source = 0;
   m_node = 0;

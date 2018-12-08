@@ -42,18 +42,18 @@ UavDeviceEnergyModelHelper::GetTypeId(void)
 
 UavDeviceEnergyModelHelper::UavDeviceEnergyModelHelper()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_energyModel.SetTypeId("ns3::UavDeviceEnergyModel");
 }
 
 UavDeviceEnergyModelHelper::~UavDeviceEnergyModelHelper()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
 }
 
 void UavDeviceEnergyModelHelper::Set(std::string name, const AttributeValue &v)
 {
-  NS_LOG_FUNCTION(this << name << &v);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << name << &v);
   m_energyModel.Set(name, v);
 }
 
@@ -61,7 +61,7 @@ DeviceEnergyModelContainer
 UavDeviceEnergyModelHelper::Install(Ptr<Node> node,
                                     Ptr<EnergySource> source) const
 {
-  NS_LOG_FUNCTION(this << node << source);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << node << source);
   NS_ASSERT(node != NULL);
   NS_ASSERT(source != NULL);
   // check to make sure source and net node are on the same node
@@ -74,7 +74,7 @@ DeviceEnergyModelContainer
 UavDeviceEnergyModelHelper::Install(NodeContainer nodeContainer,
                                     EnergySourceContainer sourceContainer) const
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_ASSERT(nodeContainer.GetN() <= sourceContainer.GetN());
   DeviceEnergyModelContainer container;
   NodeContainer::Iterator node = nodeContainer.Begin();
@@ -94,7 +94,7 @@ UavDeviceEnergyModelHelper::Install(NodeContainer nodeContainer,
 Ptr<UavDeviceEnergyModel>
 UavDeviceEnergyModelHelper::DoInstall(Ptr<Node> node, Ptr<EnergySource> source) const
 {
-  NS_LOG_FUNCTION(this << node << source);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << node << source);
   NS_ASSERT(node != NULL);
   NS_ASSERT(source != NULL);
   Ptr<UavDeviceEnergyModel> model = m_energyModel.Create()->GetObject<UavDeviceEnergyModel>();

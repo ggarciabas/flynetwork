@@ -144,13 +144,13 @@ UavNetwork::GetTypeId(void)
 
 UavNetwork::UavNetwork() //: m_filePacketServer("./scratch/flynetwork/data/output/packet_trace_server.txt"), m_filePacketUav("./scratch/flynetwork/data/output/packet_trace_uav.txt"), m_filePacketClient("./scratch/flynetwork/data/output/packet_trace_client.txt")
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_iniX = m_iniY = -2000;
 }
 
 void UavNetwork::DoDispose ()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_INFO ("UavNetwork::DoDispose REF " << GetReferenceCount() << " @" << Simulator::Now().GetSeconds());
   m_palcoPos.clear();
   m_uavNode.Clear();
@@ -162,12 +162,12 @@ void UavNetwork::DoDispose ()
 
 UavNetwork::~UavNetwork()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
 }
 
 void UavNetwork::Run()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
 
   std::ifstream scenario;
   std::ostringstream ss, ss_;
@@ -318,7 +318,7 @@ void UavNetwork::Run()
 
 void UavNetwork::ConfigureServer()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_serverNode.Create(1);
 
   /// Net device
@@ -410,7 +410,7 @@ void UavNetwork::ConfigureServer()
 
 void UavNetwork::NewUav(int total, int update)
 {
-  NS_LOG_FUNCTION(this<<total<<update);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<total<<update);
   NS_LOG_DEBUG ("UavNetwork::NewUav " << total << " " << update << " @" << Simulator::Now().GetSeconds());
   // validar se ainda existem UAVs
   uint32_t uav_livre = 0;
@@ -485,7 +485,7 @@ void UavNetwork::NewUav(int total, int update)
 
 void UavNetwork::RemoveUav(int id)
 {
-  NS_LOG_FUNCTION(this<<id);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<id);
   NS_LOG_DEBUG ("UavNetwork::RemoveUav [" << id << "]");
   Ptr<Node> n = m_uavNodeActive.RemoveId(id);
   m_uavNode.Add(n);
@@ -528,7 +528,7 @@ void UavNetwork::RemoveUav(int id)
 
 void UavNetwork::ConfigureUav(int total)
 {
-  NS_LOG_FUNCTION(this<<total);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<total);
   NodeContainer uav;
   uav.Create(total);
   m_uavNode.Add(uav);
@@ -682,7 +682,7 @@ void UavNetwork::ConfigureUav(int total)
 
 void UavNetwork::ConfigureCli()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   if (m_totalCli == 0)
     return;
 
@@ -873,7 +873,7 @@ void UavNetwork::ConfigureCli()
 
 void UavNetwork::ConfigurePalcos() // TODO: poderia ser otimizada a leitura do arquivo colocando esta estrutura na configuração do cliente, mas isso tbm poderia confundir! Pensar!
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   std::ostringstream ss;
   std::ifstream scenario;
   ss << "./scratch/flynetwork/data/scenarios/" << m_PathData << ".txt";
@@ -916,7 +916,7 @@ void UavNetwork::ConfigurePalcos() // TODO: poderia ser otimizada a leitura do a
 
 void UavNetwork::Configure()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   std::ostringstream ss;
   // Routing
   AodvHelper aodv;
@@ -984,7 +984,7 @@ void UavNetwork::Configure()
 
 void UavNetwork::PrintUavEnergy (int t)
 {
-  NS_LOG_FUNCTION(this<<t);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<t);
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << t << "/uav_energy.txt";
   std::ofstream file;
@@ -998,7 +998,7 @@ void UavNetwork::PrintUavEnergy (int t)
 
 void UavNetwork::ClientPosition (string name)
 {
-  NS_LOG_FUNCTION(this<<name);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<name);
   std::ofstream file;
   file.open(name, std::ofstream::out | std::ofstream::app);
   for (vector<double>::iterator i = m_palcoPos.begin(); i != m_palcoPos.end();)

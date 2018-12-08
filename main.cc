@@ -73,7 +73,7 @@ int main (int argc, char *argv[])
 	LogComponentEnable("UavDeviceEnergyModel", LOG_FUNCTION);
 	LogComponentEnable("UavEnergySourceHelper", LOG_FUNCTION);
 	LogComponentEnable("UavEnergySource", LOG_FUNCTION);
-	LogComponentEnable("UavMobilityModel", LOG_FUNCTION);
+	// LogComponentEnable("UavMobilityModel", LOG_FUNCTION);
 	LogComponentEnable("UavModelContainer", LOG_FUNCTION);
 	LogComponentEnable("UavModel", LOG_FUNCTION);
 	LogComponentEnable("UavNetwork", LOG_FUNCTION);

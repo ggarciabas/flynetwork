@@ -45,7 +45,7 @@ LocationModel::GetTypeId(void)
 
 LocationModel::LocationModel()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("LocationModel::LocationModel @" << Simulator::Now().GetSeconds());
   m_used = false;
   m_totaCli = 0;
@@ -54,27 +54,27 @@ LocationModel::LocationModel()
 
 LocationModel::~LocationModel()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("LocationModel::~LocationModel @" << Simulator::Now().GetSeconds());
   m_position.clear();
 }
 
 void LocationModel::SetId(uint32_t id)
 {
-  NS_LOG_FUNCTION(this<<id);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<id);
   m_id = id;
 }
 
 uint32_t
 LocationModel::GetId()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_id;
 }
 
 void LocationModel::SetPosition(double x, double y)
 {
-  NS_LOG_FUNCTION(this<<x<<y);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<x<<y);
   m_position.clear();
   m_position.push_back(x);
   m_position.push_back(y);
@@ -83,44 +83,44 @@ void LocationModel::SetPosition(double x, double y)
 const std::vector<double>
 LocationModel::GetPosition()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_position;
 }
 
 bool LocationModel::IsUsed() {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_used;
 }
 
 void LocationModel::SetUsed () {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_used = true;
 }
 
 double LocationModel::GetTotalConsumption ()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_totalConsumption;
 }
 
 void LocationModel::SetTotalConsumption (double v)
 {
-  NS_LOG_FUNCTION(this<<v);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<v);
   m_totalConsumption = v;
 }
 
 void LocationModel::DoDispose () {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("LocationModel::Dispose id "<< m_id << " REF " << GetReferenceCount() << " @" << Simulator::Now().GetSeconds());
 }
 
 void LocationModel::SetTotalCli (int t) {
-  NS_LOG_FUNCTION(this<<t);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<t);
   m_totaCli = t;
 }
 
 int LocationModel::GetTotalCli () {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_totaCli;
 }
 

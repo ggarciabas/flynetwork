@@ -116,13 +116,13 @@ ServerApplication::GetTypeId(void)
 
 ServerApplication::ServerApplication()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   std::cout << "ServerApplication::ServerApplication @" << Simulator::Now().GetSeconds() << "\n";
 }
 
 ServerApplication::~ServerApplication()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   std::cout << "ServerApplication::~ServerApplication @" << Simulator::Now().GetSeconds() << "\n";
   m_uavContainer.Clear();
   m_locationContainer.Clear();
@@ -132,7 +132,7 @@ ServerApplication::~ServerApplication()
 
 void ServerApplication::AddNewUav(uint32_t id, Ipv4Address addrAdhoc, double totalEnergy, double energyCost, double totalBattery, Ptr<MobilityModel> mob)
 {
-  NS_LOG_FUNCTION(this << id << addrAdhoc << totalEnergy << energyCost << totalBattery << mob);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << id << addrAdhoc << totalEnergy << energyCost << totalBattery << mob);
 
   NS_LOG_DEBUG ("ServerApplication::AddNewUav Criando uav: " << id << " @" << Simulator::Now().GetSeconds());
 
@@ -159,7 +159,7 @@ void ServerApplication::AddNewUav(uint32_t id, Ipv4Address addrAdhoc, double tot
 
 void ServerApplication::AddSupplyUav(uint32_t id, Ipv4Address addrAdhoc, double totalEnergy, double energyCost, double totalBattery, Ptr<MobilityModel> mob)
 {
-  NS_LOG_FUNCTION(this << id << addrAdhoc << totalEnergy << energyCost << totalBattery << mob << m_supplyPos);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << id << addrAdhoc << totalEnergy << energyCost << totalBattery << mob << m_supplyPos);
   Ptr<UavModel> supplied = m_uavContainer.RemoveAt(m_supplyPos);
   NS_LOG_DEBUG("Criando supply uav: " << id << " last: " << supplied->GetId());
 
@@ -200,7 +200,7 @@ void ServerApplication::AddSupplyUav(uint32_t id, Ipv4Address addrAdhoc, double 
 
 void ServerApplication::AddNewFixedClient(string login, double x, double y)
 {
-  NS_LOG_FUNCTION(this << login << x << y);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << login << x << y);
   ObjectFactory obj;
   obj.SetTypeId("ns3::ClientModel");
   obj.Set("Login", StringValue(login));
@@ -213,7 +213,7 @@ void ServerApplication::AddNewFixedClient(string login, double x, double y)
 void
 ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & address)
 {
-  NS_LOG_FUNCTION(this << packet << address);
+  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << packet << address);
   uint8_t *buffer = new uint8_t[packet->GetSize ()];
   packet->CopyData(buffer, packet->GetSize ());
   std::string s = std::string(buffer, buffer+packet->GetSize());
@@ -369,7 +369,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
 
 void ServerApplication::ReplyAskCliData(Ptr<UavModel> uav)
 {
-  NS_LOG_FUNCTION(this << uav);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << uav);
   std::ostringstream msg;
   msg << "DATAOK "<< '\0';
   uint16_t packetSize = msg.str().length() + 1;
@@ -383,7 +383,7 @@ void ServerApplication::ReplyAskCliData(Ptr<UavModel> uav)
 
 void ServerApplication::ReplyUav(Ptr<UavModel> uav)
 {
-  NS_LOG_FUNCTION(this << uav);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << uav);
   std::ostringstream msg;
   msg << "SERVEROK "<< '\0';
   uint16_t packetSize = msg.str().length() + 1;
@@ -397,7 +397,7 @@ void ServerApplication::ReplyUav(Ptr<UavModel> uav)
 
 void ServerApplication::StartApplication(void)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_rmax = std::sqrt(std::pow(m_maxx,2)+std::pow(m_maxy,2));
   m_newUav(1,0); // inicia com um UAV
   ValidateUavPosition();
@@ -419,7 +419,7 @@ void ServerApplication::SendAskClientPacket(Ptr<UavModel> uav)
 
 void ServerApplication::AskClientData ()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   Simulator::Remove(m_serverEvent);
   double t = 0.0;
   for (UavModelContainer::Iterator i = m_uavContainer.Begin(); i != m_uavContainer.End(); ++i) {
@@ -433,13 +433,13 @@ void ServerApplication::AskClientData ()
 
 void ServerApplication::StopApplication(void)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   Simulator::Remove(m_serverEvent);
 }
 
 void ServerApplication::ValidateUavPosition()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   // Verificar se todos os UAVs estão no posicionamento desejado!
   UavModelContainer::Iterator i;
   bool flag = true;
@@ -457,7 +457,7 @@ void ServerApplication::ValidateUavPosition()
 
 void ServerApplication::Run ()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   if (!m_clientContainer.IsEmpty() || !m_fixedClientContainer.IsEmpty())
   {
     NS_LOG_DEBUG("SERVER - Iniciando execução dos DAs @" << Simulator::Now().GetSeconds());
@@ -481,7 +481,7 @@ void ServerApplication::Run ()
 
 void ServerApplication::SendCentralPacket(Ptr<UavModel> uav)
 {
-  NS_LOG_FUNCTION(this << uav);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << uav);
   NS_LOG_DEBUG ("ServerApplication::SendCentralPacket @" << Simulator::Now().GetSeconds() << " Id: " << uav->GetId());
   uav->CancelSendCentralEvent();
   NS_ASSERT(uav != 0);
@@ -508,7 +508,7 @@ void ServerApplication::SendCentralPacket(Ptr<UavModel> uav)
 
 void ServerApplication::SendUavPacket(Ptr<UavModel> uav)
 {
-  NS_LOG_FUNCTION(this << uav);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << uav);
   NS_LOG_DEBUG("ServerApplication::SendUavPacket UAV Id "  << uav->GetId() << " @" << Simulator::Now().GetSeconds() << " REF " << uav->GetReferenceCount());
   uav->CancelSendPositionEvent();
   NS_ASSERT(uav != 0);
@@ -532,7 +532,7 @@ void ServerApplication::SendUavPacket(Ptr<UavModel> uav)
 
 void ServerApplication::runDAPython()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
 
   std::ofstream cenario, file;
   std::ostringstream os;
@@ -659,7 +659,7 @@ void ServerApplication::runDAPython()
 
 void ServerApplication::CreateCentralLocation(void)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
   ObjectFactory fac;
   fac.SetTypeId("ns3::LocationModel");
@@ -678,7 +678,7 @@ void ServerApplication::CreateCentralLocation(void)
 
 double
 ServerApplication::CalculateDistanceCentral(const std::vector<double> pos) {
-  NS_LOG_FUNCTION(this << pos);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << pos);
   Vector v = GetNode()->GetObject<MobilityModel>()->GetPosition();
   double dist = std::sqrt(std::pow(pos.at(0) - v.x, 2) + std::pow(pos.at(1) - v.y, 2));
   NS_LOG_INFO("SERVER -- DIST " << dist);
@@ -688,14 +688,14 @@ ServerApplication::CalculateDistanceCentral(const std::vector<double> pos) {
 double
 ServerApplication::CalculateDistance(const std::vector<double> pos1, const std::vector<double> pos2)
 {
-  NS_LOG_FUNCTION(this << pos1 << pos2);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << pos1 << pos2);
   double dist = std::sqrt(std::pow(pos1.at(0) - pos2.at(0), 2) + std::pow(pos1.at(1) - pos2.at(1), 2));
   return dist; // euclidean, sempre considera a distância atual calculada pelo DA
 }
 
 bool ServerApplication::ValidateMijConvergency(vector<vector<double>> vec, vector<vector<double>> m_ij, unsigned siz)
 {
-  NS_LOG_FUNCTION(this << vec << m_ij << siz);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << vec << m_ij << siz);
   for (unsigned i = 0; i < siz; ++i)
   {
     for (unsigned j = 0; j < siz; ++j)
@@ -718,7 +718,7 @@ bool ServerApplication::ValidateMijConvergency(vector<vector<double>> vec, vecto
 
 void ServerApplication::runAgendamento(void)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_ASSERT(m_locationContainer.GetN() != 0);
 
   //  - fazer com que o número de localizacoes e uavs sejam iguais!

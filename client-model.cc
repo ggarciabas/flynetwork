@@ -51,20 +51,20 @@ ClientModel::GetTypeId(void)
 
 ClientModel::ClientModel() : m_position()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("ClientModel::ClientModel @" << Simulator::Now().GetSeconds());
 }
 
 ClientModel::~ClientModel()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("ClientModel::~ClientModel @" << Simulator::Now().GetSeconds());
   m_position.clear();
 }
 
 void ClientModel::SetPosition(double x, double y)
 {
-  NS_LOG_FUNCTION(this<<x<<y);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<x<<y);
   m_position.clear();
   m_position.push_back(x);
   m_position.push_back(y);
@@ -73,60 +73,60 @@ void ClientModel::SetPosition(double x, double y)
 const std::vector<double>
 ClientModel::GetPosition()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_position;
 }
 
 void ClientModel::SetLogin(std::string str)
 {
-  NS_LOG_FUNCTION(this<<str);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<str);
   m_login = str;
 }
 
 std::string
 ClientModel::GetLogin()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_login;
 }
 
 double
 ClientModel::GetConsumption ()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_consumption;
 }
 
 void ClientModel::SetConsumption (double c)
 {
-  NS_LOG_FUNCTION(this<<c);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<c);
   m_consumption = c;
 }
 
 void ClientModel::SetIp (Ipv4Address ip) {
-  NS_LOG_FUNCTION(this<<ip);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<ip);
   m_addr = ip;
 }
 
 Ipv4Address ClientModel::GetIp () {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_addr;
 }
 
 void ClientModel::SetUpdatePos (Time t)
 {
-  NS_LOG_FUNCTION(this<<t);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<t);
   m_updatePos = t;
 }
 
 Time ClientModel::GetUpdatePos ()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_updatePos;
 }
 
 void ClientModel::DoDispose () {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("ClientModel::Dispose login " << m_login << " REF " << GetReferenceCount() << " @" << Simulator::Now().GetSeconds());
 }
 

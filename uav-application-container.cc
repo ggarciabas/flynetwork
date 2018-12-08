@@ -30,19 +30,19 @@ NS_LOG_COMPONENT_DEFINE("UavApplicationContainer");
 
 UavApplicationContainer::UavApplicationContainer()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
 }
 
 UavApplicationContainer::UavApplicationContainer(Ptr<UavApplication> app)
 {
-  NS_LOG_FUNCTION(this << app);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << app);
   NS_ASSERT(app != NULL);
   m_apps.push_back(app);
 }
 
 UavApplicationContainer::UavApplicationContainer(std::string appName)
 {
-  NS_LOG_FUNCTION(this << appName);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << appName);
   Ptr<UavApplication> app = Names::Find<UavApplication>(appName);
   NS_ASSERT(app != NULL);
   m_apps.push_back(app);
@@ -50,7 +50,7 @@ UavApplicationContainer::UavApplicationContainer(std::string appName)
 
 UavApplicationContainer::UavApplicationContainer(const UavApplicationContainer &a, const UavApplicationContainer &b)
 {
-  NS_LOG_FUNCTION(this << &a << &b);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << &a << &b);
   *this = a;
   Add(b);
 }
@@ -58,34 +58,34 @@ UavApplicationContainer::UavApplicationContainer(const UavApplicationContainer &
 UavApplicationContainer::Iterator
 UavApplicationContainer::Begin(void) const
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_apps.begin();
 }
 
 UavApplicationContainer::Iterator
 UavApplicationContainer::End(void) const
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_apps.end();
 }
 
 uint32_t
 UavApplicationContainer::GetN(void) const
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_apps.size();
 }
 
 Ptr<UavApplication>
 UavApplicationContainer::Get(uint32_t i) const
 {
-  NS_LOG_FUNCTION(this << i);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << i);
   return m_apps[i];
 }
 
 void UavApplicationContainer::Add(UavApplicationContainer container)
 {
-  NS_LOG_FUNCTION(this << &container);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << &container);
   for (Iterator i = container.Begin(); i != container.End(); i++)
   {
     m_apps.push_back(*i);
@@ -94,14 +94,14 @@ void UavApplicationContainer::Add(UavApplicationContainer container)
 
 void UavApplicationContainer::Add(Ptr<UavApplication> app)
 {
-  NS_LOG_FUNCTION(this << app);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << app);
   NS_ASSERT(app != NULL);
   m_apps.push_back(app);
 }
 
 void UavApplicationContainer::Add(std::string appName)
 {
-  NS_LOG_FUNCTION(this << appName);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << appName);
   Ptr<UavApplication> app = Names::Find<UavApplication>(appName);
   NS_ASSERT(app != NULL);
   m_apps.push_back(app);
@@ -109,7 +109,7 @@ void UavApplicationContainer::Add(std::string appName)
 
 void UavApplicationContainer::Clear(void)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   for (Iterator i = m_apps.begin(); i != m_apps.end(); i++)
   {
     NS_LOG_DEBUG ("UavApplicationContainer::Clear id " << (*i)->GetId() << " REF " << (*i)->GetReferenceCount());

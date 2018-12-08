@@ -26,25 +26,25 @@ NS_LOG_COMPONENT_DEFINE("UavEnergySourceHelper");
 
 UavEnergySourceHelper::UavEnergySourceHelper()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_uavEnergySource.SetTypeId("ns3::UavEnergySource");
 }
 
 UavEnergySourceHelper::~UavEnergySourceHelper()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
 }
 
 void UavEnergySourceHelper::Set(std::string name, const AttributeValue &v)
 {
-  NS_LOG_FUNCTION(this << name << &v);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << name << &v);
   m_uavEnergySource.Set(name, v);
 }
 
 Ptr<EnergySource>
 UavEnergySourceHelper::DoInstall(Ptr<Node> node) const
 {
-  NS_LOG_FUNCTION(this << node);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << node);
   NS_ASSERT(node != NULL);
   Ptr<EnergySource> source = m_uavEnergySource.Create()->GetObject<EnergySource>();
   NS_ASSERT(source != NULL);
