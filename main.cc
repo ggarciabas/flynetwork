@@ -57,6 +57,28 @@ int main (int argc, char *argv[])
 	LogComponentEnable("ServerApplication", LOG_DEBUG);
 	LogComponentEnable("UavApplication", LOG_DEBUG);
 
+	LogComponentEnable("ClientDeviceEnergyModelHelper", LOG_FUNCTION);
+	LogComponentEnable("ClientDeviceEnergyModel", LOG_FUNCTION);
+	LogComponentEnable("ClientModel", LOG_FUNCTION);
+	LogComponentEnable("ClientModelContainer", LOG_FUNCTION);
+	LogComponentEnable("DhcpHelperUav", LOG_FUNCTION);
+	LogComponentEnable("DhcpServerUav", LOG_FUNCTION);
+	LogComponentEnable("LocationModelContainer", LOG_FUNCTION);
+	LogComponentEnable("LocationModel", LOG_FUNCTION);
+	LogComponentEnable("ServerApplication", LOG_FUNCTION);
+	LogComponentEnable("SmartphoneApplication", LOG_FUNCTION);
+	LogComponentEnable("UavApplicationContainer", LOG_FUNCTION);
+	LogComponentEnable("UavApplication", LOG_FUNCTION);
+	LogComponentEnable("UavDeviceEnergyModelHelper", LOG_FUNCTION);
+	LogComponentEnable("UavDeviceEnergyModel", LOG_FUNCTION);
+	LogComponentEnable("UavEnergySourceHelper", LOG_FUNCTION);
+	LogComponentEnable("UavEnergySource", LOG_FUNCTION);
+	LogComponentEnable("UavMobilityModel", LOG_FUNCTION);
+	LogComponentEnable("UavModelContainer", LOG_FUNCTION);
+	LogComponentEnable("UavModel", LOG_FUNCTION);
+	LogComponentEnable("UavNetwork", LOG_FUNCTION);
+	LogComponentEnable("UavNodeContainer", LOG_FUNCTION);
+
 	SeedManager::SetSeed(6112018);
 
 	ObjectFactory obj;
