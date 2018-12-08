@@ -96,7 +96,7 @@ SmartphoneApplication::GetTypeId(void)
 
 SmartphoneApplication::SmartphoneApplication()
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG("SmartphoneApplication::SmartphoneApplication @" << Simulator::Now().GetSeconds());
   m_running = false;
   m_connected = false;
@@ -104,26 +104,26 @@ SmartphoneApplication::SmartphoneApplication()
 
 SmartphoneApplication::~SmartphoneApplication()
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   std::cout << "SmartphoneApplication::~SmartphoneApplication @" << Simulator::Now().GetSeconds() << "\n";
 }
 
 void SmartphoneApplication::SetLogin(std::string login)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << login);
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds()  << login);
   m_login = login;
 }
 
 std::string
 SmartphoneApplication::GetLogin()
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   return m_login;
 }
 
 void SmartphoneApplication::StartApplication(void)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   m_lastPosition = GetNode()->GetObject<MobilityModel>()->GetPosition();
 
   Ipv4StaticRoutingHelper ipv4RoutingHelper;
@@ -139,7 +139,7 @@ void SmartphoneApplication::StartApplication(void)
 
 void SmartphoneApplication::StopApplication(void)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   m_running = false;
 
   Simulator::Remove(m_sendEventUav);
@@ -152,7 +152,7 @@ void SmartphoneApplication::StopApplication(void)
 
 void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual para o UAV
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   Simulator::Remove(m_sendEventUav);
 
   if (m_socketUav && !m_socketUav->Connect (InetSocketAddress (m_uavPeer, m_port))) {
@@ -192,7 +192,7 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
 void
 SmartphoneApplication::CourseChange(Ptr<const MobilityModel> mobility)
 {
-  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  // NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   Vector actual = mobility->GetPosition();
   double distance = std::sqrt(std::pow(m_lastPosition.x - actual.x, 2) + std::pow(m_lastPosition.y - actual.y, 2));
 
@@ -208,20 +208,20 @@ SmartphoneApplication::CourseChange(Ptr<const MobilityModel> mobility)
 void
 SmartphoneApplication::TracedCallbackTxApp (Ptr<const Packet> packet, const Address &source, const Address &dest)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - SERVER ");
 }
 
 void SmartphoneApplication::TracedCallbackExpiryLease (const Ipv4Address& ip)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   Simulator::Remove(m_sendEventUav);
   NS_LOG_DEBUG ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " [[ perdeu IP ]]");
 }
 
 void SmartphoneApplication::TracedCallbackNewLease (const Ipv4Address& ip)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   Simulator::Remove(m_sendEventUav);
   m_uavPeer = DynamicCast<DhcpClient>(GetNode()->GetApplication(m_idDHCP))->GetDhcpServer();
   NS_LOG_DEBUG ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " novo IP " << ip << " do servidor " << m_uavPeer);
@@ -232,28 +232,28 @@ void SmartphoneApplication::TracedCallbackNewLease (const Ipv4Address& ip)
 void
 SmartphoneApplication::PhyRxOkTrace (std::string context, Ptr<const Packet> packet, double snr, WifiMode mode, enum WifiPreamble preamble)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   NS_LOG_INFO("CLIENT - PHYRXOK mode=" << mode << " snr=" << snr << " " << *packet);
 }
 
 void
 SmartphoneApplication::PhyRxErrorTrace (std::string context, Ptr<const Packet> packet, double snr)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   NS_LOG_INFO("CLIENT - PHYRXERROR snr=" << snr << " " << *packet);
 }
 
 void
 SmartphoneApplication::PhyTxTrace (std::string context, Ptr<const Packet> packet, WifiMode mode, WifiPreamble preamble, uint8_t txPower)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   NS_LOG_INFO("CLIENT - PHYTX mode=" << mode << " " << *packet);
 }
 
 void
 SmartphoneApplication::TracedCallbackAssocLogger (Mac48Address mac)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   Simulator::Remove(m_sendEventUav);
   NS_LOG_INFO ("CLIENT [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - associated to " << mac);
   m_sendEventUav = Simulator::Schedule(Seconds(20.0), &SmartphoneApplication::SendPacketUav, this);
@@ -264,14 +264,14 @@ SmartphoneApplication::TracedCallbackAssocLogger (Mac48Address mac)
 void
 SmartphoneApplication::TracedCallbackDeAssocLogger (Mac48Address mac)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   Simulator::Remove(m_sendEventUav);
   NS_LOG_INFO ("CLIENT [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - lost association to " << mac);
   m_connected = false;
 }
 
 void SmartphoneApplication::DoDispose() {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("SmartphoneApplication::DoDispose id " << m_id << " REF " << GetReferenceCount() << " SKT REF " << m_socketUav->GetReferenceCount() << " @" << Simulator::Now().GetSeconds());
   Simulator::Remove(m_sendEventUav);
   m_socketUav->ShutdownRecv();
@@ -284,12 +284,12 @@ void SmartphoneApplication::DoDispose() {
 
 void SmartphoneApplication::SetApp (std::string a)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   m_app = a;
 }
 
 std::string SmartphoneApplication::GetApp () {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   return m_app;
 }
 
