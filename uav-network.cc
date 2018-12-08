@@ -203,6 +203,9 @@ void UavNetwork::Run()
     case 9: // teste_5
       ss << "teste_5";
       break;
+    case 10: // teste_10
+      ss << "teste_10";
+      break;
     case 15: // teste_15
       ss << "teste_15";
       break;
@@ -260,6 +263,15 @@ void UavNetwork::Run()
   system(ss.str().c_str());
   ss.str("");
   ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/etapa";
+  system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_recharged";
+  system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_depletion";
+  system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_stop";
   system(ss.str().c_str());
   // ss.str("");
   // ss << "./scratch/flynetwork/data/output/"<< m_pathData<<"/packet_trace_server.txt";

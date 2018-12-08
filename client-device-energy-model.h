@@ -97,9 +97,7 @@ public:
    *
    * Not implemented
    */
-  virtual void HandleEnergyChanged (void)
-  {
-  }
+  virtual void HandleEnergyChanged (void);
 
   virtual void ChangeState (int) {}
 

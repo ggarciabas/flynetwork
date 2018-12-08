@@ -331,7 +331,9 @@ void UavEnergySource::Start () {
 void UavEnergySource::Stop () {
   NS_LOG_FUNCTION(this);
   m_depleted = true;
-  HandleEnergyDrainedEvent();
+  NotifyEnergyChanged();
 }
+
+
 
 } // namespace ns3

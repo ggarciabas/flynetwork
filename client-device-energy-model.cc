@@ -98,6 +98,16 @@ void ClientDeviceEnergyModel::HandleEnergyRecharged (void)
 {
   NS_LOG_FUNCTION(this);
   m_energyRechargedCallback();
+  m_cliEvent.Cancel();
+  this->m_lastUpdateTime = Simulator::Now ();
+  m_cliEvent = Simulator::Schedule(Seconds(m_energyUpdateInterval), &ClientDeviceEnergyModel::ClientConsumption, this);
+}
+
+void ClientDeviceEnergyModel::HandleEnergyChanged(void)
+{
+  NS_LOG_FUNCTION(this);
+  ClientConsumption(); // update battery
+  m_cliEvent.Cancel();
 }
 
 void ClientDeviceEnergyModel::HandleEnergyDepletion(void)
