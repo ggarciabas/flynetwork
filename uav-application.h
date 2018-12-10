@@ -80,10 +80,12 @@ private:
   virtual void StartApplication(void);
   virtual void StopApplication(void);
 
+  void CalculateDistance(const std::vector<double> pos1, const std::vector<double> pos2);
+
   void ReplyServer ();
   void ReplyServerCentral ();
 
-  void ScheduleTx(void);
+  // void ScheduleTx(void);
   void SendPacket(void);
   void SendCliData ();
   void SendPacketDepletion(void);
@@ -98,7 +100,7 @@ private:
   Ipv4Address m_peer;
   DataRate m_dataRate;
   Ptr<Socket> m_sendSck; // sending socket
-  EventId m_sendEvent;
+  EventId m_sendEvent; // nao esta sendo utilizado, remover
   EventId m_sendCliDataEvent;
   EventId m_packetDepletion;
   bool m_running;

@@ -369,7 +369,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
 
 void ServerApplication::ReplyAskCliData(Ptr<UavModel> uav)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << uav);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << uav->GetId());
   std::ostringstream msg;
   msg << "DATAOK "<< '\0';
   uint16_t packetSize = msg.str().length() + 1;
@@ -378,12 +378,13 @@ void ServerApplication::ReplyAskCliData(Ptr<UavModel> uav)
     msg.str("");
     msg << "SERVER\t-1\tSENT\t" << Simulator::Now().GetSeconds() << "\tDATAOK";
     m_packetTrace(msg.str());
+    NS_LOG_DEBUG (msg.str());
   }
 }
 
 void ServerApplication::ReplyUav(Ptr<UavModel> uav)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << uav);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << uav->GetId());
   std::ostringstream msg;
   msg << "SERVEROK "<< '\0';
   uint16_t packetSize = msg.str().length() + 1;
@@ -405,7 +406,7 @@ void ServerApplication::StartApplication(void)
 
 void ServerApplication::SendAskClientPacket(Ptr<UavModel> uav)
 {
-  NS_LOG_FUNCTION (this << uav);
+  NS_LOG_FUNCTION (this << uav->GetId());
   uav->CancelAskCliDataEvent();
   std::ostringstream msg;
   msg << "SERVERDATA " << '\0';
@@ -443,8 +444,22 @@ void ServerApplication::ValidateUavPosition()
   // Verificar se todos os UAVs estão no posicionamento desejado!
   UavModelContainer::Iterator i;
   bool flag = true;
+  double t=0.0;
   for (i = m_uavContainer.Begin(); i != m_uavContainer.End(); ++i) {
-    flag = (flag && ((*i)->IsConfirmed() && (*i)->ClientDataConfirmed())); // espera receber informacoes de dados do cliente tbm!
+    bool f_uav = ((*i)->IsConfirmed() && (*i)->ClientDataConfirmed());
+    flag = (flag && f_uav); // espera receber informacoes de dados do cliente tbm!
+    if (!(*i)->ClientDataConfirmed()) {
+      (*i)->CancelAskCliDataEvent();
+      (*i)->SetClientDataConfirmed(false);
+      (*i)->SetAskCliDataEvent(Simulator::Schedule(Seconds(t), &ServerApplication::SendAskClientPacket, this, (*i)));
+      t += 0.5;
+    }
+
+    if (!(*i)->IsConfirmed()) {
+      uav->CancelSendPositionEvent();
+      SendUavPacket((*i));
+    }
+
   }
   if (flag) {
     NS_LOG_DEBUG ("SERVER - todos os UAVs estao na posicao desejada @" << Simulator::Now().GetSeconds());
@@ -481,7 +496,7 @@ void ServerApplication::Run ()
 
 void ServerApplication::SendCentralPacket(Ptr<UavModel> uav)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << uav);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << uav->GetId());
   NS_LOG_DEBUG ("ServerApplication::SendCentralPacket @" << Simulator::Now().GetSeconds() << " Id: " << uav->GetId());
   uav->CancelSendCentralEvent();
   NS_ASSERT(uav != 0);
@@ -508,7 +523,7 @@ void ServerApplication::SendCentralPacket(Ptr<UavModel> uav)
 
 void ServerApplication::SendUavPacket(Ptr<UavModel> uav)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << uav);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << uav->GetId());
   NS_LOG_DEBUG("ServerApplication::SendUavPacket UAV Id "  << uav->GetId() << " @" << Simulator::Now().GetSeconds() << " REF " << uav->GetReferenceCount());
   uav->CancelSendPositionEvent();
   NS_ASSERT(uav != 0);
