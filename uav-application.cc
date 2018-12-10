@@ -296,7 +296,7 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
         pa.push_back(GetNode()->GetObject<MobilityModel>()->GetPosition().y);
         pn.push_back(std::stod(results.at(1), &sz));
         pn.push_back(std::stod(results.at(2), &sz));
-        GetNode()->GetObject<MobilityModel>()
+        GetNode()->GetObject<MobilityModel>();
         if (CalculateDistance(pa, pn) != 0) {
           // mudar o posicionamento do UAV
           Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
@@ -322,7 +322,7 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
           pa.push_back(GetNode()->GetObject<MobilityModel>()->GetPosition().y);
           pn.push_back(std::stod(results.at(1), &sz));
           pn.push_back(std::stod(results.at(2), &sz));
-          GetNode()->GetObject<MobilityModel>()
+          GetNode()->GetObject<MobilityModel>();
           if (CalculateDistance(pa, pn) != 0) {
             // mudar o posicionamento do UAV
             Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
@@ -342,12 +342,12 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
   }
 }
 
-void
+double
 UavApplication::CalculateDistance(const std::vector<double> pos1, const std::vector<double> pos2)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << pos1 << pos2);
   double dist = std::sqrt(std::pow(pos1.at(0) - pos2.at(0), 2) + std::pow(pos1.at(1) - pos2.at(1), 2));
-  return dist; // euclidean, sempre considera a distância atual calculada pelo DA
+  return dist; // euclidean
 }
 
 void

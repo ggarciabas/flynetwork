@@ -448,6 +448,7 @@ void ServerApplication::ValidateUavPosition()
   for (i = m_uavContainer.Begin(); i != m_uavContainer.End(); ++i) {
     bool f_uav = ((*i)->IsConfirmed() && (*i)->ClientDataConfirmed());
     flag = (flag && f_uav); // espera receber informacoes de dados do cliente tbm!
+    
     if (!(*i)->ClientDataConfirmed()) {
       (*i)->CancelAskCliDataEvent();
       (*i)->SetClientDataConfirmed(false);
@@ -456,7 +457,7 @@ void ServerApplication::ValidateUavPosition()
     }
 
     if (!(*i)->IsConfirmed()) {
-      uav->CancelSendPositionEvent();
+      (*i)->CancelSendPositionEvent();
       SendUavPacket((*i));
     }
 

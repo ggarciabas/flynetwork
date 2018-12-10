@@ -80,7 +80,7 @@ private:
   virtual void StartApplication(void);
   virtual void StopApplication(void);
 
-  void CalculateDistance(const std::vector<double> pos1, const std::vector<double> pos2);
+  double CalculateDistance(const std::vector<double> pos1, const std::vector<double> pos2);
 
   void ReplyServer ();
   void ReplyServerCentral ();
