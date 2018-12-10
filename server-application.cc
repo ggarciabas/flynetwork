@@ -255,9 +255,9 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
         uav->SetPosition(pos.at(0), pos.at(1));
         uav->ConfirmPosition(); // confirma o posicionamento do UAV
         uav->SetTotalEnergy(std::stod(results.at(5), &sz)); // atualiza energia total do UAV
-        NS_LOG_INFO ("SERVER - atualizando UAV " << uav->GetId());
+        NS_LOG_DEBUG ("SERVER - atualizando UAV " << uav->GetId());
         if (uav->IsConfirmed()) {
-          NS_LOG_INFO("SERVER - UAV #" << uav->GetId() << " confirmado no posicionamento");
+          NS_LOG_DEBUG("SERVER - UAV #" << uav->GetId() << " confirmado no posicionamento");
           ReplyUav(uav);
         }
         uav = 0;
@@ -273,7 +273,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             if (uav != NULL)
             {
               uav->CancelSendPositionEvent(); // recebida confirmacao do UAV
-              NS_LOG_INFO("SERVER - UAVRECEIVED ::: UAV #" << uav->GetId() << " @" << Simulator::Now().GetSeconds());
+              NS_LOG_DEBUG("SERVER - UAVRECEIVED ::: UAV #" << uav->GetId() << " @" << Simulator::Now().GetSeconds());
             } else
             {
               NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [UAVRECEIVED] --- fora da rede?! ID " << results.at(1));
@@ -284,7 +284,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
                {
                  uav->CancelSendCentralEvent(); // recebida confirmacao do UAV
                  uav = 0;
-                 NS_LOG_INFO("SERVER - CENTRALOK ::: UAV going to central @" << Simulator::Now().GetSeconds());
+                 NS_LOG_DEBUG("SERVER - CENTRALOK ::: UAV going to central @" << Simulator::Now().GetSeconds());
                } else
                {
                  NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [CENTRALOK] ID " << results.at(1));
@@ -297,7 +297,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             uav->CancelAskCliDataEvent(); // recebida confirmacao do UAV
             uav->SetClientDataConfirmed(true); // recebeu confirmacao!
             uav->SetTotalEnergy(std::stod(results.at(2), &sz)); // atualiza energia total do UAV
-            NS_LOG_INFO("SERVER - DATA confirmation ::: UAV #" << uav->GetId() << " @" << Simulator::Now().GetSeconds());
+            NS_LOG_DEBUG("SERVER - DATA confirmation ::: UAV #" << uav->GetId() << " @" << Simulator::Now().GetSeconds());
             int i = 3; // 3 informacoes antes das informacoes dos clientes! contemplam cada cliente!
             for (; i < int(results.size()-1); i+=4) { // id time_update posx posy
               Ptr<ClientModel> cli = m_clientContainer.FindClientModel(results.at(i)); // id
@@ -322,7 +322,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
                 m_clientContainer.Add(cli);
                 pos.clear();
               }
-              NS_LOG_INFO ("ServerApplication::TracedCallbackRxApp \n" << cli->ToString());
+              NS_LOG_DEBUG ("ServerApplication::TracedCallbackRxApp \n" << cli->ToString());
             }
             // repply to UAV
             ReplyAskCliData (uav);
@@ -447,10 +447,10 @@ void ServerApplication::ValidateUavPosition()
     flag = (flag && ((*i)->IsConfirmed() && (*i)->ClientDataConfirmed())); // espera receber informacoes de dados do cliente tbm!
   }
   if (flag) {
-    NS_LOG_INFO ("SERVER - todos os UAVs estao na posicao desejada @" << Simulator::Now().GetSeconds());
+    NS_LOG_DEBUG ("SERVER - todos os UAVs estao na posicao desejada @" << Simulator::Now().GetSeconds());
     Run();
   } else {
-    NS_LOG_INFO ("Server - [" << Simulator::Now().GetSeconds() << "] $$ [NÃO] estao prontos @" << Simulator::Now().GetSeconds());
+    NS_LOG_DEBUG ("Server - [" << Simulator::Now().GetSeconds() << "] $$ [NÃO] estao prontos @" << Simulator::Now().GetSeconds());
     Simulator::Schedule(Seconds(5.00), &ServerApplication::ValidateUavPosition, this);
   }
 }
@@ -585,6 +585,7 @@ void ServerApplication::runDAPython()
 
   os.str ("");
   os << "python ./scratch/flynetwork/da_python " << m_pathData << " " << int(Simulator::Now().GetSeconds()) << " > ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/python_log.txt";
+  NS_LOG_DEBUG (os.str());
   int status = system(os.str().c_str());
   if (status < 0)
   {
@@ -1093,7 +1094,7 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
           custo = 0.0;
         }
         break;
-      case 5:
+      case 3:
         custo = 1 - P_te;
         if (custo < 0.0) {
           custo = 0.0;
@@ -1101,7 +1102,7 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
         custo += (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot;
         custo /= 2.0;
         break;
-      case 6:
+      case 4:
         custo = 1-P_te;
         if (custo < 0.0) { // Verificar isto! Colocar um outro parâmetro aqui para ajudar
           custo = (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot;
