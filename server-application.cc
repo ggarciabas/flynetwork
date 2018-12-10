@@ -234,7 +234,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
     m_packetTrace(mm.str());
     NS_LOG_DEBUG("MSG UAV: " << s);
     pos.push_back(std::stod(results.at(3), &sz)); // UAV tem posição 3D
-    if (CalculateDistanceCentral(pos)==0.0) { // caso o UAV esteja na central, desligar!
+    if (CalculateDistanceCentral(pos)<0.05) { // caso o UAV esteja na central, desligar!
       Ptr<UavModel> uav = m_uavGoToCentral.FindUavModel(std::stoi(results.at(4), &sz));
       if (uav != NULL)
       {
@@ -448,7 +448,7 @@ void ServerApplication::ValidateUavPosition()
   for (i = m_uavContainer.Begin(); i != m_uavContainer.End(); ++i) {
     bool f_uav = ((*i)->IsConfirmed() && (*i)->ClientDataConfirmed());
     flag = (flag && f_uav); // espera receber informacoes de dados do cliente tbm!
-    
+
     if (!(*i)->ClientDataConfirmed()) {
       (*i)->CancelAskCliDataEvent();
       (*i)->SetClientDataConfirmed(false);

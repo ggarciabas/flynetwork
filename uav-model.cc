@@ -81,7 +81,7 @@ UavModel::~UavModel()
 void
 UavModel::SetSendPositionEvent (EventId id)
 {
-  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() <<&id);
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds());
   m_sendPosition = id;
 }
 
@@ -95,7 +95,7 @@ UavModel::CancelSendPositionEvent()
 void
 UavModel::SetSendCentralEvent (EventId id)
 {
-  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() <<&id);
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds());
   m_sendCentral = id;
 }
 
@@ -108,7 +108,7 @@ UavModel::CancelSendCentralEvent()
 
 void UavModel::SetAskCliDataEvent (EventId id)
 {
-  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() <<&id);
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds());
   m_askCliData = id;
 }
 
@@ -215,24 +215,24 @@ UavModel::GetAddressAdhoc()
 bool
 UavModel::IsConfirmed ()
 {
-  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() << m_confirmed);
   return m_confirmed;
 }
 
 void
 UavModel::NotConfirmed ()
 {
-  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() << m_confirmed);
   m_confirmed = false;
 }
 
 void
 UavModel::ConfirmPosition () {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  if (int(m_newPos.at(0)) == int(m_position.at(0)) && int(m_newPos.at(1)) == int(m_position.at(1))) { // compara com a posicao que se deseja que ele chegue
-    m_confirmed = true;
-    NS_LOG_INFO ("UAVMODEL :: posicionamento do uav " << m_id << " confirmado!");
-  }
+  // if (int(m_newPos.at(0)) == int(m_position.at(0)) && int(m_newPos.at(1)) == int(m_position.at(1))) { // compara com a posicao que se deseja que ele chegue // REMOVEr
+    m_confirmed = true; // mantendo confirmacao, pois o UAV somente envia mensagem quando chega ao destino!
+    // NS_LOG_INFO ("UAVMODEL :: posicionamento do uav " << m_id << " confirmado!"); // REMOVEr
+  // } // REMOVER
 }
 
 void UavModel::DoDispose () {
@@ -248,13 +248,13 @@ void UavModel::DoDispose () {
 
 bool UavModel::ClientDataConfirmed ()
 {
-  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() << m_clientData);
   return m_clientData;
 }
 
 void UavModel::SetClientDataConfirmed (bool b)
 {
-  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() <<b);
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() << b);
   m_clientData = b;
 }
 
