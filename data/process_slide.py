@@ -76,4 +76,9 @@ for custo in custos:
     if len(glob.glob(main_path+'../slide/'+folder+'/slide_uav_remaining_energy_time.tex'))>0:
         file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+folder+'/slide_uav_remaining_energy_time.tex')[0])+"}\n")
 
+    # DA LOCALIZACAO CENARIOS
+    da_location_slide.slide(main_path+custo+'/', teste, title, folder, list_folder)
+    if len(glob.glob(main_path+'../slide/'+folder+'/slide_da_location.tex'))>0:
+        file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+folder+'/slide_da_location.tex')[0])+"}\n")
+
     file.close()
