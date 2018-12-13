@@ -212,6 +212,9 @@ void UavNetwork::Run()
     case 20: // teste_20
       ss << "teste_20";
       break;
+    case 50: // teste_50
+      ss << "teste_50";
+      break;
     default:
       NS_LOG_ERROR("Não foi possivel identificar o cenario!");
       exit(-1);
