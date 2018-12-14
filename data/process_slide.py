@@ -3,7 +3,7 @@
 # libraries and data
 import uav_loc_slide
 import uav_bat_slide
-import intermediario
+import da_location_slide
 import glob
 import os
 import sys
@@ -22,7 +22,8 @@ if teste :
 if not os.path.exists(main_path+'../slide'):
     os.mkdir(main_path+'../slide')
 
-custos = ["custo_1", "custo_2", "custo_3", "custo_4"]
+# custos = ["custo_1", "custo_2", "custo_3", "custo_4"]
+custos = ["custo_1", "custo_3", "custo_4"]
 for custo in custos:
     title = ""
     if custo == "custo_1":

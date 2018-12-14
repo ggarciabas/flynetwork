@@ -14,7 +14,8 @@ teste = True
 #     teste = False
 scenario = sys.argv[2]
 
-custos = ["custo_1", "custo_2", "custo_3", "custo_4"]
+# custos = ["custo_1", "custo_2", "custo_3", "custo_4"]
+custos = ["custo_1", "custo_3", "custo_4"]
 for custo in custos:
     main_path = "./output/"+scenario+"/"+custo+"/"
     list_folder = []

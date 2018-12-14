@@ -30,7 +30,8 @@ main_path = "./output/"+scenario+"/"
 # if teste :
 #     main_path = "./output/"+scenario+"/"
 
-custos = ["custo_1", "custo_2", "custo_3", "custo_4"]
+custos = ["custo_1", "custo_3", "custo_4"]
+# custos = ["custo_1", "custo_2", "custo_3", "custo_4"]
 for custo in custos:
     list_folder = []
 

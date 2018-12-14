@@ -266,7 +266,6 @@ SmartphoneApplication::TracedCallbackDeAssocLogger (Mac48Address mac)
 {
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   Simulator::Remove(m_sendEventUav);
-  NS_LOG_INFO ("CLIENT [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - lost association to " << mac);
   m_connected = false;
 }
 

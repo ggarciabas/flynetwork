@@ -14,9 +14,12 @@ if sys.argv[1] == "False":
     teste = False
 scenario = sys.argv[2]
 
-custos = ["custo_1", "custo_2", "custo_3", "custo_4"]
-c_name = ["Custo 1", "Custo 2", "Custo 3", "Custo 4"]
-data_c = {"Custo 1":[], "Custo 2":[], "Custo 3":[], "Custo 4":[]}
+# custos = ["custo_1", "custo_2", "custo_3", "custo_4"]
+custos = ["custo_1", "custo_3", "custo_4"]
+# c_name = ["Custo 1", "Custo 2", "Custo 3", "Custo 4"]
+c_name = ["Custo 1", "Custo 3", "Custo 4"]
+# data_c = {"Custo 1":[], "Custo 2":[], "Custo 3":[], "Custo 4":[]}
+data_c = {"Custo 1":[], "Custo 3":[], "Custo 4":[]}
 
 ## Custo
 for custo in range(0,len(custos)):

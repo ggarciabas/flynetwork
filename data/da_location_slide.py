@@ -16,10 +16,10 @@ def slide (main_path, teste, title, folder, list_folder):
         f_file = open(main_path+'../../slide/'+folder+'/slide_da_location.tex', 'w')
         files_da = open(main_path+'python/files.txt', 'r')
         for line in files_da:
-            copyfile(main_path+'python/'+line, main_path+'../../slide/'+folder+'/'+line)
+            copyfile(main_path+'python/'+line[:-1], main_path+'../../slide/'+folder+'/'+line[:-1])
             f_file.write("""\\begin{frame}{"""+title+""" - DA Location}
                 \\begin{figure}[!htb]
-                     \\includegraphics[width=\\textwidth]{"""+folder+'/'+line+"""}
+                     \\includegraphics[width=\\textwidth]{"""+folder+'/'+line[:-1]+"""}
                  \\end{figure}
             \\end{frame}""")
         files_da.close()
