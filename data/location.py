@@ -8,7 +8,6 @@ from matplotlib import colors as mcolors
 
 colors = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
 
-
 def scenario (time, main_path, teste):
     teste = True
     if teste:

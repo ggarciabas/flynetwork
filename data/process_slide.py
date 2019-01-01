@@ -8,6 +8,7 @@ import glob
 import os
 import sys
 import numpy as np
+from custos_ativos import c_name # c_name
 
 teste = True
 if sys.argv[1] == "False":
@@ -22,18 +23,9 @@ if teste :
 if not os.path.exists(main_path+'../slide'):
     os.mkdir(main_path+'../slide')
 
-# custos = ["custo_1", "custo_2", "custo_3", "custo_4"]
-custos = ["custo_1", "custo_3", "custo_4"]
-for custo in custos:
-    title = ""
-    if custo == "custo_1":
-        title = "Custo 1"
-    elif custo == "custo_2":
-        title = "Custo 2"
-    elif custo == "custo_3":
-        title = "Custo 3"
-    elif custo == "custo_4":
-        title = "Custo 4"
+for custo_name in glob.glob(main_path+'custo_*/'):
+    custo = os.path.dirname(custo_name).split('/')[-1]
+    title = c_name[custo]
     folder = custo
     list_folder = []
 

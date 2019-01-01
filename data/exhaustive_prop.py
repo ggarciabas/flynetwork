@@ -8,21 +8,21 @@ import glob
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
+from custos_ativos import c_name
 
 teste = True
 # if sys.argv[1] == "False":
 #     teste = False
 scenario = sys.argv[2]
+main_path = "./output/"+scenario+"/"
 
-# custos = ["custo_1", "custo_2", "custo_3", "custo_4"]
-custos = ["custo_1", "custo_3", "custo_4"]
-for custo in custos:
-    main_path = "./output/"+scenario+"/"+custo+"/"
+for custo_name in glob.glob(main_path+'custo_*/'):
+    custo = os.path.dirname(custo_name).split('/')[-1]
     list_folder = []
     if len(sys.argv) == 4: # folder number
         list_folder.append(int(sys.argv[3]))
     else:
-        for folder_name in glob.glob(main_path+'etapa/*/'):
+        for folder_name in glob.glob(main_path+custo+"/"+'etapa/*/'):
             if teste:
                 print "folder_name: "+str(folder_name)
             list_folder.append(int(os.path.dirname(folder_name).split('/')[-1]))
@@ -31,20 +31,12 @@ for custo in custos:
     list_folder = np.array(list_folder)
     list_folder.sort()
     data = {"Exaustivo":[], "Sequencial":[], "Aleatório":[]}
-    c_name = ""
-    if custo == "custo_1":
-        c_name = "Custo 1"
-    elif custo == "custo_2":
-        c_name = "Custo 2"
-    elif custo == "custo_3":
-        c_name = "Custo 3"
-    elif custo == "custo_4":
-        c_name = "Custo 4"
-    data[c_name] = []
+    custo_n = c_name[custo]
+    data[custo_n] = []
     for time in list_folder:
         # read bij
         try:
-            file = open(main_path+'etapa/'+str(time)+"/bij.txt", 'r')
+            file = open(main_path+custo+"/"+'etapa/'+str(time)+"/bij.txt", 'r')
         except IOError:
             exit()
         line = file.readline().strip()
@@ -59,7 +51,7 @@ for custo in custos:
         file.close()
 
         try:
-            file = open(main_path+'etapa/'+str(time)+"/f_mij.txt", 'r')
+            file = open(main_path+custo+"/"+'etapa/'+str(time)+"/f_mij.txt", 'r')
         except IOError:
             exit()
         line = file.readline().strip()
@@ -114,9 +106,9 @@ for custo in custos:
         def toString(List):
             return ','.join(List)
 
-        f_file = open(main_path+'etapa/'+str(time)+"/exaustive.txt", 'w')
-        f_file_s = open(main_path+'etapa/'+str(time)+"/sequential.txt", 'w')
-        f_file_a = open(main_path+'etapa/'+str(time)+"/random.txt", 'w')
+        f_file = open(main_path+custo+"/"+'etapa/'+str(time)+"/exaustive.txt", 'w')
+        f_file_s = open(main_path+custo+"/"+'etapa/'+str(time)+"/sequential.txt", 'w')
+        f_file_a = open(main_path+custo+"/"+'etapa/'+str(time)+"/random.txt", 'w')
 
         f_file.write(str(uavs_id[0]))
         f_file_a.write(str(uavs_id[0]))
@@ -214,9 +206,9 @@ for custo in custos:
         plt.ylabel(u"Localização")
         # general title
         plt.title("Custo final exaustivo", fontsize=13, fontweight=0, color='black', style='italic')
-        plt.savefig(main_path+'etapa/'+str(time)+'/exaustive_'+str(custo)+'.svg')
-        plt.savefig(main_path+'etapa/'+str(time)+'/exaustive_'+str(custo)+'.png')
-        plt.savefig(main_path+'etapa/'+str(time)+'/exaustive_'+str(custo)+'.eps')
+        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/exaustive_'+str(custo)+'.svg')
+        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/exaustive_'+str(custo)+'.png')
+        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/exaustive_'+str(custo)+'.eps')
 
         # print propose heatmap
         plt.clf()
@@ -229,9 +221,9 @@ for custo in custos:
         plt.ylabel(u"Localização")
         # general title
         plt.title("Custo final algoritmo proposto", fontsize=13, fontweight=0, color='black', style='italic')
-        plt.savefig(main_path+'etapa/'+str(time)+'/'+str(custo)+'.svg')
-        plt.savefig(main_path+'etapa/'+str(time)+'/'+str(custo)+'.png')
-        plt.savefig(main_path+'etapa/'+str(time)+'/'+str(custo)+'.eps')
+        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/'+str(custo)+'.svg')
+        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/'+str(custo)+'.png')
+        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/'+str(custo)+'.eps')
         plt.clf()
 
         # print sequential heatmap
@@ -245,9 +237,9 @@ for custo in custos:
         plt.ylabel(u"Localização")
         # general title
         plt.title("Custo final sequencial", fontsize=13, fontweight=0, color='black', style='italic')
-        plt.savefig(main_path+'etapa/'+str(time)+'/seq_'+str(custo)+'.svg')
-        plt.savefig(main_path+'etapa/'+str(time)+'/seq_'+str(custo)+'.png')
-        plt.savefig(main_path+'etapa/'+str(time)+'/seq_'+str(custo)+'.eps')
+        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/seq_'+str(custo)+'.svg')
+        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/seq_'+str(custo)+'.png')
+        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/seq_'+str(custo)+'.eps')
         plt.clf()
 
         # print aletorio heatmap
@@ -261,14 +253,14 @@ for custo in custos:
         plt.ylabel(u"Localização")
         # general title
         plt.title(u"Custo final aleatório", fontsize=13, fontweight=0, color='black', style='italic')
-        plt.savefig(main_path+'etapa/'+str(time)+'/ale_'+str(custo)+'.svg')
-        plt.savefig(main_path+'etapa/'+str(time)+'/ale_'+str(custo)+'.png')
-        plt.savefig(main_path+'etapa/'+str(time)+'/ale_'+str(custo)+'.eps')
+        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/ale_'+str(custo)+'.svg')
+        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/ale_'+str(custo)+'.png')
+        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/ale_'+str(custo)+'.eps')
         plt.clf()
 
         data["Exaustivo"].append(c_exaustive.sum())
         # data["Proposto"].append(c_prop.sum()-c_exaustive.sum()) # para apresentar a diferença
-        data[c_name].append(c_prop.sum())
+        data[custo_n].append(c_prop.sum())
         data["Sequencial"].append(c_seq.sum())
         data["Aleatório"].append(c_ale.sum())
 
@@ -290,7 +282,7 @@ for custo in custos:
     ax.set_ylabel('Custo total')
     ax.set_xlabel('Tempo (s)')
 
-    plt.savefig(main_path+'/exh_'+str(custo)+'.svg')
-    plt.savefig(main_path+'/exh_'+str(custo)+'.png')
-    plt.savefig(main_path+'/exh_'+str(custo)+'.eps')
+    plt.savefig(main_path+custo+"/"+'/exh_'+str(custo)+'.svg')
+    plt.savefig(main_path+custo+"/"+'/exh_'+str(custo)+'.png')
+    plt.savefig(main_path+custo+"/"+'/exh_'+str(custo)+'.eps')
     plt.clf()

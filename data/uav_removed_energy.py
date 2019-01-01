@@ -8,27 +8,23 @@ import glob
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
+from custos_ativos import c_name, data_c # c_name e data_c
 
 teste = True
 if sys.argv[1] == "False":
     teste = False
 scenario = sys.argv[2]
 
-# custos = ["custo_1", "custo_2", "custo_3", "custo_4"]
-custos = ["custo_1", "custo_3", "custo_4"]
-c_name = ["Custo 1", "Custo 3", "Custo 4"]
-# c_name = ["Custo 1", "Custo 2", "Custo 3", "Custo 4"]
-# data_c = {"Custo 1":[], "Custo 2":[], "Custo 3":[], "Custo 4":[]}
-data_c = {"Custo 1":[], "Custo 3":[], "Custo 4":[]}
+main_path = "./output/"+scenario+"/"
 
 ## Custo
-for custo in range(0,len(custos)):
-    main_path = "./output/"+scenario+"/"+custos[custo]+"/"
+for custo_name in glob.glob(main_path+'custo_*/'):
+    custo = os.path.dirname(custo_name).split('/')[-1]
     time_folders = []
     if len(sys.argv) == 4: # folder number
         time_folders.append(int(sys.argv[3]))
     else:
-        for folder_name in glob.glob(main_path+'etapa/*/'):
+        for folder_name in glob.glob(main_path+custo+"/"+'etapa/*/'):
             if teste:
                 print "folder_name: "+str(folder_name)
             time_folders.append(int(os.path.dirname(folder_name).split('/')[-1]))
@@ -37,7 +33,7 @@ for custo in range(0,len(custos)):
     time_folders.sort()
     for time in time_folders:
         try:
-            f_removed = open(main_path+'etapa/'+str(time)+"/uav_removed_energy.txt", 'r')
+            f_removed = open(main_path+custo+"/"+'etapa/'+str(time)+"/uav_removed_energy.txt", 'r')
             total = 0.0
             for line in f_removed:
                 total = total + float(line.strip())
