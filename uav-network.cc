@@ -285,6 +285,9 @@ void UavNetwork::Run()
   ss.str("");
   ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/python";
   system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/dhcp";
+  system(ss.str().c_str());
   // ss.str("");
   // ss << "./scratch/flynetwork/data/output/"<< m_pathData<<"/packet_trace_server.txt";
   // m_filePacketServer = ss.str().c_str();
@@ -797,6 +800,7 @@ void UavNetwork::ConfigureCli()
     factory.Set("DataRate", DataRateValue(DataRate("11Mbps")));
     factory.Set("Port", UintegerValue(m_cliPort));
     factory.Set("IdDhcp", UintegerValue(id));
+    factory.Set("PathData", StringValue(m_pathData));
 
     Ptr<SmartphoneApplication> smart = factory.Create()->GetObject<SmartphoneApplication>();
     smart->SetStartTime(Seconds(10.0));
