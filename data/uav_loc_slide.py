@@ -10,7 +10,7 @@ import glob
 import os
 import sys
 
-def slide (time, main_path, teste, title, folder):
+def slide (time, main_path, teste, title, folder, scenario):
     print "Executando uav loc "+str(time)
     # validando existencia de arquivos
     if len(glob.glob(main_path+'etapa/'+time+'/f_mij_.eps')) == 0:
@@ -30,11 +30,11 @@ def slide (time, main_path, teste, title, folder):
         print uav_loc_file
 
     #copiar imagens para a pasta
-    copyfile(main_path+'etapa/'+time+'/'+mij_file, main_path+'../../slide/'+folder+'/'+str(time)+'_'+mij_file)
-    copyfile(main_path+'etapa/'+time+'/'+bij_file, main_path+'../../slide/'+folder+'/'+str(time)+'_'+bij_file)
-    copyfile(main_path+'etapa/'+time+'/'+uav_loc_file, main_path+'../../slide/'+folder+'/'+str(time)+'_'+uav_loc_file)
+    copyfile(main_path+'etapa/'+time+'/'+mij_file, main_path+'../../slide/'+scenario+'/'+folder+'/'+str(time)+'_'+mij_file)
+    copyfile(main_path+'etapa/'+time+'/'+bij_file, main_path+'../../slide/'+scenario+'/'+folder+'/'+str(time)+'_'+bij_file)
+    copyfile(main_path+'etapa/'+time+'/'+uav_loc_file, main_path+'../../slide/'+scenario+'/'+folder+'/'+str(time)+'_'+uav_loc_file)
 
-    f_file = open(main_path+'../../slide/'+folder+'/slide_'+str(time)+'.tex', 'w')
+    f_file = open(main_path+'../../slide/'+scenario+'/'+folder+'/slide_'+str(time)+'.tex', 'w')
     f_file.write("""\\begin{frame}{"""+title+"""}
         \\begin{columns}
             \\begin{column}{0.65\\textwidth}
