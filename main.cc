@@ -61,8 +61,6 @@ int main (int argc, char *argv[])
 	LogComponentEnable("ClientDeviceEnergyModel", LOG_FUNCTION);
 	LogComponentEnable("ClientModel", LOG_FUNCTION);
 	LogComponentEnable("ClientModelContainer", LOG_FUNCTION);
-	LogComponentEnable("DhcpHelperUav", LOG_FUNCTION);
-	LogComponentEnable("DhcpServerUav", LOG_FUNCTION);
 	LogComponentEnable("LocationModelContainer", LOG_FUNCTION);
 	LogComponentEnable("LocationModel", LOG_FUNCTION);
 	LogComponentEnable("ServerApplication", LOG_FUNCTION);

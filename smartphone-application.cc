@@ -227,8 +227,8 @@ void SmartphoneApplication::TracedCallbackExpiryLease (const Ipv4Address& ip)
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   file << Simulator::Now().GetSeconds() << " " << ip << std::endl;
   file.close();
-  os.str();
-  os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/all_expirylease" << ".txt";
+  os.str("");
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/all_expirylease.txt";
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   file << Simulator::Now().GetSeconds() << " " << m_id << " "<< ip << std::endl;
   file.close();
@@ -246,8 +246,8 @@ void SmartphoneApplication::TracedCallbackNewLease (const Ipv4Address& ip)
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   file << Simulator::Now().GetSeconds() << " " << ip << " " << m_uavPeer << std::endl;
   file.close();
-  os.str();
-  os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/all_newlease" << ".txt";
+  os.str("");
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/all_newlease.txt";
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   file << Simulator::Now().GetSeconds() << " " << m_id << " "<< ip << " " << m_uavPeer << std::endl;
   file.close();
@@ -291,8 +291,8 @@ SmartphoneApplication::TracedCallbackAssocLogger (Mac48Address mac)
   file << Simulator::Now().GetSeconds() << " " << mac << std::endl;
   file.close();
 
-  os.str();
-  os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/all_assoc" << ".txt";
+  os.str("");
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/all_assoc.txt";
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   file << Simulator::Now().GetSeconds() << " " << m_id << " " << mac << std::endl;
   file.close();
@@ -313,8 +313,8 @@ SmartphoneApplication::TracedCallbackDeAssocLogger (Mac48Address mac)
   file << Simulator::Now().GetSeconds() << " " << mac << std::endl;
   file.close();
 
-  os.str();
-  os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/all_deassoc" << ".txt";
+  os.str("");
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/all_deassoc.txt";
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   file << Simulator::Now().GetSeconds() << " " << m_id << " " << mac << std::endl;
   file.close();
