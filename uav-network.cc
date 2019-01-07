@@ -288,6 +288,9 @@ void UavNetwork::Run()
   ss.str("");
   ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/dhcp";
   system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/client";
+  system(ss.str().c_str());
   // ss.str("");
   // ss << "./scratch/flynetwork/data/output/"<< m_pathData<<"/packet_trace_server.txt";
   // m_filePacketServer = ss.str().c_str();

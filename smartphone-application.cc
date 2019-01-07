@@ -160,31 +160,57 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   Simulator::Remove(m_sendEventUav);
 
+  if (!m_connected) { // caso nao esteja com IP conectado ao AP, tentar enviar assim que se conectar!
+    m_sendEventUav = Simulator::Schedule(Seconds(5.0), &SmartphoneApplication::SendPacketUav, this);
+  }
+
   if (m_socketUav && !m_socketUav->Connect (InetSocketAddress (m_uavPeer, m_port))) {
     std::ostringstream msg;
     Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
     msg << "CLIENT " << pos.x << " " << pos.y << " " << m_login << " MSG" << '\0';
     uint16_t packetSize = msg.str().length() + 1;
     Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
-
+    NS_LOG_DEBUG("SmartphoneApplication::SendPacketUa @" << Simulator::Now().GetSeconds() <<  " " << m_id << " conectado enviando pacote.");
     if (m_socketUav && m_socketUav->Send(packet, 0) == packetSize)
     {
       msg.str("");
       msg << "CLIENT\t" << m_id << "\tSENT\t" << Simulator::Now().GetSeconds() << "\tUAV";
       m_packetTrace(msg.str());
       NS_LOG_INFO ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - UAV");
+      NS_LOG_DEBUG("SmartphoneApplication::SendPacketUa @" << Simulator::Now().GetSeconds() <<  " " << m_id << " enviado.");
+
+      std::ostringstream os;
+      os << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << m_id << "_packet" << ".txt";
+      std::ofstream file;
+      file.open(os.str(), std::ofstream::out | std::ofstream::app);
+      file << Simulator::Now().GetSeconds() << " ENVIADO" << std::endl;
+      file.close();
     }
     else
     {
+      NS_LOG_DEBUG("SmartphoneApplication::SendPacketUa @" << Simulator::Now().GetSeconds() <<  " " << m_id << " erro ao enviar.");
       NS_LOG_ERROR("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - UAV NAO");
+      std::ostringstream os;
+      os << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << m_id << "_packet" << ".txt";
+      std::ofstream file;
+      file.open(os.str(), std::ofstream::out | std::ofstream::app);
+      file << Simulator::Now().GetSeconds() << " FALHA" << std::endl;
+      file.close();
       if (m_connected) {
-        m_sendEventUav = Simulator::Schedule(Seconds(10.0), &SmartphoneApplication::SendPacketUav, this);
+        m_sendEventUav = Simulator::Schedule(Seconds(5.0), &SmartphoneApplication::SendPacketUav, this);
       }
       return;
     }
     NS_LOG_INFO("SmartphoneApplication::SendPacketUav " << packet->GetReferenceCount());
   } else {
+    NS_LOG_DEBUG("SmartphoneApplication::SendPacketUa @" << Simulator::Now().GetSeconds() << " " << m_id << " cerro ao conectar com o servidor.");
     NS_LOG_INFO ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " erro ao conectar socket com servidor " << m_uavPeer);
+    std::ostringstream os;
+    os << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << m_id << "_packet" << ".txt";
+    std::ofstream file;
+    file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    file << Simulator::Now().GetSeconds() << " NAO_CONECTADO" << std::endl;
+    file.close();
     if (m_connected) {
       m_sendEventUav = Simulator::Schedule(Seconds(10.0), &SmartphoneApplication::SendPacketUav, this);
     }
