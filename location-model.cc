@@ -138,5 +138,44 @@ bool LocationModel::MovimentoB () {
   return false;
 }
 
+void LocationModel::SetPunishCapacity (double pn) {
+  m_punshCapacity = pn;
+}
+
+double LocationModel::GetPunishCapacity () {
+  return m_punshCapacity;
+}
+
+void LocationModel::SetPunishNeighboor (double pn) {
+  m_punshNeigh = pn;
+}
+
+double LocationModel::GetPunishNeighboor () {
+  return m_punshNeigh;
+}
+
+void LocationModel::InitializeWij (double v) {
+  m_wij = v;
+}
+
+void LocationModel::NewClient (double Wi) {
+  m_wij += Wi;
+}
+
+void LocationModel::RemoveClient (double Wi) {
+  m_wij -= Wi;
+}
+
+double LocationModel::GetWij () {
+  return m_wij;
+}
+
+void LocationModel::SetTempPljci (double pljci) {
+  m_tempPljci = pljci;
+}
+
+void LocationModel::AddPljCi (Ptr<ClientModel> ci, double Zci) {
+  m_pljci[ci] = m_tempPljci/Zci;
+}
 
 } // namespace ns3

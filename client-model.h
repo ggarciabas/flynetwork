@@ -71,8 +71,16 @@ public:
   double GetYPosition();
   double GetXPosition();
 
+  void SetLocConnected (Ptr<LocationModel>);
+  Ptr<LocationModel> GetLocConnected ();
+
+  void SetConnected (bool);
+  bool GetConnected ();
+
 private:
   void DoDispose ();
+  bool m_connected;
+  Ptr<LocationModel> m_locConnected;
   std::string m_login;
   std::vector<double> m_position;
   double m_consumption; //

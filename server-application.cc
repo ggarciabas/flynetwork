@@ -1093,6 +1093,19 @@ void ServerApplication::runDA() {
   //constantes
   double t_min = 1e-7;
   double r_max = std::sqrt(std::pow(m_maxx, 2) + std::pow(maxy, 2));
+  double uav_cob = 10**(110.0/(10*3.0)-46.6777/(10*3.0)) // ver arquivo main.py do da_python
+  double Wi = 1.0;
+  double raio_cob = 0.0;
+  switch (m_environment) { // ver valores no arquivo main.py
+    case 1:
+      raio_cob = 19.0581; break;
+    case 2:
+      raio_cob = 79.6821; break;
+    case 3:
+      raio_cob = 101.609; break;
+    case 4:
+      raio_cob = 108.295; break;
+  }
 
   ObjectFactory lObj;
   lObj.SetTypeId("ns3::LocationModel");
@@ -1101,28 +1114,72 @@ void ServerApplication::runDA() {
   loc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
   m_locationContainer.Add(loc);
 
+  loc->SetPunishCapacity(1.0);
+  loc->SetPunishNeighboor(1e-18);
+  loc->InitializeWij (m_clientContainer.GetN()*Wi); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
+
   double t = 0.9;
   do {// laco A
-    
+
     // salvando posicionamento para comparacao de movimento no laco B
-    for (LocationModelContainer::Iterator i = m_locationContainer.Begin(); i != m_locationContainer.End(); ++i) {
-      (*i)->IniciarMovimentoB();
+    for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+      (*lj)->IniciarMovimentoB();
     }
 
     do { // laco B
-
+      for (ClientModelContainer::Iterator ci = m_clientContainer.Begin(); ci != m_clientContainer.End(); ++ci){
+        double Zci = 0.0;
+        double high_pljci = -1;
+        for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+          double dcilj = - CalculateDistance((*ci)->GetPosition(), (*lj)->GetPosition());
+          double pljci = std::exp ( (dcilj + (*lj)->GetPunishCapacity()*(*lj)->GetWij())/t );
+          Zci += pljci;
+          (*lj)->SetTempPljci(pljci);
+          (*lj)->InitializeWij(0.0); // zerando para calcular novamente os clientes conectados, considerando agora a distancia!
+          if (pljci > high_pljci) {
+            high_pljci = pljci;
+            /*
+              Ao considerar a distancia o controle de punicao de capacidade nao estará efetivamente agindo para cobrir o cenario, somente os clientes dentro da regiao serao considerados. Assim, acredito que seja melhor considerar somente o maior pljci para a evolucao do DA e no final somente considerar a distancia para cargo de retorno de valores para a simulacao.
+            */
+            // if (dcilj <= raio_cob) { // somente considera conectado se estiver dentro do raio de cobertura para clientes
+              Ptr<LocationModel> lCon = (*ci)->GetLocConnected();
+              if (lCon) { // caso tenha alguma informacao anterior, desconsidera nos calculos, para isto atualiza o loc
+                lCon->RemoveClient(Wi);
+              }
+              (*ci)->SetLocConnected((*lj));
+              (*lj)->NewClient(Wi);
+            // }
+            // PENSAR: como saber se os clientes possuem conexão?!, falta adicionar uma flag no cliente para saber se ele está dentro da cobertura da localização conectada, esta é uma condição para finalizar o algoritmo, uma porcentagem dos clientes tem que estar dentro da cobertura de algum UAV
+            if (dcilj <= raio_cob) {
+              (*ci)->SetConnected(true);
+            } else {
+              (*ci)->SetConnected(false);
+            }
+          }
+        }
+        for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+          // PENSAR: preciso guardar o valor de pljci?! Não é suficiente calcular já a parte da equacao de lj e descartar estes valores?!
+          (*lj)->AddPljCi((*ci), Zci); // finaliza o calculo do pljci na funcao e cadastra no map relacionando o ci
+        }
+      }
+      // TODO: salvar cenario intermediario para visualizar se está tendo avancos
     } while (MovimentoB());
 
 
   } while (t > t_min); // laco da temperatura
+
+
+  // TODO: LIMPAR OS VALORES
+  // -- anular o valor da localizacao que o cliente está conectado, caso o container de clientes nao seja renovado, ou criado antes de executar o DA.
 
 }
 
 bool ServerApplication::MovimentoA() {
   // verificar se as localizações tiveram o MovimentoA, este movimento é pra validar dentro do laço A
   bool retorno = true;
-  for (LocationModelContainer::Iterator i = m_locationContainer.Begin(); i != m_locationContainer.End(); ++i) {
-    retorno = retorno && (*i)->MovimentoA();
+  for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+    retorno = retorno && (*lj)->MovimentoA();
+    (*lj)->IniciarMovimentoA(); // atualizar para o novo posicionamento para nao entrar em laco infinito
   }
 
   return retorno;
@@ -1131,8 +1188,9 @@ bool ServerApplication::MovimentoA() {
 bool ServerApplication::MovimentoB() {
   // verificar se as localizações tiveram o MovimentoB, este movimento é pra validar dentro do laço B
   bool retorno = true;
-  for (LocationModelContainer::Iterator i = m_locationContainer.Begin(); i != m_locationContainer.End(); ++i) {
-    retorno = retorno && (*i)->MovimentoB();
+  for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+    retorno = retorno && (*lj)->MovimentoB();
+    (*lj)->IniciarMovimentoB(); // atualizar para o novo posicionamento senão fica em laco infinito!
   }
 
   return retorno;

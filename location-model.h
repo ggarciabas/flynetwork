@@ -25,8 +25,10 @@
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
+#include "client-model.h"
 
 #include <vector>
+#include <map>
 #include <cmath>
 
 using namespace std;
@@ -70,8 +72,28 @@ public:
   bool MovimentoA ();
   bool MovimentoB ();
 
+  void SetPunishCapacity (double);
+  double GetPunishCapacity ();
+
+  void SetPunishNeighboor (double);
+  double GetPunishNeighboor ();
+
+  void InitializeWij (double);
+  void NewClient (double);
+  void RemoveClient (double);
+  double GetWij ();
+
+  void SetTempPljci (double);
+
+  void AddPljCi (Ptr<ClientModel>, double);
+
 private:
   void DoDispose ();
+  std::map<Ptr<ClientModel>, double> m_pljci;
+  double m_tempPljci;
+  double m_wij;
+  double m_punshCapacity; // punicao de capacidade
+  double m_punshNeigh; // punicao de conexao com vizinho
   bool m_used;
   int m_totaCli;
   uint32_t m_id;

@@ -49,6 +49,7 @@ ClientModel::ClientModel() : m_position()
   NS_LOG_FUNCTION(this);
   NS_LOG_DEBUG ("ClientModel::ClientModel @" << Simulator::Now().GetSeconds());
   m_consumption = 0.0;
+  m_locConnected = 0;
 }
 
 ClientModel::~ClientModel()
@@ -130,6 +131,22 @@ double ClientModel::GetXPosition () {
 
 double ClientModel::GetYPosition () {
   return m_position.at(1);
+}
+
+void ClientModel::SetLocConnected (Ptr<LocationModel> l) {
+  m_locConnected = l;
+}
+
+Ptr<LocationModel> ClientModel::GetLocConnected () {
+  return m_locConnected;
+}
+
+void ClientModel::SetConnected (bool c) {
+    m_connected = c;
+}
+
+bool ClientModel::GetConnected () {
+  return m_connected;
 }
 
 } // namespace ns3
