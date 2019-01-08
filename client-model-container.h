@@ -111,6 +111,9 @@ public:
 
   bool IsEmpty();
 
+  void RemoveLogin (std::string id);
+  void RemoveAt (uint32_t pos);
+
 private:
   std::vector<Ptr<ClientModel>> m_models;
 };

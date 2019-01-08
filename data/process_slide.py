@@ -2,11 +2,13 @@
 # -*- coding: UTF-8 -*-
 # libraries and data
 import uav_loc_slide
-import intermediario
+import uav_bat_slide
+import da_location_slide
 import glob
 import os
 import sys
 import numpy as np
+from custos_ativos import c_name # c_name
 
 teste = True
 if sys.argv[1] == "False":
@@ -14,39 +16,65 @@ if sys.argv[1] == "False":
 
 scenario = sys.argv[2]
 
-title = sys.argv[4]
-folder = sys.argv[5]
-
 main_path = "./scratch/flynetwork/data/output/"+scenario+"/"
 if teste :
     main_path = "./output/"+scenario+"/"
 
-list_folder = []
+if not os.path.exists(main_path+'../slide'):
+    os.mkdir(main_path+'../slide')
 
-if int(sys.argv[3]) == -1: # folder number
-    for folder_name in glob.glob(main_path+'*/'):
-        list_folder.append(int(os.path.dirname(folder_name).split('/')[-1]))
-else:
-    list_folder.append(int(sys.argv[3]))
+if not os.path.exists(main_path+'../slide/'+scenario):
+    os.mkdir(main_path+'../slide/'+scenario)
 
-if teste:
-    print (list_folder)
+for custo_name in glob.glob(main_path+'custo_*/'):
+    custo = os.path.dirname(custo_name).split('/')[-1]
+    title = c_name[custo]
+    folder = custo
+    list_folder = []
 
-list_folder = np.array(list_folder)
-list_folder.sort()
+    if int(sys.argv[3]) == -1: # folder number
+        for folder_name in glob.glob(main_path+custo+'/etapa/*/'):
+            list_folder.append(int(os.path.dirname(folder_name).split('/')[-1]))
+    else:
+        list_folder.append(int(sys.argv[3]))
 
-# criar pasta TODO
-if not os.path.exists(main_path+'../'+folder):
-    os.mkdir(main_path+'../'+folder)
+    if teste:
+        print (list_folder)
 
-for time in list_folder:
-    uav_loc_slide.slide (str(time), main_path, teste, title, folder)
-    intermediario.slide (str(time), main_path, teste, title, folder)
+    list_folder = np.array(list_folder)
+    list_folder.sort()
 
-file = open(main_path+'..'+'/slide_'+folder+'.tex', 'w')
-for time in list_folder:
-    if len(glob.glob(main_path+'../'+folder+'/slide_'+str(time)+'.tex'))>0:
-        file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../'+folder+'/slide_'+str(time)+'.tex')[0])+"}\n")
-    if len(glob.glob(main_path+'../'+folder+'/slide_intermediario_'+str(time)+'.tex'))>0:
-        file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../'+folder+'/slide_intermediario_'+str(time)+'.tex')[0])+"}\n")
-file.close()
+    # criar pasta TODO
+    if not os.path.exists(main_path+'../slide/'+scenario+'/'+folder):
+        os.mkdir(main_path+'../slide/'+scenario+'/'+folder)
+
+    # UAV LOC Slide
+    file = open(main_path+'..'+'/slide/'+scenario+'/slide_'+folder+'.tex', 'w')
+    for time in list_folder:
+        uav_loc_slide.slide (str(time), main_path+custo+'/', teste, title, folder, scenario)
+        if len(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_'+str(time)+'.tex'))>0:
+            file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_'+str(time)+'.tex')[0])+"}\n")
+
+    # UAV BATTERY SLIDES
+    uav_bat_slide.slide(main_path+custo+'/', teste, title, folder, list_folder, scenario)
+    if len(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_energy_threshold.tex'))>0:
+        file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_energy_threshold.tex')[0])+"}\n")
+    if len(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_hover.tex'))>0:
+        file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_hover.tex')[0])+"}\n")
+    if len(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_hover_acum_uav.tex'))>0:
+        file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_hover_acum_uav.tex')[0])+"}\n")
+    if len(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_move.tex'))>0:
+        file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_move_acum_uav.tex')[0])+"}\n")
+    if len(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_move_acum_uav.tex'))>0:
+        file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_move.tex')[0])+"}\n")
+    if len(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_remaining_energy.tex'))>0:
+        file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_remaining_energy.tex')[0])+"}\n")
+    if len(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_remaining_energy_time.tex'))>0:
+        file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_remaining_energy_time.tex')[0])+"}\n")
+
+    # DA LOCALIZACAO CENARIOS
+    da_location_slide.slide(main_path+custo+'/', teste, title, folder, list_folder, scenario)
+    if len(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_da_location.tex'))>0:
+        file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_da_location.tex')[0])+"}\n")
+
+    file.close()

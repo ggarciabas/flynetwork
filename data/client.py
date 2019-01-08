@@ -11,7 +11,7 @@ colors = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
 
 def scenario (time, main_path, teste):
     try:
-        f_cen = open(main_path+'/'+time+'/client.txt','r')
+        f_cen = open(main_path+'etapa/'+time+'/client.txt','r')
     except IOError:
         return
     # read CLIENTS
@@ -58,11 +58,11 @@ def scenario (time, main_path, teste):
 
     plt.xlabel('X (m)')
     plt.ylabel('Y (m)')
-    plt.title("Cenario @"+time+"s")
+    plt.title("Cenario @"+'etapa/'+time+"s")
 
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.23), fancybox=True, shadow=True, ncol=5)
 
-    plt.savefig(main_path+'/'+time+'/client.svg', bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.savefig(main_path+'/'+time+'/client.eps', bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.savefig(main_path+'/'+time+'/client.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+'etapa/'+time+'/client.svg', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+'etapa/'+time+'/client.eps', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+'etapa/'+time+'/client.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
     # plt.savefig('teste.svg')

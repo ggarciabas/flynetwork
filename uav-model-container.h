@@ -69,6 +69,8 @@ public:
 
   Ptr<UavModel> RemoveAt (uint32_t pos);
 
+  Ptr<UavModel> GetLast();
+
   /**
    * \brief Get the number of Ptr<UavModel> stored in this container.
    *
@@ -98,8 +100,6 @@ public:
    */
   void Add(Ptr<UavModel> model);
 
-  void Add(Ptr<UavModel> model, int pos);
-
   /**
    * \brief Append a single Ptr<UavModel> referred to by its object
    * name to the end of this container.
@@ -111,6 +111,8 @@ public:
    * \brief Removes all elements in the container.
    */
   void Clear(void);
+
+  void RemoveUav (Ptr<UavModel> uav);
 
 private:
   std::vector<Ptr<UavModel>> m_models;

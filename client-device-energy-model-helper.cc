@@ -18,7 +18,7 @@
  * Authors: Giovanna Garcia <ggarciabas@gmail.com>
  */
 
-#include "uav-device-energy-model-helper.h"
+#include "client-device-energy-model-helper.h"
 #include "ns3/config.h"
 #include "ns3/names.h"
 #include "uav-application.h"
@@ -26,42 +26,41 @@
 namespace ns3
 {
 
-NS_LOG_COMPONENT_DEFINE("UavDeviceEnergyModelHelper");
-
-NS_OBJECT_ENSURE_REGISTERED(UavDeviceEnergyModelHelper);
+NS_LOG_COMPONENT_DEFINE("ClientDeviceEnergyModelHelper");
+NS_OBJECT_ENSURE_REGISTERED(ClientDeviceEnergyModelHelper);
 
 TypeId
-UavDeviceEnergyModelHelper::GetTypeId(void)
+ClientDeviceEnergyModelHelper::GetTypeId(void)
 {
-  static TypeId tid = TypeId("ns3::UavDeviceEnergyModelHelper")
+  static TypeId tid = TypeId("ns3::ClientDeviceEnergyModelHelper")
                           .SetParent<Object>()
                           .SetGroupName("Flynetwork-Energy")
-                          .AddConstructor<UavDeviceEnergyModelHelper>();
+                          .AddConstructor<ClientDeviceEnergyModelHelper>();
   return tid;
 }
 
-UavDeviceEnergyModelHelper::UavDeviceEnergyModelHelper()
+ClientDeviceEnergyModelHelper::ClientDeviceEnergyModelHelper()
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  m_energyModel.SetTypeId("ns3::UavDeviceEnergyModel");
+  m_energyModel.SetTypeId("ns3::ClientDeviceEnergyModel");
 }
 
-UavDeviceEnergyModelHelper::~UavDeviceEnergyModelHelper()
+ClientDeviceEnergyModelHelper::~ClientDeviceEnergyModelHelper()
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
 }
 
-void UavDeviceEnergyModelHelper::Set(std::string name, const AttributeValue &v)
+void ClientDeviceEnergyModelHelper::Set(std::string name, const AttributeValue &v)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << name << &v);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<name<<&v);
   m_energyModel.Set(name, v);
 }
 
 DeviceEnergyModelContainer
-UavDeviceEnergyModelHelper::Install(Ptr<Node> node,
+ClientDeviceEnergyModelHelper::Install(Ptr<Node> node,
                                     Ptr<EnergySource> source) const
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << node << source);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<node<<source);
   NS_ASSERT(node != NULL);
   NS_ASSERT(source != NULL);
   // check to make sure source and net node are on the same node
@@ -71,7 +70,7 @@ UavDeviceEnergyModelHelper::Install(Ptr<Node> node,
 }
 
 DeviceEnergyModelContainer
-UavDeviceEnergyModelHelper::Install(NodeContainer nodeContainer,
+ClientDeviceEnergyModelHelper::Install(NodeContainer nodeContainer,
                                     EnergySourceContainer sourceContainer) const
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
@@ -83,7 +82,7 @@ UavDeviceEnergyModelHelper::Install(NodeContainer nodeContainer,
   {
     // check to make sure source and net node are on the same node
     NS_ASSERT(*node == (*src)->GetNode());
-    Ptr<UavDeviceEnergyModel> model = DoInstall(*node, *src);
+    Ptr<ClientDeviceEnergyModel> model = DoInstall(*node, *src);
     container.Add(model);
     node++;
     src++;
@@ -91,35 +90,14 @@ UavDeviceEnergyModelHelper::Install(NodeContainer nodeContainer,
   return container;
 }
 
-Ptr<UavDeviceEnergyModel>
-UavDeviceEnergyModelHelper::DoInstall(Ptr<Node> node, Ptr<EnergySource> source) const
+Ptr<ClientDeviceEnergyModel>
+ClientDeviceEnergyModelHelper::DoInstall(Ptr<Node> node, Ptr<EnergySource> source) const
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << node << source);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<node<<source);
   NS_ASSERT(node != NULL);
   NS_ASSERT(source != NULL);
-  Ptr<UavDeviceEnergyModel> model = m_energyModel.Create()->GetObject<UavDeviceEnergyModel>();
+  Ptr<ClientDeviceEnergyModel> model = m_energyModel.Create()->GetObject<ClientDeviceEnergyModel>();
   NS_ASSERT(model != NULL);
-  // set energy source pointer
-  // buscar o objeto UavApplication do nó
-  Ptr<UavApplication> app = node->GetObject<UavApplication>();
-  if (m_depletionCallback.IsNull())
-  {
-    model->SetEnergyDepletionCallback(MakeCallback(&UavApplication::EnergyDepletionCallback, app));
-  }
-  else
-  {
-    model->SetEnergyDepletionCallback(m_depletionCallback);
-  }
-
-  if (m_rechargedCallback.IsNull())
-  {
-    model->SetEnergyRechargedCallback(MakeCallback(&UavApplication::EnergyRechargedCallback, app));
-  }
-  else
-  {
-    model->SetEnergyRechargedCallback(m_rechargedCallback);
-  }
-
   // set energy source
   model->SetEnergySource(source);
   // adicionando dispositivo no nó

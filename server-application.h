@@ -73,6 +73,7 @@ private:
   void Run();
   void ValidateUavPosition (); // utilizada para garantir que os UAVs esteja no posicionamento desejado
   void SendUavPacket(Ptr<UavModel> uav);
+  void SendCentralPacket(Ptr<UavModel> uav);
   void runDAPython();
   void runAgendamento(void);
   void CreateCentralLocation(void);
@@ -85,11 +86,14 @@ private:
   void SendAskClientPacket(Ptr<UavModel> uav);
   void ReplyAskCliData(Ptr<UavModel> uav);
 
-  void PrintCusto (vector<vector<double>> custo, int print);
-  void PrintMij (vector<vector<double>> m_ij, int print, double temp);
-  void PrintBij (vector<vector<double>> b_ij, int print);
+  double CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, vector<double> central_pos);
+
+  void PrintCusto (vector<vector<double>> custo, int print, bool before, vector<int> uav_ids, vector<int> loc_ids);
+  void PrintMij (vector<vector<double>> m_ij, double temp, std::string nameFile, vector<int> uav_ids, vector<int> loc_ids);
+  void PrintBij (vector<vector<double>> b_ij, int print, bool before, vector<int> uav_ids, vector<int> loc_ids);
 
   UavModelContainer   m_uavContainer;
+  UavModelContainer   m_uavGoToCentral; // UAVs enviados para central
   LocationModelContainer m_locationContainer;
   ClientModelContainer          m_fixedClientContainer; // utilizando o container de clientes diretamente só mudando o 'login' destes 'nos'
   ClientModelContainer m_clientContainer;
@@ -107,11 +111,12 @@ private:
   double m_locConsTotal; // total de consumo das localizacoes
   Ipv4Address m_address;
 
-  TracedCallback<int, bool> m_newUav;
+  TracedCallback<int, int> m_newUav;
   TracedCallback<int> m_removeUav;
+  TracedCallback<int> m_printUavEnergy;
   TracedCallback<string> m_clientPosition;
   TracedCallback<std::string> m_packetTrace;
-  std::string m_scenarioName;
+  std::string m_pathData;
 
   int m_supplyPos;
   int m_totalCliGeral;

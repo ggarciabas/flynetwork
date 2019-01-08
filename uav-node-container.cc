@@ -64,18 +64,20 @@ NS_LOG_COMPONENT_DEFINE("UavNodeContainer");
 // }
 
 void UavNodeContainer::Clear() {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("UavNodeContainer::Clear");
   m_nodes.clear();
 }
 
 Ptr<Node> UavNodeContainer::RemoveAt (uint32_t pos) {
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<pos);
   Ptr<Node> n = m_nodes[pos];
   m_nodes.erase(m_nodes.begin()+pos);
   return n;
 }
 
 Ptr<Node> UavNodeContainer::RemoveId (uint32_t id) {
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<id);
   int c=0;
   for (Iterator i = m_nodes.begin(); i != m_nodes.end(); ++i, ++c) {
     if ((*i)->GetId() == id) {

@@ -30,19 +30,19 @@ NS_LOG_COMPONENT_DEFINE("ClientModelContainer");
 
 ClientModelContainer::ClientModelContainer()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
 }
 
 ClientModelContainer::ClientModelContainer(Ptr<ClientModel> model)
 {
-  NS_LOG_FUNCTION(this << model);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << model);
   NS_ASSERT(model != NULL);
   m_models.push_back(model);
 }
 
 ClientModelContainer::ClientModelContainer(std::string modelName)
 {
-  NS_LOG_FUNCTION(this << modelName);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << modelName);
   Ptr<ClientModel> model = Names::Find<ClientModel>(modelName);
   NS_ASSERT(model != NULL);
   m_models.push_back(model);
@@ -50,7 +50,7 @@ ClientModelContainer::ClientModelContainer(std::string modelName)
 
 ClientModelContainer::ClientModelContainer(const ClientModelContainer &a, const ClientModelContainer &b)
 {
-  NS_LOG_FUNCTION(this << &a << &b);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   *this = a;
   Add(b);
 }
@@ -58,34 +58,34 @@ ClientModelContainer::ClientModelContainer(const ClientModelContainer &a, const 
 ClientModelContainer::Iterator
 ClientModelContainer::Begin(void) const
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_models.begin();
 }
 
 ClientModelContainer::Iterator
 ClientModelContainer::End(void) const
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_models.end();
 }
 
 uint32_t
 ClientModelContainer::GetN(void) const
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_models.size();
 }
 
 Ptr<ClientModel>
 ClientModelContainer::Get(uint32_t i) const
 {
-  NS_LOG_FUNCTION(this << i);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << i);
   return m_models[i];
 }
 
 void ClientModelContainer::Add(ClientModelContainer container)
 {
-  NS_LOG_FUNCTION(this << &container);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   for (Iterator i = container.Begin(); i != container.End(); i++)
   {
     m_models.push_back(*i);
@@ -94,14 +94,14 @@ void ClientModelContainer::Add(ClientModelContainer container)
 
 void ClientModelContainer::Add(Ptr<ClientModel> model)
 {
-  NS_LOG_FUNCTION(this << model);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << model);
   NS_ASSERT(model != NULL);
   m_models.push_back(model);
 }
 
 void ClientModelContainer::Add(std::string modelName)
 {
-  NS_LOG_FUNCTION(this << modelName);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << modelName);
   Ptr<ClientModel> model = Names::Find<ClientModel>(modelName);
   NS_ASSERT(model != NULL);
   m_models.push_back(model);
@@ -110,7 +110,7 @@ void ClientModelContainer::Add(std::string modelName)
 Ptr<ClientModel>
 ClientModelContainer::FindClientModel(std::string login)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<login);
   for (Iterator i = m_models.begin(); i != m_models.end(); i++)
   {
     if ((*i)->GetLogin().compare(login) == 0)
@@ -126,7 +126,7 @@ ClientModelContainer::FindClientModel(std::string login)
 Ptr<ClientModel>
 ClientModelContainer::FindClientModel(Ipv4Address ip)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<ip);
   for (Iterator i = m_models.begin(); i != m_models.end(); i++)
   {
     if ((*i)->GetIp() == ip)
@@ -141,7 +141,7 @@ ClientModelContainer::FindClientModel(Ipv4Address ip)
 
 void ClientModelContainer::Clear()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("ClientModelContainer::Clear");
   for (Iterator i = m_models.begin(); i != m_models.end(); i++)
   {
@@ -153,7 +153,25 @@ void ClientModelContainer::Clear()
 
 bool ClientModelContainer::IsEmpty()
 {
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_models.size() == 0;
+}
+
+void ClientModelContainer::RemoveAt (uint32_t pos) {
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<pos);
+  m_models.erase(m_models.begin()+pos);
+}
+
+void ClientModelContainer::RemoveLogin (std::string id) {
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<id);
+  int c=0;
+  Iterator i;
+  for (i = m_models.begin(); i != m_models.end(); ++i, ++c) {
+    if (std::strcmp((*i)->GetLogin().c_str(), id.c_str()) == 0) {
+      break;
+    }
+  }
+  if (i != m_models.end()) RemoveAt(uint32_t(c)); // nao remover se nao existe!
 }
 
 } // namespace ns3

@@ -8,10 +8,12 @@ from matplotlib import colors as mcolors
 
 colors = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
 
-
 def scenario (time, main_path, teste):
+    teste = True
+    if teste:
+        print time
     try:
-        f_cen = open(main_path+'/'+time+'/uav_loc.txt','r')
+        f_cen = open(main_path+'etapa/'+time+'/uav_loc.txt','r')
     except IOError:
         return
     # read LIMITS
@@ -23,27 +25,27 @@ def scenario (time, main_path, teste):
     # read UAV
     line = f_cen.readline().strip()
     uav = [float(x) for x in line.split(',')] # read [x y x y x y] sequence of UAVs
-    if teste:
-        print (uav)
+    # if teste:
+    #     print (uav)
     # read LOC
     line = f_cen.readline().strip()
-    if teste:
-        print (line)
+    # if teste:
+    #     print (line)
     loc = [float(x) for x in line.split(',')] # read [x y x y x y] sequence of Locations
-    if teste:
-        print (loc)
+    # if teste:
+    #     print (loc)
     #read BIJ
     line = f_cen.readline().strip()
     value = [float(x) for x in line.split(',')] # read bij for each x y
-    if teste:
-        print (value)
+    # if teste:
+    #     print (value)
     f_cen.close()
     point_value = range(0,len(value)*2)
 
     try:
-        f_cen = open(main_path+'/'+time+'/client.txt','r')
+        f_cen = open(main_path+'etapa/'+time+'/client.txt','r')
     except IOError:
-        return 
+        return
     # read CLIENTS
     line = f_cen.readline().strip()
     cli = [x for x in line.split(',')] # position that server knows
@@ -94,7 +96,7 @@ def scenario (time, main_path, teste):
             first = False
         else:
             plt.plot(loc[i+1],loc[i+2],'cx', markersize=7.0)
-        
+
         ax.annotate(str(int(loc[i])), xy=(loc[i+1],loc[i+2]-10))
 
     first = True
@@ -109,16 +111,16 @@ def scenario (time, main_path, teste):
 
 
     plt.plot(central[0],central[1],'g*', markersize=7.0, label="central")
-                
+
     plt.xlim([0,lim[0]])
     plt.ylim([0,lim[1]])
     plt.xlabel('X (m)')
     plt.ylabel('Y (m)')
-    plt.title("Cenario @"+time+"s")
+    plt.title("Cenario @"+'etapa/'+time+"s")
 
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.23), fancybox=True, shadow=True, ncol=5)
 
-    plt.savefig(main_path+'/'+time+'/location.svg', bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.savefig(main_path+'/'+time+'/location.eps', bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.savefig(main_path+'/'+time+'/location.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+'etapa/'+time+'/location.svg', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+'etapa/'+time+'/location.eps', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+'etapa/'+time+'/location.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
     # plt.savefig('teste.svg')

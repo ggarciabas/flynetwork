@@ -18,11 +18,11 @@
  * Authors: Giovanna Garcia <ggarciabas@gmail.com>
  */
 
-#ifndef UAV_DEVICE_ENERGY_MODEL_HELPER_H
-#define UAV_DEVICE_ENERGY_MODEL_HELPER_H
+#ifndef CLIENT_DEVICE_ENERGY_MODEL_HELPER_H
+#define CLIENT_DEVICE_ENERGY_MODEL_HELPER_H
 
 #include "ns3/node-container.h"
-#include "uav-device-energy-model.h"
+#include "client-device-energy-model.h"
 #include "ns3/core-module.h"
 
 namespace ns3
@@ -39,12 +39,12 @@ namespace ns3
  * the node.
  *
  */
-class UavDeviceEnergyModelHelper : public Object
+class ClientDeviceEnergyModelHelper : public Object
 {
 public:
   static TypeId GetTypeId(void);
-  UavDeviceEnergyModelHelper();
-  virtual ~UavDeviceEnergyModelHelper();
+  ClientDeviceEnergyModelHelper();
+  virtual ~ClientDeviceEnergyModelHelper();
 
   /**
    * \param node Pointer to the Node.
@@ -73,13 +73,13 @@ public:
   void Set(std::string name, const AttributeValue &v);
 
 private:
-  virtual Ptr<UavDeviceEnergyModel> DoInstall(Ptr<Node> node, Ptr<EnergySource> source) const;
+  virtual Ptr<ClientDeviceEnergyModel> DoInstall(Ptr<Node> node, Ptr<EnergySource> source) const;
 
   ObjectFactory m_energyModel;
-  UavDeviceEnergyModel::EnergyCallback m_depletionCallback;
-  UavDeviceEnergyModel::EnergyCallback m_rechargedCallback;
+  ClientDeviceEnergyModel::EnergyCallback m_depletionCallback;
+  ClientDeviceEnergyModel::EnergyCallback m_rechargedCallback;
 };
 
 } // namespace ns3
 
-#endif /* UAV_DEVICE_ENERGY_MODEL_HELPER_H */
+#endif /* CLIENT_DEVICE_ENERGY_MODEL_HELPER_H */

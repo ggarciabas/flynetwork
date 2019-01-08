@@ -60,6 +60,7 @@ public:
   uint32_t GetId();
 
   void EnergyDepletionCallback();
+  void EnergyRechargedCallback();
 
   void CourseChange (Ptr<const MobilityModel>);
 
@@ -69,6 +70,7 @@ public:
   // void SetTurnOffWifiPhyCallback(OffWifiPhyCallback adhoc, OffWifiPhyCallback infra);
 
   void TotalEnergyConsumptionTrace (double oldV, double newV);
+  void TotalLeasedTrace (int oldV, int newV);
 
   void Start(double);
   void Stop();
@@ -78,11 +80,15 @@ private:
   virtual void StartApplication(void);
   virtual void StopApplication(void);
 
-  void ReplyServer ();
+  double CalculateDistance(const std::vector<double> pos1, const std::vector<double> pos2);
 
-  void ScheduleTx(void);
+  void ReplyServer ();
+  void ReplyServerCentral ();
+
+  // void ScheduleTx(void);
   void SendPacket(void);
   void SendCliData ();
+  void SendPacketDepletion(void);
 
   uint32_t m_id;
   uint16_t m_serverPort;
@@ -94,16 +100,22 @@ private:
   Ipv4Address m_peer;
   DataRate m_dataRate;
   Ptr<Socket> m_sendSck; // sending socket
-  EventId m_sendEvent;
+  EventId m_sendEvent; // nao esta sendo utilizado, remover
   EventId m_sendCliDataEvent;
+  EventId m_packetDepletion;
   bool m_running;
   TracedCallback<std::string> m_packetTrace;
   Callback<void> m_setOffWifiPhyInfra; // turn off wifiphy
   Callback<void> m_setOffWifiPhyAdhoc; // turn off wifiphy
 
   ClientModelContainer m_client;
+
   Ptr<WifiRadioEnergyModel> m_wifiRadioEnergyModel;
   Ptr<UavEnergySource> m_uavEnergySource;
+
+  std::string m_pathData;
+
+  int m_totalLeased;
 
 };
 
