@@ -74,12 +74,17 @@ private:
   void ValidateUavPosition (); // utilizada para garantir que os UAVs esteja no posicionamento desejado
   void SendUavPacket(Ptr<UavModel> uav);
   void runDAPython();
+  void runDA();
   void runAgendamento(void);
   void CreateCentralLocation(void);
   double CalculateDistance(const std::vector<double> pos1, const std::vector<double> pos2);
   double CalculateDistanceCentral(const std::vector<double> pos);
   bool ValidateMijConvergency(vector<vector<double>> vec, vector<vector<double>> m_ij, unsigned siz);
   void ReplyUav(Ptr<UavModel> uav);
+
+  bool MovimentoA();
+  bool MovimentoB();
+  void CentroDeMassa (Ptr<LocationModel>);
 
   void AskClientData ();
   void SendAskClientPacket(Ptr<UavModel> uav);

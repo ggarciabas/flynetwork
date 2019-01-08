@@ -124,4 +124,12 @@ void ClientModel::DoDispose () {
 //   return m_updateCons;
 // }
 
+double ClientModel::GetXPosition () {
+  return m_position.at(0);
+}
+
+double ClientModel::GetYPosition () {
+  return m_position.at(1);
+}
+
 } // namespace ns3

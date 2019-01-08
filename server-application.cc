@@ -1088,4 +1088,64 @@ void ServerApplication::DoDispose() {
   m_clientContainer.Clear();
 }
 
+// https://github.com/ggarciabas/nsnam_ns3/blob/17c1f9200727381852528ac4798f040128ac842a/scratch/flynetwork/da_cpp/deterministic-annealing.cc
+void ServerApplication::runDA() {
+  //constantes
+  double t_min = 1e-7;
+  double r_max = std::sqrt(std::pow(m_maxx, 2) + std::pow(maxy, 2));
+
+  ObjectFactory lObj;
+  lObj.SetTypeId("ns3::LocationModel");
+  Ptr<LocationModel> loc = lObj.Create()->GetObject<LocationModel>();
+  CentroDeMassa(loc);
+  loc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
+  m_locationContainer.Add(loc);
+
+  double t = 0.9;
+  do {// laco A
+    
+    // salvando posicionamento para comparacao de movimento no laco B
+    for (LocationModelContainer::Iterator i = m_locationContainer.Begin(); i != m_locationContainer.End(); ++i) {
+      (*i)->IniciarMovimentoB();
+    }
+
+    do { // laco B
+
+    } while (MovimentoB());
+
+
+  } while (t > t_min); // laco da temperatura
+
+}
+
+bool ServerApplication::MovimentoA() {
+  // verificar se as localizações tiveram o MovimentoA, este movimento é pra validar dentro do laço A
+  bool retorno = true;
+  for (LocationModelContainer::Iterator i = m_locationContainer.Begin(); i != m_locationContainer.End(); ++i) {
+    retorno = retorno && (*i)->MovimentoA();
+  }
+
+  return retorno;
+}
+
+bool ServerApplication::MovimentoB() {
+  // verificar se as localizações tiveram o MovimentoB, este movimento é pra validar dentro do laço B
+  bool retorno = true;
+  for (LocationModelContainer::Iterator i = m_locationContainer.Begin(); i != m_locationContainer.End(); ++i) {
+    retorno = retorno && (*i)->MovimentoB();
+  }
+
+  return retorno;
+}
+
+void ServerApplication::CentroDeMassa (Ptr<LocationModel> l) {
+  double x=0, y=0;
+
+  for (ClientModelContainer::Iterator i = m_clientContainer.Begin(); i != m_clientContainer.End(); ++i) {
+    x += (*i)->GetXPosition();
+    y += (*i)->GetYPosition();
+  }
+
+  l->SetPosition(x/(double)m_clientPosition.GetN(), y/(double)m_clientPosition.GetN()); // posicionar no centro dos clientes
+}
 } // namespace ns3

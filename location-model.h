@@ -65,6 +65,11 @@ public:
   void SetTotalCli (int t);
   int GetTotalCli ();
 
+  void IniciarMovimentoA();
+  void IniciarMovimentoB();
+  bool MovimentoA ();
+  bool MovimentoB ();
+
 private:
   void DoDispose ();
   bool m_used;

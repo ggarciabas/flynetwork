@@ -68,6 +68,9 @@ public:
   // void SetUpdateCons (Time t);
   // Time GetUpdateCons ();
 
+  double GetYPosition();
+  double GetXPosition();
+
 private:
   void DoDispose ();
   std::string m_login;

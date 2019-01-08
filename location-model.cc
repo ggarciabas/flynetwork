@@ -112,4 +112,31 @@ int LocationModel::GetTotalCli () {
   return m_totaCli;
 }
 
+void LocationModel::IniciarMovimentoA () {
+  m_positionA.clear();
+  m_positionA.push_back(m_position.at(0));
+  m_positionA.push_back(m_position.at(1));
+}
+
+bool LocationModel::MovimentoA () {
+  if (m_position.at(0) == m_positionA.at(0) && m_position.at(1) == m_positionA.at(1)) {
+    return true;
+  }
+  return false;
+}
+
+void LocationModel::IniciarMovimentoB () {
+  m_positionB.clear();
+  m_positionB.push_back(m_position.at(0));
+  m_positionB.push_back(m_position.at(1));
+}
+
+bool LocationModel::MovimentoB () {
+  if (m_position.at(0) == m_positionB.at(0) && m_position.at(1) == m_positionB.at(1)) {
+    return true;
+  }
+  return false;
+}
+
+
 } // namespace ns3
