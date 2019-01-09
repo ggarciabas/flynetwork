@@ -66,7 +66,7 @@ UavModel::GetTypeId(void)
 
 UavModel::UavModel() : m_position()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("UavModel::UavModel @" << Simulator::Now().GetSeconds());
   m_confirmed = true; // para que nao de erro na primera execucao
   m_clientData = true; // para que nao de erro na primeira execucao
@@ -74,82 +74,110 @@ UavModel::UavModel() : m_position()
 
 UavModel::~UavModel()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("UavModel::~UavModel @" << Simulator::Now().GetSeconds());
 }
 
 void
 UavModel::SetSendPositionEvent (EventId id)
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds());
   m_sendPosition = id;
 }
 
 void
 UavModel::CancelSendPositionEvent()
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   Simulator::Remove(m_sendPosition);
+}
+
+void
+UavModel::SetSendCentralEvent (EventId id)
+{
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds());
+  m_sendCentral = id;
+}
+
+void
+UavModel::CancelSendCentralEvent()
+{
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
+  Simulator::Remove(m_sendCentral);
 }
 
 void UavModel::SetAskCliDataEvent (EventId id)
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds());
   m_askCliData = id;
 }
 
 void UavModel::CancelAskCliDataEvent()
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   Simulator::Remove(m_askCliData);
 }
 
 void
 UavModel::SetSocket(Ptr<Socket> s) {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() <<s);
   m_socket = s;
 }
 
 Ptr<Socket>
 UavModel::GetSocket(){
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   return m_socket;
 }
 
 double
 UavModel::CalculateEnergyCost(double dist)
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() <<dist);
   return m_energyCost * dist; // in joule
 }
 double
 UavModel::GetTotalBattery()
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   return m_totalBattery;
 }
 
 void UavModel::SetTotalEnergy(double total)
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() <<total);
   m_totalEnergy = total;
 }
 
 double
 UavModel::GetTotalEnergy()
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   return m_totalEnergy;
 }
 
 void UavModel::SetId(uint32_t id)
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() <<id);
   m_id = id;
 }
 
 uint32_t
 UavModel::GetId()
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   return m_id;
 }
 
 void UavModel::SetNewPosition(std::vector<double> pos)
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() <<pos);
   SetNewPosition(pos.at(0), pos.at(1));
 }
 
 void UavModel::SetPosition(double x, double y)
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() <<x<<y);
   m_position.clear();
   m_position.push_back(x);
   m_position.push_back(y);
@@ -158,11 +186,13 @@ void UavModel::SetPosition(double x, double y)
 const std::vector<double>
 UavModel::GetPosition()
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   return m_position;
 }
 
 void UavModel::SetNewPosition(double x, double y)
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() <<x<<y);
   m_newPos.clear();
   m_newPos.push_back(x);
   m_newPos.push_back(y);
@@ -171,36 +201,42 @@ void UavModel::SetNewPosition(double x, double y)
 const std::vector<double>
 UavModel::GetNewPosition()
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   return m_newPos;
 }
 
 Ipv4Address
 UavModel::GetAddressAdhoc()
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   return m_addressAdhoc;
 }
 
 bool
 UavModel::IsConfirmed ()
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() << m_confirmed);
   return m_confirmed;
 }
 
 void
 UavModel::NotConfirmed ()
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() << m_confirmed);
   m_confirmed = false;
 }
 
 void
 UavModel::ConfirmPosition () {
-  if (int(m_newPos.at(0)) == int(m_position.at(0)) && int(m_newPos.at(1)) == int(m_position.at(1))) { // compara com a posicao que se deseja que ele chegue
-    m_confirmed = true;
-    NS_LOG_INFO ("UAVMODEL :: posicionamento do uav " << m_id << " confirmado!");
-  }
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
+  // if (int(m_newPos.at(0)) == int(m_position.at(0)) && int(m_newPos.at(1)) == int(m_position.at(1))) { // compara com a posicao que se deseja que ele chegue // REMOVEr
+    m_confirmed = true; // mantendo confirmacao, pois o UAV somente envia mensagem quando chega ao destino!
+    // NS_LOG_INFO ("UAVMODEL :: posicionamento do uav " << m_id << " confirmado!"); // REMOVEr
+  // } // REMOVER
 }
 
 void UavModel::DoDispose () {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   CancelAskCliDataEvent();
   CancelSendPositionEvent();
   NS_LOG_DEBUG("UavModel::DoDispose id " << m_id << " REF " << GetReferenceCount() << " SKT REF " << m_socket->GetReferenceCount() << "@" << Simulator::Now().GetSeconds());
@@ -212,11 +248,13 @@ void UavModel::DoDispose () {
 
 bool UavModel::ClientDataConfirmed ()
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() << m_clientData);
   return m_clientData;
 }
 
 void UavModel::SetClientDataConfirmed (bool b)
 {
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() << b);
   m_clientData = b;
 }
 

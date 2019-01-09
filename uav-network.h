@@ -57,14 +57,14 @@ public:
   void Run();
   void ClientPosition (string name);
 
-  void NewUav (int total, bool update);
+  void NewUav (int total, int update);
   void RemoveUav(int id);
 
   /**
    * TracedCallback signature.
    */
   typedef void (*RemoveUavTrace) (int id);
-  typedef void (*NewUavTrace)(int total, bool update);
+  typedef void (*NewUavTrace)(int total, int update);
   typedef void (*ClientPositionTrace)(string name);
 
 
@@ -74,10 +74,13 @@ public:
   typedef void (*PacketTraceServer)(std::string msg);
   typedef void (*PacketTraceUav)(std::string msg);
   typedef void (*PacketTraceClient)(std::string msg);
+  typedef void (*PrintTraceUavEnergy)(int i);
 
   void PacketUav(std::string);
   void PacketServer(std::string);
   void PacketClient(std::string);
+
+  void PrintUavEnergy (int i);
 
 private:
   void Configure();
@@ -108,7 +111,8 @@ private:
   double m_rxGain;
   double m_powerLevel;
   double m_frequency;
-  std::string m_scenarioName;
+  std::string m_PathData;
+  std::string m_pathData;
 
   NodeContainer m_clientNode;
   vector<double> m_palcoPos; // posicao dos palcos para nao dar conflito no arquivo de conferencia
@@ -129,6 +133,8 @@ private:
   std::string m_protocolName;
   Ipv4ListRoutingHelper m_list;
   Ipv4InterfaceContainer m_serverAddress;
+  double m_iniX, m_iniY; // posicao inicial do UAV para nao interferir nos resultados!
+  double m_scheduleServer;
 
   // AthstatsHelper m_athstats;
 
@@ -151,6 +157,8 @@ private:
 
   UavApplicationContainer   m_uavAppContainer;
   Ptr< PositionAllocator >    m_positionAlloc; // utilizado para distanciar os UAVs da central
+
+  std::ofstream m_file;
 };
 
 } // namespace ns3

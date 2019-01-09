@@ -56,6 +56,8 @@ private:
   double m_speed;
   Vector m_goTo; //
   Time m_updatePosition;
+
+  ns3::TracedCallback<Ptr<const MobilityModel> > m_courseChangeDevice;
 };
 
 } // namespace ns3

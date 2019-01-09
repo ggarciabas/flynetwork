@@ -30,19 +30,19 @@ NS_LOG_COMPONENT_DEFINE("LocationModelContainer");
 
 LocationModelContainer::LocationModelContainer()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
 }
 
 LocationModelContainer::LocationModelContainer(Ptr<LocationModel> model)
 {
-  NS_LOG_FUNCTION(this << model);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << model);
   NS_ASSERT(model != NULL);
   m_models.push_back(model);
 }
 
 LocationModelContainer::LocationModelContainer(std::string modelName)
 {
-  NS_LOG_FUNCTION(this << modelName);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << modelName);
   Ptr<LocationModel> model = Names::Find<LocationModel>(modelName);
   NS_ASSERT(model != NULL);
   m_models.push_back(model);
@@ -50,7 +50,7 @@ LocationModelContainer::LocationModelContainer(std::string modelName)
 
 LocationModelContainer::LocationModelContainer(const LocationModelContainer &a, const LocationModelContainer &b)
 {
-  NS_LOG_FUNCTION(this << &a << &b);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << &a << &b);
   *this = a;
   Add(b);
 }
@@ -58,34 +58,34 @@ LocationModelContainer::LocationModelContainer(const LocationModelContainer &a, 
 LocationModelContainer::Iterator
 LocationModelContainer::Begin(void) const
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_models.begin();
 }
 
 LocationModelContainer::Iterator
 LocationModelContainer::End(void) const
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_models.end();
 }
 
 uint32_t
 LocationModelContainer::GetN(void) const
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_models.size();
 }
 
 const Ptr<LocationModel>
 LocationModelContainer::Get(uint32_t i) const
 {
-  NS_LOG_FUNCTION(this << i);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << i);
   return m_models[i];
 }
 
 void LocationModelContainer::Add(LocationModelContainer container)
 {
-  NS_LOG_FUNCTION(this << &container);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << &container);
   for (Iterator i = container.Begin(); i != container.End(); i++)
   {
     m_models.push_back(*i);
@@ -94,14 +94,14 @@ void LocationModelContainer::Add(LocationModelContainer container)
 
 void LocationModelContainer::Add(Ptr<LocationModel> model)
 {
-  NS_LOG_FUNCTION(this << model);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << model);
   NS_ASSERT(model != NULL);
   m_models.push_back(model);
 }
 
 void LocationModelContainer::Add(std::string modelName)
 {
-  NS_LOG_FUNCTION(this << modelName);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << modelName);
   Ptr<LocationModel> model = Names::Find<LocationModel>(modelName);
   NS_ASSERT(model != NULL);
   m_models.push_back(model);
@@ -109,7 +109,7 @@ void LocationModelContainer::Add(std::string modelName)
 
 void LocationModelContainer::Clear(void)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("LocationModelContainer::Clear");
   for (Iterator i = m_models.begin(); i != m_models.end(); i++)
   {

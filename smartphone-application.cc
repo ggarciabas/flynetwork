@@ -82,6 +82,11 @@ SmartphoneApplication::GetTypeId(void)
                                         PointerValue(),
                                         MakePointerAccessor(&SmartphoneApplication::m_serverApp),
                                         MakePointerChecker<PacketSink>())
+                          .AddAttribute("PathData",
+                                        "Name of scenario",
+                                        StringValue("none"),
+                                        MakeStringAccessor(&SmartphoneApplication::m_pathData),
+                                        MakeStringChecker())
                           .AddAttribute("DataRate", "Data rate of the communication.",
                                         DataRateValue(),
                                         MakeDataRateAccessor(&SmartphoneApplication::m_dataRate),
@@ -96,7 +101,7 @@ SmartphoneApplication::GetTypeId(void)
 
 SmartphoneApplication::SmartphoneApplication()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG("SmartphoneApplication::SmartphoneApplication @" << Simulator::Now().GetSeconds());
   m_running = false;
   m_connected = false;
@@ -104,23 +109,26 @@ SmartphoneApplication::SmartphoneApplication()
 
 SmartphoneApplication::~SmartphoneApplication()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   std::cout << "SmartphoneApplication::~SmartphoneApplication @" << Simulator::Now().GetSeconds() << "\n";
 }
 
 void SmartphoneApplication::SetLogin(std::string login)
 {
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds()  << login);
   m_login = login;
 }
 
 std::string
 SmartphoneApplication::GetLogin()
 {
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   return m_login;
 }
 
 void SmartphoneApplication::StartApplication(void)
 {
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   m_lastPosition = GetNode()->GetObject<MobilityModel>()->GetPosition();
 
   Ipv4StaticRoutingHelper ipv4RoutingHelper;
@@ -136,6 +144,7 @@ void SmartphoneApplication::StartApplication(void)
 
 void SmartphoneApplication::StopApplication(void)
 {
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   m_running = false;
 
   Simulator::Remove(m_sendEventUav);
@@ -148,7 +157,12 @@ void SmartphoneApplication::StopApplication(void)
 
 void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual para o UAV
 {
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   Simulator::Remove(m_sendEventUav);
+
+  if (!m_connected) { // caso nao esteja com IP conectado ao AP, tentar enviar assim que se conectar!
+    m_sendEventUav = Simulator::Schedule(Seconds(5.0), &SmartphoneApplication::SendPacketUav, this);
+  }
 
   if (m_socketUav && !m_socketUav->Connect (InetSocketAddress (m_uavPeer, m_port))) {
     std::ostringstream msg;
@@ -156,25 +170,47 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
     msg << "CLIENT " << pos.x << " " << pos.y << " " << m_login << " MSG" << '\0';
     uint16_t packetSize = msg.str().length() + 1;
     Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
-
+    NS_LOG_DEBUG("SmartphoneApplication::SendPacketUa @" << Simulator::Now().GetSeconds() <<  " " << m_id << " conectado enviando pacote.");
     if (m_socketUav && m_socketUav->Send(packet, 0) == packetSize)
     {
       msg.str("");
       msg << "CLIENT\t" << m_id << "\tSENT\t" << Simulator::Now().GetSeconds() << "\tUAV";
       m_packetTrace(msg.str());
       NS_LOG_INFO ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - UAV");
+      NS_LOG_DEBUG("SmartphoneApplication::SendPacketUa @" << Simulator::Now().GetSeconds() <<  " " << m_id << " enviado.");
+
+      std::ostringstream os;
+      os << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << m_id << "_packet" << ".txt";
+      std::ofstream file;
+      file.open(os.str(), std::ofstream::out | std::ofstream::app);
+      file << Simulator::Now().GetSeconds() << " ENVIADO" << std::endl;
+      file.close();
     }
     else
     {
+      NS_LOG_DEBUG("SmartphoneApplication::SendPacketUa @" << Simulator::Now().GetSeconds() <<  " " << m_id << " erro ao enviar.");
       NS_LOG_ERROR("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - UAV NAO");
+      std::ostringstream os;
+      os << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << m_id << "_packet" << ".txt";
+      std::ofstream file;
+      file.open(os.str(), std::ofstream::out | std::ofstream::app);
+      file << Simulator::Now().GetSeconds() << " FALHA" << std::endl;
+      file.close();
       if (m_connected) {
-        m_sendEventUav = Simulator::Schedule(Seconds(10.0), &SmartphoneApplication::SendPacketUav, this);
+        m_sendEventUav = Simulator::Schedule(Seconds(5.0), &SmartphoneApplication::SendPacketUav, this);
       }
       return;
     }
     NS_LOG_INFO("SmartphoneApplication::SendPacketUav " << packet->GetReferenceCount());
   } else {
+    NS_LOG_DEBUG("SmartphoneApplication::SendPacketUa @" << Simulator::Now().GetSeconds() << " " << m_id << " cerro ao conectar com o servidor.");
     NS_LOG_INFO ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " erro ao conectar socket com servidor " << m_uavPeer);
+    std::ostringstream os;
+    os << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << m_id << "_packet" << ".txt";
+    std::ofstream file;
+    file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    file << Simulator::Now().GetSeconds() << " NAO_CONECTADO" << std::endl;
+    file.close();
     if (m_connected) {
       m_sendEventUav = Simulator::Schedule(Seconds(10.0), &SmartphoneApplication::SendPacketUav, this);
     }
@@ -187,6 +223,7 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
 void
 SmartphoneApplication::CourseChange(Ptr<const MobilityModel> mobility)
 {
+  // NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   Vector actual = mobility->GetPosition();
   double distance = std::sqrt(std::pow(m_lastPosition.x - actual.x, 2) + std::pow(m_lastPosition.y - actual.y, 2));
 
@@ -202,19 +239,44 @@ SmartphoneApplication::CourseChange(Ptr<const MobilityModel> mobility)
 void
 SmartphoneApplication::TracedCallbackTxApp (Ptr<const Packet> packet, const Address &source, const Address &dest)
 {
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - SERVER ");
 }
 
 void SmartphoneApplication::TracedCallbackExpiryLease (const Ipv4Address& ip)
 {
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   Simulator::Remove(m_sendEventUav);
+  std::ostringstream os;
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/client_" << m_id << "_expirylease" << ".txt";
+  std::ofstream file;
+  file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  file << Simulator::Now().GetSeconds() << " " << ip << std::endl;
+  file.close();
+  os.str("");
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/all_expirylease.txt";
+  file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  file << Simulator::Now().GetSeconds() << " " << m_id << " "<< ip << std::endl;
+  file.close();
   NS_LOG_DEBUG ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " [[ perdeu IP ]]");
 }
 
 void SmartphoneApplication::TracedCallbackNewLease (const Ipv4Address& ip)
 {
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   Simulator::Remove(m_sendEventUav);
   m_uavPeer = DynamicCast<DhcpClient>(GetNode()->GetApplication(m_idDHCP))->GetDhcpServer();
+  std::ostringstream os;
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/client_" << m_id << "_newlease" << ".txt";
+  std::ofstream file;
+  file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  file << Simulator::Now().GetSeconds() << " " << ip << " " << m_uavPeer << std::endl;
+  file.close();
+  os.str("");
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/all_newlease.txt";
+  file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  file << Simulator::Now().GetSeconds() << " " << m_id << " "<< ip << " " << m_uavPeer << std::endl;
+  file.close();
   NS_LOG_DEBUG ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " novo IP " << ip << " do servidor " << m_uavPeer);
 
   SendPacketUav();
@@ -223,26 +285,43 @@ void SmartphoneApplication::TracedCallbackNewLease (const Ipv4Address& ip)
 void
 SmartphoneApplication::PhyRxOkTrace (std::string context, Ptr<const Packet> packet, double snr, WifiMode mode, enum WifiPreamble preamble)
 {
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   NS_LOG_INFO("CLIENT - PHYRXOK mode=" << mode << " snr=" << snr << " " << *packet);
 }
 
 void
 SmartphoneApplication::PhyRxErrorTrace (std::string context, Ptr<const Packet> packet, double snr)
 {
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   NS_LOG_INFO("CLIENT - PHYRXERROR snr=" << snr << " " << *packet);
 }
 
 void
 SmartphoneApplication::PhyTxTrace (std::string context, Ptr<const Packet> packet, WifiMode mode, WifiPreamble preamble, uint8_t txPower)
 {
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   NS_LOG_INFO("CLIENT - PHYTX mode=" << mode << " " << *packet);
 }
 
 void
 SmartphoneApplication::TracedCallbackAssocLogger (Mac48Address mac)
 {
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   Simulator::Remove(m_sendEventUav);
   NS_LOG_INFO ("CLIENT [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - associated to " << mac);
+
+  std::ostringstream os;
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/client_" << m_id << "_assoc" << ".txt";
+  std::ofstream file;
+  file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  file << Simulator::Now().GetSeconds() << " " << mac << std::endl;
+  file.close();
+
+  os.str("");
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/all_assoc.txt";
+  file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  file << Simulator::Now().GetSeconds() << " " << m_id << " " << mac << std::endl;
+  file.close();
   m_sendEventUav = Simulator::Schedule(Seconds(20.0), &SmartphoneApplication::SendPacketUav, this);
 
   m_connected = true;
@@ -251,12 +330,25 @@ SmartphoneApplication::TracedCallbackAssocLogger (Mac48Address mac)
 void
 SmartphoneApplication::TracedCallbackDeAssocLogger (Mac48Address mac)
 {
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   Simulator::Remove(m_sendEventUav);
-  NS_LOG_INFO ("CLIENT [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - lost association to " << mac);
+  std::ostringstream os;
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/client_" << m_id << "_deassoc" << ".txt";
+  std::ofstream file;
+  file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  file << Simulator::Now().GetSeconds() << " " << mac << std::endl;
+  file.close();
+
+  os.str("");
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/all_deassoc.txt";
+  file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  file << Simulator::Now().GetSeconds() << " " << m_id << " " << mac << std::endl;
+  file.close();
   m_connected = false;
 }
 
 void SmartphoneApplication::DoDispose() {
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("SmartphoneApplication::DoDispose id " << m_id << " REF " << GetReferenceCount() << " SKT REF " << m_socketUav->GetReferenceCount() << " @" << Simulator::Now().GetSeconds());
   Simulator::Remove(m_sendEventUav);
   m_socketUav->ShutdownRecv();
@@ -269,10 +361,12 @@ void SmartphoneApplication::DoDispose() {
 
 void SmartphoneApplication::SetApp (std::string a)
 {
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   m_app = a;
 }
 
 std::string SmartphoneApplication::GetApp () {
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   return m_app;
 }
 

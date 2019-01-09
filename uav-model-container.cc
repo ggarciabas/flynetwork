@@ -30,19 +30,19 @@ NS_LOG_COMPONENT_DEFINE("UavModelContainer");
 
 UavModelContainer::UavModelContainer()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
 }
 
 UavModelContainer::UavModelContainer(Ptr<UavModel> model)
 {
-  NS_LOG_FUNCTION(this << model);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << model);
   NS_ASSERT(model != NULL);
   m_models.push_back(model);
 }
 
 UavModelContainer::UavModelContainer(std::string modelName)
 {
-  NS_LOG_FUNCTION(this << modelName);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << modelName);
   Ptr<UavModel> model = Names::Find<UavModel>(modelName);
   NS_ASSERT(model != NULL);
   m_models.push_back(model);
@@ -50,15 +50,22 @@ UavModelContainer::UavModelContainer(std::string modelName)
 
 UavModelContainer::UavModelContainer(const UavModelContainer &a, const UavModelContainer &b)
 {
-  NS_LOG_FUNCTION(this << &a << &b);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << &a << &b);
   *this = a;
   Add(b);
 }
 
 Ptr<UavModel>
+UavModelContainer::GetLast()
+{
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  return m_models.back();
+}
+
+Ptr<UavModel>
 UavModelContainer::FindUavModel(uint32_t id)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<id);
   for (Iterator i = m_models.begin(); i != m_models.end(); i++)
   {
     if ((*i)->GetId() == id)
@@ -72,34 +79,34 @@ UavModelContainer::FindUavModel(uint32_t id)
 UavModelContainer::Iterator
 UavModelContainer::Begin(void) const
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_models.begin();
 }
 
 UavModelContainer::Iterator
 UavModelContainer::End(void) const
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_models.end();
 }
 
 uint32_t
 UavModelContainer::GetN(void) const
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_models.size();
 }
 
 Ptr<UavModel>
 UavModelContainer::Get(uint32_t i) const
 {
-  NS_LOG_FUNCTION(this << i);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << i);
   return m_models[i];
 }
 
 void UavModelContainer::Add(UavModelContainer container)
 {
-  NS_LOG_FUNCTION(this << &container);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << &container);
   for (Iterator i = container.Begin(); i != container.End(); i++)
   {
     m_models.push_back(*i);
@@ -108,27 +115,22 @@ void UavModelContainer::Add(UavModelContainer container)
 
 void UavModelContainer::Add(Ptr<UavModel> model)
 {
-  NS_LOG_FUNCTION(this << model);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << model);
   NS_ASSERT(model != NULL);
   m_models.push_back(model);
 }
 
 void UavModelContainer::Add(std::string modelName)
 {
-  NS_LOG_FUNCTION(this << modelName);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << modelName);
   Ptr<UavModel> model = Names::Find<UavModel>(modelName);
   NS_ASSERT(model != NULL);
   m_models.push_back(model);
 }
 
-void UavModelContainer::Add(Ptr<UavModel> model, int pos)
-{
-  m_models[pos] = model;
-}
-
 void UavModelContainer::Clear(void)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("UavModelContainer::Clear");
   for (Iterator i = m_models.begin(); i != m_models.end(); i++)
   {
@@ -139,9 +141,22 @@ void UavModelContainer::Clear(void)
 }
 
 Ptr<UavModel> UavModelContainer::RemoveAt (uint32_t pos) {
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<pos);
   Ptr<UavModel> n = m_models[pos];
   m_models.erase(m_models.begin()+pos);
   return n;
+}
+
+void UavModelContainer::RemoveUav (Ptr<UavModel> uav) {
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<uav);
+  int c = 0;
+  for (Iterator i = m_models.begin(); i != m_models.end(); i++, c++)
+  {
+    if ((*i)->GetId() == uav->GetId()) {
+      break;
+    }
+  }
+  RemoveAt(c);
 }
 
 } // namespace ns3

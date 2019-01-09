@@ -79,8 +79,10 @@ public:
    * energy cost draw at the energy source and updates remaining energy. Called by
    * DeviceEnergyModel to inform EnergySource of a state change.
    */
-  virtual void UpdateEnergySourceMov(double);
   virtual void UpdateEnergySource (void);
+  virtual void UpdateEnergySourceMove (double);
+  virtual void UpdateEnergySourceClient (double);
+  virtual void UpdateEnergySourceHover (double energyToDecrease);
 
   /**
    * \param initialEnergyJ Initial energy, in Joules
@@ -109,6 +111,8 @@ public:
    * \returns The interval between each energy update.
    */
   Time GetEnergyUpdateInterval (void) const;
+
+  void SetBasicEnergyLowBatteryThreshold (double thr);
 
   void Reset ();
   void Stop (); // stop, UAV fora da rede
@@ -159,7 +163,11 @@ private:
   Time m_energyUpdateInterval;           // energy update interval
   std::ofstream m_file;
 
-  std::string m_scenarioName;
+  double m_hoverAcum;
+  double m_movAcum;
+  double m_cliAcum;
+
+  std::string m_pathData;
 
 };
 

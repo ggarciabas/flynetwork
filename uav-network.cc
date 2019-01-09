@@ -21,17 +21,22 @@
 #include "uav-network.h"
 #include "ns3/simulator.h"
 #include "ns3/log.h"
-#include "uav-energy-source-helper.h"
-#include "uav-device-energy-model-helper.h"
-#include "uav-model.h"
 #include "ns3/wifi-radio-energy-model-helper.h"
 #include "ns3/wifi-radio-energy-model.h"
-#include "smartphone-application.h"
 #include "ns3/aodv-module.h"
 #include "ns3/olsr-module.h"
 #include "ns3/dsdv-module.h"
 #include "ns3/internet-apps-module.h"
 #include "ns3/dsr-module.h"
+
+#include "uav-energy-source-helper.h"
+#include "uav-device-energy-model-helper.h"
+#include "client-device-energy-model-helper.h"
+#include "uav-model.h"
+#include "smartphone-application.h"
+// #include "dhcp-helper-uav.h"
+// #include "dhcp-server-uav.h"
+
 #include <fstream>
 #include <cstdlib>
 #include <string>
@@ -69,6 +74,10 @@ UavNetwork::GetTypeId(void)
                                         "Z value",
                                         DoubleValue(10.0),
                                         MakeDoubleAccessor(&UavNetwork::m_zValue),
+                                        MakeDoubleChecker<double>())
+                          .AddAttribute("ScheduleServer", "Time to schedule server method.",
+                                        DoubleValue(60.0),
+                                        MakeDoubleAccessor(&UavNetwork::m_scheduleServer),
                                         MakeDoubleChecker<double>())
                           .AddAttribute("TxGain",
                                         "Transmitter gain",
@@ -135,12 +144,13 @@ UavNetwork::GetTypeId(void)
 
 UavNetwork::UavNetwork() //: m_filePacketServer("./scratch/flynetwork/data/output/packet_trace_server.txt"), m_filePacketUav("./scratch/flynetwork/data/output/packet_trace_uav.txt"), m_filePacketClient("./scratch/flynetwork/data/output/packet_trace_client.txt")
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  m_iniX = m_iniY = -2000;
 }
 
 void UavNetwork::DoDispose ()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_INFO ("UavNetwork::DoDispose REF " << GetReferenceCount() << " @" << Simulator::Now().GetSeconds());
   m_palcoPos.clear();
   m_uavNode.Clear();
@@ -152,74 +162,70 @@ void UavNetwork::DoDispose ()
 
 UavNetwork::~UavNetwork()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
 }
 
 void UavNetwork::Run()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
 
   std::ifstream scenario;
-
+  std::ostringstream ss, ss_;
   switch (m_scenario)
   {
     case 0: // teste
-      m_scenarioName = "teste";
+      ss << "teste";
       break;
     case 1: //Austin City Limits
-      m_scenarioName = "austincitylimits";
+      ss << "austincitylimits";
       break;
     case 2: //Lollapalooza
-      m_scenarioName = "lollapalooza";
+      ss << "lollapalooza";
       break;
     case 3: //Rock in Rio Brasil
-      m_scenarioName = "rockinriobrasil";
+      ss << "rockinriobrasil";
       break;
     case 4: //Rock in Rio Lisboa
-      m_scenarioName = "rockinriolisboa";
+      ss << "rockinriolisboa";
       break;
     case 5: //Rock in Rio USA
-      m_scenarioName = "rockinriousa";
+      ss << "rockinriousa";
       break;
     case 6: // Glastonburry
-      m_scenarioName = "glastonbury";
+      ss << "glastonbury";
       break;
     case 7: // teste_1
-      m_scenarioName = "teste_1";
+      ss << "teste_1";
       break;
     case 8: // teste_2
-      m_scenarioName = "teste_2";
+      ss << "teste_2";
       break;
     case 9: // teste_5
-      m_scenarioName = "teste_5";
+      ss << "teste_5";
+      break;
+    case 10: // teste_10
+      ss << "teste_10";
       break;
     case 15: // teste_15
-      m_scenarioName = "teste_15";
+      ss << "teste_15";
+      break;
+    case 20: // teste_20
+      ss << "teste_20";
+      break;
+    case 50: // teste_50
+      ss << "teste_50";
+      break;
+    case 99: // austin_30
+      ss << "austin_30";
       break;
     default:
       NS_LOG_ERROR("Não foi possivel identificar o cenario!");
       exit(-1);
   }
-  std::ostringstream ss;
-  ss << "rm -Rf ./scratch/flynetwork/data/output/" << m_scenarioName;
-  system(ss.str().c_str());
-  ss.str("");
-  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_scenarioName;
-  system(ss.str().c_str());
-  // ss.str("");
-  // ss << "./scratch/flynetwork/data/output/"<< m_scenarioName<<"/packet_trace_server.txt";
-  // m_filePacketServer = ss.str().c_str();
-  // ss.str("");
-  // ss << "./scratch/flynetwork/data/output/"<<m_scenarioName<<"/packet_trace_uav.txt";
-  // m_filePacketUav = ss.str().c_str();
-  // ss.str("");
-  // ss << "./scratch/flynetwork/data/output/"<<m_scenarioName<<"/packet_trace_client.txt";
-  // m_filePacketClient = ss.str().c_str();
-
   // ler informacoes do arquivo
-  ss.str("");
-  ss << "./scratch/flynetwork/data/scenarios/" << m_scenarioName << ".txt";
-  scenario.open(ss.str());
+  m_PathData = ss.str();
+  ss_ << "./scratch/flynetwork/data/scenarios/" << m_PathData << ".txt";
+  scenario.open(ss_.str());
   if (scenario.is_open())
   {
     std::string line;
@@ -234,12 +240,66 @@ void UavNetwork::Run()
   }
   else
   {
-    string s = ss.str();
-    ss.str("");
-    ss << "Não foi possível abrir o arquivo: " << s;
-    NS_LOG_ERROR(ss.str().c_str());
+    string s = ss_.str();
+    ss_.str("");
+    ss_ << "Não foi possível abrir o arquivo: " << s;
+    NS_LOG_ERROR(ss_.str().c_str());
     exit(-1);
   }
+
+  ss << "/custo_" << m_custo;
+  m_pathData = ss.str();
+  ss.str("");
+  ss << "rm -Rf ./scratch/flynetwork/data/output/" << m_pathData;
+  system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData;
+  system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/course_changed";
+  system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_remaining_energy";
+  system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_hover";
+  system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_move";
+  system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_energy_threshold";
+  system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/etapa";
+  system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_recharged";
+  system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_depletion";
+  system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_stop";
+  system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/python";
+  system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/dhcp";
+  system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/client";
+  system(ss.str().c_str());
+  // ss.str("");
+  // ss << "./scratch/flynetwork/data/output/"<< m_pathData<<"/packet_trace_server.txt";
+  // m_filePacketServer = ss.str().c_str();
+  // ss.str("");
+  // ss << "./scratch/flynetwork/data/output/"<<m_pathData<<"/packet_trace_uav.txt";
+  // m_filePacketUav = ss.str().c_str();
+  // ss.str("");
+  // ss << "./scratch/flynetwork/data/output/"<<m_pathData<<"/packet_trace_client.txt";
+  // m_filePacketClient = ss.str().c_str();
 
   // configure variables
   NS_LOG_INFO("Configurando variaveis");
@@ -255,7 +315,7 @@ void UavNetwork::Run()
 
   // Configure UAV
   NS_LOG_INFO("Configurando UAV");
-  ConfigureUav(20);
+  ConfigureUav(5);
 
   // Configure Client
   NS_LOG_INFO("Configurando Cliente");
@@ -276,7 +336,7 @@ void UavNetwork::Run()
 
 void UavNetwork::ConfigureServer()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_serverNode.Create(1);
 
   /// Net device
@@ -342,13 +402,17 @@ void UavNetwork::ConfigureServer()
   obj.Set("ClientPort", UintegerValue(m_cliPort));
   obj.Set("MaxX", DoubleValue(m_xmax));
   obj.Set("MaxY", DoubleValue(m_ymax));
-  obj.Set("ScenarioName", StringValue(m_scenarioName));
+  obj.Set("PathData", StringValue(m_pathData));
+  obj.Set("ScheduleServer", DoubleValue(m_scheduleServer));
+  obj.Set("Custo", UintegerValue(m_custo));
 
   m_serverApp = obj.Create()->GetObject<ServerApplication>();
   m_serverApp->SetStartTime(Seconds(0.0));
   m_serverApp->SetStopTime(Seconds(m_simulationTime));
 
-  m_serverApp->TraceConnectWithoutContext("NewUav", MakeCallback(&UavNetwork::NewUav, this)); // adicionando callback para criar UAVs
+  m_serverApp->TraceConnectWithoutContext("NewUav", MakeCallback(&UavNetwork::NewUav, this));// adicionando callback para criar UAVs
+  m_serverApp->TraceConnectWithoutContext("PrintUavEnergy", MakeCallback(&UavNetwork::PrintUavEnergy, this));
+  m_serverApp->TraceConnectWithoutContext("RemoveUav", MakeCallback(&UavNetwork::RemoveUav, this));
   // m_serverApp->TraceConnectWithoutContext("PacketTrace", MakeCallback(&UavNetwork::PacketServer, this));
   m_serverApp->TraceConnectWithoutContext("ClientPositionTrace", MakeCallback(&UavNetwork::ClientPosition, this));
 
@@ -362,17 +426,31 @@ void UavNetwork::ConfigureServer()
   m_serverNode.Get(0)->AddApplication(m_serverApp);
 }
 
-void UavNetwork::NewUav(int total, bool update)
+void UavNetwork::NewUav(int total, int update)
 {
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<total<<update);
   NS_LOG_DEBUG ("UavNetwork::NewUav " << total << " " << update << " @" << Simulator::Now().GetSeconds());
   // validar se ainda existem UAVs
-  if (m_uavNode.GetN() < uint32_t(total)) {// Caso nao, configurar um novo
-    ConfigureUav(total - m_uavNode.GetN()); // diferenca
+  uint32_t uav_livre = 0;
+  for (UavNodeContainer::Iterator i = m_uavNode.Begin(); i != m_uavNode.End(); ++i) {
+    Ptr<MobilityModel> mob = (*i)->GetObject<MobilityModel>();
+    if (mob->GetPosition().x == m_iniX && mob->GetPosition().y == m_iniY) { // somente se estiver na "posicao inicial"
+      uav_livre++;
+    }
   }
-  uint32_t sz = m_uavNode.GetN();
-  for (uint32_t i = sz-1; i >= (sz-total); i = i - 1) {
-    NS_LOG_DEBUG("I " << i << " Id " << m_uavNode.Get(i)->GetId() << " REF " << m_uavNode.Get(i)->GetReferenceCount());
-    Ptr<Node> n = m_uavNode.RemoveAt(i);
+  if (uav_livre < uint32_t(total)) {// Caso nao, configurar um novo
+    ConfigureUav(total - uav_livre); // diferenca
+  }
+  while (total--) {
+    int p = -1;
+    Ptr<MobilityModel> mob = 0;
+    do {
+      mob = m_uavNode.Get(++p)->GetObject<MobilityModel>();
+    } while (!(mob->GetPosition().x == m_iniX && mob->GetPosition().y == m_iniY)); // somente se estiver na "posicao inicial"
+
+    NS_LOG_DEBUG("Id " << m_uavNode.Get(p)->GetId() << " REF " << m_uavNode.Get(p)->GetReferenceCount());
+    Ptr<Node> n = m_uavNode.RemoveAt(p);
+
     NS_LOG_DEBUG("->REF " << n->GetReferenceCount());
     m_uavNodeActive.Add(n);
 
@@ -393,19 +471,30 @@ void UavNetwork::NewUav(int total, bool update)
     do {
       uavApp = DynamicCast<UavApplication>(n->GetApplication(app));
       --app;
-    } while (uavApp==NULL && app >= 0);
+    } while (uavApp == NULL && app >= 0);
     NS_ASSERT (uavApp != NULL);
     uavApp->Start(m_simulationTime);
 
     // Adicionando informacoes na aplicacao servidor!
     Ipv4Address addr = n->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();
     NS_LOG_DEBUG("IP " << addr << " -------------");
-    if (update) {
+    if (update == 1 || update == 2) {
       // envia ao servidor informacoes do UAV substituto
       m_serverApp->AddSupplyUav(n->GetId(), addr, source->GetRemainingEnergy(), n->GetObject<UavDeviceEnergyModel>()->GetEnergyCost(), source->GetInitialEnergy(), n->GetObject<MobilityModel>());
     } else { // adiciona um novo UAV no servidor
       m_serverApp->AddNewUav(n->GetId(), addr, source->GetRemainingEnergy(), n->GetObject<UavDeviceEnergyModel>()->GetEnergyCost(), source->GetInitialEnergy(), n->GetObject<MobilityModel>()); // tell the server to create a new model of UAV, used to identify the actual location of those UAV nodes
     }
+
+    std::ostringstream os;
+    os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_network_log.txt";
+    m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    if (update == 2) {
+      m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << ",2" << std::endl;
+    } else  {
+      m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << ",1" << std::endl;
+    }
+    m_file.close();
+
     n = 0;
     NS_LOG_DEBUG (" ------------------------------------- ");
   }
@@ -414,15 +503,24 @@ void UavNetwork::NewUav(int total, bool update)
 
 void UavNetwork::RemoveUav(int id)
 {
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<id);
+  NS_LOG_DEBUG ("UavNetwork::RemoveUav [" << id << "]");
   Ptr<Node> n = m_uavNodeActive.RemoveId(id);
   m_uavNode.Add(n);
 
   // Stop application
-  Ptr<UavApplication> uavApp = n->GetObject<UavApplication>();
+  NS_LOG_DEBUG ("Apps " << n->GetNApplications());
+  int app = n->GetNApplications()-1;
+  Ptr<UavApplication> uavApp = NULL;
+  do {
+    uavApp = DynamicCast<UavApplication>(n->GetApplication(app));
+    --app;
+  } while (uavApp==NULL && app >= 0);
+  NS_ASSERT (uavApp != NULL);
   uavApp->Stop();
 
   // modificando posicionamento para fora do cenario
-  Vector v (2000,2000,0);
+  Vector v (m_iniX, m_iniY,0);
   Ptr<UavMobilityModel> model = n->GetObject<UavMobilityModel>();
   model->SetFirstPosition(v); // manda para perto da central!
 
@@ -430,12 +528,25 @@ void UavNetwork::RemoveUav(int id)
   Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>(n->GetObject<UavDeviceEnergyModel>()->GetEnergySource());
   source->Stop(); // recarregando
 
+  std::ostringstream os;
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_network_log.txt";
+  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << ",0" << std::endl;
+  m_file.close();
+
+  os.str("");
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/uav_removed_energy.txt";
+  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  Ptr<UavDeviceEnergyModel> dev = n->GetObject<UavDeviceEnergyModel>();
+  m_file << dev->GetEnergySource()->GetRemainingEnergy() / dev->GetEnergySource()->GetInitialEnergy() << std::endl;
+  m_file.close();
+
   n = 0;
 }
 
 void UavNetwork::ConfigureUav(int total)
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<total);
   NodeContainer uav;
   uav.Create(total);
   m_uavNode.Add(uav);
@@ -459,7 +570,7 @@ void UavNetwork::ConfigureUav(int total)
     ObjectFactory objFacMobUAV;
     objFacMobUAV.SetTypeId("ns3::UavMobilityModel");
     objFacMobUAV.Set("Speed", DoubleValue(m_speedUav));
-    Vector v(2000,2000,0); // longe, bem longe! Para nao influenciar nos resultados!
+    Vector v(m_iniX, m_iniY,0); // longe, bem longe! Para nao influenciar nos resultados!
     objFacMobUAV.Set("FirstPosition", VectorValue(v));// modificando posicionamento inicial do UAV
     Ptr<MobilityModel> model = objFacMobUAV.Create()->GetObject<MobilityModel>();
     Ptr<Object> object = (*i);
@@ -469,16 +580,24 @@ void UavNetwork::ConfigureUav(int total)
   /** Energy Model **/
   /* energy source */
   UavEnergySourceHelper sourceHelper;
-  sourceHelper.Set("ScenarioName", StringValue(m_scenarioName));
+  sourceHelper.Set("PathData", StringValue(m_pathData));
   // install source
   EnergySourceContainer sources = sourceHelper.Install(uav);
-  /* device energy model */
+
+  /* uav device energy model */
   UavDeviceEnergyModelHelper energyHelper;
   energyHelper.Set("AverageVelocity", DoubleValue(18)); // m/s
   energyHelper.Set("ResistTime", DoubleValue(27*60)); // s
-  energyHelper.Set("ScenarioName", StringValue(m_scenarioName));
+  energyHelper.Set("PathData", StringValue(m_pathData));
+  energyHelper.Set("xCentral", DoubleValue(m_cx)); // utilizado para calcular o threshold dinamicamente
+  energyHelper.Set("yCentral", DoubleValue(m_cy));
   // install device model
   DeviceEnergyModelContainer uavEnergyModels = energyHelper.Install(uav, sources);
+
+  /* client device energy model*/
+  ClientDeviceEnergyModelHelper cliHelper;
+  DeviceEnergyModelContainer cliEnergyModels = cliHelper.Install(uav, sources);
+
   /* device energy model */
   // WifiRadioEnergyModelHelper radioEnergyHelper;
   // configure radio energy model
@@ -489,7 +608,6 @@ void UavNetwork::ConfigureUav(int total)
   // DeviceEnergyModelContainer deviceModelsAdhoc = radioEnergyHelper.Install (adhoc, sources);
 
   // create and configure UAVApp and Sink application
-  DhcpHelper dhcpHelper;
   int c = 0;
   std::ostringstream oss, poolAddr, minAddr, maxAddr, serverAddr;
   for (NodeContainer::Iterator i = uav.Begin(); i != uav.End(); ++i, ++c)
@@ -523,12 +641,13 @@ void UavNetwork::ConfigureUav(int total)
     obj.Set("AdhocAddress", Ipv4AddressValue(addContainer.GetAddress(c)));
     obj.Set("ServerPort", UintegerValue(m_serverPort));
     obj.Set("ClientPort", UintegerValue(m_cliPort));
+    obj.Set("PathData", StringValue(m_pathData));
 
     std::cout << "Uav #" << (*i)->GetId() << " IP " << addContainer.GetAddress(c) << std::endl;
 
     Ptr<UavApplication> uavApp = obj.Create()->GetObject<UavApplication>();
-    uavApp->SetStartTime(Seconds(5.0));
-    uavApp->SetStopTime(Seconds(6.0));
+    uavApp->SetStartTime(Seconds(0.0));
+    uavApp->SetStopTime(Seconds(0.01));
 
     // uavApp->TraceConnectWithoutContext("PacketTrace", MakeCallback(&UavNetwork::PacketUav, this));
     Ptr<WifiNetDevice> wifiDeviceAdhoc = DynamicCast<WifiNetDevice> (adhoc.Get(c));
@@ -548,6 +667,8 @@ void UavNetwork::ConfigureUav(int total)
 
     // Mobility
     (*i)->GetObject<MobilityModel>()->TraceConnectWithoutContext ("CourseChange", MakeCallback (&UavApplication::CourseChange, uavApp));
+    Ptr<UavDeviceEnergyModel> dev = (*i)->GetObject<UavDeviceEnergyModel>();
+    DynamicCast<UavMobilityModel>((*i)->GetObject<MobilityModel>())->TraceConnectWithoutContext ("CourseChangeDevice", MakeCallback (&UavDeviceEnergyModel::CourseChange, dev));
 
     // energy start
     Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>((*i)->GetObject<UavDeviceEnergyModel>()->GetEnergySource());
@@ -560,6 +681,7 @@ void UavNetwork::ConfigureUav(int total)
     minAddr << "192.168." << (*i)->GetId() << ".2";
     maxAddr << "192.168." << (*i)->GetId() << ".254";
     poolAddr << "192.168." << (*i)->GetId() << ".0";
+    DhcpHelper dhcpHelper;
     Ipv4InterfaceContainer fixedNodes = dhcpHelper.InstallFixedAddress (wifi.Get (c), Ipv4Address (serverAddr.str().c_str()), Ipv4Mask ("/24"));
     // Not really necessary, IP forwarding is enabled by default in IPv4.
     fixedNodes.Get (0).first->SetAttribute ("IpForward", BooleanValue (true));
@@ -569,6 +691,7 @@ void UavNetwork::ConfigureUav(int total)
                         Ipv4Address (poolAddr.str().c_str()), Ipv4Mask ("/24"),
                         Ipv4Address (minAddr.str().c_str()), Ipv4Address (maxAddr.str().c_str()),
                         Ipv4Address (serverAddr.str().c_str()));
+    dhcpServerApp.Get(0)->TraceConnectWithoutContext ("TotalLeased", MakeCallback(&UavApplication::TotalLeasedTrace, uavApp));
     dhcpServerApp.Start (Seconds (0.0));
     dhcpServerApp.Stop (Seconds(m_simulationTime));
     m_uavAppContainer.Add(uavApp); // armazenando informacoes das aplicacoes dos UAVs para que os clientes possam obter informacoes necessarias para se conectar no UAV mais proximo!
@@ -577,7 +700,7 @@ void UavNetwork::ConfigureUav(int total)
 
 void UavNetwork::ConfigureCli()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   if (m_totalCli == 0)
     return;
 
@@ -586,7 +709,7 @@ void UavNetwork::ConfigureCli()
 
   std::ostringstream ss;
   std::ifstream scenario;
-  ss << "./scratch/flynetwork/data/scenarios/" << m_scenarioName << ".txt";
+  ss << "./scratch/flynetwork/data/scenarios/" << m_PathData << ".txt";
   scenario.open(ss.str());
   // ler informacoes dos arquivos
   if (scenario.is_open())
@@ -642,7 +765,7 @@ void UavNetwork::ConfigureCli()
   app_rand->SetAttribute ("Max", DoubleValue (4));
 
   std::ofstream cliLogin;
-  ss << "./scratch/flynetwork/data/output/" << m_scenarioName << "/client_login.txt";
+  ss << "./scratch/flynetwork/data/output/" << m_pathData << "/client_login.txt";
   cliLogin.open(ss.str().c_str());
   // aggregate SmartphoneApp on node and configure it!
   Ptr<UniformRandomVariable> e_ai = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
@@ -680,6 +803,7 @@ void UavNetwork::ConfigureCli()
     factory.Set("DataRate", DataRateValue(DataRate("11Mbps")));
     factory.Set("Port", UintegerValue(m_cliPort));
     factory.Set("IdDhcp", UintegerValue(id));
+    factory.Set("PathData", StringValue(m_pathData));
 
     Ptr<SmartphoneApplication> smart = factory.Create()->GetObject<SmartphoneApplication>();
     smart->SetStartTime(Seconds(10.0));
@@ -768,10 +892,10 @@ void UavNetwork::ConfigureCli()
 
 void UavNetwork::ConfigurePalcos() // TODO: poderia ser otimizada a leitura do arquivo colocando esta estrutura na configuração do cliente, mas isso tbm poderia confundir! Pensar!
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   std::ostringstream ss;
   std::ifstream scenario;
-  ss << "./scratch/flynetwork/data/scenarios/" << m_scenarioName << ".txt";
+  ss << "./scratch/flynetwork/data/scenarios/" << m_PathData << ".txt";
   string file = ss.str();
   scenario.open(file);
   // ler informacoes dos arquivos
@@ -811,7 +935,7 @@ void UavNetwork::ConfigurePalcos() // TODO: poderia ser otimizada a leitura do a
 
 void UavNetwork::Configure()
 {
-  NS_LOG_FUNCTION(this);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   std::ostringstream ss;
   // Routing
   AodvHelper aodv;
@@ -877,8 +1001,23 @@ void UavNetwork::Configure()
   m_addressHelperCli.SetBase("192.168.1.0", "255.255.255.0"); // wifi address
 }
 
+void UavNetwork::PrintUavEnergy (int t)
+{
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<t);
+  std::ostringstream os;
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << t << "/uav_energy.txt";
+  std::ofstream file;
+  file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  for (UavNodeContainer::Iterator it = m_uavNodeActive.Begin(); it != m_uavNodeActive.End(); ++it) {
+    Ptr<UavDeviceEnergyModel> dev = (*it)->GetObject<UavDeviceEnergyModel>();
+    file << (*it)->GetId()  << "," << dev->GetEnergySource()->GetRemainingEnergy() << "," << dev->GetEnergySource()->GetInitialEnergy() << std::endl;
+  }
+  file.close();
+}
+
 void UavNetwork::ClientPosition (string name)
 {
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<name);
   std::ofstream file;
   file.open(name, std::ofstream::out | std::ofstream::app);
   for (vector<double>::iterator i = m_palcoPos.begin(); i != m_palcoPos.end();)
@@ -910,22 +1049,5 @@ void UavNetwork::ClientPosition (string name)
   file.close();
 }
 
-// void UavNetwork::PacketServer(std::string msg)
-// {
-//   // NS_LOG_FUNCTION(this);
-//   m_filePacketServer << msg << std::endl;
-// }
-//
-// void UavNetwork::PacketUav(std::string msg)
-// {
-//   // NS_LOG_FUNCTION(this);
-//   m_filePacketUav << msg << std::endl;
-// }
-//
-// void UavNetwork::PacketClient(std::string msg)
-// {
-//   // NS_LOG_FUNCTION(this);
-//   m_filePacketClient << msg << std::endl;
-// }
 
 } // namespace ns3

@@ -72,6 +72,9 @@ public:
   void SetSendPositionEvent (EventId);
   void CancelSendPositionEvent();
 
+  void SetSendCentralEvent (EventId);
+  void CancelSendCentralEvent();
+
   void SetAskCliDataEvent (EventId);
   void CancelAskCliDataEvent();
 
@@ -90,6 +93,7 @@ private:
   std::vector<double> m_position;
   std::vector<double> m_newPos;
   EventId m_sendPosition;
+  EventId m_sendCentral;
   EventId m_askCliData;
   Ipv4Address m_addressAdhoc;
   double m_totalEnergy; // total de bateria atual do UAV

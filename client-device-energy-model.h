@@ -18,8 +18,8 @@
  * Authors: Giovanna Garcia <ggarciabas@gmail.com>
  */
 
-#ifndef UAV_DEVICE_ENERGY_MODEL_H
-#define UAV_DEVICE_ENERGY_MODEL_H
+#ifndef CLIENT_DEVICE_ENERGY_MODEL_H
+#define CLIENT_DEVICE_ENERGY_MODEL_H
 
 #include "ns3/nstime.h"
 #include "ns3/traced-value.h"
@@ -36,19 +36,17 @@ namespace ns3
 
 /**
  *
- * A simple device energy model where energyCost drain can be set by the user.
- *
- * It is supposed to be used as a testing model for energy sources.
+ * A simple device energy  that helps to calculate the energy used of UAv based on clients
  *
  */
-class UavDeviceEnergyModel : public DeviceEnergyModel
+class ClientDeviceEnergyModel : public DeviceEnergyModel
 {
 public:
   typedef Callback<void> EnergyCallback;
 
   static TypeId GetTypeId(void);
-  UavDeviceEnergyModel();
-  virtual ~UavDeviceEnergyModel();
+  ClientDeviceEnergyModel();
+  virtual ~ClientDeviceEnergyModel();
 
   /**
    * \param interval Energy update interval.
@@ -61,23 +59,6 @@ public:
    * \returns The interval between each energy update.
    */
   Time GetEnergyUpdateInterval(void) const;
-
-  /**
-   * \brief Sets pointer to node.
-   *
-   * \param node Pointer to node.
-   *
-   */
-  virtual void SetNode(Ptr<Node> node);
-
-  virtual double GetEnergyCost ();
-  /**
-   * \brief Gets pointer to node.
-   *
-   * \returns Pointer to node.
-   *
-   */
-  virtual Ptr<Node> GetNode(void) const;
 
   /**
    * \returns Total energy consumption of the vehicle.
@@ -93,17 +74,6 @@ public:
    *
    */
   virtual void SetEnergySource(Ptr<EnergySource> source);
-
-  const Ptr<EnergySource> GetEnergySource();
-
-  /**
-   * \param newState New state the device is in.
-   *
-   * Not implemented
-   */
-  virtual void ChangeState(int newState)
-  {
-  }
 
   /**
    * \param callback Callback function.
@@ -122,30 +92,43 @@ public:
 
   virtual void HandleEnergyRecharged (void);
 
-  double ChangeThreshold ();
-
   /**
    * \brief Handles energy changed.
    *
    * Not implemented
    */
   virtual void HandleEnergyChanged (void);
-  void CourseChange (Ptr<const MobilityModel> mob);
 
-  void HoverConsumption(void);
-  void StartHover ();
-  void StopHover ();
+  virtual void ChangeState (int) {}
+
+  /**
+   * \brief Sets pointer to node.
+   *
+   * \param node Pointer to node.
+   *
+   */
+  virtual void SetNode(Ptr<Node> node);
+
+  /**
+   * \brief Gets pointer to node.
+   *
+   * \returns Pointer to node.
+   *
+   */
+  virtual Ptr<Node> GetNode(void) const;
+
+  void Reset();
+
+  void AddClient ();
+  void RemoveClient();
 
 private:
 
   void DoDispose (void);
 
-  /**
-   * \returns Current draw of device, at energyCost state.
-   *
-   * Implements DeviceEnergyModel::GetEnergyCost.
-   */
-  virtual double DoGetEnergyCost(void) const;
+  void DoInitialize();
+
+  double UpdateConsumption ();
 
   /**
    * \returns Current draw of device, at current state.
@@ -154,24 +137,20 @@ private:
    */
   virtual double DoGetCurrentA (void) const;
 
-  void UpdateMoving(void);
-  void HoveConsumption(void);
+  void ClientConsumption ();
 
 private:
   Time m_energyUpdateInterval;
-  Vector m_lastPosition;
-  double m_energyCost; // energy cost to a unit of distance J/m
+  Time m_lastUpdateTime;
+  TracedValue<double> m_totalEnergyConsumption;
+  std::ofstream m_file;
+  std::string m_pathData;
+  double m_clientCost; // in Joules
+  EventId m_cliEvent;
   Ptr<EnergySource> m_source;
   Ptr<Node> m_node;
-  EventId m_hoverEvent;
-  Time m_lastTime;
-  std::ofstream m_file;
-  double m_avgVel;
-  double m_resistTime;
-  double m_hoverCost;
-  double m_xCentral, m_yCentral;
-  TracedValue<double> m_totalEnergyConsumption;
-  std::string m_pathData;
+
+  int m_clientCount;
   /**
    * Callback type for Energy Depletion function. Devices uses this callbak to notify
    * the node about the energy depletion.
@@ -182,4 +161,4 @@ private:
 
 } // namespace ns3
 
-#endif /* UAV_DEVICE_ENERGY_MODEL_H */
+#endif /* CLIENT_DEVICE_ENERGY_MODEL_H */

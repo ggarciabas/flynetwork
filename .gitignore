@@ -3,3 +3,4 @@ scratch/flynetwork/da_python
 *.zip
 da_python
 data/output/**
+.DS_Store

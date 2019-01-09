@@ -95,6 +95,7 @@ private:
   Vector m_lastPosition;   // posicao inicial para notificacao ao servidor
   TracedCallback<std::string> m_packetTrace;
   Ipv4StaticRoutingHelper m_routingHelper;
+  std::string m_pathData;
 
   Ptr<PacketSink> m_sink;
   Ptr<OnOffApplication> m_serverApp; // application sent to server

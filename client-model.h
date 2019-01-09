@@ -83,7 +83,7 @@ private:
   Ptr<LocationModel> m_locConnected;
   std::string m_login;
   std::vector<double> m_position;
-  double m_consumption; //
+  double m_consumption; // fixed value
   Time m_updatePos;
   // Time m_updateCons;
   Ipv4Address m_addr;
