@@ -50,7 +50,6 @@ public:
   void SetPosition(double, double);
   const std::vector<double> GetPosition();
 
-  void SetPosition(double, double, double);
   const std::vector<double> GetPosition(double);
 
   double GetConsumption ();

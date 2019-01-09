@@ -98,7 +98,7 @@ void LocationModel::SetPosition(double x, double y, double r_max)
   m_position.push_back(y*r_max);
 }
 
-const std::vector<double>
+std::vector<double>
 LocationModel::GetPosition(double r_max)
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
@@ -153,9 +153,9 @@ void LocationModel::IniciarMovimentoA () {
 
 bool LocationModel::MovimentoA () {
   if (m_position.at(0) == m_positionA.at(0) && m_position.at(1) == m_positionA.at(1)) {
-    return true;
+    return false;
   }
-  return false;
+  return true;
 }
 
 void LocationModel::IniciarMovimentoB () {
@@ -166,9 +166,9 @@ void LocationModel::IniciarMovimentoB () {
 
 bool LocationModel::MovimentoB () {
   if (m_position.at(0) == m_positionB.at(0) && m_position.at(1) == m_positionB.at(1)) {
-    return true;
+    return false;
   }
-  return false;
+  return true;
 }
 
 void LocationModel::SetPunishCapacity (double pn) {

@@ -80,14 +80,6 @@ ClientModel::GetPosition()
   return m_position;
 }
 
-void ClientModel::SetPosition(double x, double y, double r_max)
-{
-  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() <<x<<y);
-  m_position.clear();
-  m_position.push_back(x*r_max);
-  m_position.push_back(y*r_max);
-}
-
 const std::vector<double>
 ClientModel::GetPosition(double r_max)
 {

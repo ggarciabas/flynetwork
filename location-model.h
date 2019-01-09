@@ -55,14 +55,21 @@ public:
   const std::vector<double> GetPosition();
 
   void SetPosition(double, double, double);
-  const std::vector<double> GetPosition(double);
+  std::vector<double> GetPosition(double);
 
   double GetXPosition (double);
   double GetYPosition (double);
 
   std::string toString() {
     std::ostringstream os;
-    os << "Id: " << m_id << "\n\tPos: (" << m_position.at(0) << "," << m_position.at(1) << ")\n\tConsumption: " << m_totalConsumption << std::endl;
+    os << "Id: " << m_id << "\n\tPos: (" << m_position.at(0) << "," << m_position.at(1) 
+      << ")\n\tPosA: (" << m_positionA.at(0) << "," << m_positionA.at(1) 
+      << ")\n\tPosB: (" << m_positionB.at(0) << "," << m_positionB.at(1) 
+      << ")\n\tConsumption: " << m_totalConsumption 
+      << "\n\tPunCap: " << m_punshCapacity 
+      << "\n\tPunNeigh: " << m_punshNeigh 
+      << "\n\tWij: " << m_wij 
+      << "\n\tConnected: " << m_connected << std::endl;
     return os.str();
   }
 
@@ -118,9 +125,6 @@ public:
 
 private:
   void DoDispose ();
-  std::map<Ptr<ClientModel>, double> m_pljci;
-  Ptr<LocationModel> m_father;
-  LocationModelContainer m_childList;
   std::vector<double> m_positionA;
   std::vector<double> m_positionB;  
   double m_tempPljci;
@@ -140,6 +144,10 @@ private:
   double m_xAcum; // posicao em X acumulada, sem normalização, parte inferior da equação acima
   double m_yAcum; // posicao em Y acumulada, sem normalização, parte inferior da equação acima
   double m_plj; // acumulado da parte da equação referente a p(l_j)
+
+  std::map<Ptr<ClientModel>, double> m_pljci;
+  Ptr<LocationModel> m_father;
+  LocationModelContainer m_childList;
 };
 
 } // namespace ns3

@@ -102,6 +102,7 @@ private:
   LocationModelContainer m_locationContainer;
   ClientModelContainer          m_fixedClientContainer; // utilizando o container de clientes diretamente só mudando o 'login' destes 'nos'
   ClientModelContainer m_clientContainer;
+  ClientModelContainer m_clientDaContainer;
 
   DataRate m_dataRate;
   double m_scheduleServer;

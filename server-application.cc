@@ -706,7 +706,7 @@ ServerApplication::CalculateDistanceCentral(const std::vector<double> pos) {
 double
 ServerApplication::CalculateDistance(const std::vector<double> pos1, const std::vector<double> pos2)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << pos1 << pos2);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds());
   double dist = std::sqrt(std::pow(pos1.at(0) - pos2.at(0), 2) + std::pow(pos1.at(1) - pos2.at(1), 2));
   return dist; // euclidean, sempre considera a distância atual calculada pelo DA
 }
@@ -1299,9 +1299,14 @@ void ServerApplication::DoDispose() {
 
 // https://github.com/ggarciabas/nsnam_ns3/blob/17c1f9200727381852528ac4798f040128ac842a/scratch/flynetwork/da_cpp/deterministic-annealing.cc
 void ServerApplication::runDA() {
+
+  m_clientDaContainer.Clear();
+  m_clientDaContainer.Add(m_clientContainer);
+  m_clientDaContainer.Add(m_fixedClientContainer);
+
   // constantes
   double t_min = 1e-7;
-  double r_max = std::sqrt(std::pow(m_maxx, 2) + std::pow(m_maxy, 2));
+  double r_max = std::sqrt(std::pow(m_maxx, 2) + std::pow(m_maxy, 2));  
   double uav_cob = std::pow(10, (110.0/(10*3.0)-46.6777/(10*3.0))); // ver arquivo main.py do da_python
   double Wi = 1.0;
   double Wj = 20.0; // total de clientes por localizacao
@@ -1317,30 +1322,59 @@ void ServerApplication::runDA() {
     case 4:
       raio_cob = 108.295; break;
   }
+  double t = 0.9;
+  int locId = 1;
+
+  // -------------------
+  std::cout << "[\n\tTmin:\t\t" << t_min 
+            << "\n\tRMax:\t\t" << r_max
+            << "\n\tUavcob:\t\t" << uav_cob
+            << "\n\tWi:\t\t" << Wi
+            << "\n\tWj:\t\t" << Wj
+            << "\n\tTxCapa:\t\t" << taxa_capacidade
+            << "\n\tRaioCob:\t\t" << raio_cob
+            << "\n\tEnv:\t\t" << m_environment 
+            << "\n\tTini:\t\t" << t << "\n]";
+  // std::cout << "Esperando ....";
+  // std::cin >> t;
+  // -------------------  
 
   ObjectFactory lObj;
   lObj.SetTypeId("ns3::LocationModel");
   Ptr<LocationModel> loc = lObj.Create()->GetObject<LocationModel>();
+  loc->SetId(locId++);
   CentroDeMassa(loc, r_max);
   loc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
+  loc->IniciarMovimentoB();
   m_locationContainer.Add(loc);
 
-  loc->SetPunishCapacity(1.0);
+  loc->SetPunishCapacity(0.01);
   loc->SetPunishNeighboor(1.0); // ALTERADO: valor inicial de punicao!
-  loc->InitializeWij (m_clientContainer.GetN()*Wi); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
+  loc->InitializeWij (m_clientDaContainer.GetN()*Wi); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
   loc->LimparAcumuladoPosicionamento();
   Ptr<LocationModel> lCentral = lObj.Create()->GetObject<LocationModel> ();
+  lCentral->SetId(0);
   Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
-  lCentral->SetPosition(pos.x, pos.y, r_max); // iniciando a localizacao que representará a central
+  lCentral->SetPosition(pos.x, pos.y); // iniciando a localizacao que representará a central
+  lCentral->IniciarMovimentoA(); // somente para nao dar problemas ao executar toString
+  lCentral->IniciarMovimentoB();
   loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), uav_cob, r_max); // este método atualiza a variavel de punicao!
 
-  double t = 0.9;
+  // ----------------------
+  std::cout << "Central: " << lCentral->toString();
+  std::cout << "Loc: " << loc->toString();
+  // std::cout << "Esperando ....";
+  // std::cin >> t;
+  // ----------------------
+  
   do {// laco A
 
     // ------------------ Para teste somente
+    std::cout << "------------------------------------------------------------------\n";
       std::cout << "LacoA Temp: " << t << "\n[\n";
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-        std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
+        // std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
+        std::cout << (*lj)->toString();
       }
       std::cout << "]\n";
     // -----------------
@@ -1349,7 +1383,7 @@ void ServerApplication::runDA() {
     bool locConnected = true;
     bool capacidade = false;
     do { // laco B
-      for (ClientModelContainer::Iterator ci = m_clientContainer.Begin(); ci != m_clientContainer.End(); ++ci){
+      for (ClientModelContainer::Iterator ci = m_clientDaContainer.Begin(); ci != m_clientDaContainer.End(); ++ci){
         double Zci = 0.0;
         double high_pljci = -1;
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
@@ -1397,13 +1431,13 @@ void ServerApplication::runDA() {
         capacidade = capacidade && (*lj)->ValidarCapacidade(Wj, taxa_capacidade);
 
         // limpando 
-        (*lj)->LimparMapaPljci(); // OBS.: se for adicionar a estrategia de remover localizacoes, necessario retirar isto, pois será utilizado!!
+        // (*lj)->LimparMapaPljci(); NAO PRECISA LIMPAR! É UM MAPA, SERÁ ATUALIZADO SOMENTE // OBS.: se for adicionar a estrategia de remover localizacoes, necessario retirar isto, pois será utilizado!!
         (*lj)->ClearChildList();
       }
 
       // Se houve mudança no posicionamento, se faz necessario verificar um novo pai para cada lj      
       if (MovimentoB()) {
-        for (int j = m_locationContainer.GetN(); j > 0; j--) {
+        for (int j = m_locationContainer.GetN()-1; j > 0; j--) {
           m_locationContainer.Get(j)->LimparAcumuladoPosicionamento(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
           int id = -1; // a principio se conecta com a central
           double dist = CalculateDistance(lCentral->GetPosition(r_max), m_locationContainer.Get(j)->GetPosition(r_max));
@@ -1427,21 +1461,24 @@ void ServerApplication::runDA() {
       // ------------------ Para teste somente
         std::cout << "LacoB Temp: " << t << "\n[\n";
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-          std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
+          // std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
+          std::cout << (*lj)->toString();
         }
         std::cout << "]\n";
       // -----------------
     } while (MovimentoB());
 
     // Verificar condição de parada: 1- clientes conectados, 2- uavs conectados, 3- capacidade não extrapolada
-    if (totalCliCon >= m_clientContainer.GetN()*0.9 && locConnected && capacidade) { // 1- NOVO: 90% dos clientes tem que ter conexao
+    if (totalCliCon >= m_clientDaContainer.GetN()*0.9 && locConnected && capacidade) { // 1- NOVO: 90% dos clientes tem que ter conexao
       break; // finalizar Da de Localização
     }
 
-    if (!MovimentoA()) { // ALTERADO: se não houver movimento em A, necessário adicionar nova localização
+    if (!MovimentoA() || totalCliCon < m_clientDaContainer.GetN()*0.5) { // ALTERADO: se não houver movimento em A, necessário adicionar nova localização
       Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
+      nLoc->SetId(locId++);
       CentroDeMassa(nLoc, r_max);
       nLoc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
+      nLoc->IniciarMovimentoB();
       m_locationContainer.Add(nLoc);
       nLoc->SetPunishCapacity(1.0);
       nLoc->SetPunishNeighboor(1.0);
@@ -1450,17 +1487,21 @@ void ServerApplication::runDA() {
       nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), uav_cob, r_max); // este método atualiza a variavel de punicao!
       // NOVO: Aumentar a temperatura, nova localizacao adicionada!
       t = t*5.0; // NOVO: aumentando 500%
-      continue;
+      std::cout << "--**********************************************-\n";
+      continue;      
     } else {
       // Reiniciar Movimento A para cada Localizacao
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
         (*lj)->LimparAcumuladoPosicionamento();
         (*lj)->IniciarMovimentoA();
-        (*lj)->IniciarMovimentoB();
+        // (*lj)->IniciarMovimentoB(); já é atualizado no método MovimentoB do Servidor
       }
     }
 
     t = t*0.9; // reduz 90%  a tempreatura
+
+    std::cout << "------------------------------------------------------------------\n";
+    std::cout << "------------------------------------------------------------------\n";
   } while (t > t_min); // laco da temperatura
 
   std::cout << "Esperando .....\n";
@@ -1495,12 +1536,14 @@ bool ServerApplication::MovimentoB() {
 void ServerApplication::CentroDeMassa (Ptr<LocationModel> l, double r_max) {
   double x=0, y=0;
 
-  for (ClientModelContainer::Iterator i = m_clientContainer.Begin(); i != m_clientContainer.End(); ++i) {
+  for (ClientModelContainer::Iterator i = m_clientDaContainer.Begin(); i != m_clientDaContainer.End(); ++i) {
+    std::cout << (*i)->ToString();
     x += (*i)->GetXPosition(r_max);
     y += (*i)->GetYPosition(r_max);
   }
 
-  l->SetPosition(x/(double)m_clientContainer.GetN(), y/(double)m_clientContainer.GetN(), r_max); // posicionar no centro dos clientes
+  l->SetPosition(x/(double)m_clientDaContainer.GetN(), y/(double)m_clientDaContainer.GetN(), r_max); // posicionar no centro dos clientes
+
 }
 
 } // namespace ns3
