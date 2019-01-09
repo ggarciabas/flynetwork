@@ -80,7 +80,7 @@ LocationModelContainer::GetN(void) const
 const Ptr<LocationModel>
 LocationModelContainer::Get(uint32_t i) const
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << i);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << i << m_models.size());
   return m_models[i];
 }
 

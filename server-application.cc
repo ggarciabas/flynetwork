@@ -1312,6 +1312,9 @@ void ServerApplication::runDA() {
   double Wj = 20.0; // total de clientes por localizacao
   double taxa_capacidade = 1.2; // NOVO: 120%
   double raio_cob = 0.0;
+
+  m_environment = 1;
+
   switch (m_environment) { // ver valores no arquivo main.py
     case 1:
       raio_cob = 19.0581; break;
@@ -1358,7 +1361,7 @@ void ServerApplication::runDA() {
   lCentral->SetPosition(pos.x, pos.y); // iniciando a localizacao que representará a central
   lCentral->IniciarMovimentoA(); // somente para nao dar problemas ao executar toString
   lCentral->IniciarMovimentoB();
-  loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), uav_cob, r_max); // este método atualiza a variavel de punicao!
+  loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), uav_cob/r_max, r_max); // este método atualiza a variavel de punicao!
 
   // ----------------------
   std::cout << "Central: " << lCentral->toString();
@@ -1406,7 +1409,7 @@ void ServerApplication::runDA() {
               (*lj)->NewClient(Wi);
             // }
             // OBS: como saber se os clientes possuem conexão?!, falta adicionar uma flag no cliente para saber se ele está dentro da cobertura da localização conectada, esta é uma condição para finalizar o algoritmo, uma porcentagem dos clientes tem que estar dentro da cobertura de algum UAV
-            if (dcilj <= raio_cob) {
+            if (dcilj <= raio_cob/r_max) {
               (*ci)->SetConnected(true);
               totalCliCon++;
             } else {
@@ -1437,12 +1440,19 @@ void ServerApplication::runDA() {
 
       // Se houve mudança no posicionamento, se faz necessario verificar um novo pai para cada lj      
       if (MovimentoB()) {
+        std::cout << "Total de Localizações: " << m_locationContainer.GetN() << std::endl;
         for (int j = m_locationContainer.GetN()-1; j > 0; j--) {
+          std::cout << "J[" << j << "]: ";
+          std::cout << m_locationContainer.Get(j)->toString();
+          std::vector<double> p1 (m_locationContainer.Get(j)->GetPosition(r_max));
           m_locationContainer.Get(j)->LimparAcumuladoPosicionamento(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
           int id = -1; // a principio se conecta com a central
-          double dist = CalculateDistance(lCentral->GetPosition(r_max), m_locationContainer.Get(j)->GetPosition(r_max));
+          double dist = CalculateDistance(lCentral->GetPosition(r_max), p1);
           for (int k = j - 1; k >= 0; ++k) {
-            double d = CalculateDistance(m_locationContainer.Get(j)->GetPosition(r_max), m_locationContainer.Get(k)->GetPosition(r_max));
+            std::cout << "K[" << k << "]: ";
+            std::cout << m_locationContainer.Get(k)->toString();
+            std::vector<double> p2 (m_locationContainer.Get(k)->GetPosition(r_max));
+            double d = CalculateDistance(p1, p2);
             if (d < dist) { // achou algum nó mais perto
               // PENSAR: Será que é interessante, mesmo achando um nó mais perto considerar como pai a central, caso a central esteja na cobertura? Isto permite reduzir o número de saltos, porém, acredito que também irá fazer com que os UAVs fiquem mais próximos a central, dificultando seu distanciamento. E ai?!              
               id = k;
@@ -1450,9 +1460,9 @@ void ServerApplication::runDA() {
             }
           }
           if (id == -1) { // menor distancia é para com a central
-            locConnected = m_locationContainer.Get(j)->SetFather(lCentral, dist, uav_cob, r_max) && locConnected; // este método atualiza a variavel de punicao!
+            locConnected = m_locationContainer.Get(j)->SetFather(lCentral, dist, uav_cob/r_max, r_max) && locConnected; // este método atualiza a variavel de punicao!
           } else { // menor distancia é para algum outro UAV, cadastrar o pai e o filho!
-            locConnected = m_locationContainer.Get(j)->SetFather(m_locationContainer.Get(id), dist, uav_cob, r_max) && locConnected; // este método atualiza a variavel de punicao!
+            locConnected = m_locationContainer.Get(j)->SetFather(m_locationContainer.Get(id), dist, uav_cob/r_max, r_max) && locConnected; // este método atualiza a variavel de punicao!
             m_locationContainer.Get(id)->AddChild(m_locationContainer.Get(j), r_max); // novo filho para id!
           }
         }
@@ -1473,6 +1483,8 @@ void ServerApplication::runDA() {
       break; // finalizar Da de Localização
     }
 
+    std::cout << "TOTAL_CLI_CON: " << totalCliCon << std::endl;
+
     if (!MovimentoA() || totalCliCon < m_clientDaContainer.GetN()*0.5) { // ALTERADO: se não houver movimento em A, necessário adicionar nova localização
       Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
       nLoc->SetId(locId++);
@@ -1484,7 +1496,7 @@ void ServerApplication::runDA() {
       nLoc->SetPunishNeighboor(1.0);
       nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
       nLoc->LimparAcumuladoPosicionamento();
-      nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), uav_cob, r_max); // este método atualiza a variavel de punicao!
+      nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), uav_cob/r_max, r_max); // este método atualiza a variavel de punicao!
       // NOVO: Aumentar a temperatura, nova localizacao adicionada!
       t = t*5.0; // NOVO: aumentando 500%
       std::cout << "--**********************************************-\n";
