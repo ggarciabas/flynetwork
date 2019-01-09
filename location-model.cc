@@ -290,4 +290,8 @@ bool LocationModel::ValidarCapacidade (double wj, double taxa_capacidade) {
   return true;
 }
 
+void LocationModel::LimparMapaPljci () {
+  m_pljci.clear();
+}
+
 } // namespace ns3

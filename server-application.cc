@@ -481,7 +481,8 @@ void ServerApplication::Run ()
     ss << "mkdir -p ./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij";
     system(ss.str().c_str());
     ss.str("");
-    runDAPython();
+    // runDAPython();
+    runDA();
     NS_LOG_INFO ("ServerApplication::Run liberando client container ");
     m_clientContainer.Clear();
     runAgendamento();
@@ -1298,7 +1299,7 @@ void ServerApplication::DoDispose() {
 
 // https://github.com/ggarciabas/nsnam_ns3/blob/17c1f9200727381852528ac4798f040128ac842a/scratch/flynetwork/da_cpp/deterministic-annealing.cc
 void ServerApplication::runDA() {
-  //constantes
+  // constantes
   double t_min = 1e-7;
   double r_max = std::sqrt(std::pow(m_maxx, 2) + std::pow(m_maxy, 2));
   double uav_cob = std::pow(10, (110.0/(10*3.0)-46.6777/(10*3.0))); // ver arquivo main.py do da_python
@@ -1336,10 +1337,13 @@ void ServerApplication::runDA() {
   double t = 0.9;
   do {// laco A
 
-    // salvando posicionamento para comparacao de movimento no laco B
-    for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-      (*lj)->IniciarMovimentoB();
-    }
+    // ------------------ Para teste somente
+      std::cout << "LacoA Temp: " << t << "\n[\n";
+      for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+        std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
+      }
+      std::cout << "]\n";
+    // -----------------
 
     int totalCliCon = 0;
     bool locConnected = true;
@@ -1391,6 +1395,10 @@ void ServerApplication::runDA() {
 
         // Avalia a utilizacao de capacidade das localizações
         capacidade = capacidade && (*lj)->ValidarCapacidade(Wj, taxa_capacidade);
+
+        // limpando 
+        (*lj)->LimparMapaPljci(); // OBS.: se for adicionar a estrategia de remover localizacoes, necessario retirar isto, pois será utilizado!!
+        (*lj)->ClearChildList();
       }
 
       // Se houve mudança no posicionamento, se faz necessario verificar um novo pai para cada lj      
@@ -1416,6 +1424,13 @@ void ServerApplication::runDA() {
         }
       } 
       // TODO: salvar cenario intermediario para visualizar se está tendo avanços
+      // ------------------ Para teste somente
+        std::cout << "LacoB Temp: " << t << "\n[\n";
+        for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+          std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
+        }
+        std::cout << "]\n";
+      // -----------------
     } while (MovimentoB());
 
     // Verificar condição de parada: 1- clientes conectados, 2- uavs conectados, 3- capacidade não extrapolada
@@ -1440,17 +1455,19 @@ void ServerApplication::runDA() {
       // Reiniciar Movimento A para cada Localizacao
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
         (*lj)->LimparAcumuladoPosicionamento();
+        (*lj)->IniciarMovimentoA();
+        (*lj)->IniciarMovimentoB();
       }
     }
 
     t = t*0.9; // reduz 90%  a tempreatura
   } while (t > t_min); // laco da temperatura
 
+  std::cout << "Esperando .....\n";
+  std::cin >> t;
 
-  // TODO: LIMPAR OS VALORES
-  // -- anular o valor da localizacao que o cliente está conectado, caso o container de clientes nao seja renovado, ou criado antes de executar o DA.
-  // -- limpar child list LocationModel
-
+  // TODO: criar pasta dentro da etapa chamada da_cpp
+  // dentro desta gravar arquivos contendo as localizacaoes geradas pelo DA juntamente com a etapa atual, assim consigo buscar a localizacao dos clientes no arquivo client.txt dentro da etapa respectiva!
 }
 
 bool ServerApplication::MovimentoA() {

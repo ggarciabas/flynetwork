@@ -114,6 +114,8 @@ public:
 
   bool ValidarCapacidade (double, double);
 
+  void LimparMapaPljci ();
+
 private:
   void DoDispose ();
   std::map<Ptr<ClientModel>, double> m_pljci;
