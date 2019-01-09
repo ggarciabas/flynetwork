@@ -106,6 +106,8 @@ public:
    */
   void Clear(void);
 
+  void Remove (uint32_t id);
+
 private:
   std::vector<Ptr<LocationModel>> m_models;
 };

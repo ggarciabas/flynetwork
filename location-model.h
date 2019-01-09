@@ -52,6 +52,9 @@ public:
   void SetPosition(double, double);
   const std::vector<double> GetPosition();
 
+  double GetXPosition ();
+  double GetYPosition ();
+
   std::string toString() {
     std::ostringstream os;
     os << "Id: " << m_id << "\n\tPos: (" << m_position.at(0) << "," << m_position.at(1) << ")\n\tConsumption: " << m_totalConsumption << std::endl;
@@ -87,9 +90,28 @@ public:
 
   void AddPljCi (Ptr<ClientModel>, double);
 
+  void SetFather (Ptr<LocationModel> l);
+  Ptr<LocationModel> GetFather ();
+
+  void AddChild (Ptr<LocationModel> l);
+  void ClearChildList ();
+  double GetChildListSize();
+  LocationModelContainer GetChildList ();
+
+  void LimparAcumuladoPosicionamento ();
+
+  double GetXAcum();
+  double GetYAcum();
+  double GetPlj();
+
+  void SetConnected (bool);
+  bool IsConnected ();
+
 private:
   void DoDispose ();
   std::map<Ptr<ClientModel>, double> m_pljci;
+  Ptr<LocationModel> m_father;
+  LocationModelContainer m_childList;
   double m_tempPljci;
   double m_wij;
   double m_punshCapacity; // punicao de capacidade
@@ -99,6 +121,14 @@ private:
   uint32_t m_id;
   std::vector<double> m_position;
   double m_totalConsumption;
+
+  bool m_conected;
+
+  // l_j = \frac{\sum_{i=1}^{N_{pi}} p(c_i)p(l_j|c_i)c_i+\omega_j(l_n + \sum_{m>j} v_{mj}~l_m)}{\sum_{i=1}^{N_{pi}} p(l_j)+\omega_j+\omega_j\sum_{m>j} v_{mj}}~.
+  // \omega_j+\omega_j\sum_{m>j} v_{mj} -> esta parte pode ser calculada multiplicando somente o m_punishNeigh pelo tamanho da lista de filhos + m_punishNeigh, lembrando que este ultimo é referente ao pai
+  double m_xAcum; // posicao em X acumulada, sem normalização, parte inferior da equação acima
+  double m_yAcum; // posicao em Y acumulada, sem normalização, parte inferior da equação acima
+  double m_plj; // acumulado da parte da equação referente a p(l_j)
 };
 
 } // namespace ns3

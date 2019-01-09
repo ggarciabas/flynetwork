@@ -1325,6 +1325,11 @@ void ServerApplication::runDA() {
   loc->SetPunishCapacity(1.0);
   loc->SetPunishNeighboor(1e-18);
   loc->InitializeWij (m_clientContainer.GetN()*Wi); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
+  loc->LimparAcumuladoPosicionamento();
+  Ptr<LocationModel> lCentral = lObj.Create()->GetObject<LocationModel> ();
+  Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
+  lCentral->SetPosition(pos.x, pos.y); // iniciando a localizacao que representará a central
+  loc->SetFather(lCentral, uav_cob); // este método atualiza a variavel de punicao!
 
   double t = 0.9;
   do {// laco A
@@ -1357,7 +1362,7 @@ void ServerApplication::runDA() {
               (*ci)->SetLocConnected((*lj));
               (*lj)->NewClient(Wi);
             // }
-            // PENSAR: como saber se os clientes possuem conexão?!, falta adicionar uma flag no cliente para saber se ele está dentro da cobertura da localização conectada, esta é uma condição para finalizar o algoritmo, uma porcentagem dos clientes tem que estar dentro da cobertura de algum UAV
+            // OBS: como saber se os clientes possuem conexão?!, falta adicionar uma flag no cliente para saber se ele está dentro da cobertura da localização conectada, esta é uma condição para finalizar o algoritmo, uma porcentagem dos clientes tem que estar dentro da cobertura de algum UAV
             if (dcilj <= raio_cob) {
               (*ci)->SetConnected(true);
             } else {
@@ -1367,9 +1372,41 @@ void ServerApplication::runDA() {
         }
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           // PENSAR: preciso guardar o valor de pljci?! Não é suficiente calcular já a parte da equacao de lj e descartar estes valores?!
+          // PENSAR: Se houver estratégia para remover UAVs, ai seria interessante armazenar para que se possa calcular os clientes que estão conectados e saber se os pais conseguem suprir o cliente
           (*lj)->AddPljCi((*ci), Zci); // finaliza o calculo do pljci na funcao e cadastra no map relacionando o ci
         }
       }
+
+      // calcular lj novos - não consigo fazer no laco anterior pela falta dos valores acumulados (não tentar colcoar la!)
+      for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+        double newX = (*lj)->GetXAcum() / ((*lj)->GetPlj + (*lj)->GetPunishNeigh() + (*lj)->GetPunishNeigh()*(*lj)->GetChildListSize());
+        double newY = (*lj)->GetYAcum() / ((*lj)->GetPlj + (*lj)->GetPunishNeigh() + (*lj)->GetPunishNeigh()*(*lj)->GetChildListSize());
+        (*lj)->SetPosition(newX, newY);
+      }
+
+      // Se houve mudança no posicionamento, se faz necessario verificar um novo pai para cada lj      
+      if (MovimentoB()) {
+        for (int j = m_locationContainer.GetN();; j > 0; j--) {
+          m_locationContainer.Get(j)->LimparAcumuladoPosicionamento(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
+          int id = -1; // a principio se conecta com a central
+          double dist = CalculateDistance(lCentral->GetPosition(), m_locationContainer.Get(j)->GetPosition());
+          for (int k = j - 1; k >= 0; ++k) {
+            double d = CalculateDistance(m_locationContainer.Get(l)->GetPosition(), m_locationContainer.Get(k)->GetPosition());
+            if (d < dist) { // achou algum nó mais perto
+              // PENSAR: Será que é interessante, mesmo achando um nó mais perto considerar como pai a central, caso a central esteja na cobertura? Isto permite reduzir o número de saltos, porém, acredito que também irá fazer com que os UAVs fiquem mais próximos a central, dificultando seu distanciamento. E ai?!              
+              id = k;
+              dist = d;
+            }
+          }
+          if (id == -1) { // menor distancia é para com a central
+            m_locationContainer.Get(j)->SetFather(lCentral, uav_cob); // este método atualiza a variavel de punicao!
+          } else { // menor distancia é para algum outro UAV, cadastrar o pai e o filho!
+            m_locationContainer.Get(j)->SetFather(m_locationContainer.Get(id), uav_cob);
+            m_locationContainer.Get(id)->AddChild(m_locationContainer.Get(j)); // novo filho para id!
+          }
+        }
+      } 
+
       // TODO: salvar cenario intermediario para visualizar se está tendo avancos
     } while (MovimentoB());
 
@@ -1379,6 +1416,7 @@ void ServerApplication::runDA() {
 
   // TODO: LIMPAR OS VALORES
   // -- anular o valor da localizacao que o cliente está conectado, caso o container de clientes nao seja renovado, ou criado antes de executar o DA.
+  // -- limpar child list LocationModel
 
 }
 
@@ -1414,4 +1452,5 @@ void ServerApplication::CentroDeMassa (Ptr<LocationModel> l) {
 
   l->SetPosition(x/(double)m_clientPosition.GetN(), y/(double)m_clientPosition.GetN()); // posicionar no centro dos clientes
 }
+
 } // namespace ns3

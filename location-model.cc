@@ -57,6 +57,8 @@ LocationModel::~LocationModel()
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("LocationModel::~LocationModel @" << Simulator::Now().GetSeconds());
   m_position.clear();
+  m_childList.Clear();
+  m_pljci.clear();
 }
 
 void LocationModel::SetId(uint32_t id)
@@ -188,6 +190,72 @@ void LocationModel::SetTempPljci (double pljci) {
 
 void LocationModel::AddPljCi (Ptr<ClientModel> ci, double Zci) {
   m_pljci[ci] = m_tempPljci/Zci;
+  // calculando parte do novo posicionamento da localização
+  m_xAcum += ci->GetPci()*m_tempPljci*ci->GetXPosition();
+  m_yAcum += ci->GetPci()*m_tempPljci*ci->GetYPosition();
+  m_plj += ci->GetPci()*m_tempPljci;
+}
+
+void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double uav_cob) {
+  m_father = l;
+  // atualizando parte do novo posicionamento da localizacao
+  m_xAcum = l->GetXPosition() * m_punshNeigh;
+  m_yAcum = l->GetYPosition() * m_punshNeigh;
+
+  if (dist > uav_cob) {
+    
+  }
+}
+
+Ptr<LocationModel> LocationModel::GetFather () {
+  return m_father;
+}
+
+void LocationModel::AddChild (Ptr<LocationModel> l) {
+  m_childList.Add(l);
+  m_xAcum += l->GetXPosition() * m_punshNeigh; // PENSAR: esta punição é interessante somente para manter o UAV próximo ao pai, para garantir conexão, não sei se vale a pena forçar com a mesma intensidade no sentido dos clientes.
+  m_yAcum += l->GetYPosition() * m_punshNeigh;
+}
+
+void LocationModel::ClearChildList () {
+  m_childList.Clear();
+}
+
+LocationModelContainer LocationModel::GetChildList () {
+  return m_childList;
+}
+
+void LocationModel::LimparAcumuladoPosicionamento () {
+  m_xAcum = m_yAcum = 0.0;
+  m_plj = 0.0;
+}
+
+double LocationModel::GetXPosition () {
+  return m_position.at(0);
+}
+
+double LocationModel::GetYPosition () {
+  return m_position.at(1); 
+}
+
+double LocationModel::GetXAcum() {
+  return m_xAcum;
+}
+
+double LocationModel::GetYAcum() {
+  return m_yAcum;
+}
+
+double LocationModel::GetPlj() {
+  return m_plj;
+}
+
+double LocationModel::GetChildListSize() {
+  return (double)m_childList.GetN();
+}
+
+bool LocationModel::IsConnected () {
+  return m_connected;
 }
 
 } // namespace ns3

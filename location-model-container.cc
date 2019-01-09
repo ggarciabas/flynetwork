@@ -119,4 +119,15 @@ void LocationModelContainer::Clear(void)
   m_models.clear();
 }
 
+void LocationModelContainer::Remove (uint32_t id) {
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  for (Iterator i = m_models.begin(); i != m_models.end(); i++)
+  {
+    if ((*i)->GetId() == id) {
+      (*i)->Dispose();
+      break;
+    }
+  }
+}
+
 } // namespace ns3

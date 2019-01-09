@@ -77,8 +77,12 @@ public:
   void SetConnected (bool);
   bool GetConnected ();
 
+  double GetPci ();
+  void SetPci (double);
+
 private:
   void DoDispose ();
+  double m_pci; // probabilidade do cliente
   bool m_connected;
   Ptr<LocationModel> m_locConnected;
   std::string m_login;

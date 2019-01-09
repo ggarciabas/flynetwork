@@ -55,6 +55,7 @@ ClientModel::ClientModel() : m_position()
   NS_LOG_DEBUG ("ClientModel::ClientModel @" << Simulator::Now().GetSeconds());
   m_consumption = 0.0;
   m_locConnected = 0;
+  m_pci = 1.0;
 }
 
 ClientModel::~ClientModel()
@@ -163,6 +164,14 @@ void ClientModel::SetConnected (bool c) {
 
 bool ClientModel::GetConnected () {
   return m_connected;
+}
+
+double ClientModel::GetPci () {
+  return m_pci;
+}
+
+void SetPci (double p) {
+  m_pci = p;
 }
 
 } // namespace ns3
