@@ -25,6 +25,7 @@
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
+#include "location-model.h"
 #include <string>
 #include <vector>
 
@@ -49,6 +50,9 @@ public:
   void SetPosition(double, double);
   const std::vector<double> GetPosition();
 
+  void SetPosition(double, double, double);
+  const std::vector<double> GetPosition(double);
+
   double GetConsumption ();
   void SetConsumption (double c);
 
@@ -68,8 +72,8 @@ public:
   // void SetUpdateCons (Time t);
   // Time GetUpdateCons ();
 
-  double GetYPosition();
-  double GetXPosition();
+  double GetYPosition(double);
+  double GetXPosition(double);
 
   void SetLocConnected (Ptr<LocationModel>);
   Ptr<LocationModel> GetLocConnected ();

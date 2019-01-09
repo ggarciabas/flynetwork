@@ -80,6 +80,24 @@ ClientModel::GetPosition()
   return m_position;
 }
 
+void ClientModel::SetPosition(double x, double y, double r_max)
+{
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() <<x<<y);
+  m_position.clear();
+  m_position.push_back(x*r_max);
+  m_position.push_back(y*r_max);
+}
+
+const std::vector<double>
+ClientModel::GetPosition(double r_max)
+{
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
+  std::vector<double> p;
+  p.push_back(m_position.at(0)/r_max);
+  p.push_back(m_position.at(1)/r_max);
+  return p;
+}
+
 void ClientModel::SetLogin(std::string str)
 {
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() <<str);
@@ -142,12 +160,12 @@ void ClientModel::DoDispose () {
 //   return m_updateCons;
 // }
 
-double ClientModel::GetXPosition () {
-  return m_position.at(0);
+double ClientModel::GetXPosition (double r_max) {
+  return m_position.at(0)/r_max;
 }
 
-double ClientModel::GetYPosition () {
-  return m_position.at(1);
+double ClientModel::GetYPosition (double r_max) {
+  return m_position.at(1)/r_max;
 }
 
 void ClientModel::SetLocConnected (Ptr<LocationModel> l) {
@@ -170,7 +188,7 @@ double ClientModel::GetPci () {
   return m_pci;
 }
 
-void SetPci (double p) {
+void ClientModel::SetPci (double p) {
   m_pci = p;
 }
 

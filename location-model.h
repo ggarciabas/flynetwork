@@ -25,7 +25,7 @@
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
-#include "client-model.h"
+#include "location-model-container.h"
 
 #include <vector>
 #include <map>
@@ -35,6 +35,8 @@ using namespace std;
 
 namespace ns3
 {
+
+class ClientModel;
 
 /**
  * LocationModel
@@ -52,8 +54,11 @@ public:
   void SetPosition(double, double);
   const std::vector<double> GetPosition();
 
-  double GetXPosition ();
-  double GetYPosition ();
+  void SetPosition(double, double, double);
+  const std::vector<double> GetPosition(double);
+
+  double GetXPosition (double);
+  double GetYPosition (double);
 
   std::string toString() {
     std::ostringstream os;
@@ -88,12 +93,12 @@ public:
 
   void SetTempPljci (double);
 
-  void AddPljCi (Ptr<ClientModel>, double);
+  void AddPljCi (Ptr<ClientModel>, double, double);
 
-  bool SetFather (Ptr<LocationModel> l, double, double);
+  bool SetFather (Ptr<LocationModel> l, double, double, double);
   Ptr<LocationModel> GetFather ();
 
-  void AddChild (Ptr<LocationModel> l);
+  void AddChild (Ptr<LocationModel> l, double r_max);
   void ClearChildList ();
   double GetChildListSize();
   LocationModelContainer GetChildList ();
@@ -114,6 +119,8 @@ private:
   std::map<Ptr<ClientModel>, double> m_pljci;
   Ptr<LocationModel> m_father;
   LocationModelContainer m_childList;
+  std::vector<double> m_positionA;
+  std::vector<double> m_positionB;  
   double m_tempPljci;
   double m_wij;
   double m_punshCapacity; // punicao de capacidade
@@ -124,7 +131,7 @@ private:
   std::vector<double> m_position;
   double m_totalConsumption;
 
-  bool m_conected;
+  bool m_connected;
 
   // l_j = \frac{\sum_{i=1}^{N_{pi}} p(c_i)p(l_j|c_i)c_i+\omega_j(l_n + \sum_{m>j} v_{mj}~l_m)}{\sum_{i=1}^{N_{pi}} p(l_j)+\omega_j+\omega_j\sum_{m>j} v_{mj}}~.
   // \omega_j+\omega_j\sum_{m>j} v_{mj} -> esta parte pode ser calculada multiplicando somente o m_punishNeigh pelo tamanho da lista de filhos + m_punishNeigh, lembrando que este ultimo é referente ao pai

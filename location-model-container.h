@@ -22,12 +22,15 @@
 #ifndef LOCATION_MODEL_CONTAINER_H
 #define LOCATION_MODEL_CONTAINER_H
 
-#include "location-model.h"
+// #include "location-model.h"
+#include "ns3/core-module.h"
 #include <vector>
 #include <stdint.h>
 
 namespace ns3
 {
+
+  class LocationModel;
 
 /**
  * \ingroup FlyNetwork

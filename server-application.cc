@@ -1300,8 +1300,8 @@ void ServerApplication::DoDispose() {
 void ServerApplication::runDA() {
   //constantes
   double t_min = 1e-7;
-  double r_max = std::sqrt(std::pow(m_maxx, 2) + std::pow(maxy, 2));
-  double uav_cob = 10**(110.0/(10*3.0)-46.6777/(10*3.0)) // ver arquivo main.py do da_python
+  double r_max = std::sqrt(std::pow(m_maxx, 2) + std::pow(m_maxy, 2));
+  double uav_cob = std::pow(10, (110.0/(10*3.0)-46.6777/(10*3.0))); // ver arquivo main.py do da_python
   double Wi = 1.0;
   double Wj = 20.0; // total de clientes por localizacao
   double taxa_capacidade = 1.2; // NOVO: 120%
@@ -1320,7 +1320,7 @@ void ServerApplication::runDA() {
   ObjectFactory lObj;
   lObj.SetTypeId("ns3::LocationModel");
   Ptr<LocationModel> loc = lObj.Create()->GetObject<LocationModel>();
-  CentroDeMassa(loc);
+  CentroDeMassa(loc, r_max);
   loc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
   m_locationContainer.Add(loc);
 
@@ -1330,8 +1330,8 @@ void ServerApplication::runDA() {
   loc->LimparAcumuladoPosicionamento();
   Ptr<LocationModel> lCentral = lObj.Create()->GetObject<LocationModel> ();
   Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
-  lCentral->SetPosition(pos.x, pos.y); // iniciando a localizacao que representará a central
-  loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(), loc->GetPosition()), uav_cob); // este método atualiza a variavel de punicao!
+  lCentral->SetPosition(pos.x, pos.y, r_max); // iniciando a localizacao que representará a central
+  loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), uav_cob, r_max); // este método atualiza a variavel de punicao!
 
   double t = 0.9;
   do {// laco A
@@ -1349,7 +1349,7 @@ void ServerApplication::runDA() {
         double Zci = 0.0;
         double high_pljci = -1;
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-          double dcilj = - CalculateDistance((*ci)->GetPosition(), (*lj)->GetPosition());
+          double dcilj = - CalculateDistance((*ci)->GetPosition(r_max), (*lj)->GetPosition(r_max));
           double pljci = std::exp ( (dcilj + (*lj)->GetPunishCapacity()*(*lj)->GetWij())/t );
           Zci += pljci;
           (*lj)->SetTempPljci(pljci);
@@ -1379,15 +1379,15 @@ void ServerApplication::runDA() {
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           // PENSAR: preciso guardar o valor de pljci?! Não é suficiente calcular já a parte da equacao de lj e descartar estes valores?!
           // PENSAR: Se houver estratégia para remover UAVs, ai seria interessante armazenar para que se possa calcular os clientes que estão conectados e saber se os pais conseguem suprir o cliente
-          (*lj)->AddPljCi((*ci), Zci); // finaliza o calculo do pljci na funcao e cadastra no map relacionando o ci
+          (*lj)->AddPljCi((*ci), Zci, r_max); // finaliza o calculo do pljci na funcao e cadastra no map relacionando o ci
         }
       }
 
       // calcular lj novos - não consigo fazer no laco anterior pela falta dos valores acumulados (não tentar colcoar la!)
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-        double newX = (*lj)->GetXAcum() / ((*lj)->GetPlj + (*lj)->GetPunishNeigh() + 0.5*(*lj)->GetChildListSize()); // ALTERADO: considera soemnte 50% para os filhos
-        double newY = (*lj)->GetYAcum() / ((*lj)->GetPlj + (*lj)->GetPunishNeigh() + 0.5*(*lj)->GetChildListSize()); // ALTERADO: considera soemnte 50% para os filhos
-        (*lj)->SetPosition(newX, newY);
+        double newX = (*lj)->GetXAcum() / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + 0.5*(*lj)->GetChildListSize()); // ALTERADO: considera soemnte 50% para os filhos
+        double newY = (*lj)->GetYAcum() / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + 0.5*(*lj)->GetChildListSize()); // ALTERADO: considera soemnte 50% para os filhos
+        (*lj)->SetPosition(newX, newY, r_max);
 
         // Avalia a utilizacao de capacidade das localizações
         capacidade = capacidade && (*lj)->ValidarCapacidade(Wj, taxa_capacidade);
@@ -1395,12 +1395,12 @@ void ServerApplication::runDA() {
 
       // Se houve mudança no posicionamento, se faz necessario verificar um novo pai para cada lj      
       if (MovimentoB()) {
-        for (int j = m_locationContainer.GetN();; j > 0; j--) {m_locationContainer.Get(j)->SetFather(lCentral, dist, uav_cob);
-          m_locationContainer.Get(j)->LimparAcumuladoPosicionamento(); // lm_locationContainer.Get(j)->SetFather(lCentral, dist, uav_cob);impando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
-          int id = -1; // a principio se conecta com a centralm_locationContainer.Get(j)->SetFather(lCentral, dist, uav_cob);
-          double dist = CalculateDistance(lCentral->GetPosition(), m_locatim_locationContainer.Get(j)->SetFather(lCentral, dist, uav_cob);onContainer.Get(j)->GetPosition());
-          for (int k = j - 1; k >= 0; ++k) {m_locationContainer.Get(j)->SetFather(lCentral, dist, uav_cob);
-            double d = CalculateDistance(m_locationContainer.Get(l)->GetPosm_locationContainer.Get(j)->SetFather(lCentral, dist, uav_cob);ition(), m_locationContainer.Get(k)->GetPosition());
+        for (int j = m_locationContainer.GetN(); j > 0; j--) {
+          m_locationContainer.Get(j)->LimparAcumuladoPosicionamento(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
+          int id = -1; // a principio se conecta com a central
+          double dist = CalculateDistance(lCentral->GetPosition(r_max), m_locationContainer.Get(j)->GetPosition(r_max));
+          for (int k = j - 1; k >= 0; ++k) {
+            double d = CalculateDistance(m_locationContainer.Get(j)->GetPosition(r_max), m_locationContainer.Get(k)->GetPosition(r_max));
             if (d < dist) { // achou algum nó mais perto
               // PENSAR: Será que é interessante, mesmo achando um nó mais perto considerar como pai a central, caso a central esteja na cobertura? Isto permite reduzir o número de saltos, porém, acredito que também irá fazer com que os UAVs fiquem mais próximos a central, dificultando seu distanciamento. E ai?!              
               id = k;
@@ -1408,10 +1408,10 @@ void ServerApplication::runDA() {
             }
           }
           if (id == -1) { // menor distancia é para com a central
-            locConnected = m_locationContainer.Get(j)->SetFather(lCentral, dist, uav_cob) && locConnected; // este método atualiza a variavel de punicao!
+            locConnected = m_locationContainer.Get(j)->SetFather(lCentral, dist, uav_cob, r_max) && locConnected; // este método atualiza a variavel de punicao!
           } else { // menor distancia é para algum outro UAV, cadastrar o pai e o filho!
-            locConnected = m_locationContainer.Get(j)->SetFather(m_locationContainer.Get(id), dist, uav_cob) && locConnected; // este método atualiza a variavel de punicao!
-            m_locationContainer.Get(id)->AddChild(m_locationContainer.Get(j)); // novo filho para id!
+            locConnected = m_locationContainer.Get(j)->SetFather(m_locationContainer.Get(id), dist, uav_cob, r_max) && locConnected; // este método atualiza a variavel de punicao!
+            m_locationContainer.Get(id)->AddChild(m_locationContainer.Get(j), r_max); // novo filho para id!
           }
         }
       } 
@@ -1425,14 +1425,14 @@ void ServerApplication::runDA() {
 
     if (!MovimentoA()) { // ALTERADO: se não houver movimento em A, necessário adicionar nova localização
       Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
-      CentroDeMassa(nLoc);
+      CentroDeMassa(nLoc, r_max);
       nLoc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
       m_locationContainer.Add(nLoc);
       nLoc->SetPunishCapacity(1.0);
       nLoc->SetPunishNeighboor(1.0);
       nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
       nLoc->LimparAcumuladoPosicionamento();
-      nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(), nLoc->GetPosition()), uav_cob); // este método atualiza a variavel de punicao!
+      nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), uav_cob, r_max); // este método atualiza a variavel de punicao!
       // NOVO: Aumentar a temperatura, nova localizacao adicionada!
       t = t*5.0; // NOVO: aumentando 500%
       continue;
@@ -1475,15 +1475,15 @@ bool ServerApplication::MovimentoB() {
   return retorno;
 }
 
-void ServerApplication::CentroDeMassa (Ptr<LocationModel> l) {
+void ServerApplication::CentroDeMassa (Ptr<LocationModel> l, double r_max) {
   double x=0, y=0;
 
   for (ClientModelContainer::Iterator i = m_clientContainer.Begin(); i != m_clientContainer.End(); ++i) {
-    x += (*i)->GetXPosition();
-    y += (*i)->GetYPosition();
+    x += (*i)->GetXPosition(r_max);
+    y += (*i)->GetYPosition(r_max);
   }
 
-  l->SetPosition(x/(double)m_clientPosition.GetN(), y/(double)m_clientPosition.GetN()); // posicionar no centro dos clientes
+  l->SetPosition(x/(double)m_clientContainer.GetN(), y/(double)m_clientContainer.GetN(), r_max); // posicionar no centro dos clientes
 }
 
 } // namespace ns3

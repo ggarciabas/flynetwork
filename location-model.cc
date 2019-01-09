@@ -18,6 +18,7 @@
  * Authors: Giovanna Garcia <ggarciabas@gmail.com>
  */
 #include "location-model.h"
+#include "client-model.h"
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 
@@ -87,6 +88,24 @@ LocationModel::GetPosition()
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   return m_position;
+}
+
+void LocationModel::SetPosition(double x, double y, double r_max)
+{
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() <<x<<y);
+  m_position.clear();
+  m_position.push_back(x*r_max);
+  m_position.push_back(y*r_max);
+}
+
+const std::vector<double>
+LocationModel::GetPosition(double r_max)
+{
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
+  std::vector<double> p;
+  p.push_back(m_position.at(0)/r_max);
+  p.push_back(m_position.at(1)/r_max);
+  return p;
 }
 
 bool LocationModel::IsUsed() {
@@ -188,19 +207,19 @@ void LocationModel::SetTempPljci (double pljci) {
   m_tempPljci = pljci;
 }
 
-void LocationModel::AddPljCi (Ptr<ClientModel> ci, double Zci) {
+void LocationModel::AddPljCi (Ptr<ClientModel> ci, double Zci, double r_max) {
   m_pljci[ci] = m_tempPljci/Zci;
   // calculando parte do novo posicionamento da localização
-  m_xAcum += ci->GetPci()*m_tempPljci*ci->GetXPosition();
-  m_yAcum += ci->GetPci()*m_tempPljci*ci->GetYPosition();
+  m_xAcum += ci->GetPci()*m_tempPljci*ci->GetXPosition(r_max);
+  m_yAcum += ci->GetPci()*m_tempPljci*ci->GetYPosition(r_max);
   m_plj += ci->GetPci()*m_tempPljci;
 }
 
-bool LocationModel::SetFather (Ptr<LocationModel> l, double dist, double uav_cob) {
+bool LocationModel::SetFather (Ptr<LocationModel> l, double dist, double uav_cob, double r_max) {
   m_father = l;
   // atualizando parte do novo posicionamento da localizacao
-  m_xAcum = l->GetXPosition() * m_punshNeigh;
-  m_yAcum = l->GetYPosition() * m_punshNeigh;
+  m_xAcum = l->GetXPosition(r_max) * m_punshNeigh;
+  m_yAcum = l->GetYPosition(r_max) * m_punshNeigh;
 
   // if (dist > uav_cob) { não faz sentido validar conexão, pois este calculo irá aliviar ou punir dependendo da distancia para com o pai.
   m_punshNeigh = m_punshNeigh * std::exp (-1+(dist/uav_cob));
@@ -213,10 +232,10 @@ Ptr<LocationModel> LocationModel::GetFather () {
   return m_father;
 }
 
-void LocationModel::AddChild (Ptr<LocationModel> l) {
+void LocationModel::AddChild (Ptr<LocationModel> l, double r_max) {
   m_childList.Add(l);
-  m_xAcum += l->GetXPosition() * 0.5; // PENSAR: m_punishNeigh -> é interessante somente para manter o UAV próximo ao pai, para garantir conexão, não sei se vale a pena forçar com a mesma intensidade no sentido dos clientes.
-  m_yAcum += l->GetYPosition() * 0.5; // ALTERADO: Modificado para 50%! Considerando como peso os filhos somente no valor de 50%!
+  m_xAcum += l->GetXPosition(r_max) * 0.5; // PENSAR: m_punishNeigh -> é interessante somente para manter o UAV próximo ao pai, para garantir conexão, não sei se vale a pena forçar com a mesma intensidade no sentido dos clientes.
+  m_yAcum += l->GetYPosition(r_max) * 0.5; // ALTERADO: Modificado para 50%! Considerando como peso os filhos somente no valor de 50%!
 }
 
 void LocationModel::ClearChildList () {
@@ -232,12 +251,12 @@ void LocationModel::LimparAcumuladoPosicionamento () {
   m_plj = 0.0;
 }
 
-double LocationModel::GetXPosition () {
-  return m_position.at(0);
+double LocationModel::GetXPosition (double r_max) {
+  return m_position.at(0)/r_max;
 }
 
-double LocationModel::GetYPosition () {
-  return m_position.at(1); 
+double LocationModel::GetYPosition (double r_max) {
+  return m_position.at(1)/r_max; 
 }
 
 double LocationModel::GetXAcum() {

@@ -20,6 +20,7 @@
  */
 
 #include "location-model-container.h"
+#include "location-model.h"
 #include "ns3/names.h"
 #include "ns3/log.h"
 

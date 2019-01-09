@@ -85,7 +85,7 @@ private:
 
   bool MovimentoA();
   bool MovimentoB();
-  void CentroDeMassa (Ptr<LocationModel>);
+  void CentroDeMassa (Ptr<LocationModel>, double);
 
   void AskClientData ();
   void SendAskClientPacket(Ptr<UavModel> uav);
