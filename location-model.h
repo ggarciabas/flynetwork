@@ -90,7 +90,7 @@ public:
 
   void AddPljCi (Ptr<ClientModel>, double);
 
-  void SetFather (Ptr<LocationModel> l);
+  bool SetFather (Ptr<LocationModel> l, double, double);
   Ptr<LocationModel> GetFather ();
 
   void AddChild (Ptr<LocationModel> l);
@@ -106,6 +106,8 @@ public:
 
   void SetConnected (bool);
   bool IsConnected ();
+
+  bool ValidarCapacidade (double, double);
 
 private:
   void DoDispose ();

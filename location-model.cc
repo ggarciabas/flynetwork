@@ -196,15 +196,17 @@ void LocationModel::AddPljCi (Ptr<ClientModel> ci, double Zci) {
   m_plj += ci->GetPci()*m_tempPljci;
 }
 
-void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double uav_cob) {
+bool LocationModel::SetFather (Ptr<LocationModel> l, double dist, double uav_cob) {
   m_father = l;
   // atualizando parte do novo posicionamento da localizacao
   m_xAcum = l->GetXPosition() * m_punshNeigh;
   m_yAcum = l->GetYPosition() * m_punshNeigh;
 
-  if (dist > uav_cob) {
-    
-  }
+  // if (dist > uav_cob) { não faz sentido validar conexão, pois este calculo irá aliviar ou punir dependendo da distancia para com o pai.
+  m_punshNeigh = m_punshNeigh * std::exp (-1+(dist/uav_cob));
+  // }
+
+  return dist>=uav_cob;
 }
 
 Ptr<LocationModel> LocationModel::GetFather () {
@@ -213,8 +215,8 @@ Ptr<LocationModel> LocationModel::GetFather () {
 
 void LocationModel::AddChild (Ptr<LocationModel> l) {
   m_childList.Add(l);
-  m_xAcum += l->GetXPosition() * m_punshNeigh; // PENSAR: esta punição é interessante somente para manter o UAV próximo ao pai, para garantir conexão, não sei se vale a pena forçar com a mesma intensidade no sentido dos clientes.
-  m_yAcum += l->GetYPosition() * m_punshNeigh;
+  m_xAcum += l->GetXPosition() * 0.5; // PENSAR: m_punishNeigh -> é interessante somente para manter o UAV próximo ao pai, para garantir conexão, não sei se vale a pena forçar com a mesma intensidade no sentido dos clientes.
+  m_yAcum += l->GetYPosition() * 0.5; // ALTERADO: Modificado para 50%! Considerando como peso os filhos somente no valor de 50%!
 }
 
 void LocationModel::ClearChildList () {
@@ -256,6 +258,17 @@ double LocationModel::GetChildListSize() {
 
 bool LocationModel::IsConnected () {
   return m_connected;
+}
+
+bool LocationModel::ValidarCapacidade (double wj, double taxa_capacidade) {
+  if (m_wij > wj) {
+    // atualizar taxa de punicao
+    m_punshCapacity *= taxa_capacidade;
+    return false;
+  } else {
+    m_punshCapacity *= 0.6; // NOVO: reduz 60%
+  }
+  return true;
 }
 
 } // namespace ns3
