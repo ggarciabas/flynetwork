@@ -1538,18 +1538,19 @@ void ServerApplication::runDA() {
       nLoc->LimparAcumuladoPosicionamento();
       nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), uav_cob/r_max, r_max); // este método atualiza a variavel de punicao!
       // NOVO: Aumentar a temperatura, nova localizacao adicionada!
-      t = t*2.0;
-      GraficoCenarioDa(t, iter, lCentral); 
-      continue;
-    } else {
-      GraficoCenarioDa(t, iter, lCentral); 
-      // Reiniciar Movimento A para cada Localizacao
-      for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-        (*lj)->LimparAcumuladoPosicionamento();
-        (*lj)->IniciarMovimentoA();
-        (*lj)->LimparHistorico();
-      }
+      t = (t < 0.1) ? 0.1 : t;
+      // GraficoCenarioDa(t, iter, lCentral); 
+      // continue;
+    } 
+    // else {
+    GraficoCenarioDa(t, iter, lCentral); 
+    // Reiniciar Movimento A para cada Localizacao
+    for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+      (*lj)->LimparAcumuladoPosicionamento();
+      (*lj)->IniciarMovimentoA();
+      (*lj)->LimparHistorico();
     }
+    // }
 
     t = t*0.9; // reduz 90%  a tempreatura
 
