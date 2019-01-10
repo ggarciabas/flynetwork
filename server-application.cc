@@ -1379,7 +1379,7 @@ void ServerApplication::runDA() {
   m_locationContainer.Add(loc);
 
   loc->SetPunishCapacity(0.01);
-  loc->SetPunishNeighboor(1.0); // ALTERADO: valor inicial de punicao!
+  loc->SetPunishNeighboor(0.01); // ALTERADO: valor inicial de punicao!
   loc->InitializeWij (m_clientDaContainer.GetN()*Wi); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
   loc->LimparAcumuladoPosicionamento();
   loc->LimparAcumuladoPosicionamentoClientes();
@@ -1546,13 +1546,13 @@ void ServerApplication::runDA() {
       nLoc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
       nLoc->IniciarMovimentoB();
       m_locationContainer.Add(nLoc);
-      nLoc->SetPunishCapacity(1.0);
-      nLoc->SetPunishNeighboor(1.0);
+      nLoc->SetPunishCapacity(0.01);
+      nLoc->SetPunishNeighboor(0.01);
       nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
       nLoc->LimparAcumuladoPosicionamento();
       nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), uav_cob/r_max, r_max); // este método atualiza a variavel de punicao!
       // NOVO: Aumentar a temperatura, nova localizacao adicionada!
-      t *= 2.0;
+      // t *= 1.1;
       GraficoCenarioDa(t, iter, lCentral, raio_cob);
       continue;
     }
