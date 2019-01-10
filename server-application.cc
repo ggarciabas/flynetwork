@@ -1530,7 +1530,8 @@ void ServerApplication::runDA() {
     std::cout << "Fim do laco B .....\n";
     std::cin >> lixo;
 
-    if (!MovimentoA() /*|| totalCliCon < m_clientDaContainer.GetN()*0.5 */ /*|| iterB == 1000*/) { // ALTERADO: se não houver movimento em A, necessário adicionar nova localização -- or caso nao tenha conseguido encontrar uma posicao fixa!
+    // NOVO: !(totalCliCon > m_clientDaContainer.GetN()*t) caso não tenha ao menos t% de usuarios cobertos, assim, conforme t diminui, não irá aumentar a quantidade de UAvs na rede
+    if (!MovimentoA() || !(totalCliCon > m_clientDaContainer.GetN()*t)  /*|| iterB == 1000*/) { // ALTERADO: se não houver movimento em A, necessário adicionar nova localização -- or caso nao tenha conseguido encontrar uma posicao fixa!
       std::cout << "---> Novo UAV\n";
       Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
       nLoc->SetId(locId++);
