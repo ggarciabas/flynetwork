@@ -1425,36 +1425,32 @@ void ServerApplication::runDA() {
       std::cout << "Iteracao: " << iterB << "\n";
       for (ClientModelContainer::Iterator ci = m_clientDaContainer.Begin(); ci != m_clientDaContainer.End(); ++ci){
         double Zci = 0.0;
-        double high_pljci = -1;
-        double high_dchilj = 0.0;
+        // double high_pljci = -1;
+        double low_dchilj = 1.5; // maior distancia é 1.0
         std::cout << "\t[";
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           double dcilj = CalculateDistance((*ci)->GetPosition(r_max), (*lj)->GetPosition(r_max));
-          double pljci = std::exp ( - ((dcilj /*+ (*lj)->GetPunishCapacity()*(*lj)->GetWij() */)/t) );
+          double pljci = std::exp ( - ((dcilj + (*lj)->GetPunishCapacity()*(*lj)->GetWij() )/t) );
           Zci += pljci;
           (*lj)->SetTempPljci(pljci);
           (*lj)->InitializeWij(0.0); // zerando para calcular novamente os clientes conectados, considerando agora a distancia!
-          if (pljci > high_pljci) {
-            high_pljci = pljci;
-            high_dchilj = dcilj;
-            /*
-              Ao considerar a distancia o controle de punicao de capacidade nao estará efetivamente agindo para cobrir o cenario, somente os clientes dentro da regiao serao considerados. Assim, acredito que seja melhor considerar somente o maior pljci para a evolucao do DA e no final somente considerar a distancia para cargo de retorno de valores para a simulacao.              
-            */
-            // if (dcilj <= raio_cob) { // somente considera conectado se estiver dentro do raio de cobertura para clientes
-              Ptr<LocationModel> lCon = (*ci)->GetLocConnected();
-              if (lCon) { // caso tenha alguma informacao anterior, desconsidera nos calculos, para isto atualiza o loc
-                lCon->RemoveClient(Wi, (*ci)->GetConsumption());
-              }
-              lCon = 0;
-              (*ci)->SetLocConnected((*lj));
-              (*lj)->NewClient(Wi, (*ci)->GetConsumption());
-            // }
+          
+          if (low_dchilj > dcilj) { // achou UAv mais proximo
+            low_dchilj = dcilj;
+            Ptr<LocationModel> lCon = (*ci)->GetLocConnected();
+            if (lCon) { // caso tenha alguma informacao anterior, desconsidera nos calculos, para isto atualiza o loc
+              lCon->RemoveClient(Wi, (*ci)->GetConsumption());
+            }
+            lCon = 0;
+            (*ci)->SetLocConnected((*lj));
+            (*lj)->NewClient(Wi, (*ci)->GetConsumption());
           }
+
         }
         std::cout << " ]\n";
-        std::cout << "\tZci: " << Zci << "\n";
+        std::cout << "\tZci: " << Zci << "\tlow_dchilj: " << low_dchilj << "\traio_cob/r_max: " << raio_cob/r_max << "\n";
         // OBS: como saber se os clientes possuem conexão?!, falta adicionar uma flag no cliente para saber se ele está dentro da cobertura da localização conectada, esta é uma condição para finalizar o algoritmo, uma porcentagem dos clientes tem que estar dentro da cobertura de algum UAV
-        if (high_dchilj <= raio_cob/r_max) {
+        if (low_dchilj <= raio_cob/r_max) {
           // std::cout << "---->>> Distancia: " << high_dchilj << " cobmax: " << raio_cob/r_max << std::endl;
           (*ci)->SetConnected(true);
           totalCliCon++;
@@ -1556,15 +1552,14 @@ void ServerApplication::runDA() {
       nLoc->LimparAcumuladoPosicionamento();
       nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), uav_cob/r_max, r_max); // este método atualiza a variavel de punicao!
       // NOVO: Aumentar a temperatura, nova localizacao adicionada!
-      t = 0.6;
-      // GraficoCenarioDa(t, iter, lCentral); 
-      // continue;
+      // t = 0.6;
+      GraficoCenarioDa(t, iter, lCentral, raio_cob); 
+      continue;
     } 
     // else {
-    GraficoCenarioDa(t, iter, lCentral); 
+    GraficoCenarioDa(t, iter, lCentral, raio_cob); 
     // Reiniciar Movimento A para cada Localizacao
     for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-      (*lj)->LimparAcumuladoPosicionamento();
       (*lj)->IniciarMovimentoA();
       (*lj)->LimparHistorico();
     }
@@ -1576,7 +1571,7 @@ void ServerApplication::runDA() {
     std::cout << "------------------------------------------------------------------\n";
   } while (t > t_min); // laco da temperatura
 
-  GraficoCenarioDa(t, iter, lCentral);   
+  GraficoCenarioDa(t, iter, lCentral, raio_cob);   
 
   m_totalCliGeral = 0;
   m_locConsTotal = 0; // atualiza total de consumo de todas as localizacoes
@@ -1595,7 +1590,7 @@ void ServerApplication::runDA() {
   }
 }
 
-void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral) {
+void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double raio_cob) {
   std::ofstream file;
   std::ostringstream os;
   os.str("");
@@ -1627,7 +1622,7 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
   file.close();
 
   os.str ("");
-  os << "python ./scratch/flynetwork/data/da_loc.py " << m_pathData << " " << int(Simulator::Now().GetSeconds()) << " " << iter;
+  os << "python ./scratch/flynetwork/data/da_loc.py " << m_pathData << " " << int(Simulator::Now().GetSeconds()) << " " << iter << " " << raio_cob;
   NS_LOG_DEBUG (os.str());
   system(os.str().c_str());
   // os.str ("");

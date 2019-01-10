@@ -15,6 +15,7 @@ path = sys.argv[1]
 main_path = "./scratch/flynetwork/data/output/"+path
 etapa = sys.argv[2]
 iteracao = sys.argv[3]
+rcob = sys.argv[4]
 
 for arquivo in glob.glob(main_path+'/'+'etapa/'+etapa+'/da_loc_*'+iteracao+'.txt'):
     print arquivo
@@ -66,11 +67,17 @@ for arquivo in glob.glob(main_path+'/'+'etapa/'+etapa+'/da_loc_*'+iteracao+'.txt
         if first:
             plt.plot(loc_last[i],loc_last[i+1],'cX', markersize=7.0, label="anteior")
             plt.plot(loc[i],loc[i+1],'c^', markersize=7.0, label="atual")
+            ax.add_patch(
+                patches.Circle((loc[i],loc[i+1]), radius=float(rcob), color='b', fill=False, linestyle='dotted')
+            )
             plt.plot(x,y,'c-', markersize=7.0)
             first = False
         else:
             plt.plot(loc_last[i],loc_last[i+1],'cX', markersize=7.0)
             plt.plot(loc[i],loc[i+1],'c^', markersize=7.0)
+            ax.add_patch(
+                patches.Circle((loc[i],loc[i+1]), radius=float(rcob), color='b', fill=False, linestyle='dotted')
+            )
             plt.plot(x,y,'c-', markersize=7.0)
         # ax.annotate(str(int(uav[i])), xy=(uav[i+1],uav[i+2]+10))
         # ax.annotate(str(int(loc[i])), xy=(loc[i+1],loc[i+2]-10))

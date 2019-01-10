@@ -176,7 +176,7 @@ void LocationModel::IniciarMovimentoA () {
 }
 
 bool LocationModel::MovimentoA () {
-  if (std::abs(m_position.at(0) - m_positionA.at(0)) < 0.1 && std::abs(m_position.at(1) - m_positionA.at(1)) < 0.1) {
+  if (std::abs(m_position.at(0) - m_positionA.at(0)) < 0.1 && std::abs(m_position.at(1) - m_positionA.at(1)) < 0.1) {// metros
     return false;
   }
   return true;
@@ -189,7 +189,7 @@ void LocationModel::IniciarMovimentoB () {
 }
 
 bool LocationModel::MovimentoB () {
-  if (std::abs(m_position.at(0) - m_positionB.at(0)) < 0.1 && std::abs(m_position.at(1) - m_positionB.at(1)) < 0.1) {
+  if (std::abs(m_position.at(0) - m_positionB.at(0)) < 0.1 && std::abs(m_position.at(1) - m_positionB.at(1)) < 0.1) { // metros
     return false;
   }
   return true;
