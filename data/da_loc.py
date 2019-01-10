@@ -100,7 +100,7 @@ for arquivo in glob.glob(main_path+'/'+'etapa/'+etapa+'/da_loc_*'+iteracao+'.txt
 
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.23), fancybox=True, shadow=True, ncol=5)
 
-    plt.savefig(main_path+'/'+'etapa/'+etapa+'/da_loc_'+'{:015x}'.format(int(iteracao))+'.svg', bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.savefig(main_path+'/'+'etapa/'+etapa+'/da_loc_'+'{:015x}'.format(int(iteracao))+'.eps', bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.savefig(main_path+'/'+'etapa/'+etapa+'/da_loc_'+'{:015x}'.format(int(iteracao))+'.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+'/'+'etapa/'+etapa+'/da_loc_'+'{:015}'.format(int(iteracao))+'.svg', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+'/'+'etapa/'+etapa+'/da_loc_'+'{:015}'.format(int(iteracao))+'.eps', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+'/'+'etapa/'+etapa+'/da_loc_'+'{:015}'.format(int(iteracao))+'.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
     # plt.savefig('teste.svg')
