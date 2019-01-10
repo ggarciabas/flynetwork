@@ -51,6 +51,7 @@ LocationModel::LocationModel()
   m_used = false;
   m_totaCli = 0;
   m_totalConsumption = 0.0;
+  m_changePosition = true;
 }
 
 LocationModel::~LocationModel()
@@ -93,9 +94,30 @@ LocationModel::GetPosition()
 void LocationModel::SetPosition(double x, double y, double r_max)
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() <<x<<y);
-  m_position.clear();
-  m_position.push_back(x*r_max);
-  m_position.push_back(y*r_max);
+
+  if (m_changePosition) { // verificar issue: https://github.com/ggarciabas/flynetwork/issues/10
+    // procurar no historico se já passou por esta localizacao
+    for (std::vector<std::vector<double> >::iterator i = m_historico.begin(); i != m_historico.end(); ++i) {
+      if (x*r_max == (*i).at(0) && y*r_max == (*i).at(1)) {
+        // já conhece a posicao, não altera mais! Selecionou ela novamente.
+        std::cout << "#### ---> Posição já avaliada! Nao permite mais trocar de posicao esta localizacao!\n";
+        m_changePosition = false;
+      }
+    }
+    m_position.clear();
+    m_position.push_back(x*r_max);
+    m_position.push_back(y*r_max);    
+    m_historico.push_back(m_position); // OBs: push_back faz cópia ou não?! Se nao fizer vai falar a estratégia!!
+  }
+
+}
+
+void LocationModel::LimparHistorico () {
+  for (std::vector<std::vector<double> >::iterator i = m_historico.begin(); i != m_historico.end(); ++i) {
+    (*i).clear();
+  }
+  m_historico.clear();
+  m_changePosition = true; // permite alterar, senão NÉ!
 }
 
 std::vector<double>
@@ -152,7 +174,7 @@ void LocationModel::IniciarMovimentoA () {
 }
 
 bool LocationModel::MovimentoA () {
-  if (m_position.at(0) - m_positionA.at(0) > 0.1 && m_position.at(1) - m_positionA.at(1) > 0.1) {
+  if (m_position.at(0) - m_positionA.at(0) < 0.1 && m_position.at(1) - m_positionA.at(1) < 0.1) {
     return false;
   }
   return true;
@@ -165,7 +187,7 @@ void LocationModel::IniciarMovimentoB () {
 }
 
 bool LocationModel::MovimentoB () {
-  if (m_position.at(0) - m_positionB.at(0) > 0.1 && m_position.at(1) - m_positionB.at(1) > 0.1) {
+  if (m_position.at(0) - m_positionB.at(0) < 0.1 && m_position.at(1) - m_positionB.at(1) < 0.1) {
     return false;
   }
   return true;
@@ -257,6 +279,22 @@ double LocationModel::GetXPosition (double r_max) {
 
 double LocationModel::GetYPosition (double r_max) {
   return m_position.at(1)/r_max; 
+}
+
+double LocationModel::GetXPosition () {
+  return m_position.at(0);
+}
+
+double LocationModel::GetYPosition () {
+  return m_position.at(1); 
+}
+
+double LocationModel::GetXPositionA () {
+  return m_positionA.at(0);
+}
+
+double LocationModel::GetYPositionA () {
+  return m_positionA.at(1); 
 }
 
 double LocationModel::GetXAcum() {

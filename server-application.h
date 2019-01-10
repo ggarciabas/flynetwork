@@ -82,6 +82,7 @@ private:
   double CalculateDistanceCentral(const std::vector<double> pos);
   bool ValidateMijConvergency(vector<vector<double>> vec, vector<vector<double>> m_ij, unsigned siz);
   void ReplyUav(Ptr<UavModel> uav);
+  void GraficoCenarioDa (double temp, int iter);
 
   bool MovimentoA();
   bool MovimentoB();

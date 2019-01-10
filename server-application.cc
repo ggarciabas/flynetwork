@@ -1327,6 +1327,7 @@ void ServerApplication::runDA() {
   }
   double t = 0.9;
   int locId = 1;
+  int max_iterB = 100000;
 
   // -------------------
   std::cout << "[\n\tTmin:\t\t" << t_min 
@@ -1337,6 +1338,7 @@ void ServerApplication::runDA() {
             << "\n\tTxCapa:\t\t" << taxa_capacidade
             << "\n\tRaioCob:\t\t" << raio_cob
             << "\n\tEnv:\t\t" << m_environment 
+            << "\n\tMaxIterB:\t\t" << max_iterB 
             << "\n\tTini:\t\t" << t << "\n]";
   // std::cout << "Esperando ....";
   // std::cin >> t;
@@ -1371,12 +1373,13 @@ void ServerApplication::runDA() {
   // ----------------------
   
   int lixo;
-
+  int iter = 0;
   do {// laco A
+    iter++;
 
     // ------------------ Para teste somente
     std::cout << "------------------------------------------------------------------\n";
-      std::cout << "LacoA Temp: " << t << "\n[\n";
+      std::cout << "LacoA Temp: " << t << " Iteracao: " << iter << "\n[\n";
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
         // std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
         std::cout << (*lj)->toString();
@@ -1388,10 +1391,11 @@ void ServerApplication::runDA() {
     bool locConnected = true;
     bool capacidade = false;
     bool movimentoB = true;
+    int iterB = 0;
     do { // laco B
-
+      iterB++;
       // ------------------ Para teste somente
-        std::cout << "LacoB Temp: " << t << "\n[\n";
+        std::cout << "LacoB Temp: " << t << " IteracaoB: " << iterB << "\n[\n";
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           // std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
           std::cout << (*lj)->toString();
@@ -1439,8 +1443,8 @@ void ServerApplication::runDA() {
 
       // calcular lj novos - não consigo fazer no laco anterior pela falta dos valores acumulados (não tentar colcoar la!)
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-        double newX = (*lj)->GetXAcum() / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + 0.5*(*lj)->GetChildListSize()); // ALTERADO: considera soemnte 50% para os filhos
-        double newY = (*lj)->GetYAcum() / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + 0.5*(*lj)->GetChildListSize()); // ALTERADO: considera soemnte 50% para os filhos
+        double newX = (*lj)->GetXAcum() / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize()); // SAI DA EQUACAO: nao pode eletar ---> antigo: considera soemnte 50% para os filhos
+        double newY = (*lj)->GetYAcum() / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize()); // SAI DA EQUACAO: nao pode eletar ---> antigo: considera soemnte 50% para os filhos
         (*lj)->SetPosition(newX, newY, r_max);
 
         // Avalia a utilizacao de capacidade das localizações
@@ -1483,9 +1487,9 @@ void ServerApplication::runDA() {
       } 
       // TODO: salvar cenario intermediario para visualizar se está tendo avanços      
       
-    } while (movimentoB);
+    } while (movimentoB /*&& iterB < max_iterB*/); // NOVO: definir valor melhor, coloquei iteração pois no teste_1/custo_1 com 3 localizacoes o algoritmo detecam 4 grupos e as localizacoes ficam trocando entre estas 4, assim, nunca saindo do laco! Com limite de iterações espera-se que saia adicione uma nova localização e o problema seja resolvido.
 
-    std::cout << "Esperando .....\n";
+    std::cout << "Fim do laco B .....\n";
     std::cin >> lixo;
 
 
@@ -1496,7 +1500,7 @@ void ServerApplication::runDA() {
 
     std::cout << "TOTAL_CLI_CON: " << totalCliCon << std::endl;
 
-    if (!MovimentoA() || totalCliCon < m_clientDaContainer.GetN()*0.5) { // ALTERADO: se não houver movimento em A, necessário adicionar nova localização
+    if (!MovimentoA() || totalCliCon < m_clientDaContainer.GetN()*0.5 /*|| iterB == 1000*/) { // ALTERADO: se não houver movimento em A, necessário adicionar nova localização -- or caso nao tenha conseguido encontrar uma posicao fixa!
       Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
       nLoc->SetId(locId++);
       CentroDeMassa(nLoc, r_max);
@@ -1509,16 +1513,15 @@ void ServerApplication::runDA() {
       nLoc->LimparAcumuladoPosicionamento();
       nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), uav_cob/r_max, r_max); // este método atualiza a variavel de punicao!
       // NOVO: Aumentar a temperatura, nova localizacao adicionada!
-      t = t*5.0; // NOVO: aumentando 500%
-      std::cout << "--**********************************************-\n";
-      continue;      
-    } else {
-      // Reiniciar Movimento A para cada Localizacao
-      for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-        (*lj)->LimparAcumuladoPosicionamento();
-        (*lj)->IniciarMovimentoA();
-        // (*lj)->IniciarMovimentoB(); já é atualizado no método MovimentoB do Servidor
-      }
+      // t = t*1.2;
+    }
+
+    GraficoCenarioDa(t, iter); 
+    // Reiniciar Movimento A para cada Localizacao
+    for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+      (*lj)->LimparAcumuladoPosicionamento();
+      (*lj)->IniciarMovimentoA();
+      (*lj)->LimparHistorico();
     }
 
     t = t*0.9; // reduz 90%  a tempreatura
@@ -1527,19 +1530,50 @@ void ServerApplication::runDA() {
     std::cout << "------------------------------------------------------------------\n";
   } while (t > t_min); // laco da temperatura
 
-  std::cout << "Esperando .....\n";
-  std::cin >> t;
+  std::cout << "Fim do laco A .....\n";
+  std::cin >> lixo;
 
   // TODO: criar pasta dentro da etapa chamada da_cpp
   // dentro desta gravar arquivos contendo as localizacaoes geradas pelo DA juntamente com a etapa atual, assim consigo buscar a localizacao dos clientes no arquivo client.txt dentro da etapa respectiva!
 }
 
+void ServerApplication::GraficoCenarioDa (double temp, int iter) {
+  std::ofstream file;
+  std::ostringstream os;
+  os.str("");
+  os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/da_loc_"<< std::setfill ('0') << std::setw (15) << iter << ".txt";
+  file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
+  LocationModelContainer::Iterator lj = m_locationContainer.Begin(); // imprimindo a posicao atual da localizacao
+  file << temp << std::endl;
+  file << (*lj)->GetXPosition() << "," << (*lj)->GetYPosition();
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    file << "," << (*lj)->GetXPosition() << "," << (*lj)->GetYPosition();
+  }
+  file << "\n";
+  lj = m_locationContainer.Begin(); // imprimindo a posicao antiga
+  file << (*lj)->GetXPositionA() << "," << (*lj)->GetYPositionA();
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    file << "," << (*lj)->GetXPositionA() << "," << (*lj)->GetYPositionA();
+  }
+  file << "\n";
+  lj = m_locationContainer.Begin(); // imprimindo a posicao do pai
+  file << (*lj)->GetFather()->GetXPosition() << "," << (*lj)->GetFather()->GetYPosition();
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    file << "," << (*lj)->GetFather()->GetXPosition() << "," << (*lj)->GetFather()->GetYPosition();
+  }
+  file.close();
+}
+
 bool ServerApplication::MovimentoA() {
   // verificar se as localizações tiveram o MovimentoA, este movimento é pra validar dentro do laço A
-  bool retorno = true;
-  for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-    retorno = retorno && (*lj)->MovimentoA();
-    (*lj)->IniciarMovimentoA(); // atualizar para o novo posicionamento para nao entrar em laco infinito
+  LocationModelContainer::Iterator lj = m_locationContainer.Begin();
+  bool retorno = (*lj)->MovimentoA();
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    retorno = retorno || (*lj)->MovimentoA();
   }
   std::cout << "----> MovimentoA: " << ((retorno)?"true":"false") << std::endl;
   return retorno;
@@ -1547,10 +1581,11 @@ bool ServerApplication::MovimentoA() {
 
 bool ServerApplication::MovimentoB() {
   // verificar se as localizações tiveram o MovimentoB, este movimento é pra validar dentro do laço B
-  bool retorno = true;
-  for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-    std::cout << "----> MovimentoB no lj: " << (((*lj)->MovimentoB())?"true":"false") << std::endl;
-    retorno = retorno && (*lj)->MovimentoB();
+  LocationModelContainer::Iterator lj = m_locationContainer.Begin();
+  bool retorno = (*lj)->MovimentoB(); (*lj)->IniciarMovimentoB(); // atualizar para o novo posicionamento senão fica em laco infinito!
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    retorno = retorno || (*lj)->MovimentoB();
     (*lj)->IniciarMovimentoB(); // atualizar para o novo posicionamento senão fica em laco infinito!
   }
   std::cout << "----> MovimentoB: " << ((retorno)?"true":"false") << std::endl;

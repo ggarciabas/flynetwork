@@ -123,10 +123,19 @@ public:
 
   void LimparMapaPljci ();
 
+  double GetXPositionA ();
+  double GetYPositionA ();
+  double GetXPosition ();
+  double GetYPosition ();
+
+  void LimparHistorico ();
+
 private:
   void DoDispose ();
   std::vector<double> m_positionA;
-  std::vector<double> m_positionB;  
+  std::vector<double> m_positionB; 
+  std::vector<std::vector<double> > m_historico; // verificar issue: https://github.com/ggarciabas/flynetwork/issues/10
+  bool m_changePosition; // variavel para permitir trocar de posicao, verificar issue: https://github.com/ggarciabas/flynetwork/issues/10
   double m_tempPljci;
   double m_wij;
   double m_punshCapacity; // punicao de capacidade
