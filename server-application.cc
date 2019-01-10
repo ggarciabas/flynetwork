@@ -1338,9 +1338,6 @@ void ServerApplication::runDA() {
   double Wj = 20.0; // total de clientes por localizacao
   double taxa_capacidade = 1.2; // NOVO: 120%
   double raio_cob = 0.0;
-
-  m_environment = 1;
-
   switch (m_environment) { // ver valores no arquivo main.py
     case 1:
       raio_cob = 19.0581; break;
@@ -1352,7 +1349,7 @@ void ServerApplication::runDA() {
       raio_cob = 108.295; break;
   }
   double t = 0.9;
-  int locId = 1;
+  int locId = 0;
   int max_iterB = 100000;
 
   // -------------------
@@ -1384,7 +1381,7 @@ void ServerApplication::runDA() {
   loc->InitializeWij (m_clientDaContainer.GetN()*Wi); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
   loc->LimparAcumuladoPosicionamento();
   Ptr<LocationModel> lCentral = lObj.Create()->GetObject<LocationModel> ();
-  lCentral->SetId(0);
+  lCentral->SetId(9999);
   Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
   lCentral->SetPosition(pos.x, pos.y); // iniciando a localizacao que representará a central
   lCentral->IniciarMovimentoA(); // somente para nao dar problemas ao executar toString
@@ -1398,7 +1395,7 @@ void ServerApplication::runDA() {
   // std::cin >> t;
   // ----------------------
   
-  int lixo;
+  // int lixo;
   int iter = 0;
   do {// laco A
     iter++;
@@ -1444,23 +1441,24 @@ void ServerApplication::runDA() {
           (*lj)->InitializeWij(0.0); // zerando para calcular novamente os clientes conectados, considerando agora a distancia!
           if (pljci > high_pljci) {
             high_pljci = pljci;
-            high_dchilj = dcilj;
+            high_dchilj = -dcilj;
             /*
-              Ao considerar a distancia o controle de punicao de capacidade nao estará efetivamente agindo para cobrir o cenario, somente os clientes dentro da regiao serao considerados. Assim, acredito que seja melhor considerar somente o maior pljci para a evolucao do DA e no final somente considerar a distancia para cargo de retorno de valores para a simulacao.
+              Ao considerar a distancia o controle de punicao de capacidade nao estará efetivamente agindo para cobrir o cenario, somente os clientes dentro da regiao serao considerados. Assim, acredito que seja melhor considerar somente o maior pljci para a evolucao do DA e no final somente considerar a distancia para cargo de retorno de valores para a simulacao.              
             */
             // if (dcilj <= raio_cob) { // somente considera conectado se estiver dentro do raio de cobertura para clientes
               Ptr<LocationModel> lCon = (*ci)->GetLocConnected();
               if (lCon) { // caso tenha alguma informacao anterior, desconsidera nos calculos, para isto atualiza o loc
-                lCon->RemoveClient(Wi);
+                lCon->RemoveClient(Wi, (*ci)->GetConsumption());
               }
               lCon = 0;
               (*ci)->SetLocConnected((*lj));
-              (*lj)->NewClient(Wi);
+              (*lj)->NewClient(Wi, (*ci)->GetConsumption());
             // }
           }
         }
         // OBS: como saber se os clientes possuem conexão?!, falta adicionar uma flag no cliente para saber se ele está dentro da cobertura da localização conectada, esta é uma condição para finalizar o algoritmo, uma porcentagem dos clientes tem que estar dentro da cobertura de algum UAV
         if (high_dchilj <= raio_cob/r_max) {
+          std::cout << "---->>> Distancia: " << high_dchilj << " cobmax: " << raio_cob/r_max << std::endl;
           (*ci)->SetConnected(true);
           totalCliCon++;
         } else {
@@ -1527,8 +1525,8 @@ void ServerApplication::runDA() {
       break; // finalizar Da de Localização
     }
 
-    std::cout << "Fim do laco B .....\n";
-    std::cin >> lixo;
+    // std::cout << "Fim do laco B .....\n";
+    // std::cin >> lixo;
 
     if (!MovimentoA() || totalCliCon < m_clientDaContainer.GetN()*0.5 /*|| iterB == 1000*/) { // ALTERADO: se não houver movimento em A, necessário adicionar nova localização -- or caso nao tenha conseguido encontrar uma posicao fixa!
       Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
@@ -1564,6 +1562,22 @@ void ServerApplication::runDA() {
   } while (t > t_min); // laco da temperatura
 
   GraficoCenarioDa(t, iter, lCentral);   
+
+  m_totalCliGeral = 0;
+  m_locConsTotal = 0; // atualiza total de consumo de todas as localizacoes
+
+  os.str("");
+  os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/location_client.txt";
+  std::ofstream location_cli;
+  location_cli.open(os.str().c_str(), std::ofstream::out);
+  for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+    location_cli << (*lj)->GetId() << "," << (*lj)->GetTotalCli() << "," << (*lj)->GetTotalConsumption() << std::endl;
+  }
+  location_cli.close();
+
+  if ( m_locConsTotal == 0) {
+    m_locConsTotal = 1.0; // para nao dar problemas no calculo
+  }
 }
 
 void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral) {

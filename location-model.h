@@ -94,8 +94,8 @@ public:
   double GetPunishNeighboor ();
 
   void InitializeWij (double);
-  void NewClient (double);
-  void RemoveClient (double);
+  void NewClient (double, double);
+  void RemoveClient (double, double);
   double GetWij ();
 
   void SetTempPljci (double);

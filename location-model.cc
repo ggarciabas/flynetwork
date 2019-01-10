@@ -52,6 +52,8 @@ LocationModel::LocationModel()
   m_totaCli = 0;
   m_totalConsumption = 0.0;
   m_changePosition = true;
+  m_totaCli = 0;
+  m_totalConsumption = 0.0;
 }
 
 LocationModel::~LocationModel()
@@ -211,14 +213,20 @@ double LocationModel::GetPunishNeighboor () {
 
 void LocationModel::InitializeWij (double v) {
   m_wij = v;
+  m_totalConsumption = 0.0;
+  m_totaCli = 0;
 }
 
-void LocationModel::NewClient (double Wi) {
+void LocationModel::NewClient (double Wi, double cons) {
   m_wij += Wi;
+  m_totalConsumption += cons;
+  m_totaCli++;
 }
 
-void LocationModel::RemoveClient (double Wi) {
+void LocationModel::RemoveClient (double Wi, double cons) {
   m_wij -= Wi;
+  m_totalConsumption -= cons;
+  m_totaCli--;
 }
 
 double LocationModel::GetWij () {
