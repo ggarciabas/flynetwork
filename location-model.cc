@@ -241,8 +241,8 @@ void LocationModel::SetTempPljci (double pljci) {
 void LocationModel::AddPljCi (Ptr<ClientModel> ci, double Zci, double r_max) {
   m_pljci[ci] = m_tempPljci/Zci;
   // calculando parte do novo posicionamento da localização
-  m_xAcum += ci->GetPci()*m_tempPljci*ci->GetXPosition(r_max);
-  m_yAcum += ci->GetPci()*m_tempPljci*ci->GetYPosition(r_max);
+  m_xAcumCli += ci->GetPci()*m_tempPljci*ci->GetXPosition(r_max);
+  m_yAcumCli += ci->GetPci()*m_tempPljci*ci->GetYPosition(r_max);
   m_plj += ci->GetPci()*m_tempPljci;
 }
 
@@ -281,9 +281,13 @@ LocationModelContainer LocationModel::GetChildList () {
   return m_childList;
 }
 
+void LocationModel::LimparAcumuladoPosicionamentoClientes () {
+  m_xAcumCli = m_yAcumCli = 0.0;
+  m_plj = 0.0;
+}
+
 void LocationModel::LimparAcumuladoPosicionamento () {
   m_xAcum = m_yAcum = 0.0;
-  m_plj = 0.0;
 }
 
 double LocationModel::GetXPosition (double r_max) {
@@ -316,6 +320,14 @@ double LocationModel::GetXAcum() {
 
 double LocationModel::GetYAcum() {
   return m_yAcum;
+}
+
+double LocationModel::GetXAcumCli() {
+  return m_xAcumCli;
+}
+
+double LocationModel::GetYAcumCli() {
+  return m_yAcumCli;
 }
 
 double LocationModel::GetPlj() {
