@@ -1338,7 +1338,7 @@ void ServerApplication::runDA() {
   double uav_cob = std::pow(10, (110.0/(10*3.0)-46.6777/(10*3.0))); // ver arquivo main.py do da_python
   double Wi = 1.0;
   double Wj = 20.0; // total de clientes por localizacao
-  double taxa_capacidade = 1.2; // NOVO: 120%
+  double taxa_capacidade = 1.01; // NOVO: 120%
   double raio_cob = 0.0;
   switch (m_environment) { // ver valores no arquivo main.py
     case 1:
@@ -1421,20 +1421,21 @@ void ServerApplication::runDA() {
       capacidade = true;
       iterB++;
       totalCliCon = 0;
-
+      std::cout << "Iteracao: " << iterB << "\n";
       for (ClientModelContainer::Iterator ci = m_clientDaContainer.Begin(); ci != m_clientDaContainer.End(); ++ci){
         double Zci = 0.0;
         double high_pljci = -1;
         double high_dchilj = 0.0;
+        std::cout << "\t[";
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-          double dcilj = - CalculateDistance((*ci)->GetPosition(r_max), (*lj)->GetPosition(r_max));
-          double pljci = std::exp ( (dcilj + (*lj)->GetPunishCapacity()*(*lj)->GetWij())/t );
+          double dcilj = CalculateDistance((*ci)->GetPosition(r_max), (*lj)->GetPosition(r_max));
+          double pljci = std::exp ( - ((dcilj + (*lj)->GetPunishCapacity()*(*lj)->GetWij())/t) );
           Zci += pljci;
           (*lj)->SetTempPljci(pljci);
           (*lj)->InitializeWij(0.0); // zerando para calcular novamente os clientes conectados, considerando agora a distancia!
           if (pljci > high_pljci) {
             high_pljci = pljci;
-            high_dchilj = -dcilj;
+            high_dchilj = dcilj;
             /*
               Ao considerar a distancia o controle de punicao de capacidade nao estará efetivamente agindo para cobrir o cenario, somente os clientes dentro da regiao serao considerados. Assim, acredito que seja melhor considerar somente o maior pljci para a evolucao do DA e no final somente considerar a distancia para cargo de retorno de valores para a simulacao.              
             */
@@ -1449,6 +1450,8 @@ void ServerApplication::runDA() {
             // }
           }
         }
+        std::cout << " ]\n";
+        std::cout << "\tZci: " << Zci << "\n";
         // OBS: como saber se os clientes possuem conexão?!, falta adicionar uma flag no cliente para saber se ele está dentro da cobertura da localização conectada, esta é uma condição para finalizar o algoritmo, uma porcentagem dos clientes tem que estar dentro da cobertura de algum UAV
         if (high_dchilj <= raio_cob/r_max) {
           // std::cout << "---->>> Distancia: " << high_dchilj << " cobmax: " << raio_cob/r_max << std::endl;
@@ -1469,6 +1472,7 @@ void ServerApplication::runDA() {
         double newX = (*lj)->GetXAcum() / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize()); // SAI DA EQUACAO: nao pode eletar ---> antigo: considera soemnte 50% para os filhos
         double newY = (*lj)->GetYAcum() / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize()); // SAI DA EQUACAO: nao pode eletar ---> antigo: considera soemnte 50% para os filhos
         (*lj)->SetPosition(newX, newY, r_max);
+        (*lj)->LimparAcumuladoPosicionamento(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc          
 
         // Avalia a utilizacao de capacidade das localizações
         capacidade = capacidade && (*lj)->ValidarCapacidade(Wj, taxa_capacidade);
@@ -1486,7 +1490,6 @@ void ServerApplication::runDA() {
           // std::cout << "J[" << j << "]: ";
           // std::cout << m_locationContainer.Get(j)->toString();
           std::vector<double> p1 (m_locationContainer.Get(j)->GetPosition(r_max));
-          m_locationContainer.Get(j)->LimparAcumuladoPosicionamento(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
           int id = -1; // a principio se conecta com a central
           double dist = CalculateDistance(lCentral->GetPosition(r_max), p1);
           for (int k = j - 1; k >= 0; --k) {
@@ -1510,6 +1513,7 @@ void ServerApplication::runDA() {
       } 
       // TODO: salvar cenario intermediario para visualizar se está tendo avanços      
       
+      std::cout << "-----------------------\n";
     } while (movimentoB /*&& iterB < max_iterB*/); // NOVO: definir valor melhor, coloquei iteração pois no teste_1/custo_1 com 3 localizacoes o algoritmo detecam 4 grupos e as localizacoes ficam trocando entre estas 4, assim, nunca saindo do laco! Com limite de iterações espera-se que saia adicione uma nova localização e o problema seja resolvido.    
 
     // ------------------ Para teste somente

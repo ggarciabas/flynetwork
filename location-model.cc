@@ -235,6 +235,7 @@ double LocationModel::GetWij () {
 
 void LocationModel::SetTempPljci (double pljci) {
   m_tempPljci = pljci;
+  std::cout << " " << pljci;
 }
 
 void LocationModel::AddPljCi (Ptr<ClientModel> ci, double Zci, double r_max) {
@@ -250,10 +251,12 @@ bool LocationModel::SetFather (Ptr<LocationModel> l, double dist, double uav_cob
   // atualizando parte do novo posicionamento da localizacao
   m_xAcum = l->GetXPosition(r_max) * m_punshNeigh;
   m_yAcum = l->GetYPosition(r_max) * m_punshNeigh;
-
-  // if (dist > uav_cob) { não faz sentido validar conexão, pois este calculo irá aliviar ou punir dependendo da distancia para com o pai.
-  m_punshNeigh = m_punshNeigh * std::exp (-1+(dist/uav_cob));
-  // }
+  
+  if (dist <= uav_cob) { 
+    m_punshNeigh = m_punshNeigh * std::exp (-1+(dist/uav_cob)); // nunca aumenta, só diminui esta equacao
+  } else {
+    m_punshNeigh = m_punshNeigh * 1.2;
+  }
 
   m_connected = dist>=uav_cob;
 
@@ -266,8 +269,8 @@ Ptr<LocationModel> LocationModel::GetFather () {
 
 void LocationModel::AddChild (Ptr<LocationModel> l, double r_max) {
   m_childList.Add(l);
-  m_xAcum += l->GetXPosition(r_max) * 0.5; // PENSAR: m_punishNeigh -> é interessante somente para manter o UAV próximo ao pai, para garantir conexão, não sei se vale a pena forçar com a mesma intensidade no sentido dos clientes.
-  m_yAcum += l->GetYPosition(r_max) * 0.5; // ALTERADO: Modificado para 50%! Considerando como peso os filhos somente no valor de 50%!
+  m_xAcum += l->GetXPosition(r_max) * m_punshNeigh; // PENSAR: m_punishNeigh -> é interessante somente para manter o UAV próximo ao pai, para garantir conexão, não sei se vale a pena forçar com a mesma intensidade no sentido dos clientes.
+  m_yAcum += l->GetYPosition(r_max) * m_punshNeigh; // ESTÁ NA EQUAÇAO, NAO PODE MUDARALTERADO: Modificado para 50%! Considerando como peso os filhos somente no valor de 50%!
 }
 
 void LocationModel::ClearChildList () {
