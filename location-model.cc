@@ -247,7 +247,9 @@ bool LocationModel::SetFather (Ptr<LocationModel> l, double dist, double uav_cob
   m_punshNeigh = m_punshNeigh * std::exp (-1+(dist/uav_cob));
   // }
 
-  return dist>=uav_cob;
+  m_connected = dist>=uav_cob;
+
+  return m_connected;
 }
 
 Ptr<LocationModel> LocationModel::GetFather () {
@@ -317,8 +319,8 @@ bool LocationModel::IsConnected () {
   return m_connected;
 }
 
-bool LocationModel::ValidarCapacidade (double wj, double taxa_capacidade) {
-  if (m_wij > wj) {
+bool LocationModel::ValidarCapacidade (double Wj, double taxa_capacidade) {
+  if (m_wij > Wj) {
     // atualizar taxa de punicao
     m_punshCapacity *= taxa_capacidade;
     return false;

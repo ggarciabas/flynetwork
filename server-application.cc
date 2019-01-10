@@ -1415,11 +1415,14 @@ void ServerApplication::runDA() {
 
     int totalCliCon = 0;
     bool locConnected = true;
-    bool capacidade = false;
+    bool capacidade = true;
     bool movimentoB = true;
     int iterB = 0;
     do { // laco B
+      capacidade = true;
       iterB++;
+      totalCliCon = 0;
+
       // ------------------ Para teste somente
         std::cout << "LacoB Temp: " << t << " IteracaoB: " << iterB << "\n[\n";
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
@@ -1432,6 +1435,7 @@ void ServerApplication::runDA() {
       for (ClientModelContainer::Iterator ci = m_clientDaContainer.Begin(); ci != m_clientDaContainer.End(); ++ci){
         double Zci = 0.0;
         double high_pljci = -1;
+        double high_dchilj = 0.0;
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           double dcilj = - CalculateDistance((*ci)->GetPosition(r_max), (*lj)->GetPosition(r_max));
           double pljci = std::exp ( (dcilj + (*lj)->GetPunishCapacity()*(*lj)->GetWij())/t );
@@ -1440,6 +1444,7 @@ void ServerApplication::runDA() {
           (*lj)->InitializeWij(0.0); // zerando para calcular novamente os clientes conectados, considerando agora a distancia!
           if (pljci > high_pljci) {
             high_pljci = pljci;
+            high_dchilj = dcilj;
             /*
               Ao considerar a distancia o controle de punicao de capacidade nao estará efetivamente agindo para cobrir o cenario, somente os clientes dentro da regiao serao considerados. Assim, acredito que seja melhor considerar somente o maior pljci para a evolucao do DA e no final somente considerar a distancia para cargo de retorno de valores para a simulacao.
             */
@@ -1448,17 +1453,18 @@ void ServerApplication::runDA() {
               if (lCon) { // caso tenha alguma informacao anterior, desconsidera nos calculos, para isto atualiza o loc
                 lCon->RemoveClient(Wi);
               }
+              lCon = 0;
               (*ci)->SetLocConnected((*lj));
               (*lj)->NewClient(Wi);
             // }
-            // OBS: como saber se os clientes possuem conexão?!, falta adicionar uma flag no cliente para saber se ele está dentro da cobertura da localização conectada, esta é uma condição para finalizar o algoritmo, uma porcentagem dos clientes tem que estar dentro da cobertura de algum UAV
-            if (dcilj <= raio_cob/r_max) {
-              (*ci)->SetConnected(true);
-              totalCliCon++;
-            } else {
-              (*ci)->SetConnected(false);
-            }
           }
+        }
+        // OBS: como saber se os clientes possuem conexão?!, falta adicionar uma flag no cliente para saber se ele está dentro da cobertura da localização conectada, esta é uma condição para finalizar o algoritmo, uma porcentagem dos clientes tem que estar dentro da cobertura de algum UAV
+        if (high_dchilj <= raio_cob/r_max) {
+          (*ci)->SetConnected(true);
+          totalCliCon++;
+        } else {
+          (*ci)->SetConnected(false);
         }
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           // PENSAR: preciso guardar o valor de pljci?! Não é suficiente calcular já a parte da equacao de lj e descartar estes valores?!
@@ -1513,17 +1519,16 @@ void ServerApplication::runDA() {
       } 
       // TODO: salvar cenario intermediario para visualizar se está tendo avanços      
       
-    } while (movimentoB /*&& iterB < max_iterB*/); // NOVO: definir valor melhor, coloquei iteração pois no teste_1/custo_1 com 3 localizacoes o algoritmo detecam 4 grupos e as localizacoes ficam trocando entre estas 4, assim, nunca saindo do laco! Com limite de iterações espera-se que saia adicione uma nova localização e o problema seja resolvido.
-
-    // std::cout << "Fim do laco B .....\n";
-    // std::cin >> lixo;
+    } while (movimentoB /*&& iterB < max_iterB*/); // NOVO: definir valor melhor, coloquei iteração pois no teste_1/custo_1 com 3 localizacoes o algoritmo detecam 4 grupos e as localizacoes ficam trocando entre estas 4, assim, nunca saindo do laco! Com limite de iterações espera-se que saia adicione uma nova localização e o problema seja resolvido.    
 
     // Verificar condição de parada: 1- clientes conectados, 2- uavs conectados, 3- capacidade não extrapolada
+    std::cout << "Condição de parada:\n\tTotalCliCon: " << totalCliCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false") << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << std::endl;
     if (totalCliCon >= m_clientDaContainer.GetN()*0.9 && locConnected && capacidade) { // 1- NOVO: 90% dos clientes tem que ter conexao
       break; // finalizar Da de Localização
     }
 
-    std::cout << "TOTAL_CLI_CON: " << totalCliCon << std::endl;
+    std::cout << "Fim do laco B .....\n";
+    std::cin >> lixo;
 
     if (!MovimentoA() || totalCliCon < m_clientDaContainer.GetN()*0.5 /*|| iterB == 1000*/) { // ALTERADO: se não houver movimento em A, necessário adicionar nova localização -- or caso nao tenha conseguido encontrar uma posicao fixa!
       Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
@@ -1558,11 +1563,7 @@ void ServerApplication::runDA() {
     std::cout << "------------------------------------------------------------------\n";
   } while (t > t_min); // laco da temperatura
 
-  std::cout << "Fim do laco A .....\n";
-  std::cin >> lixo;
-
-  // TODO: criar pasta dentro da etapa chamada da_cpp
-  // dentro desta gravar arquivos contendo as localizacaoes geradas pelo DA juntamente com a etapa atual, assim consigo buscar a localizacao dos clientes no arquivo client.txt dentro da etapa respectiva!
+  GraficoCenarioDa(t, iter, lCentral);   
 }
 
 void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral) {

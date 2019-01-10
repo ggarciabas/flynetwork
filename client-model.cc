@@ -63,6 +63,7 @@ ClientModel::~ClientModel()
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("ClientModel::~ClientModel @" << Simulator::Now().GetSeconds());
   m_position.clear();
+  m_locConnected = 0;
 }
 
 void ClientModel::SetPosition(double x, double y)
