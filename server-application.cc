@@ -1299,6 +1299,32 @@ void ServerApplication::DoDispose() {
 
 // https://github.com/ggarciabas/nsnam_ns3/blob/17c1f9200727381852528ac4798f040128ac842a/scratch/flynetwork/da_cpp/deterministic-annealing.cc
 void ServerApplication::runDA() {
+  std::ofstream file;
+  std::ostringstream os;
+  os.str("");
+  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/"<<int(Simulator::Now().GetSeconds())<<"/client.txt";
+  file.open(os.str().c_str(), std::ofstream::out);
+  bool first = true;
+  for (ClientModelContainer::Iterator i = m_clientContainer.Begin(); i != m_clientContainer.End(); ++i)
+  {
+    if (first) {
+      file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
+      first = false;
+    } else {
+      file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
+    }
+  }
+  for (ClientModelContainer::Iterator i = m_fixedClientContainer.Begin(); i != m_fixedClientContainer.End(); ++i)
+  {
+    if (first) {
+      file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
+      first = false;
+    } else {
+      file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
+    }
+  }
+  file << std::endl;
+  file.close ();
 
   m_clientDaContainer.Clear();
   m_clientDaContainer.Add(m_clientContainer);
@@ -1489,9 +1515,8 @@ void ServerApplication::runDA() {
       
     } while (movimentoB /*&& iterB < max_iterB*/); // NOVO: definir valor melhor, coloquei iteração pois no teste_1/custo_1 com 3 localizacoes o algoritmo detecam 4 grupos e as localizacoes ficam trocando entre estas 4, assim, nunca saindo do laco! Com limite de iterações espera-se que saia adicione uma nova localização e o problema seja resolvido.
 
-    std::cout << "Fim do laco B .....\n";
-    std::cin >> lixo;
-
+    // std::cout << "Fim do laco B .....\n";
+    // std::cin >> lixo;
 
     // Verificar condição de parada: 1- clientes conectados, 2- uavs conectados, 3- capacidade não extrapolada
     if (totalCliCon >= m_clientDaContainer.GetN()*0.9 && locConnected && capacidade) { // 1- NOVO: 90% dos clientes tem que ter conexao
@@ -1513,15 +1538,17 @@ void ServerApplication::runDA() {
       nLoc->LimparAcumuladoPosicionamento();
       nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), uav_cob/r_max, r_max); // este método atualiza a variavel de punicao!
       // NOVO: Aumentar a temperatura, nova localizacao adicionada!
-      // t = t*1.2;
-    }
-
-    GraficoCenarioDa(t, iter); 
-    // Reiniciar Movimento A para cada Localizacao
-    for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-      (*lj)->LimparAcumuladoPosicionamento();
-      (*lj)->IniciarMovimentoA();
-      (*lj)->LimparHistorico();
+      t = t*2.0;
+      GraficoCenarioDa(t, iter, lCentral); 
+      continue;
+    } else {
+      GraficoCenarioDa(t, iter, lCentral); 
+      // Reiniciar Movimento A para cada Localizacao
+      for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+        (*lj)->LimparAcumuladoPosicionamento();
+        (*lj)->IniciarMovimentoA();
+        (*lj)->LimparHistorico();
+      }
     }
 
     t = t*0.9; // reduz 90%  a tempreatura
@@ -1537,14 +1564,16 @@ void ServerApplication::runDA() {
   // dentro desta gravar arquivos contendo as localizacaoes geradas pelo DA juntamente com a etapa atual, assim consigo buscar a localizacao dos clientes no arquivo client.txt dentro da etapa respectiva!
 }
 
-void ServerApplication::GraficoCenarioDa (double temp, int iter) {
+void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral) {
   std::ofstream file;
   std::ostringstream os;
   os.str("");
   os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/da_loc_"<< std::setfill ('0') << std::setw (15) << iter << ".txt";
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
   LocationModelContainer::Iterator lj = m_locationContainer.Begin(); // imprimindo a posicao atual da localizacao
+  file << m_maxx << "," << m_maxy << std::endl;
   file << temp << std::endl;
+  file << lCentral->GetXPosition() << "," << lCentral->GetYPosition() << std::endl;
   file << (*lj)->GetXPosition() << "," << (*lj)->GetYPosition();
   lj++;
   for (; lj != m_locationContainer.End(); ++lj) {
@@ -1565,6 +1594,16 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter) {
     file << "," << (*lj)->GetFather()->GetXPosition() << "," << (*lj)->GetFather()->GetYPosition();
   }
   file.close();
+
+  os.str ("");
+  os << "python ./scratch/flynetwork/data/da_loc.py " << m_pathData << " " << int(Simulator::Now().GetSeconds()) << " " << iter;
+  NS_LOG_DEBUG (os.str());
+  system(os.str().c_str());
+  // os.str ("");
+  // os << "convert -delay 20 -loop 0 ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/*.png" << " ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/da_loc.gif";
+  // NS_LOG_DEBUG (os.str());
+  // system(os.str().c_str());
+  
 }
 
 bool ServerApplication::MovimentoA() {
