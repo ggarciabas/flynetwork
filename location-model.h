@@ -69,7 +69,7 @@ public:
       << "\n\tPunCap: " << m_punshCapacity 
       << "\n\tPunNeigh: " << m_punshNeigh 
       << "\n\tWij: " << m_wij 
-      << "\n\tConnected: " << m_connected << std::endl;
+      << "\n\tConnected: " << ((m_connected) ? "true" : "false") << std::endl;
     return os.str();
   }
 
