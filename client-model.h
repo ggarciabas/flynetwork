@@ -78,7 +78,7 @@ public:
   Ptr<LocationModel> GetLocConnected ();
 
   void SetConnected (bool);
-  bool GetConnected ();
+  bool IsConnected ();
 
   double GetPci ();
   void SetPci (double);

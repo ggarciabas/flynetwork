@@ -173,7 +173,7 @@ void ClientModel::SetConnected (bool c) {
     m_connected = c;
 }
 
-bool ClientModel::GetConnected () {
+bool ClientModel::IsConnected () {
   return m_connected;
 }
 

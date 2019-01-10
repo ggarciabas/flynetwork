@@ -1307,6 +1307,7 @@ void ServerApplication::runDA() {
   bool first = true;
   for (ClientModelContainer::Iterator i = m_clientContainer.Begin(); i != m_clientContainer.End(); ++i)
   {
+    (*i)->SetPci(1/(double)(m_clientContainer.GetN()+m_fixedClientContainer.GetN()));
     if (first) {
       file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
       first = false;
@@ -1316,6 +1317,7 @@ void ServerApplication::runDA() {
   }
   for (ClientModelContainer::Iterator i = m_fixedClientContainer.Begin(); i != m_fixedClientContainer.End(); ++i)
   {
+    (*i)->SetPci(1/(double)(m_clientContainer.GetN()+m_fixedClientContainer.GetN()));
     if (first) {
       file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
       first = false;
@@ -1348,7 +1350,7 @@ void ServerApplication::runDA() {
     case 4:
       raio_cob = 108.295; break;
   }
-  double t = 0.9;
+  double t = 0.6;
   int locId = 0;
   int max_iterB = 100000;
 
@@ -1395,7 +1397,7 @@ void ServerApplication::runDA() {
   // std::cin >> t;
   // ----------------------
   
-  // int lixo;
+  int lixo;
   int iter = 0;
   do {// laco A
     iter++;
@@ -1419,15 +1421,6 @@ void ServerApplication::runDA() {
       capacidade = true;
       iterB++;
       totalCliCon = 0;
-
-      // ------------------ Para teste somente
-        std::cout << "LacoB Temp: " << t << " IteracaoB: " << iterB << "\n[\n";
-        for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-          // std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
-          std::cout << (*lj)->toString();
-        }
-        std::cout << "]\n";
-      // -----------------
 
       for (ClientModelContainer::Iterator ci = m_clientDaContainer.Begin(); ci != m_clientDaContainer.End(); ++ci){
         double Zci = 0.0;
@@ -1458,7 +1451,7 @@ void ServerApplication::runDA() {
         }
         // OBS: como saber se os clientes possuem conexão?!, falta adicionar uma flag no cliente para saber se ele está dentro da cobertura da localização conectada, esta é uma condição para finalizar o algoritmo, uma porcentagem dos clientes tem que estar dentro da cobertura de algum UAV
         if (high_dchilj <= raio_cob/r_max) {
-          std::cout << "---->>> Distancia: " << high_dchilj << " cobmax: " << raio_cob/r_max << std::endl;
+          // std::cout << "---->>> Distancia: " << high_dchilj << " cobmax: " << raio_cob/r_max << std::endl;
           (*ci)->SetConnected(true);
           totalCliCon++;
         } else {
@@ -1488,7 +1481,7 @@ void ServerApplication::runDA() {
       // Se houve mudança no posicionamento, se faz necessario verificar um novo pai para cada lj  
       movimentoB = MovimentoB();    
       if (movimentoB) {
-        std::cout << "Total de Localizações: " << m_locationContainer.GetN() << std::endl;
+        // std::cout << "Total de Localizações: " << m_locationContainer.GetN() << std::endl;
         for (int j = m_locationContainer.GetN()-1; j > 0; j--) {
           // std::cout << "J[" << j << "]: ";
           // std::cout << m_locationContainer.Get(j)->toString();
@@ -1519,16 +1512,26 @@ void ServerApplication::runDA() {
       
     } while (movimentoB /*&& iterB < max_iterB*/); // NOVO: definir valor melhor, coloquei iteração pois no teste_1/custo_1 com 3 localizacoes o algoritmo detecam 4 grupos e as localizacoes ficam trocando entre estas 4, assim, nunca saindo do laco! Com limite de iterações espera-se que saia adicione uma nova localização e o problema seja resolvido.    
 
+    // ------------------ Para teste somente
+    std::cout << "LacoB (fim) Temp: " << t << " IteracaoB: " << iterB << "\n[\n";
+    for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+      // std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
+      std::cout << (*lj)->toString();
+    }
+    std::cout << "]\n";
+    // -----------------
+
     // Verificar condição de parada: 1- clientes conectados, 2- uavs conectados, 3- capacidade não extrapolada
     std::cout << "Condição de parada:\n\tTotalCliCon: " << totalCliCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false") << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << std::endl;
     if (totalCliCon >= m_clientDaContainer.GetN()*0.9 && locConnected && capacidade) { // 1- NOVO: 90% dos clientes tem que ter conexao
       break; // finalizar Da de Localização
     }
 
-    // std::cout << "Fim do laco B .....\n";
-    // std::cin >> lixo;
+    std::cout << "Fim do laco B .....\n";
+    std::cin >> lixo;
 
-    if (!MovimentoA() || totalCliCon < m_clientDaContainer.GetN()*0.5 /*|| iterB == 1000*/) { // ALTERADO: se não houver movimento em A, necessário adicionar nova localização -- or caso nao tenha conseguido encontrar uma posicao fixa!
+    if (!MovimentoA() /*|| totalCliCon < m_clientDaContainer.GetN()*0.5 */ /*|| iterB == 1000*/) { // ALTERADO: se não houver movimento em A, necessário adicionar nova localização -- or caso nao tenha conseguido encontrar uma posicao fixa!
+      std::cout << "---> Novo UAV\n";
       Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
       nLoc->SetId(locId++);
       CentroDeMassa(nLoc, r_max);
@@ -1619,7 +1622,6 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
   // os << "convert -delay 20 -loop 0 ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/*.png" << " ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/da_loc.gif";
   // NS_LOG_DEBUG (os.str());
   // system(os.str().c_str());
-  
 }
 
 bool ServerApplication::MovimentoA() {
@@ -1643,7 +1645,7 @@ bool ServerApplication::MovimentoB() {
     retorno = retorno || (*lj)->MovimentoB();
     (*lj)->IniciarMovimentoB(); // atualizar para o novo posicionamento senão fica em laco infinito!
   }
-  std::cout << "----> MovimentoB: " << ((retorno)?"true":"false") << std::endl;
+  // std::cout << "----> MovimentoB: " << ((retorno)?"true":"false") << std::endl;
   return retorno;
 }
 
@@ -1652,8 +1654,10 @@ void ServerApplication::CentroDeMassa (Ptr<LocationModel> l, double r_max) {
 
   for (ClientModelContainer::Iterator i = m_clientDaContainer.Begin(); i != m_clientDaContainer.End(); ++i) {
     std::cout << (*i)->ToString();
-    x += (*i)->GetXPosition(r_max);
-    y += (*i)->GetYPosition(r_max);
+    if (!(*i)->IsConnected()) { // NOVO: considera somente os que nao estao conectados!
+      x += (*i)->GetXPosition(r_max);
+      y += (*i)->GetYPosition(r_max);
+    }
   }
 
   l->SetPosition(x/(double)m_clientDaContainer.GetN(), y/(double)m_clientDaContainer.GetN(), r_max); // posicionar no centro dos clientes
