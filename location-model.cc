@@ -152,7 +152,7 @@ void LocationModel::IniciarMovimentoA () {
 }
 
 bool LocationModel::MovimentoA () {
-  if (m_position.at(0) == m_positionA.at(0) && m_position.at(1) == m_positionA.at(1)) {
+  if (m_position.at(0) - m_positionA.at(0) > 0.1 && m_position.at(1) - m_positionA.at(1) > 0.1) {
     return false;
   }
   return true;
@@ -165,7 +165,7 @@ void LocationModel::IniciarMovimentoB () {
 }
 
 bool LocationModel::MovimentoB () {
-  if (m_position.at(0) == m_positionB.at(0) && m_position.at(1) == m_positionB.at(1)) {
+  if (m_position.at(0) - m_positionB.at(0) > 0.1 && m_position.at(1) - m_positionB.at(1) > 0.1) {
     return false;
   }
   return true;
@@ -294,4 +294,4 @@ void LocationModel::LimparMapaPljci () {
   m_pljci.clear();
 }
 
-} // namespace ns3
+}
