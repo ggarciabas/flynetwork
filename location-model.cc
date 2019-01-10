@@ -108,7 +108,7 @@ void LocationModel::SetPosition(double x, double y, double r_max)
     }
     m_position.clear();
     m_position.push_back(x*r_max);
-    m_position.push_back(y*r_max);    
+    m_position.push_back(y*r_max);
     m_historico.push_back(m_position); // OBs: push_back faz cópia ou não?! Se nao fizer vai falar a estratégia!!
   }
 
@@ -252,11 +252,11 @@ bool LocationModel::SetFather (Ptr<LocationModel> l, double dist, double uav_cob
   std::cout << "Father: " << l->GetXPosition(r_max) << " " << l->GetYPosition(r_max) << " Dist: " << dist << " UavCob: " << uav_cob << " exp: " << std::exp (-1+(dist/uav_cob)) <<  std::endl;
   m_xAcum = l->GetXPosition(r_max) * m_punshNeigh;
   m_yAcum = l->GetYPosition(r_max) * m_punshNeigh;
-  
-  if (dist <= uav_cob) { 
-    m_punshNeigh = m_punshNeigh * std::exp (-1+(dist/uav_cob)); // nunca aumenta, só diminui esta equacao
+
+  if (dist <= uav_cob) {
+    m_punshNeigh = m_punshNeigh * 0.9; //std::exp (-1+(dist/uav_cob)); // nunca aumenta, só diminui esta equacao
   } else {
-    m_punshNeigh = m_punshNeigh * 1.2;
+    m_punshNeigh = m_punshNeigh * 1.1;
   }
 
   m_connected = dist>=uav_cob;
@@ -296,7 +296,7 @@ double LocationModel::GetXPosition (double r_max) {
 }
 
 double LocationModel::GetYPosition (double r_max) {
-  return m_position.at(1)/r_max; 
+  return m_position.at(1)/r_max;
 }
 
 double LocationModel::GetXPosition () {
@@ -304,7 +304,7 @@ double LocationModel::GetXPosition () {
 }
 
 double LocationModel::GetYPosition () {
-  return m_position.at(1); 
+  return m_position.at(1);
 }
 
 double LocationModel::GetXPositionA () {
@@ -312,7 +312,7 @@ double LocationModel::GetXPositionA () {
 }
 
 double LocationModel::GetYPositionA () {
-  return m_positionA.at(1); 
+  return m_positionA.at(1);
 }
 
 double LocationModel::GetXAcum() {
