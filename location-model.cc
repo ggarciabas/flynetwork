@@ -249,6 +249,7 @@ void LocationModel::AddPljCi (Ptr<ClientModel> ci, double Zci, double r_max) {
 bool LocationModel::SetFather (Ptr<LocationModel> l, double dist, double uav_cob, double r_max) {
   m_father = l;
   // atualizando parte do novo posicionamento da localizacao
+  std::cout << "Father: " << l->GetXPosition(r_max) << " " << l->GetYPosition(r_max) << " Dist: " << dist << " UavCob: " << uav_cob << " exp: " << std::exp (-1+(dist/uav_cob)) <<  std::endl;
   m_xAcum = l->GetXPosition(r_max) * m_punshNeigh;
   m_yAcum = l->GetYPosition(r_max) * m_punshNeigh;
   

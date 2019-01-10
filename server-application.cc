@@ -1430,7 +1430,7 @@ void ServerApplication::runDA() {
         std::cout << "\t[";
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           double dcilj = CalculateDistance((*ci)->GetPosition(r_max), (*lj)->GetPosition(r_max));
-          double pljci = std::exp ( - ((dcilj + (*lj)->GetPunishCapacity()*(*lj)->GetWij())/t) );
+          double pljci = std::exp ( - ((dcilj /*+ (*lj)->GetPunishCapacity()*(*lj)->GetWij() */)/t) );
           Zci += pljci;
           (*lj)->SetTempPljci(pljci);
           (*lj)->InitializeWij(0.0); // zerando para calcular novamente os clientes conectados, considerando agora a distancia!
@@ -1467,9 +1467,12 @@ void ServerApplication::runDA() {
           (*lj)->AddPljCi((*ci), Zci, r_max); // finaliza o calculo do pljci na funcao e cadastra no map relacionando o ci
         }
       }
+      std::cout << "-----------------------\n";
 
       // calcular lj novos - não consigo fazer no laco anterior pela falta dos valores acumulados (não tentar colcoar la!)
+      std::cout << "[";
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+        std::cout << "\n\tX: " << (*lj)->GetXAcumCli() << "\t\tY: " << (*lj)->GetYAcumCli() << "\t\tX: " << (*lj)->GetXAcum() << "\t\tY: " << (*lj)->GetYAcum() << "\t\tPLJ: " << (*lj)->GetPlj() << "\t\tPN: " << (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize();
         double newX = ((*lj)->GetXAcumCli()+(*lj)->GetXAcum()) / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize()); // SAI DA EQUACAO: nao pode eletar ---> antigo: considera soemnte 50% para os filhos
         double newY = ((*lj)->GetYAcumCli()+(*lj)->GetYAcum()) / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize()); // SAI DA EQUACAO: nao pode eletar ---> antigo: considera soemnte 50% para os filhos
         (*lj)->SetPosition(newX, newY, r_max);
@@ -1482,12 +1485,15 @@ void ServerApplication::runDA() {
         // (*lj)->LimparMapaPljci(); NAO PRECISA LIMPAR! É UM MAPA, SERÁ ATUALIZADO SOMENTE // OBS.: se for adicionar a estrategia de remover localizacoes, necessario retirar isto, pois será utilizado!!
         (*lj)->ClearChildList();
       }
+      std::cout << "\n]\n";
 
       // Se houve mudança no posicionamento, se faz necessario verificar um novo pai para cada lj  
       movimentoB = MovimentoB();    
       if (movimentoB) {
+        std::cout << "---> MovimentoB \n";
         // std::cout << "Total de Localizações: " << m_locationContainer.GetN() << std::endl;
-        for (int j = m_locationContainer.GetN()-1; j > 0; j--) {
+        m_locationContainer.Get(0)->LimparAcumuladoPosicionamento();
+        for (int j = m_locationContainer.GetN()-1; j >= 0; j--) { // Obs.: >=0 para que seja feito o calculo da localizacao 0 com a central, não irá entrar no segundo laco devido a condicao imposta lá!
           // std::cout << "J[" << j << "]: ";
           // std::cout << m_locationContainer.Get(j)->toString();
           m_locationContainer.Get(j)->LimparAcumuladoPosicionamento(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc          
@@ -1514,8 +1520,7 @@ void ServerApplication::runDA() {
         }
       } 
       // TODO: salvar cenario intermediario para visualizar se está tendo avanços      
-      
-      std::cout << "-----------------------\n";
+            
     } while (movimentoB /*&& iterB < max_iterB*/); // NOVO: definir valor melhor, coloquei iteração pois no teste_1/custo_1 com 3 localizacoes o algoritmo detecam 4 grupos e as localizacoes ficam trocando entre estas 4, assim, nunca saindo do laco! Com limite de iterações espera-se que saia adicione uma nova localização e o problema seja resolvido.    
 
     // ------------------ Para teste somente
