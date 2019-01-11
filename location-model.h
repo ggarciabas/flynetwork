@@ -55,6 +55,7 @@ public:
   const std::vector<double> GetPosition();
 
   void SetPosition(double, double, double);
+  void SetPositionPuro(double x, double y, double r_max);
   std::vector<double> GetPosition(double);
 
   double GetXPosition (double);
@@ -62,13 +63,13 @@ public:
 
   std::string toString() {
     std::ostringstream os;
-    os << "Id: " << m_id << "\n\tPos: (" << m_position.at(0) << "," << m_position.at(1) 
-      << ")\n\tPosA: (" << m_positionA.at(0) << "," << m_positionA.at(1) 
-      << ")\n\tPosB: (" << m_positionB.at(0) << "," << m_positionB.at(1) 
-      << ")\n\tConsumption: " << m_totalConsumption 
-      << "\n\tPunCap: " << m_punshCapacity 
-      << "\n\tPunNeigh: " << m_punshNeigh 
-      << "\n\tWij: " << m_wij 
+    os << "Id: " << m_id << "\n\tPos: (" << m_position.at(0) << "," << m_position.at(1)
+      // << ")\n\tPosA: (" << m_positionA.at(0) << "," << m_positionA.at(1)
+      // << ")\n\tPosB: (" << m_positionB.at(0) << "," << m_positionB.at(1)
+      << ")\n\tConsumption: " << m_totalConsumption
+      << "\n\tPunCap: " << m_punshCapacity
+      << "\n\tPunNeigh: " << m_punshNeigh
+      << "\n\tWij: " << m_wij
       << "\n\tConnected: " << ((m_connected) ? "true" : "false") << std::endl;
     return os.str();
   }
@@ -101,6 +102,7 @@ public:
   void SetTempPljci (double);
 
   void AddPljCi (Ptr<ClientModel>, double, double);
+  void AddPljCiPuro (Ptr<ClientModel> ci, double Zci, double r_max);
 
   bool SetFather (Ptr<LocationModel> l, double, double, double);
   Ptr<LocationModel> GetFather ();
@@ -136,7 +138,7 @@ public:
 private:
   void DoDispose ();
   std::vector<double> m_positionA;
-  std::vector<double> m_positionB; 
+  std::vector<double> m_positionB;
   std::vector<std::vector<double> > m_historico; // verificar issue: https://github.com/ggarciabas/flynetwork/issues/10
   bool m_changePosition; // variavel para permitir trocar de posicao, verificar issue: https://github.com/ggarciabas/flynetwork/issues/10
   double m_tempPljci;

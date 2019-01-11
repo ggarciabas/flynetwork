@@ -76,6 +76,7 @@ private:
   void SendCentralPacket(Ptr<UavModel> uav);
   void runDAPython();
   void runDA();
+  void runDAPuro();
   void runAgendamento(void);
   void CreateCentralLocation(void);
   double CalculateDistance(const std::vector<double> pos1, const std::vector<double> pos2);
@@ -83,6 +84,7 @@ private:
   bool ValidateMijConvergency(vector<vector<double>> vec, vector<vector<double>> m_ij, unsigned siz);
   void ReplyUav(Ptr<UavModel> uav);
   void GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double raio_cob);
+  void GraficoCenarioDaPuro (double temp, int iter, Ptr<LocationModel> lCentral, double raio_cob);
 
   bool MovimentoA();
   bool MovimentoB();

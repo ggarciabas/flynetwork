@@ -120,6 +120,11 @@ void LocationModelContainer::Clear(void)
   m_models.clear();
 }
 
+void LocationModelContainer::Erase (uint32_t id) {
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  m_models.erase(m_models.begin()+id);
+}
+
 void LocationModelContainer::Remove (uint32_t id) {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   for (Iterator i = m_models.begin(); i != m_models.end(); i++)

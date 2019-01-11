@@ -482,7 +482,8 @@ void ServerApplication::Run ()
     system(ss.str().c_str());
     ss.str("");
     // runDAPython();
-    runDA();
+    runDAPuro();
+    // runDA();
     NS_LOG_INFO ("ServerApplication::Run liberando client container ");
     m_clientContainer.Clear();
     runAgendamento();
@@ -1594,7 +1595,7 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
   std::ofstream file;
   std::ostringstream os;
   os.str("");
-  os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/da_loc_"<< std::setfill ('0') << std::setw (15) << iter << ".txt";
+  os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/da_loc_cpp_" << std::setfill ('0') << std::setw (15) << iter << ".txt";
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
   LocationModelContainer::Iterator lj = m_locationContainer.Begin(); // imprimindo a posicao atual da localizacao
   file << m_maxx << "," << m_maxy << std::endl;
@@ -1669,6 +1670,241 @@ void ServerApplication::CentroDeMassa (Ptr<LocationModel> l, double r_max) {
 
   l->SetPosition(x/(double)m_clientDaContainer.GetN(), y/(double)m_clientDaContainer.GetN(), r_max); // posicionar no centro dos clientes
 
+}
+
+void ServerApplication::runDAPuro() {
+  std::ofstream file;
+  std::ostringstream os;
+  os.str("");
+  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/"<<int(Simulator::Now().GetSeconds())<<"/client.txt";
+  file.open(os.str().c_str(), std::ofstream::out);
+  bool first = true;
+  for (ClientModelContainer::Iterator i = m_clientContainer.Begin(); i != m_clientContainer.End(); ++i)
+  {
+    (*i)->SetPci(1/(double)(m_clientContainer.GetN()+m_fixedClientContainer.GetN()));
+    if (first) {
+      file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
+      first = false;
+    } else {
+      file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
+    }
+  }
+  for (ClientModelContainer::Iterator i = m_fixedClientContainer.Begin(); i != m_fixedClientContainer.End(); ++i)
+  {
+    (*i)->SetPci(1/(double)(m_clientContainer.GetN()+m_fixedClientContainer.GetN()));
+    if (first) {
+      file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
+      first = false;
+    } else {
+      file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
+    }
+  }
+  file << std::endl;
+  file.close ();
+
+  m_clientDaContainer.Clear();
+  m_clientDaContainer.Add(m_clientContainer);
+  m_clientDaContainer.Add(m_fixedClientContainer);
+
+  // constantes
+  double t_min = 1e-7;
+  double r_max = std::sqrt(std::pow(m_maxx, 2) + std::pow(m_maxy, 2));
+  double raio_cob = 0.0;
+  switch (m_environment) { // ver valores no arquivo main.py
+    case 1:
+      raio_cob = 19.0581; break;
+    case 2:
+      raio_cob = 79.6821; break;
+    case 3:
+      raio_cob = 101.609; break;
+    case 4:
+      raio_cob = 108.295; break;
+  }
+  double t = 0.9;
+  int locId = 0;
+  int max_iterB = 100000;
+
+  // -------------------
+  std::cout << "[\n\tTmin:\t\t" << t_min
+            << "\n\tRMax:\t\t" << r_max
+            << "\n\tRaioCob:\t\t" << raio_cob
+            << "\n\tEnv:\t\t" << m_environment
+            << "\n\tMaxIterB:\t\t" << max_iterB
+            << "\n\tTini:\t\t" << t << "\n]";
+  // std::cout << "Esperando ....";
+  // std::cin >> t;
+  // -------------------
+
+  ObjectFactory lObj;
+  lObj.SetTypeId("ns3::LocationModel");
+  Ptr<LocationModel> loc = lObj.Create()->GetObject<LocationModel>();
+  loc->SetId(locId++);
+  CentroDeMassa(loc, r_max);
+  loc->IniciarMovimentoB();
+  m_locationContainer.Add(loc);
+
+  Ptr<LocationModel> lCentral = lObj.Create()->GetObject<LocationModel> ();
+  lCentral->SetId(9999);
+  Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
+  lCentral->SetPosition(pos.x, pos.y); // iniciando a localizacao que representará a central
+  // ----------------------
+  std::cout << "Central: " << lCentral->toString();
+  std::cout << "Loc: " << loc->toString();
+  // std::cout << "Esperando ....";
+  // std::cin >> t;
+  // ----------------------
+
+  int lixo;
+  int iter = 0;
+  do {// laco A
+    iter++;
+
+    // ------------------ Para teste somente
+    std::cout << "------------------------------------------------------------------\n";
+      std::cout << "LacoA Temp: " << t << " Iteracao: " << iter << "\n[\n";
+      for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+        // std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
+        std::cout << (*lj)->toString();
+      }
+      std::cout << "]\n";
+    // -----------------
+
+    int totalCliCon = 0;
+    int iterB = 0;
+    bool movimentoB = false;
+    do { // laco B
+      iterB++;
+      totalCliCon = 0;
+      std::cout << "Iteracao: " << iterB << "\n";
+      for (ClientModelContainer::Iterator ci = m_clientDaContainer.Begin(); ci != m_clientDaContainer.End(); ++ci) {
+        double Zci = 0.0;
+        double low_dchilj = 1.5; // maior distancia é 1.0
+        std::cout << "\t[";
+        for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+          double dcilj = CalculateDistance((*ci)->GetPosition(r_max), (*lj)->GetPosition(r_max));
+          double pljci = std::exp ( - (dcilj/t) );
+          Zci += pljci;
+          (*lj)->SetTempPljci(pljci);
+          if (low_dchilj > dcilj) { // achou loc mais proximo
+            low_dchilj = dcilj;
+          }
+        }
+        std::cout << " ]\n";
+        std::cout << "\tZci: " << Zci << "\tlow_dchilj: " << low_dchilj << "\traio_cob/r_max: " << raio_cob/r_max << "\n";
+        if (low_dchilj <= raio_cob/r_max) {
+          (*ci)->SetConnected(true);
+          totalCliCon++;
+        } else {
+          (*ci)->SetConnected(false);
+        }
+        for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+          (*lj)->AddPljCiPuro((*ci), Zci, r_max);
+        }
+      }
+      std::cout << "-----------------------\n";
+
+      std::cout << "[";
+      movimentoB = MovimentoB();
+      for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+        std::cout << "\n\tX: " << (*lj)->GetXAcumCli() << "\t\tY: " << (*lj)->GetYAcumCli() << "\t\tX: " << (*lj)->GetXAcum() << "\t\tY: " << (*lj)->GetYAcum() << "\t\tPLJ: " << (*lj)->GetPlj() << "\t\tPN: " << (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize();
+        double newX = (*lj)->GetXAcumCli() / (*lj)->GetPlj();
+        double newY = (*lj)->GetYAcumCli() / (*lj)->GetPlj();
+        (*lj)->SetPositionPuro(newX, newY, r_max);
+        (*lj)->LimparAcumuladoPosicionamentoClientes(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
+        (*lj)->IniciarMovimentoB();
+      }
+      std::cout << "\n]\n";
+    } while (movimentoB && iterB <= max_iterB);
+
+    // eliminar duplicados
+    double dist;
+    for (int j = m_locationContainer.GetN()-1; j > 0; j--) {
+      std::vector<double> p1 (m_locationContainer.Get(j)->GetPosition(r_max));
+      for (int k = j - 1; k >= 0; --k) {
+        dist = CalculateDistance((m_locationContainer.Get(k)->GetPosition(r_max)), p1);
+        if (dist == 0) {
+          m_locationContainer.Erase(j);
+          break;
+        }
+      }
+    }
+
+    // ------------------ Para teste somente
+    std::cout << "LacoB (fim) Temp: " << t << " IteracaoB: " << iterB << "\n[\n";
+    for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+      std::cout << (*lj)->toString();
+    }
+    std::cout << "]\n";
+    // -----------------
+
+    if (totalCliCon >= m_clientDaContainer.GetN()*0.9) {
+      break; // finalizar Da
+    }
+
+    std::cout << "Fim do laco B .....\n";
+    std::cin >> lixo;
+
+    std::cout << "---> Novo UAV\n";
+    Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
+    nLoc->SetId(locId++);
+    CentroDeMassa(nLoc, r_max);
+    nLoc->IniciarMovimentoB();
+    nLoc->LimparAcumuladoPosicionamentoClientes();
+    m_locationContainer.Add(nLoc);
+
+    GraficoCenarioDaPuro(t, iter, lCentral, raio_cob);
+
+    t = t*0.9; // reduz 90%  a tempreatura
+
+    std::cout << "------------------------------------------------------------------\n";
+    std::cout << "------------------------------------------------------------------\n";
+  } while (t > t_min); // laco da temperatura
+
+  GraficoCenarioDaPuro(t, iter, lCentral, raio_cob);
+
+  m_totalCliGeral = 0;
+  m_locConsTotal = 0; // atualiza total de consumo de todas as localizacoes
+
+  os.str("");
+  os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/location_client.txt";
+  std::ofstream location_cli;
+  location_cli.open(os.str().c_str(), std::ofstream::out);
+  for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+    location_cli << (*lj)->GetId() << "," << (*lj)->GetTotalCli() << "," << (*lj)->GetTotalConsumption() << std::endl;
+  }
+  location_cli.close();
+
+  if ( m_locConsTotal == 0) {
+    m_locConsTotal = 1.0; // para nao dar problemas no calculo
+  }
+}
+
+void ServerApplication::GraficoCenarioDaPuro (double temp, int iter, Ptr<LocationModel> lCentral, double raio_cob) {
+  std::ofstream file;
+  std::ostringstream os;
+  os.str("");
+  os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/da_loc_puro_" << std::setfill ('0') << std::setw (15) << iter << ".txt";
+  file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
+  LocationModelContainer::Iterator lj = m_locationContainer.Begin(); // imprimindo a posicao atual da localizacao
+  file << m_maxx << "," << m_maxy << std::endl;
+  file << temp << std::endl;
+  file << lCentral->GetXPosition() << "," << lCentral->GetYPosition() << std::endl;
+  file << (*lj)->GetXPosition() << "," << (*lj)->GetYPosition();
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    file << "," << (*lj)->GetXPosition() << "," << (*lj)->GetYPosition();
+  }
+  file << "\n";
+  file.close();
+
+  os.str ("");
+  os << "python ./scratch/flynetwork/data/da_loc_puro.py " << m_pathData << " " << int(Simulator::Now().GetSeconds()) << " " << iter << " " << raio_cob;
+  NS_LOG_DEBUG (os.str());
+  system(os.str().c_str());
+  // os.str ("");
+  // os << "convert -delay 20 -loop 0 ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/*.png" << " ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/da_loc.gif";
+  // NS_LOG_DEBUG (os.str());
+  // system(os.str().c_str());
 }
 
 } // namespace ns3

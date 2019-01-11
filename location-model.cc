@@ -54,6 +54,7 @@ LocationModel::LocationModel()
   m_changePosition = true;
   m_totaCli = 0;
   m_totalConsumption = 0.0;
+  m_xAcumCli = m_yAcumCli = m_plj = 0.0;
 }
 
 LocationModel::~LocationModel()
@@ -111,6 +112,15 @@ void LocationModel::SetPosition(double x, double y, double r_max)
     m_position.push_back(y*r_max);
     m_historico.push_back(m_position); // OBs: push_back faz cópia ou não?! Se nao fizer vai falar a estratégia!!
   }
+}
+
+void LocationModel::SetPositionPuro(double x, double y, double r_max)
+{
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() <<x<<y);
+
+  m_position.clear();
+  m_position.push_back(x*r_max);
+  m_position.push_back(y*r_max);
 
 }
 
@@ -236,6 +246,13 @@ double LocationModel::GetWij () {
 void LocationModel::SetTempPljci (double pljci) {
   m_tempPljci = pljci;
   std::cout << " " << pljci;
+}
+
+void LocationModel::AddPljCiPuro (Ptr<ClientModel> ci, double Zci, double r_max) {
+  // calculando parte do novo posicionamento da localização
+  m_xAcumCli += ci->GetPci()*m_tempPljci*ci->GetXPosition(r_max);
+  m_yAcumCli += ci->GetPci()*m_tempPljci*ci->GetYPosition(r_max);
+  m_plj += ci->GetPci()*m_tempPljci;
 }
 
 void LocationModel::AddPljCi (Ptr<ClientModel> ci, double Zci, double r_max) {

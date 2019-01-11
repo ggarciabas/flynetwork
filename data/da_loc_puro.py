@@ -16,7 +16,7 @@ main_path = "./scratch/flynetwork/data/output/"+path
 etapa = sys.argv[2]
 iteracao = sys.argv[3]
 rcob = sys.argv[4]
-da = "cpp"
+da = "puro"
 
 for arquivo in glob.glob(main_path+'/'+'etapa/'+etapa+'/da_loc_'+da+'_*'+iteracao+'.txt'):
     print arquivo
@@ -35,12 +35,6 @@ for arquivo in glob.glob(main_path+'/'+'etapa/'+etapa+'/da_loc_'+da+'_*'+iteraca
     # posicao atual da localizacao
     line = f_cen.readline().strip()
     loc = [float(x) for x in line.split(',')] # read [x y x y x y] sequence of Locations
-    # posicao antiga da localizacao
-    line = f_cen.readline().strip()
-    loc_last = [float(x) for x in line.split(',')] # read [x y x y x y] sequence of Locations
-    # posicao do pai da localizacao
-    line = f_cen.readline().strip()
-    father = [float(x) for x in line.split(',')] # read [x y x y x y] sequence of Locations
     f_cen.close()
 
     f_cen = open(main_path+'/'+'etapa/'+etapa+'/client.txt','r')
@@ -63,39 +57,20 @@ for arquivo in glob.glob(main_path+'/'+'etapa/'+etapa+'/da_loc_'+da+'_*'+iteraca
 
     first = True
     for i in range(0, len(loc), 2):
-        x = [loc[i],loc_last[i]]
-        y = [loc[i+1],loc_last[i+1]]
         if first:
-            plt.plot(loc_last[i],loc_last[i+1],'cX', markersize=7.0, label="anteior")
             plt.plot(loc[i],loc[i+1],'c^', markersize=7.0, label="atual")
             ax.add_patch(
                 patches.Circle((loc[i],loc[i+1]), radius=float(rcob), color='b', fill=False, linestyle='dotted')
             )
-            plt.plot(x,y,'c-', markersize=7.0)
             first = False
         else:
-            plt.plot(loc_last[i],loc_last[i+1],'cX', markersize=7.0)
             plt.plot(loc[i],loc[i+1],'c^', markersize=7.0)
             ax.add_patch(
                 patches.Circle((loc[i],loc[i+1]), radius=float(rcob), color='b', fill=False, linestyle='dotted')
             )
-            plt.plot(x,y,'c-', markersize=7.0)
         # ax.annotate(str(int(uav[i])), xy=(uav[i+1],uav[i+2]+10))
         # ax.annotate(str(int(loc[i])), xy=(loc[i+1],loc[i+2]-10))
 
-    first = True
-    for i in range(0, len(loc), 2):
-        x = [loc[i],father[i]]
-        y = [loc[i+1],father[i+1]]
-        if first:
-            # plt.plot(father[i],father[i+1],'rD', markersize=7.0, label="pai")
-            plt.plot(x,y,'r-', markersize=7.0)
-            first = False
-        else:
-            # plt.plot(father[i],father[i+1],'rD', markersize=7.0)
-            plt.plot(x,y,'r-', markersize=7.0)
-        # ax.annotate(str(int(uav[i])), xy=(uav[i+1],uav[i+2]+10))
-        # ax.annotate(str(int(loc[i])), xy=(loc[i+1],loc[i+2]-10))
 
 
     plt.plot(central[0],central[1],'g*', markersize=7.0, label="central")
