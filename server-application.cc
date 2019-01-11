@@ -1537,7 +1537,12 @@ void ServerApplication::runDA() {
         }        
       }
 
-      if (feeting_locs && (totalCliCon >= m_clientDaContainer.GetN()*0.8 || !capacidade || !locConnected)) { 
+      if (feeting_locs) {
+         std::cout << "Feeting B \n\tItb: " << iterB << "\n\tTemp: " << t << "\n\tTotalCliCon: " << totalCliCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false") 
+              << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n[\n";
+      }
+
+      if (feeting_locs && (!(totalCliCon >= m_clientDaContainer.GetN()*0.8) || !capacidade || !locConnected)) { 
         t *= 1.1; // reheat 
         iterB = 1;
         // TALVEZ: atualizar a punicao de vizinhos
