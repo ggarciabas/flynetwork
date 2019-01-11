@@ -102,7 +102,7 @@ public:
   void SetTempPljci (double);
 
   void AddPljCi (Ptr<ClientModel>, double, double);
-  void AddPljCiPuro (Ptr<ClientModel> ci, double Zci, double r_max);
+  double AddPljCiPuro (Ptr<ClientModel> ci, double Zci, double r_max);
 
   bool SetFather (Ptr<LocationModel> l, double, double, double);
   Ptr<LocationModel> GetFather ();

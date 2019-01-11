@@ -1663,12 +1663,12 @@ void ServerApplication::CentroDeMassa (Ptr<LocationModel> l, double r_max) {
   for (ClientModelContainer::Iterator i = m_clientDaContainer.Begin(); i != m_clientDaContainer.End(); ++i) {
     std::cout << (*i)->ToString();
     if (!(*i)->IsConnected()) { // NOVO: considera somente os que nao estao conectados!
-      x += (*i)->GetXPosition(r_max);
-      y += (*i)->GetYPosition(r_max);
+      x += (*i)->GetXPosition();
+      y += (*i)->GetYPosition();
     }
   }
 
-  l->SetPosition(x/(double)m_clientDaContainer.GetN(), y/(double)m_clientDaContainer.GetN(), r_max); // posicionar no centro dos clientes
+  l->SetPosition(x/(double)m_clientDaContainer.GetN(), y/(double)m_clientDaContainer.GetN()); // posicionar no centro dos clientes
 
 }
 
@@ -1756,6 +1756,8 @@ void ServerApplication::runDAPuro() {
   // ----------------------
 
   int lixo;
+  std::cout << "Iniciando DA puro .....\n";
+  std::cin >> lixo;
   int iter = 0;
   do {// laco A
     iter++;
@@ -1770,6 +1772,9 @@ void ServerApplication::runDAPuro() {
       std::cout << "]\n";
     // -----------------
 
+    std::cout << "Iniciando DA puro .....\n";
+    std::cin >> lixo;
+
     int totalCliCon = 0;
     int iterB = 0;
     bool movimentoB = false;
@@ -1777,12 +1782,14 @@ void ServerApplication::runDAPuro() {
       iterB++;
       totalCliCon = 0;
       std::cout << "Iteracao: " << iterB << "\n";
+      double totalZci = 0.0;
       for (ClientModelContainer::Iterator ci = m_clientDaContainer.Begin(); ci != m_clientDaContainer.End(); ++ci) {
+        std::cout << "==> [" << (*ci)->GetPosition().at(0) << ", " << (*ci)->GetPosition().at(1) << "]\n";
         double Zci = 0.0;
-        double low_dchilj = 1.5; // maior distancia é 1.0
+        double low_dchilj = r_max+10;
         std::cout << "\t[";
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-          double dcilj = CalculateDistance((*ci)->GetPosition(r_max), (*lj)->GetPosition(r_max));
+          double dcilj = CalculateDistance((*ci)->GetPosition(), (*lj)->GetPosition());
           double pljci = std::exp ( - (dcilj/t) );
           Zci += pljci;
           (*lj)->SetTempPljci(pljci);
@@ -1791,19 +1798,22 @@ void ServerApplication::runDAPuro() {
           }
         }
         std::cout << " ]\n";
-        std::cout << "\tZci: " << Zci << "\tlow_dchilj: " << low_dchilj << "\traio_cob/r_max: " << raio_cob/r_max << "\n";
-        if (low_dchilj <= raio_cob/r_max) {
+        std::cout << "\tZci: " << Zci << "\tlow_dchilj: " << low_dchilj << "\traio_cob: " << raio_cob << "\n";
+        if (low_dchilj <= raio_cob) {
           (*ci)->SetConnected(true);
           totalCliCon++;
         } else {
           (*ci)->SetConnected(false);
         }
+        double totalPljci = 0.0;
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-          (*lj)->AddPljCiPuro((*ci), Zci, r_max);
+          totalPljci +=  (*lj)->AddPljCiPuro((*ci), Zci, r_max);
         }
+        totalZci += Zci;
+        std::cout << "--> \t totalPljci: " << totalPljci << std::endl;
       }
       std::cout << "-----------------------\n";
-
+      std::cout << "...... ZciTotal: " << totalZci << "\n";
       std::cout << "[";
       movimentoB = MovimentoB();
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
@@ -1819,9 +1829,9 @@ void ServerApplication::runDAPuro() {
     // eliminar duplicados
     double dist;
     for (int j = m_locationContainer.GetN()-1; j > 0; j--) {
-      std::vector<double> p1 (m_locationContainer.Get(j)->GetPosition(r_max));
+      std::vector<double> p1 (m_locationContainer.Get(j)->GetPosition());
       for (int k = j - 1; k >= 0; --k) {
-        dist = CalculateDistance((m_locationContainer.Get(k)->GetPosition(r_max)), p1);
+        dist = CalculateDistance((m_locationContainer.Get(k)->GetPosition()), p1);
         if (dist == 0) {
           m_locationContainer.Erase(j);
           break;
@@ -1838,11 +1848,10 @@ void ServerApplication::runDAPuro() {
     // -----------------
 
     if (totalCliCon >= m_clientDaContainer.GetN()*0.9) {
+      std::cout << "---> Todos conectados [" << totalCliCon << ", " << m_clientDaContainer.GetN()*0.9 << "]\n";
+      std::cin >> lixo;
       break; // finalizar Da
     }
-
-    std::cout << "Fim do laco B .....\n";
-    std::cin >> lixo;
 
     std::cout << "---> Novo UAV\n";
     Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();

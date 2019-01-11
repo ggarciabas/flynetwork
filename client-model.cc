@@ -161,6 +161,15 @@ double ClientModel::GetYPosition (double r_max) {
   return m_position.at(1)/r_max;
 }
 
+double ClientModel::GetXPosition () {
+  return m_position.at(0);
+}
+
+double ClientModel::GetYPosition () {
+  return m_position.at(1);
+}
+
+
 void ClientModel::SetLocConnected (Ptr<LocationModel> l) {
   m_locConnected = l;
 }

@@ -119,8 +119,8 @@ void LocationModel::SetPositionPuro(double x, double y, double r_max)
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() <<x<<y);
 
   m_position.clear();
-  m_position.push_back(x*r_max);
-  m_position.push_back(y*r_max);
+  m_position.push_back(x);
+  m_position.push_back(y);
 
 }
 
@@ -248,19 +248,20 @@ void LocationModel::SetTempPljci (double pljci) {
   std::cout << " " << pljci;
 }
 
-void LocationModel::AddPljCiPuro (Ptr<ClientModel> ci, double Zci, double r_max) {
+double LocationModel::AddPljCiPuro (Ptr<ClientModel> ci, double Zci, double r_max) {
   // calculando parte do novo posicionamento da localização
-  m_xAcumCli += ci->GetPci()*m_tempPljci*ci->GetXPosition(r_max);
-  m_yAcumCli += ci->GetPci()*m_tempPljci*ci->GetYPosition(r_max);
-  m_plj += ci->GetPci()*m_tempPljci;
+  m_xAcumCli += ci->GetPci()*(m_tempPljci/Zci)*ci->GetXPosition();
+  m_yAcumCli += ci->GetPci()*(m_tempPljci/Zci)*ci->GetYPosition();
+  m_plj += ci->GetPci()*(m_tempPljci/Zci);
+  return (m_tempPljci/Zci);
 }
 
 void LocationModel::AddPljCi (Ptr<ClientModel> ci, double Zci, double r_max) {
   m_pljci[ci] = m_tempPljci/Zci;
   // calculando parte do novo posicionamento da localização
-  m_xAcumCli += ci->GetPci()*m_tempPljci*ci->GetXPosition(r_max);
-  m_yAcumCli += ci->GetPci()*m_tempPljci*ci->GetYPosition(r_max);
-  m_plj += ci->GetPci()*m_tempPljci;
+  m_xAcumCli += ci->GetPci()*(m_tempPljci/Zci)*ci->GetXPosition(r_max);
+  m_yAcumCli += ci->GetPci()*(m_tempPljci/Zci)*ci->GetYPosition(r_max);
+  m_plj += ci->GetPci()*(m_tempPljci/Zci);
 }
 
 bool LocationModel::SetFather (Ptr<LocationModel> l, double dist, double uav_cob, double r_max) {

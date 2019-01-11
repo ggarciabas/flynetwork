@@ -73,6 +73,8 @@ public:
 
   double GetYPosition(double);
   double GetXPosition(double);
+  double GetYPosition();
+  double GetXPosition();
 
   void SetLocConnected (Ptr<LocationModel>);
   Ptr<LocationModel> GetLocConnected ();
