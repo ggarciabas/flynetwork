@@ -1747,6 +1747,7 @@ void ServerApplication::runDAPuro() {
   lCentral->SetId(9999);
   Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
   lCentral->SetPosition(pos.x, pos.y); // iniciando a localizacao que representará a central
+  lCentral->IniciarMovimentoB();
   // ----------------------
   std::cout << "Central: " << lCentral->toString();
   std::cout << "Loc: " << loc->toString();
@@ -1811,7 +1812,6 @@ void ServerApplication::runDAPuro() {
         double newY = (*lj)->GetYAcumCli() / (*lj)->GetPlj();
         (*lj)->SetPositionPuro(newX, newY, r_max);
         (*lj)->LimparAcumuladoPosicionamentoClientes(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
-        (*lj)->IniciarMovimentoB();
       }
       std::cout << "\n]\n";
     } while (movimentoB && iterB <= max_iterB);
