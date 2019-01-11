@@ -1526,7 +1526,6 @@ void ServerApplication::runDA() {
         }
         if (!locConnected) { //  se nao tiver conectados!
           t*= 1.1; // reheat
-          continue;
         }
       }
     } while (movimentoB && iterB < max_iterB); // NOVO: definir valor melhor, coloquei iteração pois no teste_1/custo_1 com 3 localizacoes o algoritmo detecam 4 grupos e as localizacoes ficam trocando entre estas 4, assim, nunca saindo do laco! Com limite de iterações espera-se que saia adicione uma nova localização e o problema seja resolvido.
