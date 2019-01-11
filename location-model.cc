@@ -277,7 +277,7 @@ bool LocationModel::SetFather (Ptr<LocationModel> l, double dist, double uav_cob
     m_punshNeigh = m_punshNeigh * 1.1;
   }
 
-  m_connected = dist>=uav_cob;
+  m_connected = dist <= uav_cob;
 
   return m_connected;
 }
