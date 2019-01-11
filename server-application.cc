@@ -1353,7 +1353,7 @@ void ServerApplication::runDA() {
   }
   double t = 0.6;
   int locId = 0;
-  int max_iterB = 100000;
+  int max_iterB = 20000;
 
   // -------------------
   std::cout << "[\n\tTmin:\t\t" << t_min
@@ -1390,7 +1390,7 @@ void ServerApplication::runDA() {
   lCentral->SetPosition(pos.x, pos.y); // iniciando a localizacao que representará a central
   lCentral->IniciarMovimentoA(); // somente para nao dar problemas ao executar toString
   lCentral->IniciarMovimentoB();
-  loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), uav_cob/r_max, r_max); // este método atualiza a variavel de punicao!
+  loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), r_max); // este método atualiza a variavel de punicao!
 
   // ----------------------
   std::cout << "Central: " << lCentral->toString();
@@ -1403,6 +1403,7 @@ void ServerApplication::runDA() {
   int iter = 0;
   do {// laco A
     iter++;
+    GraficoCenarioDa(t, iter, lCentral, raio_cob, uav_cob);
 
     // ------------------ Para teste somente
     std::cout << "------------------------------------------------------------------\n";
@@ -1420,7 +1421,7 @@ void ServerApplication::runDA() {
     bool movimentoB = true;
     int iterB = 0;
     do { // laco B
-      capacidade = true;
+      capacidade = locConnected = true;
       iterB++;
       totalCliCon = 0;
       std::cout << "Iteracao: " << iterB << "\n";
@@ -1428,7 +1429,7 @@ void ServerApplication::runDA() {
         double Zci = 0.0;
         // double high_pljci = -1;
         double low_dchilj = 1.5; // maior distancia é 1.0
-        std::cout << "\t[";
+        // std::cout << "\t[";
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           double dcilj = CalculateDistance((*ci)->GetPosition(r_max), (*lj)->GetPosition(r_max));
           double pljci = std::exp ( - ((dcilj + (*lj)->GetPunishCapacity()*(*lj)->GetWij() )/t) );
@@ -1448,8 +1449,8 @@ void ServerApplication::runDA() {
           }
 
         }
-        std::cout << " ]\n";
-        std::cout << "\tZci: " << Zci << "\tlow_dchilj: " << low_dchilj << "\traio_cob/r_max: " << raio_cob/r_max << "\n";
+        // std::cout << " ]\n";
+        // std::cout << "\tZci: " << Zci << "\tlow_dchilj: " << low_dchilj << "\traio_cob/r_max: " << raio_cob/r_max << "\n";
         // OBS: como saber se os clientes possuem conexão?!, falta adicionar uma flag no cliente para saber se ele está dentro da cobertura da localização conectada, esta é uma condição para finalizar o algoritmo, uma porcentagem dos clientes tem que estar dentro da cobertura de algum UAV
         if (low_dchilj <= raio_cob/r_max) {
           // std::cout << "---->>> Distancia: " << high_dchilj << " cobmax: " << raio_cob/r_max << std::endl;
@@ -1464,7 +1465,7 @@ void ServerApplication::runDA() {
           (*lj)->AddPljCi((*ci), Zci, r_max); // finaliza o calculo do pljci na funcao e cadastra no map relacionando o ci
         }
       }
-      std::cout << "-----------------------\n";
+      // std::cout << "-----------------------\n";
 
       // calcular lj novos - não consigo fazer no laco anterior pela falta dos valores acumulados (não tentar colcoar la!)
       std::cout << "[";
@@ -1491,40 +1492,44 @@ void ServerApplication::runDA() {
         // std::cout << "Total de Localizações: " << m_locationContainer.GetN() << std::endl;
         m_locationContainer.Get(0)->LimparAcumuladoPosicionamento();
         for (int j = m_locationContainer.GetN()-1; j >= 0; j--) { // Obs.: >=0 para que seja feito o calculo da localizacao 0 com a central, não irá entrar no segundo laco devido a condicao imposta lá!
-          // std::cout << "J[" << j << "]: ";
+          std::cout << "J[" << j << "]: ";
           // std::cout << m_locationContainer.Get(j)->toString();
           m_locationContainer.Get(j)->LimparAcumuladoPosicionamento(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
           std::vector<double> p1 (m_locationContainer.Get(j)->GetPosition(r_max));
           int id = -1; // a principio se conecta com a central
           double dist = CalculateDistance(lCentral->GetPosition(r_max), p1);
           for (int k = j - 1; k >= 0; --k) {
-            // std::cout << "K[" << k << "]: ";
+            std::cout << "\tK[" << k << "]: ";
             // std::cout << m_locationContainer.Get(k)->toString();
             std::vector<double> p2 (m_locationContainer.Get(k)->GetPosition(r_max));
             double d = CalculateDistance(p1, p2);
             if (d <= dist) { // achou algum nó mais perto
+              std::cout << "\t\t acho mais perto: " << d << std::endl;
               // PENSAR: Será que é interessante, mesmo achando um nó mais perto considerar como pai a central, caso a central esteja na cobertura? Isto permite reduzir o número de saltos, porém, acredito que também irá fazer com que os UAVs fiquem mais próximos a central, dificultando seu distanciamento. E ai?!
               id = k;
               dist = d;
             }
           }
           if (id == -1) { // menor distancia é para com a central
-            locConnected = m_locationContainer.Get(j)->SetFather(lCentral, dist, uav_cob/r_max, r_max) && locConnected; // este método atualiza a variavel de punicao!
+            m_locationContainer.Get(j)->SetFather(lCentral, dist, r_max);
+            locConnected = m_locationContainer.Get(j)->UpdatePunishNeighboor(uav_cob/r_max) && locConnected; // este método atualiza a variavel de punicao!
           } else { // menor distancia é para algum outro UAV, cadastrar o pai e o filho!
-            locConnected = m_locationContainer.Get(j)->SetFather(m_locationContainer.Get(id), dist, uav_cob/r_max, r_max) && locConnected; // este método atualiza a variavel de punicao!
+            m_locationContainer.Get(j)->SetFather(m_locationContainer.Get(id), dist, r_max);
+            locConnected = m_locationContainer.Get(j)->UpdatePunishNeighboor(uav_cob/r_max) && locConnected; // este método atualiza a variavel de punicao!
             m_locationContainer.Get(id)->AddChild(m_locationContainer.Get(j), r_max); // novo filho para id!
           }
         }
+      } 
+      else { // se nao houver movimento e não tiverem conectados deve-se alterar a punicao de conexão e continuar para que ele se movimente em direcao ao pai!
+        for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+          locConnected = (*lj)->UpdatePunishNeighboor(uav_cob/r_max) && locConnected;
+        }
+        if (!locConnected) { //  se nao tiver conectados!
+          t*= 1.1; // reheat
+          continue;
+        }
       }
-      // TODO: salvar cenario intermediario para visualizar se está tendo avanços
-
-    } while (movimentoB /*&& iterB < max_iterB*/); // NOVO: definir valor melhor, coloquei iteração pois no teste_1/custo_1 com 3 localizacoes o algoritmo detecam 4 grupos e as localizacoes ficam trocando entre estas 4, assim, nunca saindo do laco! Com limite de iterações espera-se que saia adicione uma nova localização e o problema seja resolvido.
-
-    // validar capacidade, pois se nao muda o pai, a variavel de capacidade está com valor errado!
-    locConnected = true;
-    for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-      locConnected = locConnected && (*lj)->IsConnected();
-    }
+    } while (movimentoB && iterB < max_iterB); // NOVO: definir valor melhor, coloquei iteração pois no teste_1/custo_1 com 3 localizacoes o algoritmo detecam 4 grupos e as localizacoes ficam trocando entre estas 4, assim, nunca saindo do laco! Com limite de iterações espera-se que saia adicione uma nova localização e o problema seja resolvido.
 
     // ------------------ Para teste somente
     std::cout << "LacoB (fim) Temp: " << t << " IteracaoB: " << iterB << "\n[\n";
@@ -1535,10 +1540,30 @@ void ServerApplication::runDA() {
     std::cout << "]\n";
     // -----------------
 
+    // eliminar duplicados
+    // if (t < 0.1) {
+    //   double dist;
+    //   for (int j = m_locationContainer.GetN()-1; j > 0; j--) {
+    //     std::vector<double> p1 (m_locationContainer.Get(j)->GetPosition(r_max));
+    //     for (int k = j - 1; k >= 0; --k) {
+    //       dist = CalculateDistance((m_locationContainer.Get(k)->GetPosition(r_max)), p1);
+    //       if ((int)dist == 0) {
+    //         std::cout << "-> Eliminando localizacao\n";
+    //         m_locationContainer.Erase(j);
+    //         break;
+    //       }
+    //     }
+    //   }
+    // }    
+
     // Verificar condição de parada: 1- clientes conectados, 2- uavs conectados, 3- capacidade não extrapolada
     std::cout << "Condição de parada:\n\tTotalCliCon: " << totalCliCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false") << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << std::endl;
-    if (totalCliCon >= m_clientDaContainer.GetN()*0.9 && locConnected && capacidade) { // 1- NOVO: 90% dos clientes tem que ter conexao
-      break; // finalizar Da de Localização
+    if (locConnected && capacidade) { // 1- NOVO: 90% dos clientes tem que ter conexao
+      if (totalCliCon >= m_clientDaContainer.GetN()*0.9)
+        break; // finalizar Da de Localização
+      else {
+        // adicionar novo UAV        
+      }
     }
 
     // NOVO: !(totalCliCon > m_clientDaContainer.GetN()*t) caso não tenha ao menos t% de usuarios cobertos, assim, conforme t diminui, não irá aumentar a quantidade de UAvs na rede
@@ -1554,14 +1579,12 @@ void ServerApplication::runDA() {
       nLoc->SetPunishNeighboor(0.01);
       nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
       nLoc->LimparAcumuladoPosicionamento();
-      nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), uav_cob/r_max, r_max); // este método atualiza a variavel de punicao!
+      nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max); // este método atualiza a variavel de punicao!
       // NOVO: Aumentar a temperatura, nova localizacao adicionada!
-      // t *= 1.1;
-      GraficoCenarioDa(t, iter, lCentral, raio_cob, uav_cob);
-      continue;
+      // t = (t>0.1) ? t : 0.1;
+      // continue;
     }
     // else {
-    GraficoCenarioDa(t, iter, lCentral, raio_cob, uav_cob);
     // Reiniciar Movimento A para cada Localizacao
     for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
       (*lj)->IniciarMovimentoA();

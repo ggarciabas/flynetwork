@@ -142,6 +142,17 @@ LocationModel::GetPosition(double r_max)
   return p;
 }
 
+
+std::vector<double>
+LocationModel::GetPositionA(double r_max)
+{
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
+  std::vector<double> p;
+  p.push_back(m_positionA.at(0)/r_max);
+  p.push_back(m_positionA.at(1)/r_max);
+  return p;
+}
+
 bool LocationModel::IsUsed() {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   return m_used;
@@ -245,7 +256,7 @@ double LocationModel::GetWij () {
 
 void LocationModel::SetTempPljci (double pljci) {
   m_tempPljci = pljci;
-  std::cout << " " << pljci;
+  // std::cout << " " << pljci;
 }
 
 double LocationModel::AddPljCiPuro (Ptr<ClientModel> ci, double Zci, double r_max) {
@@ -264,24 +275,26 @@ void LocationModel::AddPljCi (Ptr<ClientModel> ci, double Zci, double r_max) {
   m_plj += ci->GetPci()*(m_tempPljci/Zci);
 }
 
-bool LocationModel::SetFather (Ptr<LocationModel> l, double dist, double uav_cob, double r_max) {
-  m_father = l;
-  // atualizando parte do novo posicionamento da localizacao
-  std::cout << "Father: " << l->GetXPosition(r_max) << " " << l->GetYPosition(r_max) << " Dist: " << dist << " UavCob: " << uav_cob << " exp: " << std::exp (-1+(dist/uav_cob)) <<  std::endl;
-  m_xAcum = l->GetXPosition(r_max) * m_punshNeigh;
-  m_yAcum = l->GetYPosition(r_max) * m_punshNeigh;
-
-  if (dist <= uav_cob) {
-    m_punshNeigh = m_punshNeigh * 0.9; //std::exp (-1+(dist/uav_cob)); // nunca aumenta, só diminui esta equacao
+bool LocationModel::UpdatePunishNeighboor (double uav_cob) {
+  if (m_distFather <= uav_cob) {
+    m_punshNeigh *= std::exp (-1+(m_distFather/uav_cob)); // m_punshNeigh * 0.9; // 
   } else {
-    m_punshNeigh = m_punshNeigh * 1.1;
+    m_punshNeigh *= 1.1;
   }
 
-  m_connected = dist <= uav_cob;
+  m_connected = m_distFather <= uav_cob;
 
   std::cout << "[ Loc: " << m_id << " " << ((m_connected)?"true":"false") << "]" << std::endl;
 
   return m_connected;
+}
+
+void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max) {
+  m_father = l;
+  // atualizando parte do novo posicionamento da localizacao
+  m_xAcum = l->GetXPosition(r_max) * m_punshNeigh;
+  m_yAcum = l->GetYPosition(r_max) * m_punshNeigh;
+  m_distFather = dist;
 }
 
 Ptr<LocationModel> LocationModel::GetFather () {
@@ -370,6 +383,7 @@ bool LocationModel::ValidarCapacidade (double Wj, double taxa_capacidade) {
     return false;
   } else {
     m_punshCapacity *= 0.6; // NOVO: reduz 60%
+    m_punshCapacity = (m_punshCapacity<0.01)?0.01:m_punshCapacity; // define um minimo!
   }
   return true;
 }

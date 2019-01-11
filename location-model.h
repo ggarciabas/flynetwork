@@ -57,6 +57,7 @@ public:
   void SetPosition(double, double, double);
   void SetPositionPuro(double x, double y, double r_max);
   std::vector<double> GetPosition(double);
+  std::vector<double> GetPositionA(double);
 
   double GetXPosition (double);
   double GetYPosition (double);
@@ -64,7 +65,7 @@ public:
   std::string toString() {
     std::ostringstream os;
     os << "Id: " << m_id << "\n\tPos: (" << m_position.at(0) << "," << m_position.at(1)
-      // << ")\n\tPosA: (" << m_positionA.at(0) << "," << m_positionA.at(1)
+      << ")\n\tPosA: (" << m_positionA.at(0) << "," << m_positionA.at(1)
       << ")\n\tPosB: (" << m_positionB.at(0) << "," << m_positionB.at(1)
       << ")\n\tConsumption: " << m_totalConsumption
       << "\n\tPunCap: " << m_punshCapacity
@@ -104,7 +105,9 @@ public:
   void AddPljCi (Ptr<ClientModel>, double, double);
   double AddPljCiPuro (Ptr<ClientModel> ci, double Zci, double r_max);
 
-  bool SetFather (Ptr<LocationModel> l, double, double, double);
+
+  bool UpdatePunishNeighboor (double uav_cob);
+  void SetFather (Ptr<LocationModel> l, double dist, double r_max);
   Ptr<LocationModel> GetFather ();
 
   void AddChild (Ptr<LocationModel> l, double r_max);
@@ -161,6 +164,7 @@ private:
 
   std::map<Ptr<ClientModel>, double> m_pljci;
   Ptr<LocationModel> m_father;
+  double m_distFather;
   LocationModelContainer m_childList;
 };
 
