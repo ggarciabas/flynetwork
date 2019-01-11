@@ -1520,6 +1520,12 @@ void ServerApplication::runDA() {
 
     } while (movimentoB /*&& iterB < max_iterB*/); // NOVO: definir valor melhor, coloquei iteração pois no teste_1/custo_1 com 3 localizacoes o algoritmo detecam 4 grupos e as localizacoes ficam trocando entre estas 4, assim, nunca saindo do laco! Com limite de iterações espera-se que saia adicione uma nova localização e o problema seja resolvido.
 
+    // validar capacidade, pois se nao muda o pai, a variavel de capacidade está com valor errado!
+    locConnected = true;
+    for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+      locConnected = locConnected && (*lj)->IsConnected();
+    }
+
     // ------------------ Para teste somente
     std::cout << "LacoB (fim) Temp: " << t << " IteracaoB: " << iterB << "\n[\n";
     for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
@@ -1622,7 +1628,7 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
   file.close();
 
   os.str ("");
-  os << "python ./scratch/flynetwork/data/da_loc.py " << m_pathData << " " << int(Simulator::Now().GetSeconds()) << " " << iter << " " << raio_cob << " " << uav_cob;
+  os << "python ./scratch/flynetwork/data/da_loc.py " << m_pathData << " " << int(Simulator::Now().GetSeconds()) << " " << iter << " " << raio_cob << " " << uav_cob << " " << m_locationContainer.GetN();
   NS_LOG_DEBUG (os.str());
   system(os.str().c_str());
   // os.str ("");

@@ -17,6 +17,7 @@ etapa = sys.argv[2]
 iteracao = sys.argv[3]
 rcob = sys.argv[4]
 ucob = sys.argv[5]
+tLoc = sys.argv[6]
 da = "cpp"
 
 for arquivo in glob.glob(main_path+'/'+'etapa/'+etapa+'/da_loc_'+da+'_*'+iteracao+'.txt'):
@@ -111,7 +112,7 @@ for arquivo in glob.glob(main_path+'/'+'etapa/'+etapa+'/da_loc_'+da+'_*'+iteraca
     plt.ylim([0,lim[1]])
     plt.xlabel('X (m)')
     plt.ylabel('Y (m)')
-    plt.title("Cenario @"+'etapa/'+etapa+"s Temp.:"+str(temp[0])+ " Iter:"+iteracao)
+    plt.title("Cenario @"+'etapa/'+etapa+"s Temp.:"+str(temp[0])+ " Iter:"+iteracao+" TLoc: "+ tLoc)
 
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.23), fancybox=True, shadow=True, ncol=5)
 

@@ -279,6 +279,8 @@ bool LocationModel::SetFather (Ptr<LocationModel> l, double dist, double uav_cob
 
   m_connected = dist <= uav_cob;
 
+  std::cout << "[ Loc: " << m_id << " " << ((m_connected)?"true":"false") << "]" << std::endl;
+
   return m_connected;
 }
 
