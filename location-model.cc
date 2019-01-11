@@ -103,7 +103,7 @@ void LocationModel::SetPosition(double x, double y, double r_max)
     for (std::vector<std::vector<double> >::iterator i = m_historico.begin(); i != m_historico.end(); ++i) {
       if (x*r_max == (*i).at(0) && y*r_max == (*i).at(1)) {
         // já conhece a posicao, não altera mais! Selecionou ela novamente.
-        std::cout << "#### ---> Posição já avaliada! Nao permite mais trocar de posicao esta localizacao!\n";
+        // std::cout << "#### ---> Posição já avaliada! Nao permite mais trocar de posicao esta localizacao!\n";
         m_changePosition = false;
       }
     }
@@ -280,23 +280,25 @@ bool LocationModel::UpdatePunishNeighboor (double uav_cob) {
     m_punshNeigh *= std::exp (-1+(m_distFather/uav_cob)); // m_punshNeigh * 0.9; // 
     m_punshNeigh = (m_punshNeigh>0.01)?m_punshNeigh:0.01;
   } else {
-    m_punshNeigh *= 1.1;
+    m_punshNeigh *= 1.2;
     m_punshNeigh = (m_punshNeigh > 2) ? 2 : m_punshNeigh;
   }
 
   m_connected = m_distFather <= uav_cob;
 
-  std::cout << "[ Loc: " << m_id << " " << ((m_connected)?"true":"false") << "]" << std::endl;
+  // std::cout << "[ Loc: " << m_id << " " << ((m_connected)?"true":"false") << "]" << std::endl;
 
   return m_connected;
 }
 
-void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max) {
+void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, double uav_cob) {
   m_father = l;
   // atualizando parte do novo posicionamento da localizacao
   m_xAcum += l->GetXPosition(r_max);
   m_yAcum += l->GetYPosition(r_max);
   m_distFather = dist;
+
+  m_connected = m_distFather <= (uav_cob/r_max);
 }
 
 Ptr<LocationModel> LocationModel::GetFather () {

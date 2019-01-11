@@ -1353,7 +1353,7 @@ void ServerApplication::runDA() {
   }
   double t = 0.6;
   int locId = 0;
-  int max_iterB = 20000;
+  int max_iterB = 5000;
 
   // -------------------
   std::cout << "[\n\tTmin:\t\t" << t_min
@@ -1390,7 +1390,7 @@ void ServerApplication::runDA() {
   lCentral->SetPosition(pos.x, pos.y); // iniciando a localizacao que representará a central
   lCentral->IniciarMovimentoA(); // somente para nao dar problemas ao executar toString
   lCentral->IniciarMovimentoB();
-  loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), r_max); // este método atualiza a variavel de punicao!
+  loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), r_max, uav_cob); // este método atualiza a variavel de punicao!
 
   // ----------------------
   std::cout << "Central: " << lCentral->toString();
@@ -1402,19 +1402,22 @@ void ServerApplication::runDA() {
   int lixo;
   int iter = 0;
   double lastT = t;
+  double feeting_locs = false;
   do {// laco A
     iter++;
 
     // ------------------ Para teste somente
-    std::cout << "------------------------------------------------------------------\n";
-      std::cout << "LacoA Temp: " << t << " Iteracao: " << iter << "\n[\n";
-      for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-        // std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
-        std::cout << (*lj)->toString();
-      }
-      std::cout << "]\n";
+    // std::cout << "------------------------------------------------------------------\n";
+    //   std::cout << "LacoA Temp: " << t << " Iteracao: " << iter << "\n[\n";
+    //   for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+    //     // std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
+    //     std::cout << (*lj)->toString();
+    //   }
+    //   std::cout << "]\n";
     // -----------------
 
+
+    run_last_b:
     int totalCliCon = 0;
     bool locConnected = true;
     bool capacidade = true;
@@ -1424,7 +1427,7 @@ void ServerApplication::runDA() {
       capacidade = locConnected = true;
       iterB++;
       totalCliCon = 0;
-      std::cout << "Iteracao: " << iterB << "\n";
+      // std::cout << "Iteracao: " << iterB << "\n";
       for (ClientModelContainer::Iterator ci = m_clientDaContainer.Begin(); ci != m_clientDaContainer.End(); ++ci) {
         double Zci = 0.0;
         // double high_pljci = -1;
@@ -1461,9 +1464,14 @@ void ServerApplication::runDA() {
         }
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           if (Zci < 1e-30) {
-            Zci = 1e-30;
-            t = 0.1;
-            goto new_uav;
+            if (feeting_locs) {
+              t *= 1.1; // no feeting nao adiciona novos uavs!
+            } else {
+              Zci = 1e-30;
+              t = 0.1;
+              std::cout << "Solicitando nova localizacao pois Zci esta baixo!\n";
+              goto new_uav;
+            }
           }
           // PENSAR: preciso guardar o valor de pljci?! Não é suficiente calcular já a parte da equacao de lj e descartar estes valores?!
           // PENSAR: Se houver estratégia para remover UAVs, ai seria interessante armazenar para que se possa calcular os clientes que estão conectados e saber se os pais conseguem suprir o cliente
@@ -1473,9 +1481,8 @@ void ServerApplication::runDA() {
       // std::cout << "-----------------------\n";
 
       // calcular lj novos - não consigo fazer no laco anterior pela falta dos valores acumulados (não tentar colcoar la!)
-      std::cout << "[";
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-        std::cout << "\n\tX: " << (*lj)->GetXAcumCli() << "\t\tY: " << (*lj)->GetYAcumCli() << "\t\tX: " << (*lj)->GetXAcum() << "\t\tY: " << (*lj)->GetYAcum() << "\t\tPLJ: " << (*lj)->GetPlj() << "\t\tPN: " << (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize();
+        // std::cout << "\n\tX: " << (*lj)->GetXAcumCli() << "\t\tY: " << (*lj)->GetYAcumCli() << "\t\tX: " << (*lj)->GetXAcum() << "\t\tY: " << (*lj)->GetYAcum() << "\t\tPLJ: " << (*lj)->GetPlj() << "\t\tPN: " << (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize();
         double newX = ((*lj)->GetXAcumCli()+(*lj)->GetXAcum()*(*lj)->GetPunishNeighboor()) / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize()); // SAI DA EQUACAO: nao pode eletar ---> antigo: considera soemnte 50% para os filhos
         double newY = ((*lj)->GetYAcumCli()+(*lj)->GetYAcum()*(*lj)->GetPunishNeighboor()) / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize()); // SAI DA EQUACAO: nao pode eletar ---> antigo: considera soemnte 50% para os filhos
         (*lj)->SetPosition(newX, newY, r_max);
@@ -1487,38 +1494,37 @@ void ServerApplication::runDA() {
         (*lj)->ClearChildList();
         (*lj)->LimparAcumuladoPosicionamento(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
       }
-      std::cout << "\n]\n";
 
       // Se houve mudança no posicionamento, se faz necessario verificar um novo pai para cada lj
       movimentoB = MovimentoB();
       if (movimentoB) {
-        std::cout << "---> MovimentoB \n";
+        // std::cout << "---> MovimentoB \n";
         // std::cout << "Total de Localizações: " << m_locationContainer.GetN() << std::endl;
         m_locationContainer.Get(0)->LimparAcumuladoPosicionamentoClientes(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
         for (int j = m_locationContainer.GetN()-1; j >= 0; j--) { // Obs.: >=0 para que seja feito o calculo da localizacao 0 com a central, não irá entrar no segundo laco devido a condicao imposta lá!
-          std::cout << "J[" << j << "]: ";
+          // std::cout << "J[" << j << "]: ";
           // std::cout << m_locationContainer.Get(j)->toString();
           m_locationContainer.Get(j)->LimparAcumuladoPosicionamentoClientes();
           std::vector<double> p1 (m_locationContainer.Get(j)->GetPosition(r_max));
           int id = -1; // a principio se conecta com a central
           double dist = CalculateDistance(lCentral->GetPosition(r_max), p1);
           for (int k = j - 1; k >= 0; --k) {
-            std::cout << "\tK[" << k << "]: ";
+            // std::cout << "\tK[" << k << "]: ";
             // std::cout << m_locationContainer.Get(k)->toString();
             std::vector<double> p2 (m_locationContainer.Get(k)->GetPosition(r_max));
             double d = CalculateDistance(p1, p2);
             if (d <= dist) { // achou algum nó mais perto
-              std::cout << "\t\t acho mais perto: " << d << std::endl;
+              // std::cout << "\t\t acho mais perto: " << d << std::endl;
               // PENSAR: Será que é interessante, mesmo achando um nó mais perto considerar como pai a central, caso a central esteja na cobertura? Isto permite reduzir o número de saltos, porém, acredito que também irá fazer com que os UAVs fiquem mais próximos a central, dificultando seu distanciamento. E ai?!
               id = k;
               dist = d;
             }
           }
           if (id == -1) { // menor distancia é para com a central
-            m_locationContainer.Get(j)->SetFather(lCentral, dist, r_max);
+            m_locationContainer.Get(j)->SetFather(lCentral, dist, r_max, uav_cob);
             locConnected = m_locationContainer.Get(j)->IsConnected() && locConnected; // este método atualiza a variavel de punicao!
           } else { // menor distancia é para algum outro UAV, cadastrar o pai e o filho!
-            m_locationContainer.Get(j)->SetFather(m_locationContainer.Get(id), dist, r_max);
+            m_locationContainer.Get(j)->SetFather(m_locationContainer.Get(id), dist, r_max, uav_cob);
             locConnected = m_locationContainer.Get(j)->IsConnected() && locConnected; // este método atualiza a variavel de punicao!
             m_locationContainer.Get(id)->AddChild(m_locationContainer.Get(j), r_max); // novo filho para id!
           }
@@ -1528,20 +1534,46 @@ void ServerApplication::runDA() {
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           locConnected = (*lj)->IsConnected() && locConnected;
           // NAO limpar o acumulado posicionamento clientes quando nao houver movimento! O valor de Plj é utilizado no grafico, para isto necessito do valor!
-        }
-        // if (!locConnected) { //  se nao tiver conectados!
-        //   t*= 1.2; // reheat - nao adianta ser na mesma proporcao que será reduzida né?!
-        // }
+        }        
       }
+
+      if (feeting_locs && (totalCliCon >= m_clientDaContainer.GetN()*0.8 || !capacidade || !locConnected)) { 
+        t *= 1.1; // reheat 
+        iterB = 1;
+        // TALVEZ: atualizar a punicao de vizinhos
+        for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+          (*lj)->UpdatePunishNeighboor(uav_cob/r_max);
+        }
+        continue;
+      } 
     } while (movimentoB && iterB < max_iterB); // NOVO: definir valor melhor, coloquei iteração pois no teste_1/custo_1 com 3 localizacoes o algoritmo detecam 4 grupos e as localizacoes ficam trocando entre estas 4, assim, nunca saindo do laco! Com limite de iterações espera-se que saia adicione uma nova localização e o problema seja resolvido.
 
-    // ------------------ Para teste somente
-    std::cout << "LacoB (fim) Temp: " << t << " IteracaoB: " << iterB << "\n[\n";
-    for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-      // std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
-      std::cout << (*lj)->toString();
+    if (feeting_locs) {
+      // ------------------ Para teste somente
+      std::cout << "Finalizou feeting Temp: " << t << "\n\tTotalCliCon: " << totalCliCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false") 
+              << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n[\n";
+      for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+        // std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
+        std::cout << (*lj)->toString();
+      }
+      std::cout << "]\n";
+      // -----------------
+      if (locConnected && capacidade && totalCliCon >= m_clientDaContainer.GetN()*0.8) {        
+        GraficoCenarioDa(t, iter, lCentral, raio_cob, uav_cob);
+        break;
+      } else {
+        GraficoCenarioDa(t, iter, lCentral, raio_cob, uav_cob);
+        NS_FATAL_ERROR ("Oh my god!!!");
+      }
     }
-    std::cout << "]\n";
+
+    // ------------------ Para teste somente
+    // std::cout << "LacoB (fim) Temp: " << t << " IteracaoB: " << iterB << "\n[\n";
+    // for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+    //   // std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
+    //   std::cout << (*lj)->toString();
+    // }
+    // std::cout << "]\n";
     // -----------------
 
     // eliminar duplicados
@@ -1561,14 +1593,29 @@ void ServerApplication::runDA() {
     // }    
 
     // Verificar condição de parada: 1- clientes conectados, 2- uavs conectados, 3- capacidade não extrapolada
-    std::cout << "Condição de parada:\n\tTotalCliCon: " << totalCliCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false") 
+    std::cout << "Condição de parada:\n\tTemp: " << t << "\n\tTLj: " << m_locationContainer.GetN() 
+              << "\n\tTotalCliCon: " << totalCliCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false") 
               << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n\tTlast: " << lastT << "\n\tCaiu: " << t*100/lastT << std::endl;
-    if (locConnected && capacidade) { // 1- NOVO: 90% dos clientes tem que ter conexao
-      if (totalCliCon >= m_clientDaContainer.GetN()*0.9)
-        break; // finalizar Da de Localização
-      else if (t*100/lastT <= 20 && MovimentoA()) { // NOVO: temperatura caiu mais de 80% apos a ultima vez que foi adicionada uma localizacao
-        goto new_uav;
-      }
+    if (locConnected && capacidade) { // 1- NOVO: 80% dos clientes tem que ter conexao
+      if (totalCliCon >= m_clientDaContainer.GetN()*0.8) {
+        feeting_locs = true;
+        t *= 0.5;
+        // ------------------ Para teste somente
+        std::cout << "Iniciando feeting Temp: " << t << "\n[\n";
+        for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+          // std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
+          std::cout << (*lj)->toString();
+        }
+        std::cout << "]\n";
+        // -----------------
+        GraficoCenarioDa(t, iter, lCentral, raio_cob, uav_cob);
+        iter++;
+        goto run_last_b;
+      } 
+      // else if (t*100/lastT <= 5 && MovimentoA()) { // NOVO: temperatura caiu mais de 95% apos a ultima vez que foi adicionada uma localizacao
+      //   std::cout << "Solicitando nova localizacao 80\% temperatura\n";
+      //   goto new_uav;
+      // }
     }
 
     // NOVO: !(totalCliCon > m_clientDaContainer.GetN()*t) caso não tenha ao menos t% de usuarios cobertos, assim, conforme t diminui, não irá aumentar a quantidade de UAvs na rede
@@ -1586,7 +1633,7 @@ void ServerApplication::runDA() {
         nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
         nLoc->LimparAcumuladoPosicionamento();
         nLoc->LimparAcumuladoPosicionamentoClientes();
-        nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max); // este método atualiza a variavel de punicao!
+        nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max, uav_cob); // este método atualiza a variavel de punicao!
         lastT = t;
         std::cout << "------->lastT: " << lastT << std::endl;
         // NOVO: Aumentar a temperatura, nova localizacao adicionada!
@@ -1718,17 +1765,21 @@ bool ServerApplication::MovimentoB() {
 
 void ServerApplication::CentroDeMassa (Ptr<LocationModel> l, double r_max) {
   double x=0, y=0;
-
+  bool con = true;
   for (ClientModelContainer::Iterator i = m_clientDaContainer.Begin(); i != m_clientDaContainer.End(); ++i) {
-    std::cout << (*i)->ToString();
+    // std::cout << (*i)->ToString();
+    con = con && (*i)->IsConnected();
     if (!(*i)->IsConnected()) { // NOVO: considera somente os que nao estao conectados!
       x += (*i)->GetXPosition();
       y += (*i)->GetYPosition();
     }
   }
 
+  if (con) { // todos os cliente estao conectados
+    std::cout << "==> Todos os clientes conectados.\n";
+  }
+  std::cout << "Centro de massa: " << x << " " << y << std::endl;
   l->SetPosition(x/(double)m_clientDaContainer.GetN(), y/(double)m_clientDaContainer.GetN()); // posicionar no centro dos clientes
-
 }
 
 void ServerApplication::runDAPuro() {
@@ -1843,10 +1894,8 @@ void ServerApplication::runDAPuro() {
       std::cout << "Iteracao: " << iterB << "\n";
       double totalZci = 0.0;
       for (ClientModelContainer::Iterator ci = m_clientDaContainer.Begin(); ci != m_clientDaContainer.End(); ++ci) {
-        std::cout << "==> [" << (*ci)->GetPosition().at(0) << ", " << (*ci)->GetPosition().at(1) << "]\n";
         double Zci = 0.0;
         double low_dchilj = r_max+10;
-        std::cout << "\t[";
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           double dcilj = CalculateDistance((*ci)->GetPosition(), (*lj)->GetPosition());
           double pljci = std::exp ( - (dcilj/t) );
@@ -1856,8 +1905,6 @@ void ServerApplication::runDAPuro() {
             low_dchilj = dcilj;
           }
         }
-        std::cout << " ]\n";
-        std::cout << "\tZci: " << Zci << "\tlow_dchilj: " << low_dchilj << "\traio_cob: " << raio_cob << "\n";
         if (low_dchilj <= raio_cob) {
           (*ci)->SetConnected(true);
           totalCliCon++;
@@ -1873,11 +1920,7 @@ void ServerApplication::runDAPuro() {
           totalPljci +=  (*lj)->AddPljCiPuro((*ci), Zci, r_max);
         }
         totalZci += Zci;
-        std::cout << "--> \t totalPljci: " << totalPljci << std::endl;
       }
-      std::cout << "-----------------------\n";
-      std::cout << "...... ZciTotal: " << totalZci << "\n";
-      std::cout << "[";
       movimentoB = MovimentoB();
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
         std::cout << "\n\tX: " << (*lj)->GetXAcumCli() << "\t\tY: " << (*lj)->GetYAcumCli() << "\t\tX: " << (*lj)->GetXAcum() << "\t\tY: " << (*lj)->GetYAcum() << "\t\tPLJ: " << (*lj)->GetPlj() << "\t\tPN: " << (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize();
@@ -1886,7 +1929,6 @@ void ServerApplication::runDAPuro() {
         (*lj)->SetPositionPuro(newX, newY, r_max);
         (*lj)->LimparAcumuladoPosicionamentoClientes(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
       }
-      std::cout << "\n]\n";
     } while (movimentoB && iterB <= max_iterB);
 
     // eliminar duplicados
@@ -1910,7 +1952,7 @@ void ServerApplication::runDAPuro() {
     std::cout << "]\n";
     // -----------------
 
-    if (totalCliCon >= m_clientDaContainer.GetN()*0.9) {
+    if (totalCliCon >= m_clientDaContainer.GetN()*0.8) {
       break; // finalizar Da
     }
 
