@@ -152,7 +152,7 @@ for arquivo in glob.glob(main_path+'/'+'etapa/'+etapa+'/da_loc_'+da+'_*'+iteraca
     ax1.set_title(u'Informações da Localização')
     ax1.set_ylabel('0-1')
     ax1.set_xlabel(u'Localizações')
-    ax1.set_ylim([0,1])
+    # ax1.set_ylim([0,1])
     plt.tight_layout()
     plt.savefig(main_path+'/'+'etapa/'+etapa+'/da_loc_'+da+'_{:015}'.format(int(iteracao))+'.png')
     plt.clf()
@@ -163,7 +163,7 @@ for arquivo in glob.glob(main_path+'/'+'etapa/'+etapa+'/da_loc_'+da+'_*'+iteraca
     ax.set_title(u'Informações da Localização')
     ax.set_ylabel('0-1')
     ax.set_xlabel(u'Localizações')
-    ax.set_ylim([0,1])
+    # ax.set_ylim([0,1])
 
     # plt.savefig(main_path+'/'+'etapa/'+etapa+'/da_loc_hsit_'+da+'_{:015}'.format(int(iteracao))+'.svg')
     # plt.savefig(main_path+'/'+'etapa/'+etapa+'/da_loc_hsit_'+da+'_{:015}'.format(int(iteracao))+'.eps')

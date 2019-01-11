@@ -280,7 +280,8 @@ bool LocationModel::UpdatePunishNeighboor (double uav_cob) {
     m_punshNeigh *= std::exp (-1+(m_distFather/uav_cob)); // m_punshNeigh * 0.9; // 
     m_punshNeigh = (m_punshNeigh>0.01)?m_punshNeigh:0.01;
   } else {
-    m_punshNeigh *= 1.1;
+    m_punshNeigh *= 1.05;
+    // m_punshNeigh = (m_punshNeigh>1) ? 1 : m_punshNeigh;
   }
 
   m_connected = m_distFather <= uav_cob;
@@ -305,7 +306,7 @@ Ptr<LocationModel> LocationModel::GetFather () {
 void LocationModel::AddChild (Ptr<LocationModel> l, double r_max) {
   m_childList.Add(l);
   m_xAcum += l->GetXPosition(r_max) * m_punshNeigh; // PENSAR: m_punishNeigh -> é interessante somente para manter o UAV próximo ao pai, para garantir conexão, não sei se vale a pena forçar com a mesma intensidade no sentido dos clientes.
-  m_yAcum += l->GetYPosition(r_max) * m_punshNeigh; // ESTÁ NA EQUAÇAO, NAO PODE MUDARALTERADO: Modificado para 50%! Considerando como peso os filhos somente no valor de 50%!
+  m_yAcum += l->GetYPosition(r_max) * m_punshNeigh; // ESTÁ NA EQUAÇAO, NAO PODE MUDAR -- : Modificado para 50%! Considerando como peso os filhos somente no valor de 50%!
 }
 
 void LocationModel::ClearChildList () {

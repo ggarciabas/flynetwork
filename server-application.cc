@@ -1521,8 +1521,8 @@ void ServerApplication::runDA() {
       } 
       else { // se nao houver movimento e não tiverem conectados deve-se alterar a punicao de conexão e continuar para que ele se movimente em direcao ao pai!
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-          locConnected = (*lj)->UpdatePunishNeighboor(uav_cob/r_max) && locConnected;
-          // NAO limpar o acumulado posicionamentoclientes quando nao houver movimento! O valor de Plj é utilizado no grafico, para isto necessito do valor!
+          locConnected = (*lj)->IsConnected() && locConnected;
+          // NAO limpar o acumulado posicionamento clientes quando nao houver movimento! O valor de Plj é utilizado no grafico, para isto necessito do valor!
         }
         if (!locConnected) { //  se nao tiver conectados!
           t*= 1.1; // reheat
@@ -1592,6 +1592,7 @@ void ServerApplication::runDA() {
       (*lj)->IniciarMovimentoA();
       (*lj)->LimparHistorico();
       (*lj)->LimparAcumuladoPosicionamentoClientes();
+      (*lj)->UpdatePunishNeighboor(uav_cob/r_max);
     }
 
     t = t*0.9; // reduz 90%  a tempreatura
@@ -1650,24 +1651,24 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
   }
   file << "\n";
   lj = m_locationContainer.Begin(); // imprimindo capacidade
-  file << (*lj)->GetFather()->GetPunishCapacity();
+  file << (*lj)->GetPunishCapacity();
   lj++;
   for (; lj != m_locationContainer.End(); ++lj) {
-    file << "," << (*lj)->GetFather()->GetPunishCapacity();
+    file << "," << (*lj)->GetPunishCapacity();
   }
   file << "\n";
   lj = m_locationContainer.Begin(); // imprimindo neigh
-  file << (*lj)->GetFather()->GetPunishNeighboor();
+  file << (*lj)->GetPunishNeighboor();
   lj++;
   for (; lj != m_locationContainer.End(); ++lj) {
-    file << "," << (*lj)->GetFather()->GetPunishNeighboor();
+    file << "," << (*lj)->GetPunishNeighboor();
   }
   file << "\n";
   lj = m_locationContainer.Begin(); // imprimindo plj
-  file << (*lj)->GetFather()->GetPlj();
+  file << (*lj)->GetPlj();
   lj++;
   for (; lj != m_locationContainer.End(); ++lj) {
-    file << "," << (*lj)->GetFather()->GetPlj();
+    file << "," << (*lj)->GetPlj();
   }
   file.close();
 
