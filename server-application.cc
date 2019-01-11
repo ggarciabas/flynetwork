@@ -1403,7 +1403,6 @@ void ServerApplication::runDA() {
   int iter = 0;
   do {// laco A
     iter++;
-    GraficoCenarioDa(t, iter, lCentral, raio_cob, uav_cob);
 
     // ------------------ Para teste somente
     std::cout << "------------------------------------------------------------------\n";
@@ -1474,8 +1473,6 @@ void ServerApplication::runDA() {
         double newX = ((*lj)->GetXAcumCli()+(*lj)->GetXAcum()) / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize()); // SAI DA EQUACAO: nao pode eletar ---> antigo: considera soemnte 50% para os filhos
         double newY = ((*lj)->GetYAcumCli()+(*lj)->GetYAcum()) / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize()); // SAI DA EQUACAO: nao pode eletar ---> antigo: considera soemnte 50% para os filhos
         (*lj)->SetPosition(newX, newY, r_max);
-        (*lj)->LimparAcumuladoPosicionamentoClientes(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
-
         // Avalia a utilizacao de capacidade das localizações
         capacidade = capacidade && (*lj)->ValidarCapacidade(Wj, taxa_capacidade);
 
@@ -1491,10 +1488,12 @@ void ServerApplication::runDA() {
         std::cout << "---> MovimentoB \n";
         // std::cout << "Total de Localizações: " << m_locationContainer.GetN() << std::endl;
         m_locationContainer.Get(0)->LimparAcumuladoPosicionamento();
+        m_locationContainer.Get(0)->LimparAcumuladoPosicionamentoClientes(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
         for (int j = m_locationContainer.GetN()-1; j >= 0; j--) { // Obs.: >=0 para que seja feito o calculo da localizacao 0 com a central, não irá entrar no segundo laco devido a condicao imposta lá!
           std::cout << "J[" << j << "]: ";
           // std::cout << m_locationContainer.Get(j)->toString();
           m_locationContainer.Get(j)->LimparAcumuladoPosicionamento(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
+          m_locationContainer.Get(j)->LimparAcumuladoPosicionamentoClientes();
           std::vector<double> p1 (m_locationContainer.Get(j)->GetPosition(r_max));
           int id = -1; // a principio se conecta com a central
           double dist = CalculateDistance(lCentral->GetPosition(r_max), p1);
@@ -1523,6 +1522,7 @@ void ServerApplication::runDA() {
       else { // se nao houver movimento e não tiverem conectados deve-se alterar a punicao de conexão e continuar para que ele se movimente em direcao ao pai!
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           locConnected = (*lj)->UpdatePunishNeighboor(uav_cob/r_max) && locConnected;
+          // NAO limpar o acumulado posicionamentoclientes quando nao houver movimento! O valor de Plj é utilizado no grafico, para isto necessito do valor!
         }
         if (!locConnected) { //  se nao tiver conectados!
           t*= 1.1; // reheat
@@ -1584,21 +1584,21 @@ void ServerApplication::runDA() {
       // t = (t>0.1) ? t : 0.1;
       // continue;
     }
-    // else {
+
+    GraficoCenarioDa(t, iter, lCentral, raio_cob, uav_cob);
+
     // Reiniciar Movimento A para cada Localizacao
     for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
       (*lj)->IniciarMovimentoA();
       (*lj)->LimparHistorico();
+      (*lj)->LimparAcumuladoPosicionamentoClientes();
     }
-    // }
 
     t = t*0.9; // reduz 90%  a tempreatura
 
     std::cout << "------------------------------------------------------------------\n";
     std::cout << "------------------------------------------------------------------\n";
   } while (t > t_min); // laco da temperatura
-
-  GraficoCenarioDa(t, iter, lCentral, raio_cob, uav_cob);
 
   std::cin >> lixo;
 
@@ -1647,6 +1647,27 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
   lj++;
   for (; lj != m_locationContainer.End(); ++lj) {
     file << "," << (*lj)->GetFather()->GetXPosition() << "," << (*lj)->GetFather()->GetYPosition();
+  }
+  file << "\n";
+  lj = m_locationContainer.Begin(); // imprimindo capacidade
+  file << (*lj)->GetFather()->GetPunishCapacity();
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    file << "," << (*lj)->GetFather()->GetPunishCapacity();
+  }
+  file << "\n";
+  lj = m_locationContainer.Begin(); // imprimindo neigh
+  file << (*lj)->GetFather()->GetPunishNeighboor();
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    file << "," << (*lj)->GetFather()->GetPunishNeighboor();
+  }
+  file << "\n";
+  lj = m_locationContainer.Begin(); // imprimindo plj
+  file << (*lj)->GetFather()->GetPlj();
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    file << "," << (*lj)->GetFather()->GetPlj();
   }
   file.close();
 
