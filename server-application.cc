@@ -1511,10 +1511,10 @@ void ServerApplication::runDA() {
           }
           if (id == -1) { // menor distancia é para com a central
             m_locationContainer.Get(j)->SetFather(lCentral, dist, r_max);
-            locConnected = m_locationContainer.Get(j)->UpdatePunishNeighboor(uav_cob/r_max) && locConnected; // este método atualiza a variavel de punicao!
+            locConnected = m_locationContainer.Get(j)->IsConnected() && locConnected; // este método atualiza a variavel de punicao!
           } else { // menor distancia é para algum outro UAV, cadastrar o pai e o filho!
             m_locationContainer.Get(j)->SetFather(m_locationContainer.Get(id), dist, r_max);
-            locConnected = m_locationContainer.Get(j)->UpdatePunishNeighboor(uav_cob/r_max) && locConnected; // este método atualiza a variavel de punicao!
+            locConnected = m_locationContainer.Get(j)->IsConnected() && locConnected; // este método atualiza a variavel de punicao!
             m_locationContainer.Get(id)->AddChild(m_locationContainer.Get(j), r_max); // novo filho para id!
           }
         }
