@@ -1419,6 +1419,7 @@ void ServerApplication::runDA() {
     bool capacidade = true;
     bool movimentoB = true;
     int iterB = 0;
+    double lastT = t;
     do { // laco B
       capacidade = locConnected = true;
       iterB++;
@@ -1523,9 +1524,9 @@ void ServerApplication::runDA() {
           locConnected = (*lj)->IsConnected() && locConnected;
           // NAO limpar o acumulado posicionamento clientes quando nao houver movimento! O valor de Plj é utilizado no grafico, para isto necessito do valor!
         }
-        if (!locConnected) { //  se nao tiver conectados!
-          t*= 1.2; // reheat - nao adianta ser na mesma proporcao que será reduzida né?!
-        }
+        // if (!locConnected) { //  se nao tiver conectados!
+        //   t*= 1.2; // reheat - nao adianta ser na mesma proporcao que será reduzida né?!
+        // }
       }
     } while (movimentoB && iterB < max_iterB); // NOVO: definir valor melhor, coloquei iteração pois no teste_1/custo_1 com 3 localizacoes o algoritmo detecam 4 grupos e as localizacoes ficam trocando entre estas 4, assim, nunca saindo do laco! Com limite de iterações espera-se que saia adicione uma nova localização e o problema seja resolvido.
 
@@ -1555,12 +1556,27 @@ void ServerApplication::runDA() {
     // }    
 
     // Verificar condição de parada: 1- clientes conectados, 2- uavs conectados, 3- capacidade não extrapolada
-    std::cout << "Condição de parada:\n\tTotalCliCon: " << totalCliCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false") << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << std::endl;
+    std::cout << "Condição de parada:\n\tTotalCliCon: " << totalCliCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false") 
+              << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n\tTlast: " << lastT << "\n\tCaiu: " << t*100/lastT << std::endl;
     if (locConnected && capacidade) { // 1- NOVO: 90% dos clientes tem que ter conexao
       if (totalCliCon >= m_clientDaContainer.GetN()*0.9)
         break; // finalizar Da de Localização
-      else {
-        // adicionar novo UAV        
+      else if (t*100/lastT <= 50 && MovimentoA()) { // NOVO: temperatura caiu mais de 50% apos a ultima vez que foi adicionada uma localizacao
+        std::cout << "---> Novo UAV\n";
+        Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
+        nLoc->SetId(locId++);
+        CentroDeMassa(nLoc, r_max);
+        nLoc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
+        nLoc->IniciarMovimentoB();
+        m_locationContainer.Add(nLoc);
+        nLoc->SetPunishCapacity(0.01);
+        nLoc->SetPunishNeighboor(0.01);
+        nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
+        nLoc->LimparAcumuladoPosicionamento();
+        nLoc->LimparAcumuladoPosicionamentoClientes();
+        nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max); // este método atualiza a variavel de punicao!
+        lastT = t;
+        std::cout << "------->lastT: " << lastT << std::endl;
       }
     }
 
@@ -1579,6 +1595,8 @@ void ServerApplication::runDA() {
       nLoc->LimparAcumuladoPosicionamento();
       nLoc->LimparAcumuladoPosicionamentoClientes();
       nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max); // este método atualiza a variavel de punicao!
+      lastT = t;
+      std::cout << "------->lastT: " << lastT << std::endl;
       // NOVO: Aumentar a temperatura, nova localizacao adicionada!
       // t = (t>0.1) ? t : 0.1;
       // continue;
