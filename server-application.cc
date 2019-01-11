@@ -1722,7 +1722,7 @@ void ServerApplication::runDAPuro() {
   }
   double t = 0.9;
   int locId = 0;
-  int max_iterB = 100000;
+  int max_iterB = 1000;
 
   // -------------------
   std::cout << "[\n\tTmin:\t\t" << t_min
@@ -1757,7 +1757,7 @@ void ServerApplication::runDAPuro() {
 
   int lixo;
   std::cout << "Iniciando DA puro .....\n";
-  std::cin >> lixo;
+  // std::cin >> lixo;
   int iter = 0;
   do {// laco A
     iter++;
@@ -1773,7 +1773,7 @@ void ServerApplication::runDAPuro() {
     // -----------------
 
     std::cout << "Iniciando DA puro .....\n";
-    std::cin >> lixo;
+    // std::cin >> lixo;
 
     int totalCliCon = 0;
     int iterB = 0;
@@ -1807,6 +1807,10 @@ void ServerApplication::runDAPuro() {
         }
         double totalPljci = 0.0;
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+          if (Zci < 1e-18) {
+            Zci = 1e-30;
+            t *= 1.1;
+          }
           totalPljci +=  (*lj)->AddPljCiPuro((*ci), Zci, r_max);
         }
         totalZci += Zci;
@@ -1848,8 +1852,6 @@ void ServerApplication::runDAPuro() {
     // -----------------
 
     if (totalCliCon >= m_clientDaContainer.GetN()*0.9) {
-      std::cout << "---> Todos conectados [" << totalCliCon << ", " << m_clientDaContainer.GetN()*0.9 << "]\n";
-      std::cin >> lixo;
       break; // finalizar Da
     }
 
@@ -1870,6 +1872,9 @@ void ServerApplication::runDAPuro() {
   } while (t > t_min); // laco da temperatura
 
   GraficoCenarioDaPuro(t, iter, lCentral, raio_cob);
+
+  std::cout << "Finalizou...\n";
+  std::cin >> lixo;
 
   m_totalCliGeral = 0;
   m_locConsTotal = 0; // atualiza total de consumo de todas as localizacoes
