@@ -1479,6 +1479,7 @@ void ServerApplication::runDA() {
         // limpando
         // (*lj)->LimparMapaPljci(); NAO PRECISA LIMPAR! É UM MAPA, SERÁ ATUALIZADO SOMENTE // OBS.: se for adicionar a estrategia de remover localizacoes, necessario retirar isto, pois será utilizado!!
         (*lj)->ClearChildList();
+        (*lj)->LimparAcumuladoPosicionamento(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
       }
       std::cout << "\n]\n";
 
@@ -1487,12 +1488,10 @@ void ServerApplication::runDA() {
       if (movimentoB) {
         std::cout << "---> MovimentoB \n";
         // std::cout << "Total de Localizações: " << m_locationContainer.GetN() << std::endl;
-        m_locationContainer.Get(0)->LimparAcumuladoPosicionamento();
         m_locationContainer.Get(0)->LimparAcumuladoPosicionamentoClientes(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
         for (int j = m_locationContainer.GetN()-1; j >= 0; j--) { // Obs.: >=0 para que seja feito o calculo da localizacao 0 com a central, não irá entrar no segundo laco devido a condicao imposta lá!
           std::cout << "J[" << j << "]: ";
           // std::cout << m_locationContainer.Get(j)->toString();
-          m_locationContainer.Get(j)->LimparAcumuladoPosicionamento(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
           m_locationContainer.Get(j)->LimparAcumuladoPosicionamentoClientes();
           std::vector<double> p1 (m_locationContainer.Get(j)->GetPosition(r_max));
           int id = -1; // a principio se conecta com a central
@@ -1578,6 +1577,7 @@ void ServerApplication::runDA() {
       nLoc->SetPunishNeighboor(0.01);
       nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
       nLoc->LimparAcumuladoPosicionamento();
+      nLoc->LimparAcumuladoPosicionamentoClientes();
       nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max); // este método atualiza a variavel de punicao!
       // NOVO: Aumentar a temperatura, nova localizacao adicionada!
       // t = (t>0.1) ? t : 0.1;

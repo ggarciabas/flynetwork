@@ -280,7 +280,7 @@ bool LocationModel::UpdatePunishNeighboor (double uav_cob) {
     m_punshNeigh *= std::exp (-1+(m_distFather/uav_cob)); // m_punshNeigh * 0.9; // 
     m_punshNeigh = (m_punshNeigh>0.01)?m_punshNeigh:0.01;
   } else {
-    m_punshNeigh *= 1.05;
+    m_punshNeigh *= 1.1;
     // m_punshNeigh = (m_punshNeigh>1) ? 1 : m_punshNeigh;
   }
 
