@@ -294,8 +294,8 @@ bool LocationModel::UpdatePunishNeighboor (double uav_cob) {
 void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max) {
   m_father = l;
   // atualizando parte do novo posicionamento da localizacao
-  m_xAcum = l->GetXPosition(r_max);
-  m_yAcum = l->GetYPosition(r_max);
+  m_xAcum += l->GetXPosition(r_max);
+  m_yAcum += l->GetYPosition(r_max);
   m_distFather = dist;
 }
 
