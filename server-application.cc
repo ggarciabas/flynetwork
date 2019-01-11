@@ -1525,7 +1525,7 @@ void ServerApplication::runDA() {
           // NAO limpar o acumulado posicionamento clientes quando nao houver movimento! O valor de Plj é utilizado no grafico, para isto necessito do valor!
         }
         if (!locConnected) { //  se nao tiver conectados!
-          t*= 1.1; // reheat
+          t*= 1.2; // reheat - nao adianta ser na mesma proporcao que será reduzida né?!
         }
       }
     } while (movimentoB && iterB < max_iterB); // NOVO: definir valor melhor, coloquei iteração pois no teste_1/custo_1 com 3 localizacoes o algoritmo detecam 4 grupos e as localizacoes ficam trocando entre estas 4, assim, nunca saindo do laco! Com limite de iterações espera-se que saia adicione uma nova localização e o problema seja resolvido.
