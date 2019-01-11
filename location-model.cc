@@ -277,11 +277,11 @@ void LocationModel::AddPljCi (Ptr<ClientModel> ci, double Zci, double r_max) {
 
 bool LocationModel::UpdatePunishNeighboor (double uav_cob) {
   if (m_distFather <= uav_cob) {
-    m_punshNeigh *= 0.99; //std::exp (-1+(m_distFather/uav_cob)); // m_punshNeigh * 0.9; // 
+    m_punshNeigh *= std::exp (-1+(m_distFather/uav_cob)); // m_punshNeigh * 0.9; // 
     m_punshNeigh = (m_punshNeigh>0.01)?m_punshNeigh:0.01;
   } else {
     m_punshNeigh *= 1.1;
-    // m_punshNeigh = (m_punshNeigh>1) ? 1 : m_punshNeigh;
+    m_punshNeigh = (m_punshNeigh > 2) ? 2 : m_punshNeigh;
   }
 
   m_connected = m_distFather <= uav_cob;
@@ -294,8 +294,8 @@ bool LocationModel::UpdatePunishNeighboor (double uav_cob) {
 void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max) {
   m_father = l;
   // atualizando parte do novo posicionamento da localizacao
-  m_xAcum = l->GetXPosition(r_max) * m_punshNeigh;
-  m_yAcum = l->GetYPosition(r_max) * m_punshNeigh;
+  m_xAcum = l->GetXPosition(r_max);
+  m_yAcum = l->GetYPosition(r_max);
   m_distFather = dist;
 }
 
@@ -305,8 +305,8 @@ Ptr<LocationModel> LocationModel::GetFather () {
 
 void LocationModel::AddChild (Ptr<LocationModel> l, double r_max) {
   m_childList.Add(l);
-  m_xAcum += l->GetXPosition(r_max) * m_punshNeigh; // PENSAR: m_punishNeigh -> é interessante somente para manter o UAV próximo ao pai, para garantir conexão, não sei se vale a pena forçar com a mesma intensidade no sentido dos clientes.
-  m_yAcum += l->GetYPosition(r_max) * m_punshNeigh; // ESTÁ NA EQUAÇAO, NAO PODE MUDAR -- : Modificado para 50%! Considerando como peso os filhos somente no valor de 50%!
+  m_xAcum += l->GetXPosition(r_max); // PENSAR: m_punishNeigh -> é interessante somente para manter o UAV próximo ao pai, para garantir conexão, não sei se vale a pena forçar com a mesma intensidade no sentido dos clientes.
+  m_yAcum += l->GetYPosition(r_max); // ESTÁ NA EQUAÇAO, NAO PODE MUDAR -- : Modificado para 50%! Considerando como peso os filhos somente no valor de 50%!
 }
 
 void LocationModel::ClearChildList () {

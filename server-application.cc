@@ -1401,6 +1401,7 @@ void ServerApplication::runDA() {
 
   int lixo;
   int iter = 0;
+  double lastT = t;
   do {// laco A
     iter++;
 
@@ -1419,7 +1420,6 @@ void ServerApplication::runDA() {
     bool capacidade = true;
     bool movimentoB = true;
     int iterB = 0;
-    double lastT = t;
     do { // laco B
       capacidade = locConnected = true;
       iterB++;
@@ -1460,6 +1460,11 @@ void ServerApplication::runDA() {
           (*ci)->SetConnected(false);
         }
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+          if (Zci < 1e-30) {
+            Zci = 1e-30;
+            t = 0.1;
+            goto new_uav;
+          }
           // PENSAR: preciso guardar o valor de pljci?! Não é suficiente calcular já a parte da equacao de lj e descartar estes valores?!
           // PENSAR: Se houver estratégia para remover UAVs, ai seria interessante armazenar para que se possa calcular os clientes que estão conectados e saber se os pais conseguem suprir o cliente
           (*lj)->AddPljCi((*ci), Zci, r_max); // finaliza o calculo do pljci na funcao e cadastra no map relacionando o ci
@@ -1471,8 +1476,8 @@ void ServerApplication::runDA() {
       std::cout << "[";
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
         std::cout << "\n\tX: " << (*lj)->GetXAcumCli() << "\t\tY: " << (*lj)->GetYAcumCli() << "\t\tX: " << (*lj)->GetXAcum() << "\t\tY: " << (*lj)->GetYAcum() << "\t\tPLJ: " << (*lj)->GetPlj() << "\t\tPN: " << (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize();
-        double newX = ((*lj)->GetXAcumCli()+(*lj)->GetXAcum()) / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize()); // SAI DA EQUACAO: nao pode eletar ---> antigo: considera soemnte 50% para os filhos
-        double newY = ((*lj)->GetYAcumCli()+(*lj)->GetYAcum()) / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize()); // SAI DA EQUACAO: nao pode eletar ---> antigo: considera soemnte 50% para os filhos
+        double newX = ((*lj)->GetXAcumCli()+(*lj)->GetXAcum()*(*lj)->GetPunishNeighboor()) / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize()); // SAI DA EQUACAO: nao pode eletar ---> antigo: considera soemnte 50% para os filhos
+        double newY = ((*lj)->GetYAcumCli()+(*lj)->GetYAcum()*(*lj)->GetPunishNeighboor()) / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize()); // SAI DA EQUACAO: nao pode eletar ---> antigo: considera soemnte 50% para os filhos
         (*lj)->SetPosition(newX, newY, r_max);
         // Avalia a utilizacao de capacidade das localizações
         capacidade = capacidade && (*lj)->ValidarCapacidade(Wj, taxa_capacidade);
@@ -1561,7 +1566,14 @@ void ServerApplication::runDA() {
     if (locConnected && capacidade) { // 1- NOVO: 90% dos clientes tem que ter conexao
       if (totalCliCon >= m_clientDaContainer.GetN()*0.9)
         break; // finalizar Da de Localização
-      else if (t*100/lastT <= 50 && MovimentoA()) { // NOVO: temperatura caiu mais de 50% apos a ultima vez que foi adicionada uma localizacao
+      else if (t*100/lastT <= 20 && MovimentoA()) { // NOVO: temperatura caiu mais de 80% apos a ultima vez que foi adicionada uma localizacao
+        goto new_uav;
+      }
+    }
+
+    // NOVO: !(totalCliCon > m_clientDaContainer.GetN()*t) caso não tenha ao menos t% de usuarios cobertos, assim, conforme t diminui, não irá aumentar a quantidade de UAvs na rede
+    if (!MovimentoA() /*|| !(totalCliCon > m_clientDaContainer.GetN()*t) */ /*|| iterB == 1000*/) { // ALTERADO: se não houver movimento em A, necessário adicionar nova localização -- or caso nao tenha conseguido encontrar uma posicao fixa!
+      new_uav:
         std::cout << "---> Novo UAV\n";
         Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
         nLoc->SetId(locId++);
@@ -1577,29 +1589,9 @@ void ServerApplication::runDA() {
         nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max); // este método atualiza a variavel de punicao!
         lastT = t;
         std::cout << "------->lastT: " << lastT << std::endl;
-      }
-    }
-
-    // NOVO: !(totalCliCon > m_clientDaContainer.GetN()*t) caso não tenha ao menos t% de usuarios cobertos, assim, conforme t diminui, não irá aumentar a quantidade de UAvs na rede
-    if (!MovimentoA() /*|| !(totalCliCon > m_clientDaContainer.GetN()*t) */ /*|| iterB == 1000*/) { // ALTERADO: se não houver movimento em A, necessário adicionar nova localização -- or caso nao tenha conseguido encontrar uma posicao fixa!
-      std::cout << "---> Novo UAV\n";
-      Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
-      nLoc->SetId(locId++);
-      CentroDeMassa(nLoc, r_max);
-      nLoc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
-      nLoc->IniciarMovimentoB();
-      m_locationContainer.Add(nLoc);
-      nLoc->SetPunishCapacity(0.01);
-      nLoc->SetPunishNeighboor(0.01);
-      nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
-      nLoc->LimparAcumuladoPosicionamento();
-      nLoc->LimparAcumuladoPosicionamentoClientes();
-      nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max); // este método atualiza a variavel de punicao!
-      lastT = t;
-      std::cout << "------->lastT: " << lastT << std::endl;
-      // NOVO: Aumentar a temperatura, nova localizacao adicionada!
-      // t = (t>0.1) ? t : 0.1;
-      // continue;
+        // NOVO: Aumentar a temperatura, nova localizacao adicionada!
+        // t = (t>0.1) ? t : 0.1;
+        // continue;
     }
 
     GraficoCenarioDa(t, iter, lCentral, raio_cob, uav_cob);
@@ -1874,7 +1866,7 @@ void ServerApplication::runDAPuro() {
         }
         double totalPljci = 0.0;
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-          if (Zci < 1e-18) {
+          if (Zci < 1e-30) {
             Zci = 1e-30;
             t *= 1.1;
           }
