@@ -1300,6 +1300,11 @@ void ServerApplication::DoDispose() {
 
 // https://github.com/ggarciabas/nsnam_ns3/blob/17c1f9200727381852528ac4798f040128ac842a/scratch/flynetwork/da_cpp/deterministic-annealing.cc
 void ServerApplication::runDA() {
+  int lixo;
+  std::cout << "Iniciando runDA: ";
+  std::cin >> lixo;
+  std::cout << std::endl;
+
   std::ofstream file;
   std::ostringstream os;
   os.str("");
@@ -1399,7 +1404,6 @@ void ServerApplication::runDA() {
   // std::cin >> t;
   // ----------------------
 
-  int lixo;
   int iter = 0;
   double lastT = t;
   double feeting_locs = false;
@@ -1529,33 +1533,33 @@ void ServerApplication::runDA() {
             m_locationContainer.Get(id)->AddChild(m_locationContainer.Get(j), r_max); // novo filho para id!
           }
         }
-      } 
+      }
       else { // se nao houver movimento e não tiverem conectados deve-se alterar a punicao de conexão e continuar para que ele se movimente em direcao ao pai!
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           locConnected = (*lj)->IsConnected() && locConnected;
           // NAO limpar o acumulado posicionamento clientes quando nao houver movimento! O valor de Plj é utilizado no grafico, para isto necessito do valor!
-        }        
+        }
       }
 
       if (feeting_locs) {
-         std::cout << "Feeting B \n\tItb: " << iterB << "\n\tTemp: " << t << "\n\tTotalCliCon: " << totalCliCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false") 
+         std::cout << "Feeting B \n\tItb: " << iterB << "\n\tTemp: " << t << "\n\tTotalCliCon: " << totalCliCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
               << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n[\n";
       }
 
-      if (feeting_locs && (!(totalCliCon >= m_clientDaContainer.GetN()*0.8) || !capacidade || !locConnected)) { 
-        t *= 1.1; // reheat 
+      if (feeting_locs && (!(totalCliCon >= m_clientDaContainer.GetN()*0.8) || !capacidade || !locConnected)) {
+        t *= 1.1; // reheat
         iterB = 1;
         // TALVEZ: atualizar a punicao de vizinhos
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           (*lj)->UpdatePunishNeighboor(uav_cob/r_max);
         }
         continue;
-      } 
+      }
     } while (movimentoB && iterB < max_iterB); // NOVO: definir valor melhor, coloquei iteração pois no teste_1/custo_1 com 3 localizacoes o algoritmo detecam 4 grupos e as localizacoes ficam trocando entre estas 4, assim, nunca saindo do laco! Com limite de iterações espera-se que saia adicione uma nova localização e o problema seja resolvido.
 
     if (feeting_locs) {
       // ------------------ Para teste somente
-      std::cout << "Finalizou feeting Temp: " << t << "\n\tTotalCliCon: " << totalCliCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false") 
+      std::cout << "Finalizou feeting Temp: " << t << "\n\tTotalCliCon: " << totalCliCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
               << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n[\n";
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
         // std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
@@ -1563,7 +1567,7 @@ void ServerApplication::runDA() {
       }
       std::cout << "]\n";
       // -----------------
-      if (locConnected && capacidade && totalCliCon >= m_clientDaContainer.GetN()*0.8) {        
+      if (locConnected && capacidade && totalCliCon >= m_clientDaContainer.GetN()*0.8) {
         GraficoCenarioDa(t, iter, lCentral, raio_cob, uav_cob);
         break;
       } else {
@@ -1595,11 +1599,11 @@ void ServerApplication::runDA() {
     //       }
     //     }
     //   }
-    // }    
+    // }
 
     // Verificar condição de parada: 1- clientes conectados, 2- uavs conectados, 3- capacidade não extrapolada
-    std::cout << "Condição de parada:\n\tTemp: " << t << "\n\tTLj: " << m_locationContainer.GetN() 
-              << "\n\tTotalCliCon: " << totalCliCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false") 
+    std::cout << "Condição de parada:\n\tTemp: " << t << "\n\tTLj: " << m_locationContainer.GetN()
+              << "\n\tTotalCliCon: " << totalCliCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
               << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n\tTlast: " << lastT << "\n\tCaiu: " << t*100/lastT << std::endl;
     if (locConnected && capacidade) { // 1- NOVO: 80% dos clientes tem que ter conexao
       if (totalCliCon >= m_clientDaContainer.GetN()*0.8) {
@@ -1616,7 +1620,7 @@ void ServerApplication::runDA() {
         GraficoCenarioDa(t, iter, lCentral, raio_cob, uav_cob);
         iter++;
         goto run_last_b;
-      } 
+      }
       // else if (t*100/lastT <= 5 && MovimentoA()) { // NOVO: temperatura caiu mais de 95% apos a ultima vez que foi adicionada uma localizacao
       //   std::cout << "Solicitando nova localizacao 80\% temperatura\n";
       //   goto new_uav;
