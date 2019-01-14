@@ -1748,10 +1748,10 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
   }
   file.close();
 
-  os.str ("");
-  os << "python ./scratch/flynetwork/data/da_loc.py " << m_pathData << " " << int(Simulator::Now().GetSeconds()) << " " << iter << " " << raio_cob << " " << uav_cob << " " << m_locationContainer.GetN();
-  //NS_LOG_DEBUG (os.str());
-  system(os.str().c_str());
+  // os.str ("");
+  // os << "python ./scratch/flynetwork/data/da_loc.py " << m_pathData << " " << int(Simulator::Now().GetSeconds()) << " " << iter << " " << raio_cob << " " << uav_cob << " " << m_locationContainer.GetN();
+  // //NS_LOG_DEBUG (os.str());
+  // system(os.str().c_str());
   // os.str ("");
   // os << "convert -delay 20 -loop 0 ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/*.png" << " ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/da_loc.gif";
   // //NS_LOG_DEBUG (os.str());
@@ -2035,10 +2035,10 @@ void ServerApplication::GraficoCenarioDaPuro (double temp, int iter, Ptr<Locatio
   file << "\n";
   file.close();
 
-  os.str ("");
-  os << "python ./scratch/flynetwork/data/da_loc_puro.py " << m_pathData << " " << int(Simulator::Now().GetSeconds()) << " " << iter << " " << raio_cob;
-  //NS_LOG_DEBUG (os.str());
-  system(os.str().c_str());
+  // os.str ("");
+  // os << "python ./scratch/flynetwork/data/da_loc_puro.py " << m_pathData << " " << int(Simulator::Now().GetSeconds()) << " " << iter << " " << raio_cob;
+  // //NS_LOG_DEBUG (os.str());
+  // system(os.str().c_str());
   // os.str ("");
   // os << "convert -delay 20 -loop 0 ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/*.png" << " ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/da_loc.gif";
   // //NS_LOG_DEBUG (os.str());
