@@ -1311,9 +1311,12 @@ void ServerApplication::runDA() {
   os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/"<<int(Simulator::Now().GetSeconds())<<"/client.txt";
   file.open(os.str().c_str(), std::ofstream::out);
   bool first = true;
+  double tMov = m_clientContainer.GetN();
+  double tFix = m_fixedClientContainer.GetN();
+  double pFix = 2; // peso dos clientes fixos - clientes móveis sempre com peso de 1"
   for (ClientModelContainer::Iterator i = m_clientContainer.Begin(); i != m_clientContainer.End(); ++i)
   {
-    (*i)->SetPci(1/(double)(m_clientContainer.GetN()+m_fixedClientContainer.GetN()));
+    (*i)->SetPci(1/(tMov+tFix*pFix));
     if (first) {
       file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
       first = false;
@@ -1323,7 +1326,7 @@ void ServerApplication::runDA() {
   }
   for (ClientModelContainer::Iterator i = m_fixedClientContainer.Begin(); i != m_fixedClientContainer.End(); ++i)
   {
-    (*i)->SetPci(1/(double)(m_clientContainer.GetN()+m_fixedClientContainer.GetN()));
+    (*i)->SetPci(pFix/(tMov+tFix*pFix));
     if (first) {
       file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
       first = false;
@@ -1422,15 +1425,17 @@ void ServerApplication::runDA() {
 
 
     run_last_b:
-    int totalCliCon = 0;
+    int tMovCon = 0;
+    int tFixCon = 0;
     bool locConnected = true;
     bool capacidade = true;
     bool movimentoB = true;
     int iterB = 0;
     do { // laco B
       capacidade = locConnected = true;
-      iterB++;
-      totalCliCon = 0;
+      iterB++;     
+      tMovCon = 0;
+      tFixCon = 0;
       // std::cout << "Iteracao: " << iterB << "\n";
       for (ClientModelContainer::Iterator ci = m_clientDaContainer.Begin(); ci != m_clientDaContainer.End(); ++ci) {
         double Zci = 0.0;
@@ -1454,7 +1459,6 @@ void ServerApplication::runDA() {
             (*ci)->SetLocConnected((*lj));
             (*lj)->NewClient(Wi, (*ci)->GetConsumption());
           }
-
         }
         // std::cout << " ]\n";
         // std::cout << "\tZci: " << Zci << "\tlow_dchilj: " << low_dchilj << "\traio_cob/r_max: " << raio_cob/r_max << "\n";
@@ -1462,7 +1466,11 @@ void ServerApplication::runDA() {
         if (low_dchilj <= raio_cob/r_max) {
           // std::cout << "---->>> Distancia: " << high_dchilj << " cobmax: " << raio_cob/r_max << std::endl;
           (*ci)->SetConnected(true);
-          totalCliCon++;
+          if ((*ci)->GetLogin().at(0) == 'f') {
+            tFixCon++;
+          } else { 
+            tMovCon++;
+          }
         } else {
           (*ci)->SetConnected(false);
         }
@@ -1542,11 +1550,11 @@ void ServerApplication::runDA() {
       }
 
       if (feeting_locs) {
-         std::cout << "Feeting B \n\tItb: " << iterB << "\n\tTemp: " << t << "\n\tTotalCliCon: " << totalCliCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
+         std::cout << "Feeting B \n\tItb: " << iterB << "\n\tTemp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
               << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n[\n";
       }
 
-      if (feeting_locs && (!(totalCliCon >= m_clientDaContainer.GetN()*0.8) || !capacidade || !locConnected)) {
+      if (feeting_locs && (!(tMovCon >= tMov*0.8) || !(tFixCon == tFix) || !capacidade || !locConnected)) {
         t *= 1.1; // reheat
         iterB = 1;
         // TALVEZ: atualizar a punicao de vizinhos
@@ -1559,7 +1567,7 @@ void ServerApplication::runDA() {
 
     if (feeting_locs) {
       // ------------------ Para teste somente
-      std::cout << "Finalizou feeting Temp: " << t << "\n\tTotalCliCon: " << totalCliCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
+      std::cout << "Finalizou feeting Temp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
               << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n[\n";
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
         // std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
@@ -1567,7 +1575,7 @@ void ServerApplication::runDA() {
       }
       std::cout << "]\n";
       // -----------------
-      if (locConnected && capacidade && totalCliCon >= m_clientDaContainer.GetN()*0.8) {
+      if (locConnected && capacidade && (tMovCon >= tMov*0.8) && (tFixCon == tFix)) {
         GraficoCenarioDa(t, iter, lCentral, raio_cob, uav_cob);
         break;
       } else {
@@ -1603,10 +1611,10 @@ void ServerApplication::runDA() {
 
     // Verificar condição de parada: 1- clientes conectados, 2- uavs conectados, 3- capacidade não extrapolada
     std::cout << "Condição de parada:\n\tTemp: " << t << "\n\tTLj: " << m_locationContainer.GetN()
-              << "\n\tTotalCliCon: " << totalCliCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
+              << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
               << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n\tTlast: " << lastT << "\n\tCaiu: " << t*100/lastT << std::endl;
     if (locConnected && capacidade) { // 1- NOVO: 80% dos clientes tem que ter conexao
-      if (totalCliCon >= m_clientDaContainer.GetN()*0.8) {
+      if ((tMovCon >= tMov*0.8) && (tFixCon == tFix)) {
         feeting_locs = true;
         t *= 0.5;
         // ------------------ Para teste somente
@@ -1627,8 +1635,8 @@ void ServerApplication::runDA() {
       // }
     }
 
-    // NOVO: !(totalCliCon > m_clientDaContainer.GetN()*t) caso não tenha ao menos t% de usuarios cobertos, assim, conforme t diminui, não irá aumentar a quantidade de UAvs na rede
-    if (!MovimentoA() /*|| !(totalCliCon > m_clientDaContainer.GetN()*t) */ /*|| iterB == 1000*/) { // ALTERADO: se não houver movimento em A, necessário adicionar nova localização -- or caso nao tenha conseguido encontrar uma posicao fixa!
+    // NOVO: !(tMovCon > m_clientDaContainer.GetN()*t) caso não tenha ao menos t% de usuarios cobertos, assim, conforme t diminui, não irá aumentar a quantidade de UAvs na rede
+    if (!MovimentoA() /*|| !(tMovCon > m_clientDaContainer.GetN()*t) */ /*|| iterB == 1000*/) { // ALTERADO: se não houver movimento em A, necessário adicionar nova localização -- or caso nao tenha conseguido encontrar uma posicao fixa!
       new_uav:
         std::cout << "---> Novo UAV\n";
         Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
@@ -1775,12 +1783,14 @@ bool ServerApplication::MovimentoB() {
 void ServerApplication::CentroDeMassa (Ptr<LocationModel> l, double r_max) {
   double x=0, y=0;
   bool con = true;
+  double ccon = 0;
   for (ClientModelContainer::Iterator i = m_clientDaContainer.Begin(); i != m_clientDaContainer.End(); ++i) {
     // std::cout << (*i)->ToString();
     con = con && (*i)->IsConnected();
     if (!(*i)->IsConnected()) { // NOVO: considera somente os que nao estao conectados!
       x += (*i)->GetXPosition();
       y += (*i)->GetYPosition();
+      ccon = ccon + 1;
     }
   }
 
@@ -1788,7 +1798,7 @@ void ServerApplication::CentroDeMassa (Ptr<LocationModel> l, double r_max) {
     std::cout << "==> Todos os clientes conectados.\n";
   }
   std::cout << "Centro de massa: " << x << " " << y << std::endl;
-  l->SetPosition(x/(double)m_clientDaContainer.GetN(), y/(double)m_clientDaContainer.GetN()); // posicionar no centro dos clientes
+  l->SetPosition(x/ccon, y/ccon); // posicionar no centro dos clientes
 }
 
 void ServerApplication::runDAPuro() {
@@ -1894,12 +1904,12 @@ void ServerApplication::runDAPuro() {
     std::cout << "Iniciando DA puro .....\n";
     // std::cin >> lixo;
 
-    int totalCliCon = 0;
+    int tMovCon = 0;
     int iterB = 0;
     bool movimentoB = false;
     do { // laco B
       iterB++;
-      totalCliCon = 0;
+      tMovCon = 0;
       std::cout << "Iteracao: " << iterB << "\n";
       double totalZci = 0.0;
       for (ClientModelContainer::Iterator ci = m_clientDaContainer.Begin(); ci != m_clientDaContainer.End(); ++ci) {
@@ -1916,7 +1926,7 @@ void ServerApplication::runDAPuro() {
         }
         if (low_dchilj <= raio_cob) {
           (*ci)->SetConnected(true);
-          totalCliCon++;
+          tMovCon++;
         } else {
           (*ci)->SetConnected(false);
         }
@@ -1961,7 +1971,7 @@ void ServerApplication::runDAPuro() {
     std::cout << "]\n";
     // -----------------
 
-    if (totalCliCon >= m_clientDaContainer.GetN()*0.8) {
+    if (tMovCon >= m_clientDaContainer.GetN()*0.8) {
       break; // finalizar Da
     }
 
