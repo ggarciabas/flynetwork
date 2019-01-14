@@ -1300,10 +1300,10 @@ void ServerApplication::DoDispose() {
 
 // https://github.com/ggarciabas/nsnam_ns3/blob/17c1f9200727381852528ac4798f040128ac842a/scratch/flynetwork/da_cpp/deterministic-annealing.cc
 void ServerApplication::runDA() {
-  int lixo;
-  std::cout << "Iniciando runDA: ";
-  std::cin >> lixo;
-  std::cout << std::endl;
+  // int lixo;
+  // std::cout << "Iniciando runDA: ";
+  // std::cin >> lixo;
+  // std::cout << std::endl;
 
   std::ofstream file;
   std::ostringstream os;
@@ -1674,7 +1674,7 @@ void ServerApplication::runDA() {
     std::cout << "------------------------------------------------------------------\n";
   } while (t > t_min); // laco da temperatura
 
-  std::cin >> lixo;
+  // std::cin >> lixo;
 
   m_totalCliGeral = 0;
   m_locConsTotal = 0; // atualiza total de consumo de todas as localizacoes
@@ -1884,7 +1884,7 @@ void ServerApplication::runDAPuro() {
   // std::cin >> t;
   // ----------------------
 
-  int lixo;
+  // int lixo;
   std::cout << "Iniciando DA puro .....\n";
   // std::cin >> lixo;
   int iter = 0;
@@ -1994,7 +1994,7 @@ void ServerApplication::runDAPuro() {
   GraficoCenarioDaPuro(t, iter, lCentral, raio_cob);
 
   std::cout << "Finalizou...\n";
-  std::cin >> lixo;
+  // std::cin >> lixo;
 
   m_totalCliGeral = 0;
   m_locConsTotal = 0; // atualiza total de consumo de todas as localizacoes
