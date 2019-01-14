@@ -1368,15 +1368,15 @@ void ServerApplication::runDA() {
 
   // -------------------
   //std::cout << "[\n\tTmin:\t\t" << t_min
-            << "\n\tRMax:\t\t" << r_max
-            << "\n\tUavcob:\t\t" << uav_cob
-            << "\n\tWi:\t\t" << Wi
-            << "\n\tWj:\t\t" << Wj
-            << "\n\tTxCapa:\t\t" << taxa_capacidade
-            << "\n\tRaioCob:\t\t" << raio_cob
-            << "\n\tEnv:\t\t" << m_environment
-            << "\n\tMaxIterB:\t\t" << max_iterB
-            << "\n\tTini:\t\t" << t << "\n]";
+            // << "\n\tRMax:\t\t" << r_max
+            // << "\n\tUavcob:\t\t" << uav_cob
+            // << "\n\tWi:\t\t" << Wi
+            // << "\n\tWj:\t\t" << Wj
+            // << "\n\tTxCapa:\t\t" << taxa_capacidade
+            // << "\n\tRaioCob:\t\t" << raio_cob
+            // << "\n\tEnv:\t\t" << m_environment
+            // << "\n\tMaxIterB:\t\t" << max_iterB
+            // << "\n\tTini:\t\t" << t << "\n]";
   // //std::cout << "Esperando ....";
   // std::cin >> t;
   // -------------------
@@ -1411,7 +1411,7 @@ void ServerApplication::runDA() {
   // ----------------------
 
   int iter = 0;
-  double lastT = t;
+  // double lastT = t;
   double feeting_locs = false;
   do {// laco A
     iter++;
@@ -1554,7 +1554,7 @@ void ServerApplication::runDA() {
 
       if (feeting_locs) {
          //std::cout << "Feeting B \n\tItb: " << iterB << "\n\tTemp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
-              << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n[\n";
+              // << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n[\n";
       }
 
       if (feeting_locs && (!(tMovCon >= tMov*0.8) || !(tFixCon == tFix) || !capacidade || !locConnected)) {
@@ -1571,7 +1571,7 @@ void ServerApplication::runDA() {
     if (feeting_locs) {
       // ------------------ Para teste somente
       //std::cout << "Finalizou feeting Temp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
-              << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n[\n";
+              // << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n[\n";
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
         // //std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
         //std::cout << (*lj)->toString();
@@ -1614,8 +1614,8 @@ void ServerApplication::runDA() {
 
     // Verificar condição de parada: 1- clientes conectados, 2- uavs conectados, 3- capacidade não extrapolada
     //std::cout << "Condição de parada:\n\tTemp: " << t << "\n\tTLj: " << m_locationContainer.GetN()
-              << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
-              << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n\tTlast: " << lastT << "\n\tCaiu: " << t*100/lastT << std::endl;
+              // << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
+              // << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n\tTlast: " << lastT << "\n\tCaiu: " << t*100/lastT << std::endl;
     if (locConnected && capacidade) { // 1- NOVO: 80% dos clientes tem que ter conexao
       if ((tMovCon >= tMov*0.8) && (tFixCon == tFix)) {
         feeting_locs = true;
@@ -1654,7 +1654,7 @@ void ServerApplication::runDA() {
         nLoc->LimparAcumuladoPosicionamento();
         nLoc->LimparAcumuladoPosicionamentoClientes();
         nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max, uav_cob); // este método atualiza a variavel de punicao!
-        lastT = t;
+        // lastT = t;
         //std::cout << "------->lastT: " << lastT << std::endl;
         // NOVO: Aumentar a temperatura, nova localizacao adicionada!
         // t = (t>0.1) ? t : 0.1;
@@ -1859,11 +1859,11 @@ void ServerApplication::runDAPuro() {
 
   // -------------------
   //std::cout << "[\n\tTmin:\t\t" << t_min
-            << "\n\tRMax:\t\t" << r_max
-            << "\n\tRaioCob:\t\t" << raio_cob
-            << "\n\tEnv:\t\t" << m_environment
-            << "\n\tMaxIterB:\t\t" << max_iterB
-            << "\n\tTini:\t\t" << t << "\n]";
+            // << "\n\tRMax:\t\t" << r_max
+            // << "\n\tRaioCob:\t\t" << raio_cob
+            // << "\n\tEnv:\t\t" << m_environment
+            // << "\n\tMaxIterB:\t\t" << max_iterB
+            // << "\n\tTini:\t\t" << t << "\n]";
   // //std::cout << "Esperando ....";
   // std::cin >> t;
   // -------------------
