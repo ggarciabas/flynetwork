@@ -1555,8 +1555,8 @@ void ServerApplication::runDA() {
       }
 
       if (feeting_locs) {
-         //std::cout << "Feeting B \n\tItb: " << iterB << "\n\tTemp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
-              // << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n[\n";
+         std::cout << "Feeting B \n\tItb: " << iterB << "\n\tTemp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
+              << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n[\n";
       }
 
       if (feeting_locs && (tMovCon < tMov*0.8 || tFixCon < tFix || !capacidade || !locConnected)) {
@@ -1573,13 +1573,13 @@ void ServerApplication::runDA() {
 
     if (feeting_locs) {
       // ------------------ Para teste somente
-      //std::cout << "Finalizou feeting Temp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
-              // << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n[\n";
+      std::cout << "Finalizou feeting Temp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
+              << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n[\n";
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-        // //std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
-        //std::cout << (*lj)->toString();
+        //std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
+        std::cout << (*lj)->toString();
       }
-      //std::cout << "]\n";
+      std::cout << "]\n";
       // -----------------
       if (locConnected && capacidade && (tMovCon >= tMov*0.8) && (tFixCon == tFix)) {
         GraficoCenarioDa(t, iter, lCentral, raio_cob, uav_cob);
@@ -1901,10 +1901,10 @@ void ServerApplication::runDAPuro() {
     // ------------------ Para teste somente
     //std::cout << "------------------------------------------------------------------\n";
       //std::cout << "LacoA Temp: " << t << " Iteracao: " << iter << "\n[\n";
-      for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+      // for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
         // //std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
         //std::cout << (*lj)->toString();
-      }
+      // }
       //std::cout << "]\n";
     // -----------------
 
@@ -1972,9 +1972,9 @@ void ServerApplication::runDAPuro() {
 
     // ------------------ Para teste somente
     //std::cout << "LacoB (fim) Temp: " << t << " IteracaoB: " << iterB << "\n[\n";
-    for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+    // for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
       //std::cout << (*lj)->toString();
-    }
+    // }
     //std::cout << "]\n";
     // -----------------
 

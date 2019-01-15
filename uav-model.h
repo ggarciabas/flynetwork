@@ -96,9 +96,9 @@ private:
   EventId m_sendCentral;
   EventId m_askCliData;
   Ipv4Address m_addressAdhoc;
-  double m_totalEnergy; // total de bateria atual do UAV
+  double m_totalEnergy; // total de bateria atual do UAV in Joules
   double m_energyCost;
-  double m_totalBattery; // total de bateria quando cheia
+  double m_totalBattery; // total de bateria quando cheia in Joules
   Ptr<Socket> m_socket;
   bool m_confirmed;
   bool m_clientData;

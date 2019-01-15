@@ -965,7 +965,7 @@ void UavNetwork::Configure()
   m_stack.SetRoutingHelper(m_list);
 
   // Ad Hoc
-  m_adhocHelper.SetStandard(WIFI_PHY_STANDARD_80211a);
+  m_adhocHelper.SetStandard(WIFI_PHY_STANDARD_80211a); // https://en.wikipedia.org/wiki/IEEE_802.11ac
   m_phyHelper = YansWifiPhyHelper::Default();
 
   m_channelHelper = YansWifiChannelHelper::Default();
@@ -989,7 +989,7 @@ void UavNetwork::Configure()
   m_phyHelperCli = YansWifiPhyHelper::Default();
   m_channelHelperCli = YansWifiChannelHelper::Default();
   m_phyHelperCli.SetChannel(m_channelHelperCli.Create());
-  m_wifiHelper.SetStandard(WIFI_PHY_STANDARD_80211b);
+  m_wifiHelper.SetStandard(WIFI_PHY_STANDARD_80211b); // https://en.wikipedia.org/wiki/IEEE_802.11n-2009
 
   m_macWifiHelperCli.SetType("ns3::StaWifiMac",
                              "Ssid", SsidValue(Ssid("flynetwork")),
