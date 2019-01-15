@@ -1478,6 +1478,8 @@ void ServerApplication::runDA() {
           if (Zci < 1e-30) {
             if (feeting_locs) {
               t *= 1.1; // no feeting nao adiciona novos uavs!
+              iterB = 1;
+              continue;
             } else {
               Zci = 1e-30;
               t = 0.1;
@@ -1554,12 +1556,13 @@ void ServerApplication::runDA() {
               << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n[\n";
       }
 
-      if (feeting_locs && (!(tMovCon >= tMov*0.8) || !(tFixCon == tFix) || !capacidade || !locConnected)) {
+      if (feeting_locs && (tMovCon < tMov*0.8 || tFixCon < tFix || !capacidade || !locConnected)) {
         t *= 1.1; // reheat
         iterB = 1;
-        // TALVEZ: atualizar a punicao de vizinhos
-        for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-          (*lj)->UpdatePunishNeighboor(uav_cob/r_max);
+        if (!locConnected) { // atualizar a punicao de vizinhos
+          for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+            (*lj)->UpdatePunishNeighboor(uav_cob/r_max);
+          }
         }
         continue;
       }
