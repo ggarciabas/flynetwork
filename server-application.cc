@@ -1427,8 +1427,8 @@ void ServerApplication::runDA() {
             double pr = std::pow(10, ((ptCli + gain + gain - pl)/*dBm*/-30)/*dB*//10); // W
             double it = fsInterf*pr; // W
             double sinr = (10*std::log10((pr / (it+N))/*W*/))/*dB*/+30; // dBm
-            NS_LOG_DEBUG("\nUav mais próximo: \n\td: " << dcilj*r_max << "m\n\tpl: " << pl << "dB\n\tpr: " << pr << "W\n\tit: " << it
-                                              << "W\n\tsinr: " << sinr << "dBm\n\tDentro cob? " << ((low_dchilj <= raio_cob/r_max)?"true":"false") << "\n\tSinr min? " << ((sinr >= sinrCliMin)?"true":"false"));
+            // NS_LOG_DEBUG("\nUav mais próximo: \n\td: " << dcilj*r_max << "m\n\tpl: " << pl << "dB\n\tpr: " << pr << "W\n\tit: " << it
+            //                                   << "W\n\tsinr: " << sinr << "dBm\n\tDentro cob? " << ((low_dchilj <= raio_cob/r_max)?"true":"false") << "\n\tSinr min? " << ((sinr >= sinrCliMin)?"true":"false"));
             if (low_dchilj <= raio_cob/r_max && sinr >= sinrCliMin) { // esta dentro da area de cobertura maxima da antena e receber SINR min
               Ptr<LocationModel> lCon = (*ci)->GetLocConnected();
               if (lCon) { // caso tenha alguma informacao anterior, desconsidera nos calculos, para isto atualiza o loc
