@@ -1347,7 +1347,7 @@ void ServerApplication::runDA() {
   // 1570 series https://www.cisco.com/c/dam/en/us/products/collateral/wireless/aironet-1570-series/datasheet-c78-732348.pdf
   double ptUav = 30; // dBm - potencia de transmissao máxima para o AP Aironet 1570 series 802.11ac 5GHz
   double ptCli = 28; // dBm - potencia de transmissao máxima para o Ap Aironet 1550 series 802.11n 2.4GHz
-  double fsInterf = 0.7272; // fator de sobreposicao de espaco 5 (50%)
+  double fsInterf = 0.0008; // fator de sobreposicao de espaco 5 (50%)
   // double dRUav = 6.5; // Mbps - taxa considerada por UAV
   double dRCli = 6.5; // Mbps - taxa considerada por usuário
   double raio_cob = 115.47; // metros - para clientes utilizando equação de antena direcional com esparramento verificar Klaine2018
@@ -1436,6 +1436,7 @@ void ServerApplication::runDA() {
             //                                   << pr << "W\n\tit: " << it
             //                                   << "W\n\tsinr: " << sinr << "dBm\n\tDentro cob? " << ((low_dchilj <= raio_cob/r_max)?"true":"false") << "\n\tSinr min? " << ((sinr >= sinrCliMin)?"true":"false"));
             if (low_dchilj <= raio_cob/r_max && sinr >= sinrCliMin) { // esta dentro da area de cobertura maxima da antena e receber SINR min
+                NS_LOG_DEBUG ("-> CLI Distancia que deu: " << dcilj*r_max);
               Ptr<LocationModel> lCon = (*ci)->GetLocConnected();
               if (lCon) { // caso tenha alguma informacao anterior, desconsidera nos calculos, para isto atualiza o loc
                 lCon->RemoveClient(dRCli, (*ci)->GetConsumption());
@@ -1723,9 +1724,9 @@ void ServerApplication::CentroDeMassa (Ptr<LocationModel> l, double r_max) {
     }
   }
 
-  if (con) { // todos os cliente estao conectados
-    //std::cout << "==> Todos os clientes conectados.\n";
-  }
+  // if (con) { // todos os cliente estao conectados
+  //   //std::cout << "==> Todos os clientes conectados.\n";
+  // }
   //std::cout << "Centro de massa: " << x << " " << y << std::endl;
   l->SetPosition(x/ccon, y/ccon); // posicionar no centro dos clientes
 }

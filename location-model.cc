@@ -297,6 +297,7 @@ void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, 
   double sinr = (10*std::log10((pr / (it+N))/*W*/))/*dB*/+30; // dBm
 
   if (sinr >= sinrUavMin) {
+    std::cout << "---------> UAV Distancia: " << dist*r_max << std::endl;
     m_connected = true;
   } else {
     m_connected = false;
