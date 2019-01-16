@@ -276,12 +276,12 @@ void LocationModel::AddPljCi (Ptr<ClientModel> ci, double Zci, double r_max) {
 }
 
 bool LocationModel::UpdatePunishNeighboor (double sinrUavMin) {
-  if (m_sinrFather < sinrUavMin) {
-    m_punshNeigh *=  0.9; 
+  if (m_sinrFather >= sinrUavMin) {
+    m_punshNeigh *=  0.9;
     m_punshNeigh = (m_punshNeigh>0.01)?m_punshNeigh:0.01;
     m_connected = false;
   } else {
-    m_punshNeigh *= 1.1; // aliviando
+    m_punshNeigh *= 1.1;
     m_punshNeigh = (m_punshNeigh > 2) ? 2 : m_punshNeigh;
     m_connected = true;
   }
@@ -294,7 +294,7 @@ void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, 
   double pl = 20*std::log10((4*pi*fcUav*(dist*r_max))/comp_onda); // dB
   double pr = std::pow(10, ((ptUav + gain + gain - pl)/*dBm*/-30)/*dB*//10); // W
   double it = fsInterf*pr; // W
-  double sinr = (10*std::log10((pr / (it+N))/*W*/))/*dB*/+30; // dBm 
+  double sinr = (10*std::log10((pr / (it+N))/*W*/))/*dB*/+30; // dBm
 
   if (sinr >= sinrUavMin) {
     m_connected = true;
@@ -310,6 +310,7 @@ void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, 
   m_xAcum += l->GetXPosition(r_max);
   m_yAcum += l->GetYPosition(r_max);
   m_sinrFather = sinr;
+  m_father = l;
 }
 
 Ptr<LocationModel> LocationModel::GetFather () {

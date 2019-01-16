@@ -1303,7 +1303,7 @@ void ServerApplication::DoDispose() {
 // https://github.com/ggarciabas/nsnam_ns3/blob/17c1f9200727381852528ac4798f040128ac842a/scratch/flynetwork/da_cpp/deterministic-annealing.cc
 void ServerApplication::runDA() {
   NS_LOG_DEBUG("ServerApplication::runDA @" << Simulator::Now().GetSeconds());
- 
+
   std::ofstream file;
   std::ostringstream os;
   os.str("");
@@ -1347,7 +1347,7 @@ void ServerApplication::runDA() {
   // 1570 series https://www.cisco.com/c/dam/en/us/products/collateral/wireless/aironet-1570-series/datasheet-c78-732348.pdf
   double ptUav = 30; // dBm - potencia de transmissao máxima para o AP Aironet 1570 series 802.11ac 5GHz
   double ptCli = 28; // dBm - potencia de transmissao máxima para o Ap Aironet 1550 series 802.11n 2.4GHz
-  double fsInterf = 0.0008; // fator de sobreposicao de espaco 5 (50%)
+  double fsInterf = 1; // fator de sobreposicao de espaco 5 (50%)
   // double dRUav = 6.5; // Mbps - taxa considerada por UAV
   double dRCli = 6.5; // Mbps - taxa considerada por usuário
   double raio_cob = 115.47; // metros - para clientes utilizando equação de antena direcional com esparramento verificar Klaine2018
@@ -1364,6 +1364,11 @@ void ServerApplication::runDA() {
   double t = 0.6;
   int locId = 0;
   int max_iterB = 5000;
+
+  NS_LOG_DEBUG ("\n\t t_min =" << t_min << "\n \t r_max =" << r_max << "\n \t ptUav ="<< ptUav << "\n \t ptCli =" << ptCli << "\n \t fsInterf ="
+              << fsInterf  << "\n \t dRCli =" << dRCli << "\n \t sinrUavMin ="<<sinrUavMin << "\n \t sinrCliMin =" << sinrCliMin<< "\n \t fcCli ="
+              << fcCli  << "\n \t fcUav =" << fcUav << "\n \t comp_onda =" << comp_onda << "\n \t pi =" << pi << "\n \t maxDrUav =" << maxDrUav << "\n \t gain =" << gain
+                << "\n \t N =" << N <<  "\n \t  taxa_capacidade ="  << taxa_capacidade << "\n \t t =" << t <<  "\n \t locId =" << locId << "\n \t max_iterB =" << max_iterB);
 
   ObjectFactory lObj;
   lObj.SetTypeId("ns3::LocationModel");
@@ -1393,7 +1398,7 @@ void ServerApplication::runDA() {
   do {// laco A
     iter++;
 
-    // run_last_b:
+    run_last_b:
     int tMovCon = 0;
     int tFixCon = 0;
     bool locConnected = true;
@@ -1421,9 +1426,9 @@ void ServerApplication::runDA() {
             double pl = 20*std::log10((4*pi*fcCli*(dcilj*r_max))/comp_onda); // dB
             double pr = std::pow(10, ((ptCli + gain + gain - pl)/*dBm*/-30)/*dB*//10); // W
             double it = fsInterf*pr; // W
-            double sinr = (10*std::log10((pr / (it+N))/*W*/))/*dB*/+30; // dBm 
-            std::cout << "Uav mais próximo: \n\td: " << dcilj*r_max << "m\n\tpl: " << pl << "dB\n\tpr: " << pr << "W\n\tit: " << it
-                                              << "W\n\tsinr: " << sinr << "dBm\n\tDentro cob? " << ((low_dchilj <= raio_cob/r_max)?"true":"false") << "\n\tSinr min? " << ((sinr >= sinrCliMin)?"true":"false");
+            double sinr = (10*std::log10((pr / (it+N))/*W*/))/*dB*/+30; // dBm
+            NS_LOG_DEBUG("\nUav mais próximo: \n\td: " << dcilj*r_max << "m\n\tpl: " << pl << "dB\n\tpr: " << pr << "W\n\tit: " << it
+                                              << "W\n\tsinr: " << sinr << "dBm\n\tDentro cob? " << ((low_dchilj <= raio_cob/r_max)?"true":"false") << "\n\tSinr min? " << ((sinr >= sinrCliMin)?"true":"false"));
             if (low_dchilj <= raio_cob/r_max && sinr >= sinrCliMin) { // esta dentro da area de cobertura maxima da antena e receber SINR min
               Ptr<LocationModel> lCon = (*ci)->GetLocConnected();
               if (lCon) { // caso tenha alguma informacao anterior, desconsidera nos calculos, para isto atualiza o loc
@@ -1439,7 +1444,7 @@ void ServerApplication::runDA() {
               } else {
                 tMovCon++;
               }
-            } 
+            }
           }
         }
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
@@ -1452,7 +1457,7 @@ void ServerApplication::runDA() {
             } else {
               Zci = 1e-30;
               t = 0.1;
-              //std::cout << "Solicitando nova localizacao pois Zci esta baixo!\n";
+              NS_LOG_DEBUG("Solicitando nova localizacao pois Zci esta baixo!\n");
               goto new_uav;
             }
           }
@@ -1468,7 +1473,11 @@ void ServerApplication::runDA() {
         double newY = ((*lj)->GetYAcumCli()+(*lj)->GetYAcum()*(*lj)->GetPunishNeighboor()) / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize()); // SAI DA EQUACAO: nao pode eletar ---> antigo: considera soemnte 50% para os filhos
         (*lj)->SetPosition(newX, newY, r_max);
         // Avalia a utilizacao de capacidade das localizações
-        capacidade = capacidade && (*lj)->ValidarCapacidade(maxDrUav, taxa_capacidade);
+        if (feeting_locs) { // nao permite atualizar a punicao quando esta em feeting! somente verifica se esta dentro ou nao!
+          capacidade = capacidade && ((*lj)->GetPunishCapacity()<=taxa_capacidade);
+        } else {
+          capacidade = capacidade && (*lj)->ValidarCapacidade(maxDrUav, taxa_capacidade);
+        }
 
         (*lj)->ClearChildList();
         (*lj)->LimparAcumuladoPosicionamento(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
@@ -1507,39 +1516,31 @@ void ServerApplication::runDA() {
         }
       }
 
-      if (feeting_locs) {
-         std::cout << "Feeting B \n\tItb: " << iterB << "\n\tTemp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
-              << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n[\n";
-      }
+      NS_LOG_DEBUG("Itb: " << iterB << "\n\tTemp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
+           << "\n\tCapacidade: " << ((capacidade) ? "true":"false"));
 
       if (feeting_locs && (tMovCon < tMov*0.8 || tFixCon < tFix || !capacidade || !locConnected)) {
         if (t < t_feeting) {
           t *= 1.1; // reheat caso nao tenha ultrapassado o t_feeting
           iterB = 1;
-          if (!locConnected) { // atualizar a punicao de vizinhos
-            for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-              (*lj)->UpdatePunishNeighboor(sinrUavMin);
-            }
-          }
-          continue; 
+          continue;
         } else {
-          if (iterB >= 2) 
+          if (iterB >= 2)
             NS_FATAL_ERROR ("FUUUU, não está conseguindo voltar a solução, mesmo com a temperatura que se tinha encontrado antes!");
           t = t_feeting;
           iterB = 1;
           continue;
         }
       }
-    } while (movimentoB && iterB < max_iterB); 
+    } while (movimentoB && iterB < max_iterB);
 
     if (feeting_locs) {
       // ------------------ Para teste somente
-      std::cout << "Finalizou feeting Temp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
-              << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n[\n";
+      NS_LOG_DEBUG("Finalizou feeting Temp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
+              << "\n\tCapacidade: " << ((capacidade) ? "true":"false"));
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-        std::cout << (*lj)->toString();
+          NS_LOG_DEBUG((*lj)->toString());
       }
-      std::cout << "]\n";
       // -----------------
       if (locConnected && capacidade && (tMovCon >= tMov*0.8) && (tFixCon == tFix)) {
         GraficoCenarioDa(t, iter, lCentral, raio_cob);
@@ -1552,18 +1553,19 @@ void ServerApplication::runDA() {
 
     if (locConnected && capacidade) { // 1- NOVO: 80% dos clientes tem que ter conexao
       if ((tMovCon >= tMov*0.8) && (tFixCon == tFix)) {
-        NS_LOG_DEBUG("--> Iniciando Feeting temp="<<t);
+        NS_LOG_DEBUG("--> Finalizado - Feeting temp="<<t);
         feeting_locs = true;
         t_feeting = t; // temperatura que está sendo iniciado o feeting, este é o limiar para se tentar ajustar
-        t *= 0.5; // resfria bastante 
+        t *= 0.5; // resfria bastante
         GraficoCenarioDa(t, iter, lCentral, raio_cob);
+        iter++;
         // removendo opcao de feeting! avaliar os graficos depois do primeiro teste!
-        //goto run_last_b;
-        break;
+        goto run_last_b;
+        // break;
       }
     }
 
-    if (!MovimentoA()) { 
+    if (!MovimentoA()) {
       new_uav:
         Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
         nLoc->SetId(locId++);
