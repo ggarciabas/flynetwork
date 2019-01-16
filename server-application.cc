@@ -1694,6 +1694,10 @@ void ServerApplication::runDA() {
 
   // std::cin >> lixo;
 
+  os.str ("");
+  os << "python ./scratch/flynetwork/data/da_loc.py " << m_pathData << " " << int(Simulator::Now().GetSeconds()) << " " << iter << " " << raio_cob << " " << uav_cob << " " << m_locationContainer.GetN();
+  system(os.str().c_str());
+
   m_totalCliGeral = 0;
   m_locConsTotal = 0; // atualiza total de consumo de todas as localizacoes
 
