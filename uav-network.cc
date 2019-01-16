@@ -977,15 +977,20 @@ void UavNetwork::Configure()
   // usar taxa constante para funcionar como o DA. MCS1 para todos!
 
   // Ad Hoc
-  m_adhocHelper.SetStandard(WIFI_PHY_STANDARD_80211a); // https://en.wikipedia.org/wiki/IEEE_802.11ac
+  m_adhocHelper.SetStandard(WIFI_PHY_STANDARD_80211ac); // https://en.wikipedia.org/wiki/IEEE_802.11ac
+  m_adhocHelper.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", StringValue ("VhtMcs1"),
+                                          "ControlMode", StringValue ("VhtMcs1"));
   m_phyHelper = YansWifiPhyHelper::Default();
-
   m_channelHelper = YansWifiChannelHelper::Default();
+  
+  // TODO: change ChannelWidth = 20 and Frequency = 5180Hz ac e 2.4GHz
+  
   m_channelHelper.SetPropagationDelay ("ns3::ConstantSpeedPropagationDelayModel");
-  // The below FixedRssLossModel will cause the rss to be fixed regardless
-  // of the distance between the two stations, and the transmit power
-  double rss = -80;  // -dBm
-  m_channelHelper.AddPropagationLoss ("ns3::FixedRssLossModel","Rss",DoubleValue (rss));
+  // isto permite comunicacao entre UAVs!
+  // // The below FixedRssLossModel will cause the rss to be fixed regardless
+  // // of the distance between the two stations, and the transmit power
+  // double rss = -80;  // -dBm
+  // m_channelHelper.AddPropagationLoss ("ns3::FixedRssLossModel","Rss",DoubleValue (rss));
   m_phyHelper.SetChannel(m_channelHelper.Create());
   // Set it to adhoc mode
   m_macAdHocHelper.SetType("ns3::AdhocWifiMac");
@@ -1001,15 +1006,13 @@ void UavNetwork::Configure()
   // 16/01/2019 DataSheet: https://www.cisco.com/c/en/us/products/collateral/wireless/aironet-1550-series/data_sheet_c78-641373.pdf
   // Relacao MCS e SINR: https://www.cisco.com/c/en/us/td/docs/wireless/technology/mesh/8-0/design/guide/mesh80.pdf
   // If we consider only 802.11n rates, then Table 13: Requirements for LinkSNR with AP1552 for 2.4 and 5 GHz, on page 48 shows LinkSNR requirements with AP1552 for 2.4 and 5 GHz.
-
-  // TODO: atualizar Ns3 para utilizar as configuracoes que serão utilizadas no DA 802.11n
-
   // Wifi
   m_phyHelperCli = YansWifiPhyHelper::Default();
   m_channelHelperCli = YansWifiChannelHelper::Default();
   m_phyHelperCli.SetChannel(m_channelHelperCli.Create());
-  m_wifiHelper.SetStandard(WIFI_PHY_STANDARD_80211b); // https://en.wikipedia.org/wiki/IEEE_802.11n-2009
-
+  m_wifiHelper.SetStandard(WIFI_PHY_STANDARD_80211n_2_4GHZ); // https://en.wikipedia.org/wiki/IEEE_802.11n-2009
+  m_wifiHelper.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", StringValue ("HtMcs1"),
+                                          "ControlMode", StringValue ("HtMcs1"));
   m_macWifiHelperCli.SetType("ns3::StaWifiMac",
                              "Ssid", SsidValue(Ssid("flynetwork")),
                              "ActiveProbing", BooleanValue(false)); // configuração de scanning passivo
