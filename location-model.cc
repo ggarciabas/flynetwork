@@ -238,14 +238,14 @@ void LocationModel::InitializeWij (double v) {
   m_totaCli = 0;
 }
 
-void LocationModel::NewClient (double Wi, double cons) {
-  m_wij += Wi;
+void LocationModel::NewClient (double dataRate, double cons) {
+  m_wij += dataRate;
   m_totalConsumption += cons;
   m_totaCli++;
 }
 
-void LocationModel::RemoveClient (double Wi, double cons) {
-  m_wij -= Wi;
+void LocationModel::RemoveClient (double dataRate, double cons) {
+  m_wij -= dataRate;
   m_totalConsumption -= cons;
   m_totaCli--;
 }

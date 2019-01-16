@@ -1303,11 +1303,7 @@ void ServerApplication::DoDispose() {
 // https://github.com/ggarciabas/nsnam_ns3/blob/17c1f9200727381852528ac4798f040128ac842a/scratch/flynetwork/da_cpp/deterministic-annealing.cc
 void ServerApplication::runDA() {
   NS_LOG_DEBUG("ServerApplication::runDA @" << Simulator::Now().GetSeconds());
-  // int lixo;
-  // //std::cout << "Iniciando runDA: ";
-  // std::cin >> lixo;
-  // //std::cout << std::endl;
-
+ 
   std::ofstream file;
   std::ostringstream os;
   os.str("");
@@ -1347,39 +1343,25 @@ void ServerApplication::runDA() {
   // constantes
   double t_min = 1e-7;
   double r_max = std::sqrt(std::pow(m_maxx, 2) + std::pow(m_maxy, 2));
-  double uav_cob = std::pow(10, (110.0/(10*3.0)-46.6777/(10*3.0))); // ver arquivo main.py do da_python
-  double Wi = 1.0;
-  double Wj = 20.0; // total de clientes por localizacao
+  // 1550 series https://www.cisco.com/c/en/us/products/collateral/wireless/aironet-1550-series/data_sheet_c78-641373.pdf
+  // 1570 series https://www.cisco.com/c/dam/en/us/products/collateral/wireless/aironet-1570-series/datasheet-c78-732348.pdf
+  double ptUav = 30; // dBm - potencia de transmissao máxima para o AP Aironet 1570 series 802.11ac 5GHz
+  double ptCli = 28; // dBm - potencia de transmissao máxima para o Ap Aironet 1550 series 802.11n 2.4GHz
+  double fsInterf = 0.0008; // fator de sobreposicao de espaco 5 (50%)
+  double dRUav = 6.5; // Mbps - taxa considerada por UAV
+  double dRCli = 6.5; // Mbps - taxa considerada por usuário
+  double raio_cob = 115.47; // metros - para clientes utilizando equação de antena direcional com esparramento verificar Klaine2018
+  double sinrCliMin = -92; // dBm - tabela de Receive sensitivity para 5GHz 802.11ac (VHT20) MCS 0-3
+  double fcCli = 2.4e9; // Hz - frequencia
+  double fcUav = 5e9; // Hz - frequencia
+  double comp_onda = 3e8; // m - comprimento de onda
+  double pi = 3.141516; // pi
+  double gain = 4; // dBi - tanto o ganho de recepcao como o de transmissao
+  double N = 0.2; // W - N0 = 10e-9 W/Hz -- B = 20MHz - Livro Goldsmith ref para N0
   double taxa_capacidade = 1.01; // NOVO: 120%
-  double raio_cob = 0.0;
-  switch (m_environment) { // ver valores no arquivo main.py
-    case 1:
-      raio_cob = 19.0581; break;
-    case 2:
-      raio_cob = 79.6821; break;
-    case 3:
-      raio_cob = 101.609; break;
-    case 4:
-      raio_cob = 108.295; break;
-  }
   double t = 0.6;
   int locId = 0;
   int max_iterB = 5000;
-
-  // -------------------
-  //std::cout << "[\n\tTmin:\t\t" << t_min
-            // << "\n\tRMax:\t\t" << r_max
-            // << "\n\tUavcob:\t\t" << uav_cob
-            // << "\n\tWi:\t\t" << Wi
-            // << "\n\tWj:\t\t" << Wj
-            // << "\n\tTxCapa:\t\t" << taxa_capacidade
-            // << "\n\tRaioCob:\t\t" << raio_cob
-            // << "\n\tEnv:\t\t" << m_environment
-            // << "\n\tMaxIterB:\t\t" << max_iterB
-            // << "\n\tTini:\t\t" << t << "\n]";
-  // //std::cout << "Esperando ....";
-  // std::cin >> t;
-  // -------------------
 
   ObjectFactory lObj;
   lObj.SetTypeId("ns3::LocationModel");
@@ -1403,29 +1385,11 @@ void ServerApplication::runDA() {
   lCentral->IniciarMovimentoB();
   loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), r_max, uav_cob); // este método atualiza a variavel de punicao!
 
-  // ----------------------
-  //std::cout << "Central: " << lCentral->toString();
-  //std::cout << "Loc: " << loc->toString();
-  // //std::cout << "Esperando ....";
-  // std::cin >> t;
-  // ----------------------
-
   int iter = 0;
-  // double lastT = t;
   double feeting_locs = false;
   double t_feeting = 0.0;
   do {// laco A
     iter++;
-
-    // ------------------ Para teste somente
-    // //std::cout << "------------------------------------------------------------------\n";
-    //   //std::cout << "LacoA Temp: " << t << " Iteracao: " << iter << "\n[\n";
-    //   for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-    //     // //std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
-    //     //std::cout << (*lj)->toString();
-    //   }
-    //   //std::cout << "]\n";
-    // -----------------    
 
     // run_last_b:
     int tMovCon = 0;
@@ -1439,43 +1403,42 @@ void ServerApplication::runDA() {
       iterB++;
       tMovCon = 0;
       tFixCon = 0;
-      // //std::cout << "Iteracao: " << iterB << "\n";
       for (ClientModelContainer::Iterator ci = m_clientDaContainer.Begin(); ci != m_clientDaContainer.End(); ++ci) {
+        (*ci)->SetConnected(false); // limpando para não dar conflito!
         double Zci = 0.0;
-        // double high_pljci = -1;
-        double low_dchilj = 1.5; // maior distancia é 1.0
-        // //std::cout << "\t[";
+        double low_dchilj = 1.5; // maior distancia é 1.0, valores normalizados!
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           double dcilj = CalculateDistance((*ci)->GetPosition(r_max), (*lj)->GetPosition(r_max));
           double pljci = std::exp ( - ((dcilj + (*lj)->GetPunishCapacity()*(*lj)->GetWij() )/t) );
           Zci += pljci;
           (*lj)->SetTempPljci(pljci);
           (*lj)->InitializeWij(0.0); // zerando para calcular novamente os clientes conectados, considerando agora a distancia!
-
-          if (low_dchilj > dcilj) { // achou UAv mais proximo
+          if (low_dchilj > dcilj) { // achou UAV mais proximo
             low_dchilj = dcilj;
-            Ptr<LocationModel> lCon = (*ci)->GetLocConnected();
-            if (lCon) { // caso tenha alguma informacao anterior, desconsidera nos calculos, para isto atualiza o loc
-              lCon->RemoveClient(Wi, (*ci)->GetConsumption());
-            }
-            lCon = 0;
-            (*ci)->SetLocConnected((*lj));
-            (*lj)->NewClient(Wi, (*ci)->GetConsumption());
+            // https://bitbucket.org/cpgeimestrado/rascunhocpgei/src/master/conversor.cpp
+            double pl = 20*std::log10((4*pi*fcCli*(dcilj*r_max))/comp_onda); // dB
+            double pr = std::pow(10, ((ptCli + gain + gain - pl)/*dBm*/-30)/*dB*//10); // W
+            double it = fsInterf*pr; // W
+            double sinr = (10*std::log10((pr / (it+N))/*W*/))/*dB*/+30; // dBm 
+            std::cout << "Uav mais próximo: \n\td: " << dcilj*r_max << "m\n\tpl: " << pl << "dB\n\tpr: " << pr << "W\n\tit: " << it
+                                              << "W\n\tsinr: " << sinr << "dBm\n\tDentro cob? " << ((low_dchilj <= raio_cob/r_max)?"true":"false") << "\n\tSinr min? " << ((sinr >= sinrCliMin)?"true":"false");
+            if (low_dchilj <= raio_cob/r_max && sinr >= sinrCliMin) { // esta dentro da area de cobertura maxima da antena e receber SINR min
+              Ptr<LocationModel> lCon = (*ci)->GetLocConnected();
+              if (lCon) { // caso tenha alguma informacao anterior, desconsidera nos calculos, para isto atualiza o loc
+                lCon->RemoveClient(dRCli, (*ci)->GetConsumption());
+              }
+              lCon = 0;
+              (*ci)->SetLocConnected((*lj));
+              // calcular a SNR e caso seja maior que o mínimo, considerar cliente conectado
+              (*lj)->NewClient(dRCli, (*ci)->GetConsumption());
+              (*ci)->SetConnected(true);
+              if ((*ci)->GetLogin().at(0) == 'f') {
+                tFixCon++;
+              } else {
+                tMovCon++;
+              }
+            } 
           }
-        }
-        // //std::cout << " ]\n";
-        // //std::cout << "\tZci: " << Zci << "\tlow_dchilj: " << low_dchilj << "\traio_cob/r_max: " << raio_cob/r_max << "\n";
-        // OBS: como saber se os clientes possuem conexão?!, falta adicionar uma flag no cliente para saber se ele está dentro da cobertura da localização conectada, esta é uma condição para finalizar o algoritmo, uma porcentagem dos clientes tem que estar dentro da cobertura de algum UAV
-        if (low_dchilj <= raio_cob/r_max) {
-          // //std::cout << "---->>> Distancia: " << high_dchilj << " cobmax: " << raio_cob/r_max << std::endl;
-          (*ci)->SetConnected(true);
-          if ((*ci)->GetLogin().at(0) == 'f') {
-            tFixCon++;
-          } else {
-            tMovCon++;
-          }
-        } else {
-          (*ci)->SetConnected(false);
         }
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           if (Zci < 1e-30) {
