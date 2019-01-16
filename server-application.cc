@@ -1413,6 +1413,7 @@ void ServerApplication::runDA() {
   int iter = 0;
   // double lastT = t;
   double feeting_locs = false;
+  double t_feeting = 0.0;
   do {// laco A
     iter++;
 
@@ -1424,8 +1425,7 @@ void ServerApplication::runDA() {
     //     //std::cout << (*lj)->toString();
     //   }
     //   //std::cout << "]\n";
-    // -----------------
-
+    // -----------------    
 
     run_last_b:
     int tMovCon = 0;
@@ -1434,7 +1434,6 @@ void ServerApplication::runDA() {
     bool capacidade = true;
     bool movimentoB = true;
     int iterB = 0;
-    double t_feeting = 0.0;
     do { // laco B
       capacidade = locConnected = true;
       iterB++;
