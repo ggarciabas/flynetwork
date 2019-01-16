@@ -1427,7 +1427,7 @@ void ServerApplication::runDA() {
     //   //std::cout << "]\n";
     // -----------------    
 
-    run_last_b:
+    // run_last_b:
     int tMovCon = 0;
     int tFixCon = 0;
     bool locConnected = true;
