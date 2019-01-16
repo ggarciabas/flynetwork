@@ -275,30 +275,41 @@ void LocationModel::AddPljCi (Ptr<ClientModel> ci, double Zci, double r_max) {
   m_plj += ci->GetPci()*(m_tempPljci/Zci);
 }
 
-bool LocationModel::UpdatePunishNeighboor (double uav_cob) {
-  if (m_distFather <= uav_cob) {
-    m_punshNeigh *= std::exp (-1+(m_distFather/uav_cob)); // m_punshNeigh * 0.9; // 
+bool LocationModel::UpdatePunishNeighboor (double sinrUavMin) {
+  if (m_sinrFather < sinrUavMin) {
+    m_punshNeigh *=  0.9; 
     m_punshNeigh = (m_punshNeigh>0.01)?m_punshNeigh:0.01;
+    m_connected = false;
   } else {
-    m_punshNeigh *= 1.2;
+    m_punshNeigh *= 1.1; // aliviando
     m_punshNeigh = (m_punshNeigh > 2) ? 2 : m_punshNeigh;
+    m_connected = true;
   }
-
-  m_connected = m_distFather <= uav_cob;
-
-  // std::cout << "[ Loc: " << m_id << " " << ((m_connected)?"true":"false") << "]" << std::endl;
 
   return m_connected;
 }
 
-void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, double uav_cob) {
-  m_father = l;
+void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, double fcUav, double pi, double comp_onda, double ptUav, double gain, double fsInterf, double N, double sinrUavMin) {
+
+  double pl = 20*std::log10((4*pi*fcUav*(dist*r_max))/comp_onda); // dB
+  double pr = std::pow(10, ((ptUav + gain + gain - pl)/*dBm*/-30)/*dB*//10); // W
+  double it = fsInterf*pr; // W
+  double sinr = (10*std::log10((pr / (it+N))/*W*/))/*dB*/+30; // dBm 
+
+  if (sinr >= sinrUavMin) {
+    m_connected = true;
+  } else {
+    m_connected = false;
+  }
+
+  // FUTURO: pensar na metrica para futuro
+  // m_father->UavConsumption(-dataRate); // removendo o consumo do pai anterior
+  // l->UavConsumption(dataRate); // adicionando consumo no pai atual
+
   // atualizando parte do novo posicionamento da localizacao
   m_xAcum += l->GetXPosition(r_max);
   m_yAcum += l->GetYPosition(r_max);
-  m_distFather = dist;
-
-  m_connected = m_distFather <= (uav_cob/r_max);
+  m_sinrFather = sinr;
 }
 
 Ptr<LocationModel> LocationModel::GetFather () {
@@ -380,8 +391,8 @@ bool LocationModel::IsConnected () {
   return m_connected;
 }
 
-bool LocationModel::ValidarCapacidade (double Wj, double taxa_capacidade) {
-  if (m_wij > Wj) {
+bool LocationModel::ValidarCapacidade (double maxDrUav, double taxa_capacidade) {
+  if (m_wij > maxDrUav) {
     // atualizar taxa de punicao
     m_punshCapacity *= taxa_capacidade;
     return false;

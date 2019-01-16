@@ -15,8 +15,7 @@ main_path = "./scratch/flynetwork/data/output/"+path
 etapa = sys.argv[2]
 iteracao = sys.argv[3]
 rcob = sys.argv[4]
-ucob = sys.argv[5]
-tLoc = sys.argv[6]
+tLoc = sys.argv[5]
 da = "cpp"
 
 print(plt.rcParams.get('figure.figsize'))
@@ -83,9 +82,6 @@ for arquivo in glob.glob(main_path+'/'+'etapa/'+etapa+'/da_loc_'+da+'_*'+iteraca
             ax0.plot(loc_last[i],loc_last[i+1],'cX', markersize=7.0, label="anteior")
             ax0.plot(loc[i],loc[i+1],'c^', markersize=7.0, label="atual")
             ax0.add_patch(
-                patches.Circle((loc[i],loc[i+1]), radius=float(ucob), color='r', fill=False, linestyle='dashed')
-            )
-            ax0.add_patch(
                 patches.Circle((loc[i],loc[i+1]), radius=float(rcob), color='b', fill=False, linestyle='dotted')
             )
             ax0.plot(x,y,'c-', markersize=7.0)
@@ -93,9 +89,6 @@ for arquivo in glob.glob(main_path+'/'+'etapa/'+etapa+'/da_loc_'+da+'_*'+iteraca
         else:
             ax0.plot(loc_last[i],loc_last[i+1],'cX', markersize=7.0)
             ax0.plot(loc[i],loc[i+1],'c^', markersize=7.0)
-            ax0.add_patch(
-                patches.Circle((loc[i],loc[i+1]), radius=float(ucob), color='r', fill=False, linestyle='dashed')
-            )
             ax0.add_patch(
                 patches.Circle((loc[i],loc[i+1]), radius=float(rcob), color='b', fill=False, linestyle='dotted')
             )

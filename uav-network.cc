@@ -986,11 +986,11 @@ void UavNetwork::Configure()
   // TODO: change ChannelWidth = 20 and Frequency = 5180Hz ac e 2.4GHz
   
   m_channelHelper.SetPropagationDelay ("ns3::ConstantSpeedPropagationDelayModel");
-  // isto permite comunicacao entre UAVs!
-  // // The below FixedRssLossModel will cause the rss to be fixed regardless
-  // // of the distance between the two stations, and the transmit power
-  // double rss = -80;  // -dBm
-  // m_channelHelper.AddPropagationLoss ("ns3::FixedRssLossModel","Rss",DoubleValue (rss));
+  // ---> isto permite comunicacao entre UAVs!
+  // The below FixedRssLossModel will cause the rss to be fixed regardless
+  // of the distance between the two stations, and the transmit power
+  double rss = -80;  // -dBm
+  m_channelHelper.AddPropagationLoss ("ns3::FixedRssLossModel","Rss",DoubleValue (rss));
   m_phyHelper.SetChannel(m_channelHelper.Create());
   // Set it to adhoc mode
   m_macAdHocHelper.SetType("ns3::AdhocWifiMac");

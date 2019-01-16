@@ -106,8 +106,8 @@ public:
   double AddPljCiPuro (Ptr<ClientModel> ci, double Zci, double r_max);
 
 
-  bool UpdatePunishNeighboor (double uav_cob);
-  void SetFather (Ptr<LocationModel> l, double dist, double r_max, double uav_cob);
+  bool UpdatePunishNeighboor (double sinrUavMin);
+  void SetFather (Ptr<LocationModel> l, double dist, double r_max, double fcUav, double pi, double comp_onda, double ptUav, double gain, double fsInterf, double N, double sinrUavMin);
   Ptr<LocationModel> GetFather ();
 
   void AddChild (Ptr<LocationModel> l, double r_max);
@@ -123,6 +123,8 @@ public:
   double GetXAcumCli();
   double GetYAcumCli();
   double GetPlj();
+
+  // double UavConsumption(double);
 
   void SetConnected (bool);
   bool IsConnected ();
@@ -164,7 +166,7 @@ private:
 
   std::map<Ptr<ClientModel>, double> m_pljci;
   Ptr<LocationModel> m_father;
-  double m_distFather;
+  double m_sinrFather;
   LocationModelContainer m_childList;
 };
 
