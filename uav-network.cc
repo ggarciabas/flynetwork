@@ -964,6 +964,18 @@ void UavNetwork::Configure()
   // configurando INTERNET
   m_stack.SetRoutingHelper(m_list);
 
+  // IMPORTANTE: Information similar to the following appears for the show mesh config command:  fala o low SNR e high SNR https://www.cisco.com/c/en/us/td/docs/wireless/technology/mesh/8-0/design/guide/mesh80.pdf
+  // Low Link SNR.................................. 12
+  // High Link SNR................................. 60
+  // Max Association Number........................ 10
+
+  // Considerar o Cisco Aironet 1570 Series
+  // -- https://www.cisco.com/c/en/us/td/docs/wireless/controller/technotes/8-0/1570-DG/b_Aironet_AP1570_DG.pdf
+  // DataSheet: https://www.cisco.com/c/dam/en/us/products/collateral/wireless/aironet-1570-series/datasheet-c78-732348.pdf
+
+  // ns3 exemplo: https://www.nsnam.org/doxygen/vht-wifi-network_8cc_source.html
+  // usar taxa constante para funcionar como o DA. MCS1 para todos!
+
   // Ad Hoc
   m_adhocHelper.SetStandard(WIFI_PHY_STANDARD_80211a); // https://en.wikipedia.org/wiki/IEEE_802.11ac
   m_phyHelper = YansWifiPhyHelper::Default();
@@ -984,6 +996,13 @@ void UavNetwork::Configure()
                       ("X", DoubleValue (m_cx),
                         "Y", DoubleValue (m_cy),
                         "Rho", StringValue("ns3::ConstantRandomVariable[Constant=3.0]"));
+
+  // Considerar o Ponto de Acesso Cisco Aironet 1550 Series
+  // 16/01/2019 DataSheet: https://www.cisco.com/c/en/us/products/collateral/wireless/aironet-1550-series/data_sheet_c78-641373.pdf
+  // Relacao MCS e SINR: https://www.cisco.com/c/en/us/td/docs/wireless/technology/mesh/8-0/design/guide/mesh80.pdf
+  // If we consider only 802.11n rates, then Table 13: Requirements for LinkSNR with AP1552 for 2.4 and 5 GHz, on page 48 shows LinkSNR requirements with AP1552 for 2.4 and 5 GHz.
+
+  // TODO: atualizar Ns3 para utilizar as configuracoes que serão utilizadas no DA 802.11n
 
   // Wifi
   m_phyHelperCli = YansWifiPhyHelper::Default();

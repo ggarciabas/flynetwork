@@ -1644,7 +1644,9 @@ void ServerApplication::runDA() {
         // -----------------
         GraficoCenarioDa(t, iter, lCentral, raio_cob, uav_cob);
         iter++;
-        goto run_last_b;
+        // removendo opcao de feeting! avaliar os graficos depois do primeiro teste!
+        //goto run_last_b;
+        break;
       }
       // else if (t*100/lastT <= 5 && MovimentoA()) { // NOVO: temperatura caiu mais de 95% apos a ultima vez que foi adicionada uma localizacao
       //   //std::cout << "Solicitando nova localizacao 80\% temperatura\n";
