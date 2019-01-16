@@ -289,11 +289,11 @@ bool LocationModel::UpdatePunishNeighboor (double sinrUavMin) {
   return m_connected;
 }
 
-void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, double fcUav, double pi, double comp_onda, double ptUav, double gain, double fsInterf, double N, double sinrUavMin) {
+void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, double prRef, double pi, double comp_onda, double ptUav, double gain, double fsInterf, double N, double sinrUavMin) {
 
-  double pl = 20*std::log10((4*pi*fcUav*(dist*r_max))/comp_onda); // dB
-  double pr = std::pow(10, ((ptUav + gain + gain - pl)/*dBm*/-30)/*dB*//10); // W
-  double it = fsInterf*pr; // W
+  double pl = 10*3.32*std::log10(dist*r_max)+4.48; // dB - Beta e sigma para ambientes outdoor - LogDistance (ver dissertacao)
+  double pr = std::pow(10,((prRef - pl)/*dBm*/-30)/10.0); // W
+  double it = fsInterf*pr; // W -- convertido pra W
   double sinr = (10*std::log10((pr / (it+N))/*W*/))/*dB*/+30; // dBm
 
   if (sinr >= sinrUavMin) {

@@ -107,7 +107,7 @@ public:
 
 
   bool UpdatePunishNeighboor (double sinrUavMin);
-  void SetFather (Ptr<LocationModel> l, double dist, double r_max, double fcUav, double pi, double comp_onda, double ptUav, double gain, double fsInterf, double N, double sinrUavMin);
+  void SetFather (Ptr<LocationModel> l, double dist, double r_max, double prRef, double pi, double comp_onda, double ptUav, double gain, double fsInterf, double N, double sinrUavMin);
   Ptr<LocationModel> GetFather ();
 
   void AddChild (Ptr<LocationModel> l, double r_max);
