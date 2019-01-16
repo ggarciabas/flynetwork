@@ -1348,7 +1348,7 @@ void ServerApplication::runDA() {
   double ptUav = 30; // dBm - potencia de transmissao máxima para o AP Aironet 1570 series 802.11ac 5GHz
   double ptCli = 28; // dBm - potencia de transmissao máxima para o Ap Aironet 1550 series 802.11n 2.4GHz
   double fsInterf = 0.0008; // fator de sobreposicao de espaco 5 (50%)
-  double dRUav = 6.5; // Mbps - taxa considerada por UAV
+  // double dRUav = 6.5; // Mbps - taxa considerada por UAV
   double dRCli = 6.5; // Mbps - taxa considerada por usuário
   double raio_cob = 115.47; // metros - para clientes utilizando equação de antena direcional com esparramento verificar Klaine2018
   double sinrUavMin = -90; // dBm - tabela de Receive sensitivity para 5GHz 802.11ac (VHT20) MCS 1
