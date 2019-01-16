@@ -1434,6 +1434,7 @@ void ServerApplication::runDA() {
     bool capacidade = true;
     bool movimentoB = true;
     int iterB = 0;
+    double t_feeting = 0.0;
     do { // laco B
       capacidade = locConnected = true;
       iterB++;
@@ -1480,6 +1481,7 @@ void ServerApplication::runDA() {
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           if (Zci < 1e-30) {
             if (feeting_locs) {
+              NS_LOG_DEBUG ("===>>> O resfriamento do feeting foi extremo, aumentando a temperatura para encontrar melhores posicionamentos.");
               t *= 1.1; // no feeting nao adiciona novos uavs!
               iterB = 1;
               continue;
@@ -1560,14 +1562,22 @@ void ServerApplication::runDA() {
       }
 
       if (feeting_locs && (tMovCon < tMov*0.8 || tFixCon < tFix || !capacidade || !locConnected)) {
-        t *= 1.1; // reheat
-        iterB = 1;
-        if (!locConnected) { // atualizar a punicao de vizinhos
-          for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-            (*lj)->UpdatePunishNeighboor(uav_cob/r_max);
+        if (t < t_feeting) {
+          t *= 1.1; // reheat caso nao tenha ultrapassado o t_feeting
+          iterB = 1;
+          if (!locConnected) { // atualizar a punicao de vizinhos
+            for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+              (*lj)->UpdatePunishNeighboor(uav_cob/r_max);
+            }
           }
+          continue; 
+        } else {
+          if (iterB >= 2) 
+            NS_FATAL_ERROR ("FUUUU, não está conseguindo voltar a solução, mesmo com a temperatura que se tinha encontrado antes!");
+          t = t_feeting;
+          iterB = 1;
+          continue;
         }
-        continue;
       }
     } while (movimentoB && iterB < max_iterB); // NOVO: definir valor melhor, coloquei iteração pois no teste_1/custo_1 com 3 localizacoes o algoritmo detecam 4 grupos e as localizacoes ficam trocando entre estas 4, assim, nunca saindo do laco! Com limite de iterações espera-se que saia adicione uma nova localização e o problema seja resolvido.
 
@@ -1622,7 +1632,8 @@ void ServerApplication::runDA() {
     if (locConnected && capacidade) { // 1- NOVO: 80% dos clientes tem que ter conexao
       if ((tMovCon >= tMov*0.8) && (tFixCon == tFix)) {
         feeting_locs = true;
-        t *= 0.5;
+        t_feeting = t; // temperatura que está sendo iniciado o feeting, este é o limiar para se tentar ajustar
+        t *= 0.5; // resfria bastante 
         // ------------------ Para teste somente
         //std::cout << "Iniciando feeting Temp: " << t << "\n[\n";
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
