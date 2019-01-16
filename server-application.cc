@@ -1630,6 +1630,7 @@ void ServerApplication::runDA() {
               // << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n\tTlast: " << lastT << "\n\tCaiu: " << t*100/lastT << std::endl;
     if (locConnected && capacidade) { // 1- NOVO: 80% dos clientes tem que ter conexao
       if ((tMovCon >= tMov*0.8) && (tFixCon == tFix)) {
+        NS_LOG_DEBUG("--> Iniciando Feeting temp="<<t);
         feeting_locs = true;
         t_feeting = t; // temperatura que está sendo iniciado o feeting, este é o limiar para se tentar ajustar
         t *= 0.5; // resfria bastante 
