@@ -1643,7 +1643,6 @@ void ServerApplication::runDA() {
         //std::cout << "]\n";
         // -----------------
         GraficoCenarioDa(t, iter, lCentral, raio_cob, uav_cob);
-        iter++;
         // removendo opcao de feeting! avaliar os graficos depois do primeiro teste!
         //goto run_last_b;
         break;
