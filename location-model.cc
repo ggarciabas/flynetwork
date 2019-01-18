@@ -302,11 +302,11 @@ void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, 
     std::cout << "---------> UAV Distancia: " << dist*r_max << std::endl;
     if (sinr < -92) { // dBm
       m_dataRate = 0.0;
-    } else if (sinr > -86) {
+    } else if (sinr < -86) {
       m_dataRate = 6.5; //Mbps MCS 0 até 3, consdierando somente taxa 6.5 por falta de infos no dataSheet
-    } else if (sinr > -79) {
+    } else if (sinr < -79) {
       m_dataRate = 39; //Mbps MCS 4 até 6
-    } else if (sinr > 74) {
+    } else if (sinr < 74) {
       m_dataRate = 65; // Mbps MCS 7
     } else {
       m_dataRate = 78; // Mbps MCS 8

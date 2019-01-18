@@ -202,19 +202,19 @@ double ClientModel::GetDataRate () {
 void ClientModel::SetDataRate(double sinr) {
   if (sinr < -93) { // dBm
     m_dataRate = 0.0;
-  } else if (sinr > -91) {
+  } else if (sinr < -91) {
     m_dataRate = 6.5; //Mbps MCS 0
-  } else if (sinr > -89) {
+  } else if (sinr < -89) {
     m_dataRate = 13; //Mbps MCS 1
-  } else if (sinr > -86) {
+  } else if (sinr < -86) {
     m_dataRate = 19.5; //Mbps MCS 2
-  } else if (sinr > -82) {
+  } else if (sinr < -82) {
     m_dataRate = 26; //Mbps MCS 3
-  } else if (sinr > -78) {
+  } else if (sinr < -78) {
     m_dataRate = 39; //Mbps MCS 4
-  } else if (sinr > -77) {
+  } else if (sinr < -77) {
     m_dataRate = 52; //Mbps MCS 5
-  } else if (sinr > -75) {
+  } else if (sinr < -75) {
     m_dataRate = 58.5; //Mbps MCS 6
   } else {
     m_dataRate = 65; // Mbps MCS 7
