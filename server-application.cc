@@ -1603,10 +1603,6 @@ void ServerApplication::runDA() {
 
   } while (t > t_min); // laco da temperatura
 
-  os.str ("");
-  os << "python ./scratch/flynetwork/data/da_loc.py " << m_pathData << " " << int(Simulator::Now().GetSeconds());
-  system(os.str().c_str());
-
   m_totalCliGeral = 0;
   m_locConsTotal = 0; // atualiza total de consumo de todas as localizacoes
 
@@ -1622,7 +1618,7 @@ void ServerApplication::runDA() {
   os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/client_data_rate.txt";
   file.open(os.str().c_str(), std::ofstream::out);
   for (ClientModelContainer::Iterator ci = m_clientContainer.Begin(); ci != m_clientContainer.End(); ++ci) {
-    file << (*ci)->GetLogin() << (*ci)->GetDataRate() << std::endl;
+    file << (*ci)->GetLogin() << "," << (*ci)->GetDataRate() << std::endl;
   }
   file.close();
 
