@@ -974,7 +974,7 @@ void UavNetwork::Configure()
   // DataSheet: https://www.cisco.com/c/dam/en/us/products/collateral/wireless/aironet-1570-series/datasheet-c78-732348.pdf
 
   // ns3 exemplo: https://www.nsnam.org/doxygen/vht-wifi-network_8cc_source.html
-  // usar taxa constante para funcionar como o DA. MCS1 para todos!
+  // usar taxa constante para funcionar como o DA. MCS0 para todos!
 
   // Ad Hoc
   m_adhocHelper.SetStandard(WIFI_PHY_STANDARD_80211ac); // https://en.wikipedia.org/wiki/IEEE_802.11ac
