@@ -13,9 +13,6 @@ import pandas as pd
 path = sys.argv[1]
 main_path = "./scratch/flynetwork/data/output/"+path
 etapa = sys.argv[2]
-iteracao = sys.argv[3]
-rcob = sys.argv[4]
-tLoc = sys.argv[5]
 da = "cpp"
 
 print(plt.rcParams.get('figure.figsize'))

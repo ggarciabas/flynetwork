@@ -1604,7 +1604,7 @@ void ServerApplication::runDA() {
   } while (t > t_min); // laco da temperatura
 
   os.str ("");
-  os << "python ./scratch/flynetwork/data/da_loc.py " << m_pathData << " " << int(Simulator::Now().GetSeconds()) << " " << iter << " " << raio_cob << " " << m_locationContainer.GetN();
+  os << "python ./scratch/flynetwork/data/da_loc.py " << m_pathData << " " << int(Simulator::Now().GetSeconds());
   system(os.str().c_str());
 
   m_totalCliGeral = 0;
@@ -1638,6 +1638,8 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
   os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/da_loc_cpp_" << std::setfill ('0') << std::setw (15) << iter << ".txt";
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
   LocationModelContainer::Iterator lj = m_locationContainer.Begin(); // imprimindo a posicao atual da localizacao
+  file << iter << std::endl;
+  file << raio_cob << std::endl;
   file << m_maxx << "," << m_maxy << std::endl;
   file << temp << std::endl;
   file << lCentral->GetXPosition() << "," << lCentral->GetYPosition() << std::endl;
