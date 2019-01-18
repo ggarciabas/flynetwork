@@ -978,8 +978,8 @@ void UavNetwork::Configure()
 
   // Ad Hoc
   m_adhocHelper.SetStandard(WIFI_PHY_STANDARD_80211ac); // https://en.wikipedia.org/wiki/IEEE_802.11ac
-  m_adhocHelper.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", StringValue ("VhtMcs1"),
-                                          "ControlMode", StringValue ("VhtMcs1"));
+  m_adhocHelper.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", StringValue ("VhtMcs0"),
+                                          "ControlMode", StringValue ("VhtMcs0"));
   m_phyHelper = YansWifiPhyHelper::Default();
   m_channelHelper = YansWifiChannelHelper::Default();
   
@@ -1011,8 +1011,8 @@ void UavNetwork::Configure()
   m_channelHelperCli = YansWifiChannelHelper::Default();
   m_phyHelperCli.SetChannel(m_channelHelperCli.Create());
   m_wifiHelper.SetStandard(WIFI_PHY_STANDARD_80211n_2_4GHZ); // https://en.wikipedia.org/wiki/IEEE_802.11n-2009
-  m_wifiHelper.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", StringValue ("HtMcs1"),
-                                          "ControlMode", StringValue ("HtMcs1"));
+  m_wifiHelper.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", StringValue ("HtMcs0"),
+                                          "ControlMode", StringValue ("HtMcs0"));
   m_macWifiHelperCli.SetType("ns3::StaWifiMac",
                              "Ssid", SsidValue(Ssid("flynetwork")),
                              "ActiveProbing", BooleanValue(false)); // configuração de scanning passivo

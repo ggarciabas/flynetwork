@@ -1351,8 +1351,8 @@ void ServerApplication::runDA() {
   // double dRUav = 6.5; // Mbps - taxa considerada por UAV
   double dRCli = 6.5; // Mbps - taxa considerada por usuário
   double raio_cob = 115.47; // metros - para clientes utilizando equação de antena direcional com esparramento verificar Klaine2018
-  double sinrUavMin = -90; // dBm - tabela de Receive sensitivity para 5GHz 802.11ac (VHT20) MCS 1
-  double sinrCliMin = -91; // dBm - tabela de Receive sensitivity para 2.4GHz 802.11n (HT20) MCS 1
+  double sinrUavMin = -92; // dBm - tabela de Receive sensitivity para 5GHz 802.11ac (VHT20) MCS 0
+  double sinrCliMin = -93; // dBm - tabela de Receive sensitivity para 2.4GHz 802.11n (HT20) MCS 0
   double fcCli = 2.4e9; // Hz - frequencia
   double fcUav = 5e9; // Hz - frequencia
   double comp_onda = 3e8; // m - comprimento de onda
