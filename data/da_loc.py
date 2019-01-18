@@ -13,7 +13,7 @@ import pandas as pd
 da = "cpp"
 
 def da_loc (custo, etapa, main_path, teste):
-    for arquivo in glob.glob(main_path+'/'+custo+'/etapa/'+etapa+'/da_loc_'+da+'_*.txt'):
+    for arquivo in glob.glob(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_'+da+'_*.txt'):
         try:
             f_cen = open(arquivo,'r')
         except IOError:
@@ -53,7 +53,7 @@ def da_loc (custo, etapa, main_path, teste):
 
         lId = np.arange(0,len(loc),1);
 
-        f_cen = open(main_path+'/'+'etapa/'+etapa+'/client.txt','r')
+        f_cen = open(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/client.txt','r')
         line = f_cen.readline().strip()
         cli = [x for x in line.split(',')]
         f_cen.close()
@@ -79,7 +79,7 @@ def da_loc (custo, etapa, main_path, teste):
                 ax0.plot(loc_last[i],loc_last[i+1],'cX', markersize=7.0, label="anteior")
                 ax0.plot(loc[i],loc[i+1],'c^', markersize=7.0, label="atual")
                 ax0.add_patch(
-                    patches.Circle((loc[i],loc[i+1]), radius=float(rcob), color='b', fill=False, linestyle='dotted')
+                    patches.Circle((loc[i],loc[i+1]), radius=float(rcob[0]), color='b', fill=False, linestyle='dotted')
                 )
                 ax0.plot(x,y,'c-', markersize=7.0)
                 first = False
@@ -87,7 +87,7 @@ def da_loc (custo, etapa, main_path, teste):
                 ax0.plot(loc_last[i],loc_last[i+1],'cX', markersize=7.0)
                 ax0.plot(loc[i],loc[i+1],'c^', markersize=7.0)
                 ax0.add_patch(
-                    patches.Circle((loc[i],loc[i+1]), radius=float(rcob), color='b', fill=False, linestyle='dotted')
+                    patches.Circle((loc[i],loc[i+1]), radius=float(rcob[0]), color='b', fill=False, linestyle='dotted')
                 )
                 ax0.plot(x,y,'c-', markersize=7.0)
             
@@ -107,7 +107,7 @@ def da_loc (custo, etapa, main_path, teste):
 
         ax0.plot(central[0],central[1],'g*', markersize=7.0, label="central")
 
-        ax0.set_title("Cenario @"+'etapa/'+etapa+"s Temp.:"+str(temp[0])+ " Iter:"+iteracao+" TLoc: "+ tLoc)
+        # ax0.set_title("Cenario @"+'etapa/'+etapa+"s Temp.:"+str(temp[0])+ " Iter:"+iteracao[0]+" TLoc: "+ tLoc)
         ax0.set_ylabel('Y (m)')
         ax0.set_xlabel('X (m)')
         ax0.set_xlim([0,lim[0]])
@@ -115,9 +115,9 @@ def da_loc (custo, etapa, main_path, teste):
 
         lgd = ax0.legend(loc='upper center', bbox_to_anchor=(0.5, 1.23), fancybox=True, shadow=True, ncol=5)
 
-        plt.savefig(main_path+'/'+'etapa/'+etapa+'/da_loc_'+da+'_{:015}'.format(int(iteracao))+'.svg', bbox_extra_artists=(lgd,), bbox_inches='tight')
-        plt.savefig(main_path+'/'+'etapa/'+etapa+'/da_loc_'+da+'_{:015}'.format(int(iteracao))+'.eps', bbox_extra_artists=(lgd,), bbox_inches='tight')
-        plt.savefig(main_path+'/'+'etapa/'+etapa+'/da_loc_scenario'+da+'_{:015}'.format(int(iteracao))+'.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+        # plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_'+da+'_{:015}'.format(int(iteracao[0]))+'.svg', bbox_extra_artists=(lgd,), bbox_inches='tight')
+        # plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_'+da+'_{:015}'.format(int(iteracao[0]))+'.eps', bbox_extra_artists=(lgd,), bbox_inches='tight')
+        plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_scenario'+da+'_{:015}'.format(int(iteracao[0]))+'.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
         # plt.savefig('teste.svg')
 
         fig.set_size_inches(16, 6, forward=False)
@@ -133,7 +133,7 @@ def da_loc (custo, etapa, main_path, teste):
         ax1.set_xlabel(u'Localizações')
         # ax1.set_ylim([0,1])
         plt.tight_layout()
-        plt.savefig(main_path+'/'+'etapa/'+etapa+'/da_loc_'+da+'_{:015}'.format(int(iteracao))+'.png')
+        plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_'+da+'_{:015}'.format(int(iteracao[0]))+'.png')
         plt.clf()
         
         ax = df.plot.bar(rot=0)
@@ -143,7 +143,7 @@ def da_loc (custo, etapa, main_path, teste):
         ax.set_xlabel(u'Localizações')
         # ax.set_ylim([0,1])
 
-        plt.savefig(main_path+'/'+'etapa/'+etapa+'/da_loc_hsit_'+da+'_{:015}'.format(int(iteracao))+'.svg')
-        plt.savefig(main_path+'/'+'etapa/'+etapa+'/da_loc_hsit_'+da+'_{:015}'.format(int(iteracao))+'.eps')
-        plt.savefig(main_path+'/'+'etapa/'+etapa+'/da_loc_hist_'+da+'_{:015}'.format(int(iteracao))+'.png')
+        # plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_hsit_'+da+'_{:015}'.format(int(iteracao[0]))+'.svg')
+        # plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_hsit_'+da+'_{:015}'.format(int(iteracao[0]))+'.eps')
+        plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_hist_'+da+'_{:015}'.format(int(iteracao[0]))+'.png')
         plt.clf()

@@ -47,7 +47,7 @@ LocationModel::GetTypeId(void)
 LocationModel::LocationModel()
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  NS_LOG_DEBUG ("LocationModel::LocationModel @" << Simulator::Now().GetSeconds());
+  NS_LOG_INFO ("LocationModel::LocationModel @" << Simulator::Now().GetSeconds());
   m_used = false;
   m_totaCli = 0;
   m_totalConsumption = 0.0;
@@ -60,7 +60,7 @@ LocationModel::LocationModel()
 LocationModel::~LocationModel()
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  NS_LOG_DEBUG ("LocationModel::~LocationModel @" << Simulator::Now().GetSeconds());
+  NS_LOG_INFO ("LocationModel::~LocationModel @" << Simulator::Now().GetSeconds());
   m_position.clear();
   m_childList.Clear();
   m_pljci.clear();
@@ -177,7 +177,7 @@ void LocationModel::SetTotalConsumption (double v)
 
 void LocationModel::DoDispose () {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  NS_LOG_DEBUG ("LocationModel::Dispose id "<< m_id << " REF " << GetReferenceCount() << " @" << Simulator::Now().GetSeconds());
+  NS_LOG_INFO ("LocationModel::Dispose id "<< m_id << " REF " << GetReferenceCount() << " @" << Simulator::Now().GetSeconds());
 }
 
 void LocationModel::SetTotalCli (int t) {
@@ -291,16 +291,17 @@ double LocationModel::GetDataRate () {
   return m_dataRate;
 }
 
-void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, double prRef_dB, double pi, double comp_onda, double ptUav, double gain, double fsInterf, double N_W, double sinrUavMin) {
+void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, double prRefUav_dBm, double fsInterf, double N_W, double sinrUavMin) {
 
-  double pl_dB = 2*3.32*10*std::log10(dist*r_max)+30+0; // dB - Beta para ambiente outdoor - LogDistance (ver dissertacao)
-  long double pr_W = std::pow(10, ((prRef_dB - pl_dB)-30)/10); // W
+  long double pl_dB = 2*3.32*(10*std::log10(dist*r_max))+0; // dB - Beta para ambiente outdoor - LogDistance (ver dissertacao)
+  long double pr_W = std::pow(10, ((prRefUav_dBm - pl_dB)-30)/10); // W
   long double it_W = fsInterf*pr_W; // w        
   long double sinr_W = pr_W / (it_W + N_W); // W - modelo de goldsmith considera para escalar!!!
-  long double sinr_dBm = 10*std::log10(sinr_W)+30; // dBm
-  
+  long double sinr_dBm = 10*std::log10(sinr_W)+30; // dBm    
+
+  // NS_LOG_DEBUG("prRefUav_dBm : " << prRefUav_dBm << " pl_dB: " << pl_dB << " pr_W: " << pr_W << " it_W: " << it_W << " sinr_W: " << sinr_W << " sinr_dBm: " << sinr_dBm);
+
   if (sinr_dBm >= sinrUavMin) {
-    std::cout << "---------> UAV Distancia: " << dist*r_max << std::endl;
     if (sinr_dBm < -92) { // dBm
       m_dataRate = 0.0;
     } else if (sinr_dBm < -86) {
@@ -316,6 +317,8 @@ void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, 
   } else {
     m_connected = false;
   }
+
+  NS_LOG_DEBUG ("------> UAV " << m_id << "\t Distancia: " << dist*r_max << "\t SINR: " << sinr_dBm << "dBm\t Connected: " << ((m_connected) ? "true":"false"));
 
   // FUTURO: pensar na metrica para futuro
   // m_father->UavConsumption(-dataRate); // removendo o consumo do pai anterior

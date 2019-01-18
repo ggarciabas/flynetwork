@@ -11,7 +11,7 @@ import moving_graphic
 import battery_threshold
 import initial_scenario
 import client
-improt da_loc
+import da_loc
 import location
 import glob
 import os
@@ -67,6 +67,7 @@ for custo_name in glob.glob(main_path+'custo_*/'):
     all_uav = []
     # Bij
     for etapa in list_folder:
+        da_loc.da_loc (custo, etapa, main_path, teste)
         if teste:
             print etapa
         (uavs_id, uav_mov) = bij_graphic.bij(custo, str(etapa), main_path, teste)
@@ -88,7 +89,6 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         # Mij
         mij_graphic.mij(str(etapa), main_path+custo+'/', teste)
         all_uav.extend(uavs_id[:])
-        da_loc.da_loc (custo, etapa, main_path, teste)
 
     if teste:
         print all_uav
