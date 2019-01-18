@@ -1800,7 +1800,7 @@ void ServerApplication::runDAPuro() {
       }
       movimentoB = MovimentoB();
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-        (*lj)->UpdatePosition ();
+        (*lj)->UpdatePosition (m_xmax, m_ymax);
       }
     } while (movimentoB && iterB <= max_iterB);
 
