@@ -100,6 +100,27 @@ private:
   void PrintMij (vector<vector<double>> m_ij, double temp, std::string nameFile, vector<int> uav_ids, vector<int> loc_ids);
   void PrintBij (vector<vector<double>> b_ij, int print, bool before, vector<int> uav_ids, vector<int> loc_ids);
 
+
+  double WattsToDb (double w) {
+    return 10*std::log10(w); // dB
+  }
+
+  double WattsToDbm (double w) {
+    return 10*std::log10(w)+30; // dB
+  }
+
+  double dBmToWatts (double dbm) {
+    return std::pow(10, (dbm-30)/10);
+  }
+
+  double dbTodBm (double db) {
+    return db+30;
+  }
+
+  double dbmToDb (double dbm) {
+    return dbm-30;
+  }
+
   UavModelContainer   m_uavContainer;
   UavModelContainer   m_uavGoToCentral; // UAVs enviados para central
   LocationModelContainer m_locationContainer;

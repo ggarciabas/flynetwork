@@ -107,7 +107,7 @@ public:
 
 
   bool UpdatePunishNeighboor (double sinrUavMin);
-  void SetFather (Ptr<LocationModel> l, double dist, double r_max, double prRef, double pi, double comp_onda, double ptUav, double gain, double fsInterf, double N, double sinrUavMin);
+  void SetFather (Ptr<LocationModel> l, double, double, double, double, double, double, double, double, double, double);
   Ptr<LocationModel> GetFather ();
 
   void AddChild (Ptr<LocationModel> l, double r_max);
@@ -169,7 +169,7 @@ private:
 
   std::map<Ptr<ClientModel>, double> m_pljci;
   Ptr<LocationModel> m_father;
-  double m_sinrFather;
+  double m_sinrFather_dBm;
   LocationModelContainer m_childList;
 };
 

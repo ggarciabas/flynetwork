@@ -276,7 +276,7 @@ void LocationModel::AddPljCi (Ptr<ClientModel> ci, double Zci, double r_max) {
 }
 
 bool LocationModel::UpdatePunishNeighboor (double sinrUavMin) {
-  if (m_sinrFather >= sinrUavMin) {
+  if (m_sinrFather_dBm >= sinrUavMin) {
     m_punshNeigh *=  0.9;
     m_punshNeigh = (m_punshNeigh>0.01)?m_punshNeigh:0.01;
   } else {
@@ -291,22 +291,23 @@ double LocationModel::GetDataRate () {
   return m_dataRate;
 }
 
-void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, double prRef, double pi, double comp_onda, double ptUav, double gain, double fsInterf, double N, double sinrUavMin) {
+void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, double prRef_dB, double pi, double comp_onda, double ptUav, double gain, double fsInterf, double N_W, double sinrUavMin) {
 
-  double pl = 20*3.32*std::log10(dist*r_max)+0; // dB - Beta para ambientes outdoor - LogDistance (ver dissertacao)
-  double pr = prRef - pl; // dBm
-  double it = fsInterf*pr; // dBm
-  double sinr = pr / (it - N); // dBm
+  double pl_dB = 2*3.32*10*std::log10(dist*r_max)+30+0; // dB - Beta para ambiente outdoor - LogDistance (ver dissertacao)
+  long double pr_W = std::pow(10, ((prRef_dB - pl_dB)-30)/10); // W
+  long double it_W = fsInterf*pr_W; // w        
+  long double sinr_W = pr_W / (it_W + N_W); // W - modelo de goldsmith considera para escalar!!!
+  long double sinr_dBm = 10*std::log10(sinr_W)+30; // dBm
   
-  if (sinr >= sinrUavMin) {
+  if (sinr_dBm >= sinrUavMin) {
     std::cout << "---------> UAV Distancia: " << dist*r_max << std::endl;
-    if (sinr < -92) { // dBm
+    if (sinr_dBm < -92) { // dBm
       m_dataRate = 0.0;
-    } else if (sinr < -86) {
+    } else if (sinr_dBm < -86) {
       m_dataRate = 6.5; //Mbps MCS 0 até 3, consdierando somente taxa 6.5 por falta de infos no dataSheet
-    } else if (sinr < -79) {
+    } else if (sinr_dBm < -79) {
       m_dataRate = 39; //Mbps MCS 4 até 6
-    } else if (sinr < 74) {
+    } else if (sinr_dBm < 74) {
       m_dataRate = 65; // Mbps MCS 7
     } else {
       m_dataRate = 78; // Mbps MCS 8
@@ -323,7 +324,7 @@ void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, 
   // atualizando parte do novo posicionamento da localizacao
   m_xAcum += l->GetXPosition(r_max);
   m_yAcum += l->GetYPosition(r_max);
-  m_sinrFather = sinr;
+  m_sinrFather_dBm = sinr_dBm;
   m_father = l;
 }
 
