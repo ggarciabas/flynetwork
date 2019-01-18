@@ -199,7 +199,7 @@ double ClientModel::GetDataRate () {
 }
 
 void ClientModel::SetDataRate(double sinr) {
-  if (sinr > -93) { // dBm
+  if (sinr < -93) { // dBm
     m_dataRate = 0.0;
   } else if (sinr > -91) {
     m_dataRate = 6.5; //Mbps MCS 0

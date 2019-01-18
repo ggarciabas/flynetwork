@@ -1344,7 +1344,7 @@ void ServerApplication::runDA() {
   double t_min = 1e-7;
   double r_max = std::sqrt(std::pow(m_maxx, 2) + std::pow(m_maxy, 2));
   // 1550 series https://www.cisco.com/c/en/us/products/collateral/wireless/aironet-1550-series/data_sheet_c78-641373.html
-  // 1570 series https://www.cisco.com/c/dam/en/us/products/collateral/wireless/aironet-1570-series/datasheet-c78-732348.pdf
+  // 1570 series https://www.cisco.com/c/en/us/products/wireless/aironet-1570-series/datasheet-listing.html
   double ptUav = 30; // dBm - potencia de transmissao máxima para o AP Aironet 1570 series 802.11ac 5GHz
   double ptCli = 28; // dBm - potencia de transmissao máxima para o Ap Aironet 1550 series 802.11n 2.4GHz
   double fsInterf = 0.0008; // fator de sobreposicao de espaco 5 (50%)
