@@ -1360,7 +1360,7 @@ void ServerApplication::runDA() {
   double pi = 3.141516; // pi
   double maxDrUav = 1024; // Mbps -- verificar alguma Ref!!
   double gain = 4; // dBi - tanto o ganho de recepcao como o de transmissao
-  double N = 23.010299957; // dBm - N0 = 10e-9 W/Hz -- B = 20MHz = 0.2 W - Livro Goldsmith ref para N0
+  double N = 23.010299957 - 30; // dB - N0 = 10e-9 W/Hz -- B = 20MHz = 0.2 W = 23.01 dBm - Livro Goldsmith ref para N0 - NAO SE PODE SOMAR dBms ou subtrair! Covnertendo N para dB para nao dar problemas no calculo com interferencia
   // Fuck explanation dB and log relation: https://www.physicsforums.com/threads/confusion-with-db-equation-10-or-20.641850/#post-4105917
   double plRefCli = 10*std::log10((4*pi*d0/(fcCli/comp_onda))); // dB - Firss Model
   // --> https://www.isa.org/standards-publications/isa-publications/intech-magazine/2002/november/db-vs-dbm/
@@ -1431,7 +1431,7 @@ void ServerApplication::runDA() {
           if (low_dchilj > dcilj) { // achou UAV mais proximo
             low_dchilj = dcilj;
             // https://bitbucket.org/cpgeimestrado/rascunhocpgei/src/master/conversor.cpp
-            double pl = 10*3.32*std::log10(dcilj*r_max)+0; // dB - Beta para ambiente outdoor - LogDistance (ver dissertacao)
+            double pl = 20*3.32*std::log10(dcilj*r_max)+0; // dB - Beta para ambiente outdoor - LogDistance (ver dissertacao)
             double pr = prRefCli - pl; // dBm
             double it = fsInterf*pr; // dBm
             double sinr = pr / (it - N); // dBm            

@@ -293,7 +293,7 @@ double LocationModel::GetDataRate () {
 
 void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, double prRef, double pi, double comp_onda, double ptUav, double gain, double fsInterf, double N, double sinrUavMin) {
 
-  double pl = 10*3.32*std::log10(dist*r_max)+0; // dB - Beta para ambientes outdoor - LogDistance (ver dissertacao)
+  double pl = 20*3.32*std::log10(dist*r_max)+0; // dB - Beta para ambientes outdoor - LogDistance (ver dissertacao)
   double pr = prRef - pl; // dBm
   double it = fsInterf*pr; // dBm
   double sinr = pr / (it - N); // dBm

@@ -56,6 +56,7 @@ ClientModel::ClientModel() : m_position()
   m_consumption = 0.0;
   m_locConnected = 0;
   m_pci = 1.0;
+  m_dataRate = 0.0;
 }
 
 ClientModel::~ClientModel()
