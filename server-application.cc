@@ -1442,18 +1442,23 @@ void ServerApplication::runDA() {
               Ptr<LocationModel> lCon = (*ci)->GetLocConnected();
               if (lCon) { // caso tenha alguma informacao anterior, desconsidera nos calculos, para isto atualiza o loc
                 lCon->RemoveClient(dRCli, (*ci)->GetConsumption());
+                if ((*ci)->GetLogin().at(0) == 'f') {
+                  tFixCon--;
+                } else {
+                  tMovCon--;
+                }
               }
               lCon = 0;
               (*ci)->SetLocConnected((*lj));
               // calcular a SNR e caso seja maior que o mínimo, considerar cliente conectado
               (*lj)->NewClient(dRCli, (*ci)->GetConsumption());
               (*ci)->SetConnected(true);
-              (*ci)->SetDataRate(sinr_dBm);
+              (*ci)->SetDataRate(sinr_dBm); 
               if ((*ci)->GetLogin().at(0) == 'f') {
                 tFixCon++;
               } else {
                 tMovCon++;
-              }
+              }             
             }
           }
         }
