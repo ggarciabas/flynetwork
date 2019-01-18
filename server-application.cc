@@ -1473,7 +1473,7 @@ void ServerApplication::runDA() {
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
         // validar calculos
         NS_LOG_DEBUG("====> Loc: " << (*lj)->GetId());
-        (*lj)->UpdatePosition ();
+        (*lj)->UpdatePosition (m_xmax, m_ymax);
         NS_LOG_DEBUG ("-------------------------------");
 
         // Avalia a utilizacao de capacidade das localizações

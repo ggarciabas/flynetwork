@@ -275,7 +275,7 @@ void LocationModel::AddPljCi (Ptr<ClientModel> ci, double Zci, double r_max) {
   // m_plj += ci->GetPci()*(m_pljci[ci]);
 }
 
-void LocationModel::UpdatePosition () {
+void LocationModel::UpdatePosition (double mx, double my) {
   double x = 0.0;
   double y = 0.0;
   double plj = 0.0;
@@ -316,6 +316,10 @@ void LocationModel::UpdatePosition () {
   m_position.clear();
   m_position.push_back(x);
   m_position.push_back(y);
+
+  if (x>mx || y > my || x < 0 || y < 0) {
+    NS_FATAL_ERROR("Log fora do cenario")
+  } 
 }
 
 bool LocationModel::UpdatePunishNeighboor (double sinrUavMin) {

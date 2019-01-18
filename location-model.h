@@ -142,7 +142,7 @@ public:
 
   double GetDataRate ();
 
-  void UpdatePosition ();
+  void UpdatePosition (double mx, double my);
 
 private:
   void DoDispose ();
