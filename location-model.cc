@@ -302,6 +302,7 @@ void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, 
   // NS_LOG_DEBUG("prRefUav_dBm : " << prRefUav_dBm << " pl_dB: " << pl_dB << " pr_W: " << pr_W << " it_W: " << it_W << " sinr_W: " << sinr_W << " sinr_dBm: " << sinr_dBm);
 
   if (sinr_dBm >= sinrUavMin) {
+    NS_LOG_DEBUG ("------> UAV " << m_id << "\t Distancia: " << dist*r_max << "\t SINR: " << sinr_dBm << "dBm");
     if (sinr_dBm < -92) { // dBm
       m_dataRate = 0.0;
     } else if (sinr_dBm < -86) {
@@ -317,8 +318,6 @@ void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, 
   } else {
     m_connected = false;
   }
-
-  NS_LOG_DEBUG ("------> UAV " << m_id << "\t Distancia: " << dist*r_max << "\t SINR: " << sinr_dBm << "dBm\t Connected: " << ((m_connected) ? "true":"false"));
 
   // FUTURO: pensar na metrica para futuro
   // m_father->UavConsumption(-dataRate); // removendo o consumo do pai anterior

@@ -1438,7 +1438,7 @@ void ServerApplication::runDA() {
             long double sinr_dBm = WattsToDbm(sinr_W); // dBm
             
             if (low_dchilj <= raio_cob/r_max && sinr_dBm >= sinrCliMin) { // esta dentro da area de cobertura maxima da antena e receber SINR min
-              NS_LOG_DEBUG ("-> CLI " << (*ci)->GetLogin() <<  "\t Distancia: " << dcilj*r_max << "\t SINR: " << sinr_dBm << "dBm");
+              // NS_LOG_DEBUG ("-> CLI " << (*ci)->GetLogin() <<  "\t Distancia: " << dcilj*r_max << "\t SINR: " << sinr_dBm << "dBm");
               Ptr<LocationModel> lCon = (*ci)->GetLocConnected();
               if (lCon) { // caso tenha alguma informacao anterior, desconsidera nos calculos, para isto atualiza o loc
                 lCon->RemoveClient(dRCli, (*ci)->GetConsumption());
@@ -1526,8 +1526,8 @@ void ServerApplication::runDA() {
         }
       }
 
-      // NS_LOG_DEBUG("Itb: " << iterB << "\n\tTemp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
-      //      << "\n\tCapacidade: " << ((capacidade) ? "true":"false"));
+      NS_LOG_DEBUG("Itb: " << iterB << "\n\tTemp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
+           << "\n\tCapacidade: " << ((capacidade) ? "true":"false"));
 
       // if (feeting_locs && (tMovCon < tMov*0.8 || tFixCon < tFix || !capacidade || !locConnected)) {
       //   if (t < t_feeting) {
