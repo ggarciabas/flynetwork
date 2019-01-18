@@ -318,7 +318,7 @@ void LocationModel::UpdatePosition (double mx, double my) {
   m_position.push_back(y);
 
   if (x>mx || y > my || x < 0 || y < 0) {
-    NS_FATAL_ERROR("Log fora do cenario")
+    NS_FATAL_ERROR("Log fora do cenario");
   } 
 }
 

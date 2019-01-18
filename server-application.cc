@@ -1473,7 +1473,7 @@ void ServerApplication::runDA() {
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
         // validar calculos
         NS_LOG_DEBUG("====> Loc: " << (*lj)->GetId());
-        (*lj)->UpdatePosition (m_xmax, m_ymax);
+        (*lj)->UpdatePosition (m_maxx, m_maxy);
         NS_LOG_DEBUG ("-------------------------------");
 
         // Avalia a utilizacao de capacidade das localizações
@@ -1800,7 +1800,7 @@ void ServerApplication::runDAPuro() {
       }
       movimentoB = MovimentoB();
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-        (*lj)->UpdatePosition (m_xmax, m_ymax);
+        (*lj)->UpdatePosition (m_maxx, m_maxy);
       }
     } while (movimentoB && iterB <= max_iterB);
 
