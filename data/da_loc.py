@@ -47,8 +47,8 @@ def da_loc (custo, etapa, main_path, teste):
         data["C"] = [float(x) for x in line.split(',')]
         line = f_cen.readline().strip()
         data["N"] = [float(x) for x in line.split(',')]
-        line = f_cen.readline().strip()
-        data["Plj"] = [float(x) for x in line.split(',')]
+        # line = f_cen.readline().strip()
+        # data["Plj"] = [float(x) for x in line.split(',')]
         f_cen.close()
 
         lId = np.arange(0,len(loc),1);

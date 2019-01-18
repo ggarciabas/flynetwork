@@ -115,14 +115,14 @@ public:
   double GetChildListSize();
   LocationModelContainer GetChildList ();
 
-  void LimparAcumuladoPosicionamento ();
-  void LimparAcumuladoPosicionamentoClientes ();
+  // void LimparAcumuladoPosicionamento ();
+  // void LimparAcumuladoPosicionamentoClientes ();
 
-  double GetXAcum();
-  double GetYAcum();
-  double GetXAcumCli();
-  double GetYAcumCli();
-  double GetPlj();
+  // double GetXAcum();
+  // double GetYAcum();
+  // double GetXAcumCli();
+  // double GetYAcumCli();
+  // double GetPlj();
 
   // double UavConsumption(double);
 
@@ -141,6 +141,8 @@ public:
   void LimparHistorico ();
 
   double GetDataRate ();
+
+  void UpdatePosition ();
 
 private:
   void DoDispose ();
@@ -163,9 +165,9 @@ private:
 
   // l_j = \frac{\sum_{i=1}^{N_{pi}} p(c_i)p(l_j|c_i)c_i+\omega_j(l_n + \sum_{m>j} v_{mj}~l_m)}{\sum_{i=1}^{N_{pi}} p(l_j)+\omega_j+\omega_j\sum_{m>j} v_{mj}}~.
   // \omega_j+\omega_j\sum_{m>j} v_{mj} -> esta parte pode ser calculada multiplicando somente o m_punishNeigh pelo tamanho da lista de filhos + m_punishNeigh, lembrando que este ultimo é referente ao pai
-  double m_xAcum, m_xAcumCli; // posicao em X acumulada, sem normalização, parte inferior da equação acima
-  double m_yAcum, m_yAcumCli; // posicao em Y acumulada, sem normalização, parte inferior da equação acima
-  double m_plj; // acumulado da parte da equação referente a p(l_j)
+  // double m_xAcum, m_xAcumCli; // posicao em X acumulada, sem normalização, parte inferior da equação acima
+  // double m_yAcum, m_yAcumCli; // posicao em Y acumulada, sem normalização, parte inferior da equação acima
+  // double m_plj; // acumulado da parte da equação referente a p(l_j)
 
   std::map<Ptr<ClientModel>, double> m_pljci;
   Ptr<LocationModel> m_father;

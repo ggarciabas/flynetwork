@@ -54,7 +54,7 @@ LocationModel::LocationModel()
   m_changePosition = true;
   m_totaCli = 0;
   m_totalConsumption = 0.0;
-  m_xAcumCli = m_yAcumCli = m_plj = 0.0;
+  // m_xAcumCli = m_yAcumCli = m_plj = 0.0;
 }
 
 LocationModel::~LocationModel()
@@ -63,7 +63,7 @@ LocationModel::~LocationModel()
   NS_LOG_INFO ("LocationModel::~LocationModel @" << Simulator::Now().GetSeconds());
   m_position.clear();
   m_childList.Clear();
-  m_pljci.clear();
+  // m_pljci.clear();
 }
 
 void LocationModel::SetId(uint32_t id)
@@ -110,7 +110,7 @@ void LocationModel::SetPosition(double x, double y, double r_max)
     m_position.clear();
     m_position.push_back(x*r_max);
     m_position.push_back(y*r_max);
-    m_historico.push_back(m_position); // OBs: push_back faz cópia ou não?! Se nao fizer vai falar a estratégia!!
+    m_historico.push_back(m_position); // OBs: push_back faz cópia ou não?! Se nao fizer vai falhar a estratégia!!
   }
 }
 
@@ -261,18 +261,61 @@ void LocationModel::SetTempPljci (double pljci) {
 
 double LocationModel::AddPljCiPuro (Ptr<ClientModel> ci, double Zci, double r_max) {
   // calculando parte do novo posicionamento da localização
-  m_xAcumCli += ci->GetPci()*(m_tempPljci/Zci)*ci->GetXPosition();
-  m_yAcumCli += ci->GetPci()*(m_tempPljci/Zci)*ci->GetYPosition();
-  m_plj += ci->GetPci()*(m_tempPljci/Zci);
+  // m_xAcumCli += ci->GetPci()*(m_tempPljci/Zci)*ci->GetXPosition();
+  // m_yAcumCli += ci->GetPci()*(m_tempPljci/Zci)*ci->GetYPosition();
+  // m_plj += ci->GetPci()*(m_tempPljci/Zci);
   return (m_tempPljci/Zci);
 }
 
 void LocationModel::AddPljCi (Ptr<ClientModel> ci, double Zci, double r_max) {
   m_pljci[ci] = m_tempPljci/Zci;
   // calculando parte do novo posicionamento da localização
-  m_xAcumCli += ci->GetPci()*(m_tempPljci/Zci)*ci->GetXPosition(r_max);
-  m_yAcumCli += ci->GetPci()*(m_tempPljci/Zci)*ci->GetYPosition(r_max);
-  m_plj += ci->GetPci()*(m_tempPljci/Zci);
+  // m_xAcumCli += ci->GetPci()*(m_pljci[ci])*ci->GetXPosition(r_max);
+  // m_yAcumCli += ci->GetPci()*(m_pljci[ci])*ci->GetYPosition(r_max);
+  // m_plj += ci->GetPci()*(m_pljci[ci]);
+}
+
+void LocationModel::UpdatePosition () {
+  double x = 0.0;
+  double y = 0.0;
+  double plj = 0.0;
+  NS_LOG_DEBUG("LOGIN\tX\tY\tPLJCI\tPCI");
+  for (std::map<Ptr<ClientModel>, double>::iterator ci = m_pljci.begin(); ci != m_pljci.end(); ++ci) {
+    NS_LOG_DEBUG((ci->first)->GetLogin() << "\t" << (ci->first)->GetXPosition() << "\t" << (ci->first)->GetYPosition() << "\t" << ci->second << "\t" << (ci->first)->GetPci());
+    x += (ci->first)->GetXPosition() * (ci->first)->GetPci() * ci->second;
+    y += (ci->first)->GetYPosition() * (ci->first)->GetPci() * ci->second;
+    plj += (ci->first)->GetPci() * ci->second;
+  }
+  NS_LOG_DEBUG ("x: " << x << "\ty: " << y << "\tplj: " << plj << "\tx/: " << x/plj << "\ty/: " << y/plj);
+  double x_c = 0.0;
+  double y_c = 0.0;
+  double plj_c = 0.0;
+  NS_LOG_DEBUG ("ID\tX\tY");
+  for (LocationModelContainer::Iterator clj = m_childList.Begin(); clj != m_childList.End(); ++clj) {
+    NS_LOG_DEBUG ((*clj)->GetId() << "\t" << (*clj)->GetXPosition() << "\t" << (*clj)->GetYPosition());
+    x_c += (*clj)->GetXPosition() * m_punshNeigh;
+    y_c += (*clj)->GetYPosition() * m_punshNeigh;
+    plj_c += (*clj)->GetPunishNeighboor();
+    x += (*clj)->GetXPosition() * m_punshNeigh;
+    y += (*clj)->GetYPosition() * m_punshNeigh;
+    plj += (*clj)->GetPunishNeighboor();
+  }
+  NS_LOG_DEBUG ("x_c: " << x_c << "\ty_c: " << y_c << "\tplj_c: " << plj_c << "\tx_c/: " << x_c/plj_c << "\ty_c/: " << y_c/plj_c);
+  double x_f = m_father->GetXPosition() * m_punshNeigh;
+  double y_f = m_father->GetYPosition() * m_punshNeigh;  
+  double plj_f = m_punshNeigh;
+  NS_LOG_DEBUG ("x_f: " << x_f << "\ty_f: " << y_f << "\tplj_f: " << plj_f << "\tx_f/: " << x_f/plj_f << "\ty_f/: " << y_f/plj_f);
+  x += m_father->GetXPosition() * m_punshNeigh;
+  y += m_father->GetYPosition() * m_punshNeigh;
+  plj += m_punshNeigh;
+  NS_LOG_DEBUG ("x: " << x << "\ty: " << y << "\tplj: " << plj << "\tx/: " << x/plj << "\ty/: " << y/plj);
+
+  x /= plj;
+  y /= plj;
+
+  m_position.clear();
+  m_position.push_back(x);
+  m_position.push_back(y);
 }
 
 bool LocationModel::UpdatePunishNeighboor (double sinrUavMin) {
@@ -324,8 +367,8 @@ void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, 
   // l->UavConsumption(dataRate); // adicionando consumo no pai atual
 
   // atualizando parte do novo posicionamento da localizacao
-  m_xAcum += l->GetXPosition(r_max);
-  m_yAcum += l->GetYPosition(r_max);
+  // m_xAcum += l->GetXPosition(r_max);
+  // m_yAcum += l->GetYPosition(r_max);
   m_sinrFather_dBm = sinr_dBm;
   m_father = l;
 }
@@ -336,8 +379,8 @@ Ptr<LocationModel> LocationModel::GetFather () {
 
 void LocationModel::AddChild (Ptr<LocationModel> l, double r_max) {
   m_childList.Add(l);
-  m_xAcum += l->GetXPosition(r_max); // PENSAR: m_punishNeigh -> é interessante somente para manter o UAV próximo ao pai, para garantir conexão, não sei se vale a pena forçar com a mesma intensidade no sentido dos clientes.
-  m_yAcum += l->GetYPosition(r_max); // ESTÁ NA EQUAÇAO, NAO PODE MUDAR -- : Modificado para 50%! Considerando como peso os filhos somente no valor de 50%!
+  // m_xAcum += l->GetXPosition(r_max); // PENSAR: m_punishNeigh -> é interessante somente para manter o UAV próximo ao pai, para garantir conexão, não sei se vale a pena forçar com a mesma intensidade no sentido dos clientes.
+  // m_yAcum += l->GetYPosition(r_max); // ESTÁ NA EQUAÇAO, NAO PODE MUDAR -- : Modificado para 50%! Considerando como peso os filhos somente no valor de 50%!
 }
 
 void LocationModel::ClearChildList () {
@@ -348,14 +391,14 @@ LocationModelContainer LocationModel::GetChildList () {
   return m_childList;
 }
 
-void LocationModel::LimparAcumuladoPosicionamentoClientes () {
-  m_xAcumCli = m_yAcumCli = 0.0;
-  m_plj = 0.0;
-}
+// void LocationModel::LimparAcumuladoPosicionamentoClientes () {
+//   m_xAcumCli = m_yAcumCli = 0.0;
+//   m_plj = 0.0;
+// }
 
-void LocationModel::LimparAcumuladoPosicionamento () {
-  m_xAcum = m_yAcum = 0.0;
-}
+// void LocationModel::LimparAcumuladoPosicionamento () {
+//   m_xAcum = m_yAcum = 0.0;
+// }
 
 double LocationModel::GetXPosition (double r_max) {
   return m_position.at(0)/r_max;
@@ -381,25 +424,25 @@ double LocationModel::GetYPositionA () {
   return m_positionA.at(1);
 }
 
-double LocationModel::GetXAcum() {
-  return m_xAcum;
-}
+// double LocationModel::GetXAcum() {
+//   return m_xAcum;
+// }
 
-double LocationModel::GetYAcum() {
-  return m_yAcum;
-}
+// double LocationModel::GetYAcum() {
+//   return m_yAcum;
+// }
 
-double LocationModel::GetXAcumCli() {
-  return m_xAcumCli;
-}
+// double LocationModel::GetXAcumCli() {
+//   return m_xAcumCli;
+// }
 
-double LocationModel::GetYAcumCli() {
-  return m_yAcumCli;
-}
+// double LocationModel::GetYAcumCli() {
+//   return m_yAcumCli;
+// }
 
-double LocationModel::GetPlj() {
-  return m_plj;
-}
+// double LocationModel::GetPlj() {
+//   return m_plj;
+// }
 
 double LocationModel::GetChildListSize() {
   return (double)m_childList.GetN();

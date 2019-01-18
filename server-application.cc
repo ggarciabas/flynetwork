@@ -1390,8 +1390,6 @@ void ServerApplication::runDA() {
   loc->SetPunishCapacity(0.01);
   loc->SetPunishNeighboor(0.01); // ALTERADO: valor inicial de punicao!
   loc->InitializeWij (m_clientDaContainer.GetN()*dRCli); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
-  loc->LimparAcumuladoPosicionamento();
-  loc->LimparAcumuladoPosicionamentoClientes();
   Ptr<LocationModel> lCentral = lObj.Create()->GetObject<LocationModel> ();
   lCentral->SetId(9999);
   Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
@@ -1403,7 +1401,7 @@ void ServerApplication::runDA() {
   int iter = 0;
   do {// laco A
     iter++;
-
+    NS_LOG_DEBUG("------------------------------> ItA: " << iter);
     int tMovCon = 0;
     int tFixCon = 0;
     bool locConnected = true;
@@ -1415,6 +1413,7 @@ void ServerApplication::runDA() {
       iterB++;
       tMovCon = 0;
       tFixCon = 0;
+
       for (ClientModelContainer::Iterator ci = m_clientDaContainer.Begin(); ci != m_clientDaContainer.End(); ++ci) {
         (*ci)->SetConnected(false); // limpando para não dar conflito!
         double Zci = 0.0;
@@ -1435,7 +1434,7 @@ void ServerApplication::runDA() {
             long double sinr_dBm = WattsToDbm(sinr_W); // dBm
             
             if (low_dchilj <= raio_cob/r_max && sinr_dBm >= sinrCliMin) { // esta dentro da area de cobertura maxima da antena e receber SINR min
-              NS_LOG_DEBUG ("-> CLI " << (*ci)->GetLogin() <<  " com " << (*lj)->GetId() << "\t Distancia: " << dcilj*r_max << "\t SINR: " << sinr_dBm << "dBm");
+              // NS_LOG_DEBUG ("-> CLI " << (*ci)->GetLogin() <<  " com " << (*lj)->GetId() << "\t Distancia: " << dcilj*r_max << "\t SINR: " << sinr_dBm << "dBm");
               Ptr<LocationModel> lCon = (*ci)->GetLocConnected();
               if (lCon) { // caso tenha alguma informacao anterior, desconsidera nos calculos, para isto atualiza o loc
                 lCon->RemoveClient(dRCli, (*ci)->GetConsumption());
@@ -1472,22 +1471,21 @@ void ServerApplication::runDA() {
 
       // calcular lj novos - não consigo fazer no laco anterior pela falta dos valores acumulados (não tentar colcoar la!)
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-        double newX = ((*lj)->GetXAcumCli()+(*lj)->GetXAcum()*(*lj)->GetPunishNeighboor()) / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize()); // SAI DA EQUACAO: nao pode eletar ---> antigo: considera soemnte 50% para os filhos
-        double newY = ((*lj)->GetYAcumCli()+(*lj)->GetYAcum()*(*lj)->GetPunishNeighboor()) / ((*lj)->GetPlj() + (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize()); // SAI DA EQUACAO: nao pode eletar ---> antigo: considera soemnte 50% para os filhos
-        (*lj)->SetPosition(newX, newY, r_max);
+        // validar calculos
+        NS_LOG_DEBUG("====> Loc: " << (*lj)->GetId());
+        (*lj)->UpdatePosition ();
+        NS_LOG_DEBUG ("-------------------------------");
+
         // Avalia a utilizacao de capacidade das localizações
         capacidade = capacidade && (*lj)->ValidarCapacidade(maxDrUav, taxa_capacidade);
 
         (*lj)->ClearChildList();
-        (*lj)->LimparAcumuladoPosicionamento(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
       }
 
       // Se houve mudança no posicionamento, se faz necessario verificar um novo pai para cada lj
       movimentoB = MovimentoB();
       if (movimentoB) {
-        m_locationContainer.Get(0)->LimparAcumuladoPosicionamentoClientes(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
         for (int j = m_locationContainer.GetN()-1; j >= 0; j--) { // Obs.: >=0 para que seja feito o calculo da localizacao 0 com a central, não irá entrar no segundo laco devido a condicao imposta lá!
-          m_locationContainer.Get(j)->LimparAcumuladoPosicionamentoClientes();
           std::vector<double> p1 (m_locationContainer.Get(j)->GetPosition(r_max));
           int id = -1; // a principio se conecta com a central
           double dist = CalculateDistance(lCentral->GetPosition(r_max), p1);
@@ -1515,8 +1513,7 @@ void ServerApplication::runDA() {
         }
       }
 
-      NS_LOG_DEBUG("Itb: " << iterB << "\n\tTemp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false")
-           << "\n\tCapacidade: " << ((capacidade) ? "true":"false"));
+      NS_LOG_DEBUG ("Itb: " << iterB << "\n\tTemp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false") << "\n\tCapacidade: " << ((capacidade) ? "true":"false"));
 
     } while (movimentoB && iterB < max_iterB);
 
@@ -1540,8 +1537,6 @@ void ServerApplication::runDA() {
         nLoc->SetPunishCapacity(0.01);
         nLoc->SetPunishNeighboor(0.01);
         nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
-        nLoc->LimparAcumuladoPosicionamento();
-        nLoc->LimparAcumuladoPosicionamentoClientes();
         nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max, prRefUav_dBm, fsInterf, N_W, sinrUavMin); // este método atualiza a variavel de punicao!
     }
 
@@ -1551,7 +1546,6 @@ void ServerApplication::runDA() {
     for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
       (*lj)->IniciarMovimentoA();
       (*lj)->LimparHistorico();
-      (*lj)->LimparAcumuladoPosicionamentoClientes();
       (*lj)->UpdatePunishNeighboor(sinrUavMin);
     }
 
@@ -1627,13 +1621,6 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
   lj++;
   for (; lj != m_locationContainer.End(); ++lj) {
     file << "," << (*lj)->GetPunishNeighboor();
-  }
-  file << "\n";
-  lj = m_locationContainer.Begin(); // imprimindo plj
-  file << (*lj)->GetPlj();
-  lj++;
-  for (; lj != m_locationContainer.End(); ++lj) {
-    file << "," << (*lj)->GetPlj();
   }
   file.close();
 
@@ -1770,32 +1757,10 @@ void ServerApplication::runDAPuro() {
   Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
   lCentral->SetPosition(pos.x, pos.y); // iniciando a localizacao que representará a central
   lCentral->IniciarMovimentoB();
-  // ----------------------
-  //std::cout << "Central: " << lCentral->toString();
-  //std::cout << "Loc: " << loc->toString();
-  // //std::cout << "Esperando ....";
-  // std::cin >> t;
-  // ----------------------
 
-  // int lixo;
-  //std::cout << "Iniciando DA puro .....\n";
-  // std::cin >> lixo;
   int iter = 0;
   do {// laco A
     iter++;
-
-    // ------------------ Para teste somente
-    //std::cout << "------------------------------------------------------------------\n";
-      //std::cout << "LacoA Temp: " << t << " Iteracao: " << iter << "\n[\n";
-      // for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-        // //std::cout << "\t" << (*lj)->GetXPosition(r_max)*r_max << " - " << (*lj)->GetYPosition(r_max)*r_max << std::endl;
-        //std::cout << (*lj)->toString();
-      // }
-      //std::cout << "]\n";
-    // -----------------
-
-    //std::cout << "Iniciando DA puro .....\n";
-    // std::cin >> lixo;
 
     int tMovCon = 0;
     int iterB = 0;
@@ -1835,11 +1800,7 @@ void ServerApplication::runDAPuro() {
       }
       movimentoB = MovimentoB();
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-        //std::cout << "\n\tX: " << (*lj)->GetXAcumCli() << "\t\tY: " << (*lj)->GetYAcumCli() << "\t\tX: " << (*lj)->GetXAcum() << "\t\tY: " << (*lj)->GetYAcum() << "\t\tPLJ: " << (*lj)->GetPlj() << "\t\tPN: " << (*lj)->GetPunishNeighboor() + (*lj)->GetPunishNeighboor()*(*lj)->GetChildListSize();
-        double newX = (*lj)->GetXAcumCli() / (*lj)->GetPlj();
-        double newY = (*lj)->GetYAcumCli() / (*lj)->GetPlj();
-        (*lj)->SetPositionPuro(newX, newY, r_max);
-        (*lj)->LimparAcumuladoPosicionamentoClientes(); // limpando valores para nao dar conflito! Ao encontrar pais e filhos, já está sendo realizado o calcuo temporario da nova localizacao, verificar arquivo location-model.cc
+        (*lj)->UpdatePosition ();
       }
     } while (movimentoB && iterB <= max_iterB);
 
@@ -1873,7 +1834,6 @@ void ServerApplication::runDAPuro() {
     nLoc->SetId(locId++);
     CentroDeMassa(nLoc, r_max);
     nLoc->IniciarMovimentoB();
-    nLoc->LimparAcumuladoPosicionamentoClientes();
     m_locationContainer.Add(nLoc);
 
     GraficoCenarioDaPuro(t, iter, lCentral, raio_cob);
