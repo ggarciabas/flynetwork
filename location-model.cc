@@ -279,25 +279,46 @@ bool LocationModel::UpdatePunishNeighboor (double sinrUavMin) {
   if (m_sinrFather >= sinrUavMin) {
     m_punshNeigh *=  0.9;
     m_punshNeigh = (m_punshNeigh>0.01)?m_punshNeigh:0.01;
-    m_connected = false;
   } else {
     m_punshNeigh *= 1.1;
     m_punshNeigh = (m_punshNeigh > 2) ? 2 : m_punshNeigh;
-    m_connected = true;
   }
 
   return m_connected;
 }
 
+double LocationModel::GetDataRate () {
+  return m_dataRate;
+}
+
 void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, double prRef, double pi, double comp_onda, double ptUav, double gain, double fsInterf, double N, double sinrUavMin) {
 
-  double pl = 10*3.32*std::log10(dist*r_max)+4.48; // dB - Beta e sigma para ambientes outdoor - LogDistance (ver dissertacao)
-  double pr = std::pow(10,((prRef - pl)/*dBm*/-30)/10.0); // W
-  double it = fsInterf*pr; // W -- convertido pra W
-  double sinr = (10*std::log10((pr / (it+N))/*W*/))/*dB*/+30; // dBm
-
+  double pl = 10*3.32*std::log10(dist*r_max)+0; // dB - Beta para ambientes outdoor - LogDistance (ver dissertacao)
+  double pr = prRef - pl; // dBm
+  double it = fsInterf*pr; // dBm
+  double sinr = pr / (it - N); // dBm
+  
   if (sinr >= sinrUavMin) {
     std::cout << "---------> UAV Distancia: " << dist*r_max << std::endl;
+    if (sinr > -93) { // dBm
+      m_dataRate = 0.0;
+    } else if (sinr > -91) {
+      m_dataRate = 6.5; //Mbps MCS 0
+    } else if (sinr > -89) {
+      m_dataRate = 13; //Mbps MCS 1
+    } else if (sinr > -86) {
+      m_dataRate = 19.5; //Mbps MCS 2
+    } else if (sinr > -82) {
+      m_dataRate = 26; //Mbps MCS 3
+    } else if (sinr > -78) {
+      m_dataRate = 39; //Mbps MCS 4
+    } else if (sinr > -77) {
+      m_dataRate = 52; //Mbps MCS 5
+    } else if (sinr > -75) {
+      m_dataRate = 58.5; //Mbps MCS 6
+    } else {
+      m_dataRate = 65; // Mbps MCS 7
+    }
     m_connected = true;
   } else {
     m_connected = false;

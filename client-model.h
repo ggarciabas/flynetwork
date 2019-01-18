@@ -85,6 +85,9 @@ public:
   double GetPci ();
   void SetPci (double);
 
+  double GetDataRate ();
+  void SetDataRate (double sinr);
+
 private:
   void DoDispose ();
   double m_pci; // probabilidade do cliente
@@ -96,6 +99,7 @@ private:
   Time m_updatePos;
   // Time m_updateCons;
   Ipv4Address m_addr;
+  double m_dataRate;
 };
 
 } // namespace ns3

@@ -140,6 +140,8 @@ public:
 
   void LimparHistorico ();
 
+  double GetDataRate ();
+
 private:
   void DoDispose ();
   std::vector<double> m_positionA;
@@ -157,6 +159,7 @@ private:
   double m_totalConsumption;
 
   bool m_connected;
+  double m_dataRate;
 
   // l_j = \frac{\sum_{i=1}^{N_{pi}} p(c_i)p(l_j|c_i)c_i+\omega_j(l_n + \sum_{m>j} v_{mj}~l_m)}{\sum_{i=1}^{N_{pi}} p(l_j)+\omega_j+\omega_j\sum_{m>j} v_{mj}}~.
   // \omega_j+\omega_j\sum_{m>j} v_{mj} -> esta parte pode ser calculada multiplicando somente o m_punishNeigh pelo tamanho da lista de filhos + m_punishNeigh, lembrando que este ultimo é referente ao pai

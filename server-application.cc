@@ -1343,7 +1343,7 @@ void ServerApplication::runDA() {
   // constantes
   double t_min = 1e-7;
   double r_max = std::sqrt(std::pow(m_maxx, 2) + std::pow(m_maxy, 2));
-  // 1550 series https://www.cisco.com/c/en/us/products/collateral/wireless/aironet-1550-series/data_sheet_c78-641373.pdf
+  // 1550 series https://www.cisco.com/c/en/us/products/collateral/wireless/aironet-1550-series/data_sheet_c78-641373.html
   // 1570 series https://www.cisco.com/c/dam/en/us/products/collateral/wireless/aironet-1570-series/datasheet-c78-732348.pdf
   double ptUav = 30; // dBm - potencia de transmissao máxima para o AP Aironet 1570 series 802.11ac 5GHz
   double ptCli = 28; // dBm - potencia de transmissao máxima para o Ap Aironet 1550 series 802.11n 2.4GHz
@@ -1356,14 +1356,18 @@ void ServerApplication::runDA() {
   double fcCli = 2.4e9; // Hz - frequencia
   double fcUav = 5e9; // Hz - frequencia
   double comp_onda = 3e8; // m - comprimento de onda
+  double d0 = 1; // m - distancia de referencia
   double pi = 3.141516; // pi
   double maxDrUav = 1024; // Mbps -- verificar alguma Ref!!
   double gain = 4; // dBi - tanto o ganho de recepcao como o de transmissao
-  double N = 0.2; // W - N0 = 10e-9 W/Hz -- B = 20MHz - Livro Goldsmith ref para N0
-  double plRefCli = 20*std::log10(1) + 20*std::log10(fcCli) - 87.55; // dB - Firss Model
-  double prRefCli = ptUav + gain + gain - plRefCli; // dBm
-  double plRefUav = 20*std::log10(1) + 20*std::log10(fcUav) - 87.55; // dB - Firss Model
-  double prRefUav = ptUav + gain + gain - plRefUav; // dBm
+  double N = 23.010299957; // dBm - N0 = 10e-9 W/Hz -- B = 20MHz = 0.2 W - Livro Goldsmith ref para N0
+  // Fuck explanation dB and log relation: https://www.physicsforums.com/threads/confusion-with-db-equation-10-or-20.641850/#post-4105917
+  double plRefCli = 10*std::log10((4*pi*d0/(fcCli/comp_onda))); // dB - Firss Model
+  // --> https://www.isa.org/standards-publications/isa-publications/intech-magazine/2002/november/db-vs-dbm/
+  // Use dB when expressing the ratio between two power values. Use dBm when expressing an absolute value of power.
+  double prRefCli = ptUav + gain + gain - plRefCli; // dBm - potencia do sinal na distancia de referencia
+  double plRefUav = 10*std::log10((4*pi*d0/(fcUav/comp_onda))); // dB - Firss Model
+  double prRefUav = ptUav + gain + gain - plRefUav; // dBm - potencia do sinal na distancia de referencia
   double taxa_capacidade = 1.01; // NOVO: 120%
   double t = 0.6;
   int locId = 0;
@@ -1427,14 +1431,10 @@ void ServerApplication::runDA() {
           if (low_dchilj > dcilj) { // achou UAV mais proximo
             low_dchilj = dcilj;
             // https://bitbucket.org/cpgeimestrado/rascunhocpgei/src/master/conversor.cpp
-            double pl = 10*3.32*std::log10(dcilj*r_max)+4.48; // dB - Beta e sigma para ambientes outdoor - LogDistance (ver dissertacao)
-            // NS_LOG_DEBUG("pr: " << (prRefCli - pl) << "dBm\n");
-            double pr = std::pow(10,((prRefCli - pl)/*dBm*/-30)/10.0); // W
-            double it = fsInterf*pr; // W -- convertido pra W
-            double sinr = (10*std::log10((pr / (it+N))/*W*/))/*dB*/+30; // dBm
-            // NS_LOG_DEBUG("\nUav mais próximo: \n\td: " << dcilj*r_max << "m\n\tpl: " << pl << "dB\n\tpr: "
-            //                                   << pr << "W\n\tit: " << it
-            //                                   << "W\n\tsinr: " << sinr << "dBm\n\tDentro cob? " << ((low_dchilj <= raio_cob/r_max)?"true":"false") << "\n\tSinr min? " << ((sinr >= sinrCliMin)?"true":"false"));
+            double pl = 10*3.32*std::log10(dcilj*r_max)+0; // dB - Beta para ambiente outdoor - LogDistance (ver dissertacao)
+            double pr = prRefCli - pl; // dBm
+            double it = fsInterf*pr; // dBm
+            double sinr = pr / (it - N); // dBm            
             if (low_dchilj <= raio_cob/r_max && sinr >= sinrCliMin) { // esta dentro da area de cobertura maxima da antena e receber SINR min
                 NS_LOG_DEBUG ("-> CLI Distancia que deu: " << dcilj*r_max);
               Ptr<LocationModel> lCon = (*ci)->GetLocConnected();
@@ -1446,6 +1446,7 @@ void ServerApplication::runDA() {
               // calcular a SNR e caso seja maior que o mínimo, considerar cliente conectado
               (*lj)->NewClient(dRCli, (*ci)->GetConsumption());
               (*ci)->SetConnected(true);
+              (*ci)->SetDataRate(sinr);
               if ((*ci)->GetLogin().at(0) == 'f') {
                 tFixCon++;
               } else {
@@ -1610,13 +1611,20 @@ void ServerApplication::runDA() {
   m_locConsTotal = 0; // atualiza total de consumo de todas as localizacoes
 
   os.str("");
-  os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/location_client.txt";
-  std::ofstream location_cli;
-  location_cli.open(os.str().c_str(), std::ofstream::out);
+  os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/location_data_rate.txt";
+  file.open(os.str().c_str(), std::ofstream::out);
   for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-    location_cli << (*lj)->GetId() << "," << (*lj)->GetTotalCli() << "," << (*lj)->GetTotalConsumption() << std::endl;
+    file << (*lj)->GetId() << "," << (*lj)->GetDataRate() << std::endl;
   }
-  location_cli.close();
+  file.close();
+
+  os.str("");
+  os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/client_data_rate.txt";
+  file.open(os.str().c_str(), std::ofstream::out);
+  for (ClientModelContainer::Iterator ci = m_clientContainer.Begin(); ci != m_clientContainer.End(); ++ci) {
+    file << (*ci)->GetLogin() << (*ci)->GetDataRate() << std::endl;
+  }
+  file.close();
 
   if ( m_locConsTotal == 0) {
     m_locConsTotal = 1.0; // para nao dar problemas no calculo
