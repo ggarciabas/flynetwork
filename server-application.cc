@@ -1380,23 +1380,24 @@ void ServerApplication::runDA() {
 
   ObjectFactory lObj;
   lObj.SetTypeId("ns3::LocationModel");
-  Ptr<LocationModel> loc = lObj.Create()->GetObject<LocationModel>();
-  loc->SetId(locId++);
-  CentroDeMassa(loc, r_max);
-  loc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
-  loc->IniciarMovimentoB();
-  m_locationContainer.Add(loc);
 
-  loc->SetPunishCapacity(0.5);
-  loc->SetPunishNeighboor(0.5); // ALTERADO: valor inicial de punicao!
-  loc->InitializeWij (m_clientDaContainer.GetN()*dRCli); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
   Ptr<LocationModel> lCentral = lObj.Create()->GetObject<LocationModel> ();
   lCentral->SetId(9999);
   Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
   lCentral->SetPosition(pos.x, pos.y); // iniciando a localizacao que representará a central
   lCentral->IniciarMovimentoA(); // somente para nao dar problemas ao executar toString
   lCentral->IniciarMovimentoB();
+
+  Ptr<LocationModel> loc = lObj.Create()->GetObject<LocationModel>();
+  loc->SetId(locId++);
+  CentroDeMassa(loc, lCentral, r_max);
+  loc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
+  loc->IniciarMovimentoB();
+  loc->SetPunishCapacity(0.5);
+  loc->SetPunishNeighboor(0.5); // ALTERADO: valor inicial de punicao!
+  loc->InitializeWij (m_clientDaContainer.GetN()*dRCli); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
   loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), r_max, prRefUav_dBm, fsInterf, N_W, sinrUavMin); // este método atualiza a variavel de punicao!
+  m_locationContainer.Add(loc);
 
   int iter = 0;
   do {// laco A
@@ -1529,7 +1530,7 @@ void ServerApplication::runDA() {
       new_uav:
         Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
         nLoc->SetId(locId++);
-        CentroDeMassa(nLoc, r_max);
+        CentroDeMassa(nLoc, lCentral, r_max);
         nLoc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
         nLoc->IniciarMovimentoB();
         m_locationContainer.Add(nLoc);
@@ -1628,6 +1629,13 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
   for (; lj != m_locationContainer.End(); ++lj) {
     file << "," << (*lj)->IsConnected();
   }
+  file << "\n";
+  lj = m_locationContainer.Begin(); // imprimindo distancia para pai
+  file << (*lj)->GetDistanceFather();
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    file << "," << (*lj)->GetDistanceFather();
+  }
   file.close();
 
   // os.str ("");
@@ -1665,7 +1673,7 @@ bool ServerApplication::MovimentoB() {
   return retorno;
 }
 
-void ServerApplication::CentroDeMassa (Ptr<LocationModel> l, double r_max) {
+void ServerApplication::CentroDeMassa (Ptr<LocationModel> l, Ptr<LocationModel> central, double r_max) {
   double x=0, y=0;
   bool con = true;
   double ccon = 0;
@@ -1679,11 +1687,13 @@ void ServerApplication::CentroDeMassa (Ptr<LocationModel> l, double r_max) {
     }
   }
 
-  // if (con) { // todos os cliente estao conectados
-  //   //std::cout << "==> Todos os clientes conectados.\n";
-  // }
-  //std::cout << "Centro de massa: " << x << " " << y << std::endl;
-  l->SetPosition(x/ccon, y/ccon); // posicionar no centro dos clientes
+  if (con) { // todos os cliente estao conectados
+    std::cout << "==> Todos os clientes conectados.\n";
+    l->SetPosition(central->GetXPosition(), central->GetYPosition()); // posicionar no centro dos clientes
+  } else {
+    std::cout << "Centro de massa: " << x/ccon << " " << y/ccon << std::endl;
+    l->SetPosition(x/ccon, y/ccon); // posicionar no centro dos clientes
+  }
 }
 
 void ServerApplication::runDAPuro() {
@@ -1752,17 +1762,20 @@ void ServerApplication::runDAPuro() {
 
   ObjectFactory lObj;
   lObj.SetTypeId("ns3::LocationModel");
-  Ptr<LocationModel> loc = lObj.Create()->GetObject<LocationModel>();
-  loc->SetId(locId++);
-  CentroDeMassa(loc, r_max);
-  loc->IniciarMovimentoB();
-  m_locationContainer.Add(loc);
 
   Ptr<LocationModel> lCentral = lObj.Create()->GetObject<LocationModel> ();
   lCentral->SetId(9999);
   Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
   lCentral->SetPosition(pos.x, pos.y); // iniciando a localizacao que representará a central
   lCentral->IniciarMovimentoB();
+
+  Ptr<LocationModel> loc = lObj.Create()->GetObject<LocationModel>();
+  loc->SetId(locId++);
+  CentroDeMassa(loc, lCentral, r_max);
+  loc->IniciarMovimentoB();
+  m_locationContainer.Add(loc);
+
+  
 
   int iter = 0;
   do {// laco A
@@ -1838,7 +1851,7 @@ void ServerApplication::runDAPuro() {
     //std::cout << "---> Novo UAV\n";
     Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
     nLoc->SetId(locId++);
-    CentroDeMassa(nLoc, r_max);
+    CentroDeMassa(nLoc, lCentral, r_max);
     nLoc->IniciarMovimentoB();
     m_locationContainer.Add(nLoc);
 

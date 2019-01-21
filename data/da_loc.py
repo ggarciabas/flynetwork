@@ -60,7 +60,11 @@ def da_loc (custo, etapa, main_path, teste):
         # connected
         line = f_cen.readline().strip()
         connected = [int(x) for x in line.split(',')]
+        line = f_cen.readline().strip()
+        distance = [float(x) for x in line.split(',')]
         f_cen.close()
+        
+        uav_cob_max_dist = max(distance)
 
         lId = np.arange(0,len(loc),1);        
 
@@ -85,6 +89,9 @@ def da_loc (custo, etapa, main_path, teste):
                 ax0.plot(loc_last[i],loc_last[i+1],'cX', markersize=7.0, label="anteior")
                 ax0.plot(loc[i],loc[i+1],'c^', markersize=7.0, label="atual")
                 ax0.add_patch(
+                    patches.Circle((loc[i],loc[i+1]), radius=float(uav_cob_max_dist), color='r', fill=False, linestyle='dashed')
+                )
+                ax0.add_patch(
                     patches.Circle((loc[i],loc[i+1]), radius=float(rcob[0]), color='b', fill=False, linestyle='dotted')
                 )
                 ax0.plot(x,y,'c-', markersize=7.0)
@@ -92,6 +99,9 @@ def da_loc (custo, etapa, main_path, teste):
             else:
                 ax0.plot(loc_last[i],loc_last[i+1],'cX', markersize=7.0)
                 ax0.plot(loc[i],loc[i+1],'c^', markersize=7.0)
+                ax0.add_patch(
+                    patches.Circle((loc[i],loc[i+1]), radius=float(uav_cob_max_dist), color='r', fill=False, linestyle='dashed')
+                )
                 ax0.add_patch(
                     patches.Circle((loc[i],loc[i+1]), radius=float(rcob[0]), color='b', fill=False, linestyle='dotted')
                 )
@@ -115,7 +125,7 @@ def da_loc (custo, etapa, main_path, teste):
 
         ax0.plot(central[0],central[1],'g*', markersize=7.0, label="central")
 
-        # ax0.set_title("Cenario @"+'etapa/'+etapa+"s Temp.:"+str(temp[0])+ " Iter:"+iteracao[0]+" TLoc: "+ tLoc)
+        ax0.set_title("Cenario @"+'etapa/'+etapa+"s Temp.:"+str(temp[0])+ " Iter:"+iteracao[0]+" CobUav: "+ uav_cob_max_dist)
         ax0.set_ylabel('Y (m)')
         ax0.set_xlabel('X (m)')
         ax0.set_xlim([0,lim[0]])

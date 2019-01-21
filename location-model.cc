@@ -340,7 +340,7 @@ bool LocationModel::UpdatePunishNeighboor (double sinrUavMin) {
     m_punshNeigh = (m_punshNeigh>0.01)?m_punshNeigh:0.01;
   } else {
     m_punshNeigh *= 1.1;
-    m_punshNeigh = (m_punshNeigh > 2) ? 2 : m_punshNeigh;
+    m_punshNeigh = (m_punshNeigh > 5) ? 5 : m_punshNeigh;
   }
 
   return m_connected;
@@ -386,7 +386,12 @@ void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, 
   // m_xAcum += l->GetXPosition(r_max);
   // m_yAcum += l->GetYPosition(r_max);
   m_sinrFather_dBm = sinr_dBm;
+  m_distFather = dist;
   m_father = l;
+}
+
+double LocationModel::GetDistanceFather () {
+  return m_distFather;
 }
 
 Ptr<LocationModel> LocationModel::GetFather () {

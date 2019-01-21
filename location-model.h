@@ -144,6 +144,8 @@ public:
 
   void UpdatePosition (double mx, double my);
 
+  double GetDistanceFather ();
+
 private:
   void DoDispose ();
   std::vector<double> m_positionA;
@@ -172,6 +174,7 @@ private:
   std::map<Ptr<ClientModel>, double> m_pljci;
   Ptr<LocationModel> m_father;
   double m_sinrFather_dBm;
+  double m_distFather;
   LocationModelContainer m_childList;
 };
 
