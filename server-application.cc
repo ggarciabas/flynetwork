@@ -1622,6 +1622,13 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
   for (; lj != m_locationContainer.End(); ++lj) {
     file << "," << (*lj)->GetPunishNeighboor();
   }
+  file << "\n";
+  lj = m_locationContainer.Begin(); // imprimindo neigh
+  file << (*lj)->IsConnected();
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    file << "," << (*lj)->IsConnected();
+  }
   file.close();
 
   // os.str ("");

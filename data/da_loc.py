@@ -49,6 +49,9 @@ def da_loc (custo, etapa, main_path, teste):
         data["N"] = [float(x) for x in line.split(',')]
         # line = f_cen.readline().strip()
         # data["Plj"] = [float(x) for x in line.split(',')]
+        # connected
+        line = f_cen.readline().strip()
+        connected = [int(x) for x in line.split(',')]
         f_cen.close()
 
         lId = np.arange(0,len(loc),1);
@@ -95,15 +98,17 @@ def da_loc (custo, etapa, main_path, teste):
             c=c+1
 
         first = True
+        l = 0
         for i in range(0, len(loc), 2):
             x = [loc[i],father[i]]
             y = [loc[i+1],father[i+1]]
-            if first:
-                ax0.plot(x,y,'r-', markersize=7.0)
-                first = False
-            else:
-                ax0.plot(x,y,'r-', markersize=7.0)
-
+            if int(connected[l]) == 1:
+                if first:
+                    ax0.plot(x,y,'r-', markersize=7.0)
+                    first = False
+                else:
+                    ax0.plot(x,y,'r-', markersize=7.0)
+            l = l + 1
 
         ax0.plot(central[0],central[1],'g*', markersize=7.0, label="central")
 
