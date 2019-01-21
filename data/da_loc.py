@@ -13,7 +13,15 @@ import pandas as pd
 da = "cpp"
 
 def da_loc (custo, etapa, main_path, teste):
-    for arquivo in glob.glob(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_'+da+'_*.txt'):
+    f_cen = open(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/client.txt','r')
+    line = f_cen.readline().strip()
+    cli = [x for x in line.split(',')]
+    f_cen.close()
+    arquivos = glob.glob(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_'+da+'_*.txt')
+    arquivos = np.array(arquivos)
+    arquivos.sort()
+    for i in np.arange(0, len(arquivos), 10):
+        arquivo = arquivos[i]
         try:
             f_cen = open(arquivo,'r')
         except IOError:
@@ -54,12 +62,7 @@ def da_loc (custo, etapa, main_path, teste):
         connected = [int(x) for x in line.split(',')]
         f_cen.close()
 
-        lId = np.arange(0,len(loc),1);
-
-        f_cen = open(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/client.txt','r')
-        line = f_cen.readline().strip()
-        cli = [x for x in line.split(',')]
-        f_cen.close()
+        lId = np.arange(0,len(loc),1);        
 
         fig = plt.figure(figsize=(15,4))
         ax0 = fig.add_subplot(121)
@@ -130,13 +133,12 @@ def da_loc (custo, etapa, main_path, teste):
         # All
         print data
         df = pd.DataFrame(data) #, index=lId)
-        print df
+        # print df
         ax1 = fig.add_subplot(122)
         df.plot.bar(ax=ax1)
         ax1.set_title(u'Informações da Localização')
         ax1.set_ylabel('0-1')
         ax1.set_xlabel(u'Localizações')
-        # ax1.set_ylim([0,1])
         plt.tight_layout()
         plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_'+da+'_{:015}'.format(int(iteracao[0]))+'.png')
         plt.clf()
@@ -146,9 +148,8 @@ def da_loc (custo, etapa, main_path, teste):
         ax.set_title(u'Informações da Localização')
         ax.set_ylabel('0-1')
         ax.set_xlabel(u'Localizações')
-        # ax.set_ylim([0,1])
 
-        # plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_hsit_'+da+'_{:015}'.format(int(iteracao[0]))+'.svg')
-        # plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_hsit_'+da+'_{:015}'.format(int(iteracao[0]))+'.eps')
+        plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_hsit_'+da+'_{:015}'.format(int(iteracao[0]))+'.svg')
+        plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_hsit_'+da+'_{:015}'.format(int(iteracao[0]))+'.eps')
         plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_hist_'+da+'_{:015}'.format(int(iteracao[0]))+'.png')
         plt.clf()

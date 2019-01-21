@@ -1387,8 +1387,8 @@ void ServerApplication::runDA() {
   loc->IniciarMovimentoB();
   m_locationContainer.Add(loc);
 
-  loc->SetPunishCapacity(0.01);
-  loc->SetPunishNeighboor(0.01); // ALTERADO: valor inicial de punicao!
+  loc->SetPunishCapacity(0.5);
+  loc->SetPunishNeighboor(0.5); // ALTERADO: valor inicial de punicao!
   loc->InitializeWij (m_clientDaContainer.GetN()*dRCli); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
   Ptr<LocationModel> lCentral = lObj.Create()->GetObject<LocationModel> ();
   lCentral->SetId(9999);
@@ -1401,7 +1401,7 @@ void ServerApplication::runDA() {
   int iter = 0;
   do {// laco A
     iter++;
-    NS_LOG_DEBUG("------------------------------> ItA: " << iter);
+    NS_LOG_DEBUG("------------------------------> ItA: " << iter  << " temp: " << t);
     int tMovCon = 0;
     int tFixCon = 0;
     bool locConnected = true;
@@ -1451,7 +1451,6 @@ void ServerApplication::runDA() {
         }
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           if (Zci < 1e-30) {
-            Zci = 1e-30;
             t = 0.1;
             NS_LOG_DEBUG("Solicitando nova localizacao pois Zci esta baixo!\n");
             goto new_uav;

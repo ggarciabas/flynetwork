@@ -22,6 +22,8 @@
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 
+# include <math.h>
+
 namespace ns3
 {
 
@@ -275,7 +277,10 @@ void LocationModel::AddPljCi (Ptr<ClientModel> ci, double Zci, double r_max) {
   // m_plj += ci->GetPci()*(m_pljci[ci]);
 }
 
-void LocationModel::UpdatePosition (double mx, double my) {
+void LocationModel::UpdatePosition (double mx, double my) { // normalizados
+  double x_f = 0.0;
+  double y_f = 0.0;
+  double plj_f = 0.0;
   double x = 0.0;
   double y = 0.0;
   double plj = 0.0;
@@ -286,38 +291,45 @@ void LocationModel::UpdatePosition (double mx, double my) {
     y += (ci->first)->GetYPosition() * (ci->first)->GetPci() * ci->second;
     plj += (ci->first)->GetPci() * ci->second;
   }
-  NS_LOG_DEBUG ("x: " << x << "\ty: " << y << "\tplj: " << plj << "\tx/: " << x/plj << "\ty/: " << y/plj);
-  double x_c = 0.0;
-  double y_c = 0.0;
-  double plj_c = 0.0;
-  NS_LOG_DEBUG ("ID\tX\tY");
-  for (LocationModelContainer::Iterator clj = m_childList.Begin(); clj != m_childList.End(); ++clj) {
-    NS_LOG_DEBUG ((*clj)->GetId() << "\t" << (*clj)->GetXPosition() << "\t" << (*clj)->GetYPosition());
-    x_c += (*clj)->GetXPosition() * m_punshNeigh;
-    y_c += (*clj)->GetYPosition() * m_punshNeigh;
-    plj_c += (*clj)->GetPunishNeighboor();
-    x += (*clj)->GetXPosition() * m_punshNeigh;
-    y += (*clj)->GetYPosition() * m_punshNeigh;
-    plj += (*clj)->GetPunishNeighboor();
+  NS_LOG_DEBUG ("Client x: " << x << "\ty: " << y << "\tplj: " << plj << "\tx/: " << x/plj << "\ty/: " << y/plj);
+  if (plj > 1.0) {
+    NS_FATAL_ERROR (" Client -- fuu plj maior que 1!");
   }
-  NS_LOG_DEBUG ("x_c: " << x_c << "\ty_c: " << y_c << "\tplj_c: " << plj_c << "\tx_c/: " << x_c/plj_c << "\ty_c/: " << y_c/plj_c);
-  double x_f = m_father->GetXPosition() * m_punshNeigh;
-  double y_f = m_father->GetYPosition() * m_punshNeigh;  
-  double plj_f = m_punshNeigh;
-  NS_LOG_DEBUG ("x_f: " << x_f << "\ty_f: " << y_f << "\tplj_f: " << plj_f << "\tx_f/: " << x_f/plj_f << "\ty_f/: " << y_f/plj_f);
+  if (std::isnan(plj)) {
+    NS_FATAL_ERROR ("With client -- plj got nan value");
+  }
+  x_f += x; y_f += y; plj_f += plj; // acumulando
+
+  if (m_childList.GetN() > 0) {
+    x = y = plj = 0.0; // limpando  
+    NS_LOG_DEBUG ("ID\tX\tY");
+    for (LocationModelContainer::Iterator clj = m_childList.Begin(); clj != m_childList.End(); ++clj) {
+      NS_LOG_DEBUG ((*clj)->GetId() << "\t" << (*clj)->GetXPosition() << "\t" << (*clj)->GetYPosition());
+      x += (*clj)->GetXPosition() * m_punshNeigh;
+      y += (*clj)->GetYPosition() * m_punshNeigh;
+      plj += m_punshNeigh;
+    }
+    NS_LOG_DEBUG ("Child x: " << x << "\ty: " << y << "\tplj: " << plj << "\tx/: " << x/plj << "\ty/: " << y/plj);
+    x_f += x; y_f += y; plj_f += plj; // acumulando
+  }
+
+  x = y = plj = 0.0; // limpando
   x += m_father->GetXPosition() * m_punshNeigh;
   y += m_father->GetYPosition() * m_punshNeigh;
-  plj += m_punshNeigh;
-  NS_LOG_DEBUG ("x: " << x << "\ty: " << y << "\tplj: " << plj << "\tx/: " << x/plj << "\ty/: " << y/plj);
+  plj += m_punshNeigh;    
+  NS_LOG_DEBUG ("Father x: " << x << "\ty: " << y << "\tplj: " << plj << "\tx/: " << x/plj << "\ty/: " << y/plj);
+  x_f += x; y_f += y; plj_f += plj; // acumulando
 
-  x /= plj;
-  y /= plj;
+
+  NS_LOG_DEBUG ("Final x: " << x_f << "\ty: " << y_f << "\tplj: " << plj_f << "\tx/: " << x_f/plj_f << "\ty/: " << y_f/plj_f);
+  x_f /= plj_f;
+  y_f /= plj_f;
 
   m_position.clear();
-  m_position.push_back(x);
-  m_position.push_back(y);
+  m_position.push_back(x_f);
+  m_position.push_back(y_f);  
 
-  if (x>mx || y > my || x < 0 || y < 0) {
+  if (x_f > mx || y_f > my || x_f < 0 || y_f < 0) {
     NS_FATAL_ERROR("Log fora do cenario");
   } 
 }
@@ -346,7 +358,7 @@ void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, 
   long double sinr_W = pr_W / (it_W + N_W); // W - modelo de goldsmith considera para escalar!!!
   long double sinr_dBm = 10*std::log10(sinr_W)+30; // dBm    
 
-  // NS_LOG_DEBUG("prRefUav_dBm : " << prRefUav_dBm << " pl_dB: " << pl_dB << " pr_W: " << pr_W << " it_W: " << it_W << " sinr_W: " << sinr_W << " sinr_dBm: " << sinr_dBm);
+  NS_LOG_DEBUG("prRefUav_dBm : " << prRefUav_dBm << " pl_dB: " << pl_dB << " pr_W: " << pr_W << " it_W: " << it_W << " sinr_W: " << sinr_W << " sinr_dBm: " << sinr_dBm << " sinrMin: " << sinrUavMin << " distancia: " << dist*r_max);
 
   if (sinr_dBm >= sinrUavMin) {
     NS_LOG_DEBUG ("------> UAV " << m_id << "\t Distancia: " << dist*r_max << "\t SINR: " << sinr_dBm << "dBm");
