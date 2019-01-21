@@ -1350,7 +1350,7 @@ void ServerApplication::runDA() {
   double fsInterf = 0.0008; // fator de sobreposicao de espaco 5 (50%)
   // double dRUav = 6.5; // Mbps - taxa considerada por UAV
   double dRCli = 6.5; // Mbps - taxa considerada por usuário
-  double raio_cob = 115.47; // metros - para clientes utilizando equação de antena direcional com esparramento verificar Klaine2018
+  // double raio_cob = 115.47; // metros - para clientes utilizando equação de antena direcional com esparramento verificar Klaine2018
   double sinrUavMin = -92; // dBm - tabela de Receive sensitivity para 5GHz 802.11ac (VHT20) MCS 0
   double sinrCliMin = -93; // dBm - tabela de Receive sensitivity para 2.4GHz 802.11n (HT20) MCS 0
   double fcCli = 2.4e9; // Hz - frequencia
@@ -1434,7 +1434,7 @@ void ServerApplication::runDA() {
             long double sinr_W = pr_W / (it_W + N_W); // W - modelo de goldsmith considera para escalar!!!
             long double sinr_dBm = WattsToDbm(sinr_W); // dBm
             
-            if (low_dchilj <= raio_cob/r_max && sinr_dBm >= sinrCliMin) { // esta dentro da area de cobertura maxima da antena e receber SINR min
+            if (sinr_dBm >= sinrCliMin) { // esta dentro da area de cobertura maxima da antena e receber SINR min
               // NS_LOG_DEBUG ("-> CLI " << (*ci)->GetLogin() <<  " com " << (*lj)->GetId() << "\t Distancia: " << dcilj*r_max << "\t SINR: " << sinr_dBm << "dBm");
               Ptr<LocationModel> lCon = (*ci)->GetLocConnected();
               if (lCon) { // caso tenha alguma informacao anterior, desconsidera nos calculos, para isto atualiza o loc
@@ -1443,7 +1443,7 @@ void ServerApplication::runDA() {
               lCon = 0;
               (*ci)->SetLocConnected((*lj));
               // calcular a SNR e caso seja maior que o mínimo, considerar cliente conectado
-              (*lj)->NewClient(dRCli, (*ci)->GetConsumption());
+              (*lj)->NewClient(dRCli, (*ci)->GetConsumption(), dcilj);
               (*ci)->SetConnected(true);
               (*ci)->SetDataRate(sinr_dBm);               
               NS_LOG_DEBUG("tFix: " << tFixCon << "\ttMovCon: " << tMovCon);            
@@ -1521,7 +1521,7 @@ void ServerApplication::runDA() {
       if ((tMovCon >= tMov*0.8) && (tFixCon == tFix)) {
         NS_LOG_DEBUG("--> Finalizado - Feeting temp="<<t);
         t *= 0.5; // resfria bastante
-        GraficoCenarioDa(t, iter, lCentral, raio_cob);
+        GraficoCenarioDa(t, iter, lCentral, r_max);
         break;
       }
     }
@@ -1534,18 +1534,18 @@ void ServerApplication::runDA() {
         nLoc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
         nLoc->IniciarMovimentoB();
         m_locationContainer.Add(nLoc);
-        nLoc->SetPunishCapacity(0.01);
-        nLoc->SetPunishNeighboor(0.01);
+        nLoc->SetPunishCapacity(0.5);
+        nLoc->SetPunishNeighboor(0.5);
         nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
         nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max, prRefUav_dBm, fsInterf, N_W, sinrUavMin); // este método atualiza a variavel de punicao!
     }
 
-    GraficoCenarioDa(t, iter, lCentral, raio_cob);
+    GraficoCenarioDa(t, iter, lCentral, r_max);
 
     // Reiniciar Movimento A para cada Localizacao
     for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
       (*lj)->IniciarMovimentoA();
-      (*lj)->LimparHistorico();
+      (*lj)->LimparHistorico();      
       (*lj)->UpdatePunishNeighboor(sinrUavMin);
     }
 
@@ -1577,24 +1577,36 @@ void ServerApplication::runDA() {
   }
 }
 
-void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double raio_cob) {
+void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double r_max) {
   std::ofstream file;
   std::ostringstream os;
   os.str("");
   os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/da_loc_cpp_" << std::setfill ('0') << std::setw (15) << iter << ".txt";
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
-  LocationModelContainer::Iterator lj = m_locationContainer.Begin(); // imprimindo a posicao atual da localizacao
   file << iter << std::endl;
-  file << raio_cob << std::endl;
+  
+  LocationModelContainer::Iterator lj = m_locationContainer.Begin(); 
+  lj = m_locationContainer.Begin(); // imprimindo distancia maxima com clientes
+  file << (*lj)->GetMaxDistClient()*r_max;
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    file << "," << (*lj)->GetMaxDistClient()*r_max;
+  }
+  file << "\n";
+
   file << m_maxx << "," << m_maxy << std::endl;
+
   file << temp << std::endl;
+
   file << lCentral->GetXPosition() << "," << lCentral->GetYPosition() << std::endl;
+  lj = m_locationContainer.Begin(); // imprimindo a posicao atual da localizacao
   file << (*lj)->GetXPosition() << "," << (*lj)->GetYPosition();
   lj++;
   for (; lj != m_locationContainer.End(); ++lj) {
     file << "," << (*lj)->GetXPosition() << "," << (*lj)->GetYPosition();
   }
   file << "\n";
+
   lj = m_locationContainer.Begin(); // imprimindo a posicao antiga
   file << (*lj)->GetXPositionA() << "," << (*lj)->GetYPositionA();
   lj++;
@@ -1602,6 +1614,7 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
     file << "," << (*lj)->GetXPositionA() << "," << (*lj)->GetYPositionA();
   }
   file << "\n";
+
   lj = m_locationContainer.Begin(); // imprimindo a posicao do pai
   file << (*lj)->GetFather()->GetXPosition() << "," << (*lj)->GetFather()->GetYPosition();
   lj++;
@@ -1609,6 +1622,7 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
     file << "," << (*lj)->GetFather()->GetXPosition() << "," << (*lj)->GetFather()->GetYPosition();
   }
   file << "\n";
+
   lj = m_locationContainer.Begin(); // imprimindo capacidade
   file << (*lj)->GetPunishCapacity();
   lj++;
@@ -1616,6 +1630,7 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
     file << "," << (*lj)->GetPunishCapacity();
   }
   file << "\n";
+
   lj = m_locationContainer.Begin(); // imprimindo neigh
   file << (*lj)->GetPunishNeighboor();
   lj++;
@@ -1623,6 +1638,7 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
     file << "," << (*lj)->GetPunishNeighboor();
   }
   file << "\n";
+
   lj = m_locationContainer.Begin(); // imprimindo neigh
   file << (*lj)->IsConnected();
   lj++;
@@ -1630,18 +1646,20 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
     file << "," << (*lj)->IsConnected();
   }
   file << "\n";
+
   lj = m_locationContainer.Begin(); // imprimindo distancia para pai
-  file << (*lj)->GetDistanceFather();
+  file << (*lj)->GetDistanceFather()*r_max;
   lj++;
   for (; lj != m_locationContainer.End(); ++lj) {
-    file << "," << (*lj)->GetDistanceFather();
+    file << "," << (*lj)->GetDistanceFather()*r_max;
   }
   file.close();
 
-  // os.str ("");
-  // os << "python ./scratch/flynetwork/data/da_loc.py " << m_pathData << " " << int(Simulator::Now().GetSeconds()) << " " << iter << " " << raio_cob << " " << m_locationContainer.GetN();
-  // //NS_LOG_DEBUG (os.str());
-  // system(os.str().c_str());
+  os.str ("");
+  // custo, etapa, main_path, teste, iter
+  os << "python ./scratch/flynetwork/data/da_loc.py custo_" << m_custo << " " << int(Simulator::Now().GetSeconds()) << " ./scratch/flynetwork/data/output/teste_1" << " False " << iter;
+  NS_LOG_DEBUG (os.str());
+  system(os.str().c_str());
   // os.str ("");
   // os << "convert -delay 20 -loop 0 ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/*.png" << " ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/da_loc.gif";
   // //NS_LOG_DEBUG (os.str());

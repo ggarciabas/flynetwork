@@ -95,8 +95,10 @@ public:
   void SetPunishNeighboor (double);
   double GetPunishNeighboor ();
 
+  double GetMaxDistClient ();
+
   void InitializeWij (double);
-  void NewClient (double, double);
+  void NewClient (double, double, double);
   void RemoveClient (double, double);
   double GetWij ();
 
@@ -164,6 +166,7 @@ private:
 
   bool m_connected;
   double m_dataRate;
+  double m_maxDistCli;
 
   // l_j = \frac{\sum_{i=1}^{N_{pi}} p(c_i)p(l_j|c_i)c_i+\omega_j(l_n + \sum_{m>j} v_{mj}~l_m)}{\sum_{i=1}^{N_{pi}} p(l_j)+\omega_j+\omega_j\sum_{m>j} v_{mj}}~.
   // \omega_j+\omega_j\sum_{m>j} v_{mj} -> esta parte pode ser calculada multiplicando somente o m_punishNeigh pelo tamanho da lista de filhos + m_punishNeigh, lembrando que este ultimo é referente ao pai
