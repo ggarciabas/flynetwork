@@ -1362,11 +1362,11 @@ void ServerApplication::runDA() {
   double gain = 4; // dBi - tanto o ganho de recepcao como o de transmissao
   double N_W = 10e-9*20e7; // dB - N0 = 10e-9 W/Hz -- B = 20MHz - Livro Goldsmith ref para N0 
   // Fuck explanation dB and log relation: https://www.physicsforums.com/threads/confusion-with-db-equation-10-or-20.641850/#post-4105917
-  double plRefCli_dB = 2*WattsToDb(4*pi*d0/(fcCli/comp_onda)); // dB - Friis Model
+  double plRefCli_dB = 2*WattsToDb(4*pi*d0/(comp_onda/fcCli)); // dB - Friis Model
   // --> https://www.isa.org/standards-publications/isa-publications/intech-magazine/2002/november/db-vs-dbm/
   // Use dB when expressing the ratio between two power values. Use dBm when expressing an absolute value of power.
   double prRefCli_dBm = ptUav + gain + gain - plRefCli_dB; // dBm - potencia do sinal na distancia de referencia
-  double plRefUav_dB = 2*WattsToDb(4*pi*d0/(fcUav/comp_onda)); // dB - Firss Model
+  double plRefUav_dB = 2*WattsToDb(4*pi*d0/(comp_onda/fcUav)); // dB - Firss Model
   double prRefUav_dBm = ptUav + gain + gain - plRefUav_dB; // dBm - potencia do sinal na distancia de referencia
   double taxa_capacidade = 1.01; // NOVO: 120%
   double t = 0.6;
