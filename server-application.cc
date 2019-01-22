@@ -1345,16 +1345,17 @@ void ServerApplication::runDA() {
   double r_max = std::sqrt(std::pow(m_maxx, 2) + std::pow(m_maxy, 2));
   // 1550 series https://www.cisco.com/c/en/us/products/collateral/wireless/aironet-1550-series/data_sheet_c78-641373.html
   // 1570 series https://www.cisco.com/c/en/us/products/wireless/aironet-1570-series/datasheet-listing.html
-  double ptUav = 30; // dBm - potencia de transmissao máxima para o AP Aironet 1570 series 802.11ac 5GHz
+  // double ptUav = 30; // dBm - potencia de transmissao máxima para o AP Aironet 1570 series 802.11ac 5GHz
+  // double sinrUavMin = -92; // dBm - tabela de Receive sensitivity para 5GHz 802.11ac (VHT20) MCS 0
+  // double fcUav = 5e9; // Hz - frequencia
+  double uav_cob = 288.964; // metros Verificar anotaca Pathloss - valor encontrado para sinrUAvMin
   double ptCli = 28; // dBm - potencia de transmissao máxima para o Ap Aironet 1550 series 802.11n 2.4GHz
   double fsInterf = 0.0008; // fator de sobreposicao de espaco 5 (50%)
   // double dRUav = 6.5; // Mbps - taxa considerada por UAV
   double dRCli = 6.5; // Mbps - taxa considerada por usuário
   double raio_cob = 115.47; // metros - para clientes utilizando equação de antena direcional com esparramento verificar Klaine2018
-  double sinrUavMin = -92; // dBm - tabela de Receive sensitivity para 5GHz 802.11ac (VHT20) MCS 0
   double sinrCliMin = -93; // dBm - tabela de Receive sensitivity para 2.4GHz 802.11n (HT20) MCS 0
   double fcCli = 2.4e9; // Hz - frequencia
-  double fcUav = 5e9; // Hz - frequencia
   double comp_onda = 3e8; // m - comprimento de onda
   double d0 = 1; // m - distancia de referencia
   double pi = 3.141516; // pi
@@ -1366,8 +1367,6 @@ void ServerApplication::runDA() {
   // --> https://www.isa.org/standards-publications/isa-publications/intech-magazine/2002/november/db-vs-dbm/
   // Use dB when expressing the ratio between two power values. Use dBm when expressing an absolute value of power.
   double prRefCli_dBm = ptUav + gain + gain - plRefCli_dB; // dBm - potencia do sinal na distancia de referencia
-  double plRefUav_dB = 2*WattsToDb(4*pi*d0/(comp_onda/fcUav)); // dB - Firss Model
-  double prRefUav_dBm = ptUav + gain + gain - plRefUav_dB; // dBm - potencia do sinal na distancia de referencia
   double taxa_capacidade = 1.01; // NOVO: 120%
   double t = 0.6;
   int locId = 0;
@@ -1376,7 +1375,7 @@ void ServerApplication::runDA() {
   NS_LOG_DEBUG ("\n\t t_min =" << t_min << "\n \t r_max =" << r_max << "\n \t ptUav ="<< ptUav << "\n \t ptCli =" << ptCli << "\n \t fsInterf ="
               << fsInterf  << "\n \t dRCli =" << dRCli << "\n \t sinrUavMin ="<<sinrUavMin << "\n \t sinrCliMin =" << sinrCliMin<< "\n \t fcCli ="
               << fcCli  << "\n \t fcUav =" << fcUav << "\n \t comp_onda =" << comp_onda << "\n \t pi =" << pi << "\n \t maxDrUav =" << maxDrUav << "\n \t gain =" << gain
-                << "\n \t N_W =" << N_W <<  "\n \t  taxa_capacidade ="  << taxa_capacidade << "\n \t t =" << t <<  "\n \t locId =" << locId << "\n \t max_iterB =" << max_iterB << "\n\tplRefCli_dB: " << plRefCli_dB << "\n\tplRefUav_dB: " << plRefUav_dB << "\n\tprRefCli_dBm: " << prRefCli_dBm << "\n\tprRefUav_dBm: " << prRefUav_dBm);
+                << "\n \t N_W =" << N_W <<  "\n \t  taxa_capacidade ="  << taxa_capacidade << "\n \t t =" << t <<  "\n \t locId =" << locId << "\n \t max_iterB =" << max_iterB << "\n\tplRefCli_dB: " << plRefCli_dB << "\n\tplRefUav_dB: " << plRefUav_dB << "uav_cob: " << uav_cob;
 
   ObjectFactory lObj;
   lObj.SetTypeId("ns3::LocationModel");
@@ -1396,7 +1395,7 @@ void ServerApplication::runDA() {
   lCentral->SetPosition(pos.x, pos.y); // iniciando a localizacao que representará a central
   lCentral->IniciarMovimentoA(); // somente para nao dar problemas ao executar toString
   lCentral->IniciarMovimentoB();
-  loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), r_max, prRefUav_dBm, fsInterf, N_W, sinrUavMin); // este método atualiza a variavel de punicao!
+  loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), r_max, uav_cob);
 
   int iter = 0;
   do {// laco A
@@ -1433,7 +1432,7 @@ void ServerApplication::runDA() {
             long double sinr_W = pr_W / (it_W + N_W); // W - modelo de goldsmith considera para escalar!!!
             long double sinr_dBm = WattsToDbm(sinr_W); // dBm
             
-            if (low_dchilj <= raio_cob/r_max && sinr_dBm >= sinrCliMin) { // esta dentro da area de cobertura maxima da antena e receber SINR min
+            if (low_dchilj <= raio_cob/r_max && sinr_dBm >= sinrCliMin) { // esta dentro da area de cobertura maxima da antena e recebe SINR min
               // NS_LOG_DEBUG ("-> CLI " << (*ci)->GetLogin() <<  " com " << (*lj)->GetId() << "\t Distancia: " << dcilj*r_max << "\t SINR: " << sinr_dBm << "dBm");
               Ptr<LocationModel> lCon = (*ci)->GetLocConnected();
               if (lCon) { // caso tenha alguma informacao anterior, desconsidera nos calculos, para isto atualiza o loc
@@ -1497,11 +1496,11 @@ void ServerApplication::runDA() {
             }
           }
           if (id == -1) { // menor distancia é para com a central
-            m_locationContainer.Get(j)->SetFather(lCentral, dist, r_max, prRefUav_dBm, fsInterf, N_W, sinrUavMin);
-            locConnected = m_locationContainer.Get(j)->IsConnected() && locConnected; // este método atualiza a variavel de punicao!
+            m_locationContainer.Get(j)->SetFather(lCentral, dist, r_max, uav_cob);
+            locConnected = m_locationContainer.Get(j)->IsConnected() && locConnected; 
           } else { // menor distancia é para algum outro UAV, cadastrar o pai e o filho!
-            m_locationContainer.Get(j)->SetFather(m_locationContainer.Get(id), dist, r_max, prRefUav_dBm, fsInterf, N_W, sinrUavMin);
-            locConnected = m_locationContainer.Get(j)->IsConnected() && locConnected; // este método atualiza a variavel de punicao!
+            m_locationContainer.Get(j)->SetFather(m_locationContainer.Get(id), dist, r_max, uav_cob);
+            locConnected = m_locationContainer.Get(j)->IsConnected() && locConnected; 
             m_locationContainer.Get(id)->AddChild(m_locationContainer.Get(j), r_max); // novo filho para id!
           }
         }
@@ -1536,7 +1535,7 @@ void ServerApplication::runDA() {
         nLoc->SetPunishCapacity(0.01);
         nLoc->SetPunishNeighboor(0.01);
         nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
-        nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max, prRefUav_dBm, fsInterf, N_W, sinrUavMin); // este método atualiza a variavel de punicao!
+        nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max, uav_cob); 
     }
 
     GraficoCenarioDa(t, iter, lCentral, raio_cob);
@@ -1545,7 +1544,7 @@ void ServerApplication::runDA() {
     for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
       (*lj)->IniciarMovimentoA();
       (*lj)->LimparHistorico();
-      (*lj)->UpdatePunishNeighboor(sinrUavMin);
+      (*lj)->UpdatePunishNeighboor(uav_cob/r_max);
     }
 
     t = t*0.9; // reduz 90%  a tempreatura

@@ -106,25 +106,14 @@ public:
   double AddPljCiPuro (Ptr<ClientModel> ci, double Zci, double r_max);
 
 
-  bool UpdatePunishNeighboor (double sinrUavMin);
-  void SetFather (Ptr<LocationModel> l, double, double, double, double, double, double);
+  bool UpdatePunishNeighboor (double);
+  void SetFather (Ptr<LocationModel> l, double, double, double);
   Ptr<LocationModel> GetFather ();
 
   void AddChild (Ptr<LocationModel> l, double r_max);
   void ClearChildList ();
   double GetChildListSize();
   LocationModelContainer GetChildList ();
-
-  // void LimparAcumuladoPosicionamento ();
-  // void LimparAcumuladoPosicionamentoClientes ();
-
-  // double GetXAcum();
-  // double GetYAcum();
-  // double GetXAcumCli();
-  // double GetYAcumCli();
-  // double GetPlj();
-
-  // double UavConsumption(double);
 
   void SetConnected (bool);
   bool IsConnected ();
@@ -139,8 +128,6 @@ public:
   double GetYPosition ();
 
   void LimparHistorico ();
-
-  double GetDataRate ();
 
   void UpdatePosition (double mx, double my);
 
@@ -161,7 +148,7 @@ private:
   double m_totalConsumption;
 
   bool m_connected;
-  double m_dataRate;
+  double m_distFather;
 
   // l_j = \frac{\sum_{i=1}^{N_{pi}} p(c_i)p(l_j|c_i)c_i+\omega_j(l_n + \sum_{m>j} v_{mj}~l_m)}{\sum_{i=1}^{N_{pi}} p(l_j)+\omega_j+\omega_j\sum_{m>j} v_{mj}}~.
   // \omega_j+\omega_j\sum_{m>j} v_{mj} -> esta parte pode ser calculada multiplicando somente o m_punishNeigh pelo tamanho da lista de filhos + m_punishNeigh, lembrando que este ultimo é referente ao pai
@@ -171,7 +158,6 @@ private:
 
   std::map<Ptr<ClientModel>, double> m_pljci;
   Ptr<LocationModel> m_father;
-  double m_sinrFather_dBm;
   LocationModelContainer m_childList;
 };
 

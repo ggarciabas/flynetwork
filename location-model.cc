@@ -334,12 +334,12 @@ void LocationModel::UpdatePosition (double mx, double my) { // normalizados
   } 
 }
 
-bool LocationModel::UpdatePunishNeighboor (double sinrUavMin) {
-  if (m_sinrFather_dBm >= sinrUavMin) {
-    m_punshNeigh *=  0.9;
+bool LocationModel::UpdatePunishNeighboor (double uav_cob_norm) {
+  if (m_distFather <= uav_cob_norm) {
+    m_punshNeigh *= std::exp (-1+(m_distFather/uav_cob_norm)); // m_punshNeigh * 0.9; // 
     m_punshNeigh = (m_punshNeigh>0.01)?m_punshNeigh:0.01;
   } else {
-    m_punshNeigh *= 1.1;
+    m_punshNeigh *= 1.2;
     m_punshNeigh = (m_punshNeigh > 2) ? 2 : m_punshNeigh;
   }
 
@@ -350,29 +350,9 @@ double LocationModel::GetDataRate () {
   return m_dataRate;
 }
 
-void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, double prRefUav_dBm, double fsInterf, double N_W, double sinrUavMin) {
+void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, double uav_cob) {
 
-  long double pl_dB = 2*3.32*(10*std::log10(dist*r_max))+0; // dB - Beta para ambiente outdoor - LogDistance (ver dissertacao)
-  long double pr_W = std::pow(10, ((prRefUav_dBm - pl_dB)-30)/10); // W
-  long double it_W = fsInterf*pr_W; // w        
-  long double sinr_W = pr_W / (it_W + N_W); // W - modelo de goldsmith considera para escalar!!!
-  long double sinr_dBm = 10*std::log10(sinr_W)+30; // dBm    
-
-  NS_LOG_DEBUG("prRefUav_dBm : " << prRefUav_dBm << " pl_dB: " << pl_dB << " pr_W: " << pr_W << " it_W: " << it_W << " sinr_W: " << sinr_W << " sinr_dBm: " << sinr_dBm << " sinrMin: " << sinrUavMin << " distancia: " << dist*r_max);
-
-  if (sinr_dBm >= sinrUavMin) {
-    NS_LOG_DEBUG ("------> UAV " << m_id << "\t Distancia: " << dist*r_max << "\t SINR: " << sinr_dBm << "dBm");
-    if (sinr_dBm < -92) { // dBm
-      m_dataRate = 0.0;
-    } else if (sinr_dBm < -86) {
-      m_dataRate = 6.5; //Mbps MCS 0 até 3, consdierando somente taxa 6.5 por falta de infos no dataSheet
-    } else if (sinr_dBm < -79) {
-      m_dataRate = 39; //Mbps MCS 4 até 6
-    } else if (sinr_dBm < 74) {
-      m_dataRate = 65; // Mbps MCS 7
-    } else {
-      m_dataRate = 78; // Mbps MCS 8
-    }
+  if (dist*r_max <= uav_cob) {
     m_connected = true;
   } else {
     m_connected = false;
@@ -382,10 +362,7 @@ void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, 
   // m_father->UavConsumption(-dataRate); // removendo o consumo do pai anterior
   // l->UavConsumption(dataRate); // adicionando consumo no pai atual
 
-  // atualizando parte do novo posicionamento da localizacao
-  // m_xAcum += l->GetXPosition(r_max);
-  // m_yAcum += l->GetYPosition(r_max);
-  m_sinrFather_dBm = sinr_dBm;
+  m_distFather = dist;
   m_father = l;
 }
 
