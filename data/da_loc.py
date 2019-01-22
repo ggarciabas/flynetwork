@@ -12,7 +12,14 @@ import pandas as pd
 
 da = "cpp"
 
-def da_loc (custo, etapa, main_path, teste):
+c = sys.argv[1]
+e = sys.argv[2]
+m = sys.argv[3]
+t = sys.argv[4]
+i = sys.argv[5]
+
+def da_loc (custo, etapa, main_path, teste, it=-1):
+    print "DA LOc - new Graphic"
     f_cen = open(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/client.txt','r')
     line = f_cen.readline().strip()
     cli = [x for x in line.split(',')]
@@ -20,6 +27,8 @@ def da_loc (custo, etapa, main_path, teste):
     arquivos = glob.glob(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_'+da+'_*.txt')
     arquivos = np.array(arquivos)
     arquivos.sort()
+    if int(it) != -1:
+        arquivos = [arquivos[int(it)-1]]
     for i in np.arange(0, len(arquivos), 10):
         arquivo = arquivos[i]
         try:
@@ -32,6 +41,7 @@ def da_loc (custo, etapa, main_path, teste):
         # raio de cobertura
         line = f_cen.readline().strip()
         rcob = [float(x) for x in line.split(',')]
+        rcob = [max(rcob)]
         # limits
         line = f_cen.readline().strip()
         lim = [float(x) for x in line.split(',')]
@@ -57,7 +67,14 @@ def da_loc (custo, etapa, main_path, teste):
         data["N"] = [float(x) for x in line.split(',')]
         # line = f_cen.readline().strip()
         # data["Plj"] = [float(x) for x in line.split(',')]
+        # connected
+        line = f_cen.readline().strip()
+        connected = [int(x) for x in line.split(',')]
+        line = f_cen.readline().strip()
+        distance = [float(x) for x in line.split(',')]
         f_cen.close()
+        
+        uav_cob_max_dist = max(distance)
 
         lId = np.arange(0,len(loc),1);        
 
@@ -82,6 +99,9 @@ def da_loc (custo, etapa, main_path, teste):
                 ax0.plot(loc_last[i],loc_last[i+1],'cX', markersize=7.0, label="anteior")
                 ax0.plot(loc[i],loc[i+1],'c^', markersize=7.0, label="atual")
                 ax0.add_patch(
+                    patches.Circle((loc[i],loc[i+1]), radius=float(uav_cob_max_dist), color='r', fill=False, linestyle='dashed')
+                )
+                ax0.add_patch(
                     patches.Circle((loc[i],loc[i+1]), radius=float(rcob[0]), color='b', fill=False, linestyle='dotted')
                 )
                 ax0.plot(x,y,'c-', markersize=7.0)
@@ -89,6 +109,9 @@ def da_loc (custo, etapa, main_path, teste):
             else:
                 ax0.plot(loc_last[i],loc_last[i+1],'cX', markersize=7.0)
                 ax0.plot(loc[i],loc[i+1],'c^', markersize=7.0)
+                ax0.add_patch(
+                    patches.Circle((loc[i],loc[i+1]), radius=float(uav_cob_max_dist), color='r', fill=False, linestyle='dashed')
+                )
                 ax0.add_patch(
                     patches.Circle((loc[i],loc[i+1]), radius=float(rcob[0]), color='b', fill=False, linestyle='dotted')
                 )
@@ -98,19 +121,21 @@ def da_loc (custo, etapa, main_path, teste):
             c=c+1
 
         first = True
+        l = 0
         for i in range(0, len(loc), 2):
             x = [loc[i],father[i]]
             y = [loc[i+1],father[i+1]]
-            if first:
-                ax0.plot(x,y,'r-', markersize=7.0)
-                first = False
-            else:
-                ax0.plot(x,y,'r-', markersize=7.0)
-
+            if int(connected[l]) == 1:
+                if first:
+                    ax0.plot(x,y,'r-', markersize=7.0)
+                    first = False
+                else:
+                    ax0.plot(x,y,'r-', markersize=7.0)
+            l = l + 1
 
         ax0.plot(central[0],central[1],'g*', markersize=7.0, label="central")
 
-        # ax0.set_title("Cenario @"+'etapa/'+etapa+"s Temp.:"+str(temp[0])+ " Iter:"+iteracao[0]+" TLoc: "+ tLoc)
+        ax0.set_title("Cenario @"+'etapa/'+str(etapa)+"s Temp.:"+str(temp[0])+ " Iter:"+str(iteracao[0])+" CobUav: "+ str(uav_cob_max_dist))
         ax0.set_ylabel('Y (m)')
         ax0.set_xlabel('X (m)')
         ax0.set_xlim([0,lim[0]])
@@ -148,3 +173,7 @@ def da_loc (custo, etapa, main_path, teste):
         plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_hsit_'+da+'_{:015}'.format(int(iteracao[0]))+'.eps')
         plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_hist_'+da+'_{:015}'.format(int(iteracao[0]))+'.png')
         plt.clf()
+
+if __name__ == "__main__":
+    print m
+    da_loc(c, e, m, t, i)    

@@ -83,12 +83,12 @@ private:
   double CalculateDistanceCentral(const std::vector<double> pos);
   bool ValidateMijConvergency(vector<vector<double>> vec, vector<vector<double>> m_ij, unsigned siz);
   void ReplyUav(Ptr<UavModel> uav);
-  void GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double raio_cob);
+  void GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double r_max);
   void GraficoCenarioDaPuro (double temp, int iter, Ptr<LocationModel> lCentral, double raio_cob);
 
   bool MovimentoA();
   bool MovimentoB();
-  void CentroDeMassa (Ptr<LocationModel>, double);
+  void CentroDeMassa (Ptr<LocationModel>, Ptr<LocationModel> central, double);
 
   void AskClientData ();
   void SendAskClientPacket(Ptr<UavModel> uav);

@@ -1345,10 +1345,10 @@ void ServerApplication::runDA() {
   double r_max = std::sqrt(std::pow(m_maxx, 2) + std::pow(m_maxy, 2));
   // 1550 series https://www.cisco.com/c/en/us/products/collateral/wireless/aironet-1550-series/data_sheet_c78-641373.html
   // 1570 series https://www.cisco.com/c/en/us/products/wireless/aironet-1570-series/datasheet-listing.html
-  // double ptUav = 30; // dBm - potencia de transmissao máxima para o AP Aironet 1570 series 802.11ac 5GHz
+  double ptUav = 30; // dBm - potencia de transmissao máxima para o AP Aironet 1570 series 802.11ac 5GHz
   // double sinrUavMin = -92; // dBm - tabela de Receive sensitivity para 5GHz 802.11ac (VHT20) MCS 0
   // double fcUav = 5e9; // Hz - frequencia
-  double uav_cob = 288.964; // metros Verificar anotaca Pathloss - valor encontrado para sinrUAvMin
+  double uav_cob = 408.739; // metros Verificar anotaca Pathloss - valor encontrado para sinrUAvMin - 20dBm=288.964 30dBm=408.739
   double ptCli = 28; // dBm - potencia de transmissao máxima para o Ap Aironet 1550 series 802.11n 2.4GHz
   double fsInterf = 0.0008; // fator de sobreposicao de espaco 5 (50%)
   // double dRUav = 6.5; // Mbps - taxa considerada por UAV
@@ -1373,29 +1373,29 @@ void ServerApplication::runDA() {
   int max_iterB = 5000;
 
   NS_LOG_DEBUG ("\n\t t_min =" << t_min << "\n \t r_max =" << r_max << "\n \t ptUav ="<< ptUav << "\n \t ptCli =" << ptCli << "\n \t fsInterf ="
-              << fsInterf  << "\n \t dRCli =" << dRCli << "\n \t sinrUavMin ="<<sinrUavMin << "\n \t sinrCliMin =" << sinrCliMin<< "\n \t fcCli ="
-              << fcCli  << "\n \t fcUav =" << fcUav << "\n \t comp_onda =" << comp_onda << "\n \t pi =" << pi << "\n \t maxDrUav =" << maxDrUav << "\n \t gain =" << gain
-                << "\n \t N_W =" << N_W <<  "\n \t  taxa_capacidade ="  << taxa_capacidade << "\n \t t =" << t <<  "\n \t locId =" << locId << "\n \t max_iterB =" << max_iterB << "\n\tplRefCli_dB: " << plRefCli_dB << "\n\tplRefUav_dB: " << plRefUav_dB << "uav_cob: " << uav_cob;
+              << fsInterf  << "\n \t dRCli =" << dRCli << "\n \t sinrCliMin =" << sinrCliMin<< "\n \t fcCli ="
+              << fcCli  << "\n \t comp_onda =" << comp_onda << "\n \t pi =" << pi << "\n \t maxDrUav =" << maxDrUav << "\n \t gain =" << gain
+                << "\n \t N_W =" << N_W <<  "\n \t  taxa_capacidade ="  << taxa_capacidade << "\n \t t =" << t <<  "\n \t locId =" << locId << "\n \t max_iterB =" << max_iterB << "\n\tplRefCli_dB: " << plRefCli_dB << "uav_cob: " << uav_cob);
 
   ObjectFactory lObj;
   lObj.SetTypeId("ns3::LocationModel");
-  Ptr<LocationModel> loc = lObj.Create()->GetObject<LocationModel>();
-  loc->SetId(locId++);
-  CentroDeMassa(loc, r_max);
-  loc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
-  loc->IniciarMovimentoB();
-  m_locationContainer.Add(loc);
 
-  loc->SetPunishCapacity(0.5);
-  loc->SetPunishNeighboor(0.5); // ALTERADO: valor inicial de punicao!
-  loc->InitializeWij (m_clientDaContainer.GetN()*dRCli); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
   Ptr<LocationModel> lCentral = lObj.Create()->GetObject<LocationModel> ();
   lCentral->SetId(9999);
   Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
   lCentral->SetPosition(pos.x, pos.y); // iniciando a localizacao que representará a central
   lCentral->IniciarMovimentoA(); // somente para nao dar problemas ao executar toString
   lCentral->IniciarMovimentoB();
+  Ptr<LocationModel> loc = lObj.Create()->GetObject<LocationModel>();
+  loc->SetId(locId++);
+  CentroDeMassa(loc, lCentral, r_max);
+  loc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
+  loc->IniciarMovimentoB();
+  loc->SetPunishCapacity(0.5);
+  loc->SetPunishNeighboor(0.5); // ALTERADO: valor inicial de punicao!
+  loc->InitializeWij (m_clientDaContainer.GetN()*dRCli); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
   loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), r_max, uav_cob);
+  m_locationContainer.Add(loc);
 
   int iter = 0;
   do {// laco A
@@ -1431,7 +1431,6 @@ void ServerApplication::runDA() {
             long double it_W = fsInterf*pr_W; // w        
             long double sinr_W = pr_W / (it_W + N_W); // W - modelo de goldsmith considera para escalar!!!
             long double sinr_dBm = WattsToDbm(sinr_W); // dBm
-            
             if (low_dchilj <= raio_cob/r_max && sinr_dBm >= sinrCliMin) { // esta dentro da area de cobertura maxima da antena e recebe SINR min
               // NS_LOG_DEBUG ("-> CLI " << (*ci)->GetLogin() <<  " com " << (*lj)->GetId() << "\t Distancia: " << dcilj*r_max << "\t SINR: " << sinr_dBm << "dBm");
               Ptr<LocationModel> lCon = (*ci)->GetLocConnected();
@@ -1441,7 +1440,7 @@ void ServerApplication::runDA() {
               lCon = 0;
               (*ci)->SetLocConnected((*lj));
               // calcular a SNR e caso seja maior que o mínimo, considerar cliente conectado
-              (*lj)->NewClient(dRCli, (*ci)->GetConsumption());
+              (*lj)->NewClient(dRCli, (*ci)->GetConsumption(), dcilj);
               (*ci)->SetConnected(true);
               (*ci)->SetDataRate(sinr_dBm);               
               NS_LOG_DEBUG("tFix: " << tFixCon << "\ttMovCon: " << tMovCon);            
@@ -1519,7 +1518,7 @@ void ServerApplication::runDA() {
       if ((tMovCon >= tMov*0.8) && (tFixCon == tFix)) {
         NS_LOG_DEBUG("--> Finalizado - Feeting temp="<<t);
         t *= 0.5; // resfria bastante
-        GraficoCenarioDa(t, iter, lCentral, raio_cob);
+        GraficoCenarioDa(t, iter, lCentral, r_max);
         break;
       }
     }
@@ -1528,17 +1527,17 @@ void ServerApplication::runDA() {
       new_uav:
         Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
         nLoc->SetId(locId++);
-        CentroDeMassa(nLoc, r_max);
+        CentroDeMassa(nLoc, lCentral, r_max);
         nLoc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
         nLoc->IniciarMovimentoB();
         m_locationContainer.Add(nLoc);
-        nLoc->SetPunishCapacity(0.01);
-        nLoc->SetPunishNeighboor(0.01);
+        nLoc->SetPunishCapacity(0.5);
+        nLoc->SetPunishNeighboor(0.5);
         nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
         nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max, uav_cob); 
     }
 
-    GraficoCenarioDa(t, iter, lCentral, raio_cob);
+    GraficoCenarioDa(t, iter, lCentral, r_max);
 
     // Reiniciar Movimento A para cada Localizacao
     for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
@@ -1554,13 +1553,13 @@ void ServerApplication::runDA() {
   m_totalCliGeral = 0;
   m_locConsTotal = 0; // atualiza total de consumo de todas as localizacoes
 
-  os.str("");
-  os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/location_data_rate.txt";
-  file.open(os.str().c_str(), std::ofstream::out);
-  for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-    file << (*lj)->GetId() << "," << (*lj)->GetDataRate() << std::endl;
-  }
-  file.close();
+  // os.str("");
+  // os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/location_data_rate.txt";
+  // file.open(os.str().c_str(), std::ofstream::out);
+  // for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+  //   file << (*lj)->GetId() << "," << (*lj)->GetDataRate() << std::endl;
+  // }
+  // file.close();
 
   os.str("");
   os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/client_data_rate.txt";
@@ -1575,24 +1574,36 @@ void ServerApplication::runDA() {
   }
 }
 
-void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double raio_cob) {
+void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double r_max) {
   std::ofstream file;
   std::ostringstream os;
   os.str("");
   os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/da_loc_cpp_" << std::setfill ('0') << std::setw (15) << iter << ".txt";
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
-  LocationModelContainer::Iterator lj = m_locationContainer.Begin(); // imprimindo a posicao atual da localizacao
   file << iter << std::endl;
-  file << raio_cob << std::endl;
+  
+  LocationModelContainer::Iterator lj = m_locationContainer.Begin(); 
+  lj = m_locationContainer.Begin(); // imprimindo distancia maxima com clientes
+  file << (*lj)->GetMaxDistClient()*r_max;
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    file << "," << (*lj)->GetMaxDistClient()*r_max;
+  }
+  file << "\n";
+
   file << m_maxx << "," << m_maxy << std::endl;
+
   file << temp << std::endl;
+
   file << lCentral->GetXPosition() << "," << lCentral->GetYPosition() << std::endl;
+  lj = m_locationContainer.Begin(); // imprimindo a posicao atual da localizacao
   file << (*lj)->GetXPosition() << "," << (*lj)->GetYPosition();
   lj++;
   for (; lj != m_locationContainer.End(); ++lj) {
     file << "," << (*lj)->GetXPosition() << "," << (*lj)->GetYPosition();
   }
   file << "\n";
+
   lj = m_locationContainer.Begin(); // imprimindo a posicao antiga
   file << (*lj)->GetXPositionA() << "," << (*lj)->GetYPositionA();
   lj++;
@@ -1600,6 +1611,7 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
     file << "," << (*lj)->GetXPositionA() << "," << (*lj)->GetYPositionA();
   }
   file << "\n";
+
   lj = m_locationContainer.Begin(); // imprimindo a posicao do pai
   file << (*lj)->GetFather()->GetXPosition() << "," << (*lj)->GetFather()->GetYPosition();
   lj++;
@@ -1607,6 +1619,7 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
     file << "," << (*lj)->GetFather()->GetXPosition() << "," << (*lj)->GetFather()->GetYPosition();
   }
   file << "\n";
+
   lj = m_locationContainer.Begin(); // imprimindo capacidade
   file << (*lj)->GetPunishCapacity();
   lj++;
@@ -1614,18 +1627,36 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
     file << "," << (*lj)->GetPunishCapacity();
   }
   file << "\n";
+
   lj = m_locationContainer.Begin(); // imprimindo neigh
   file << (*lj)->GetPunishNeighboor();
   lj++;
   for (; lj != m_locationContainer.End(); ++lj) {
     file << "," << (*lj)->GetPunishNeighboor();
   }
+  file << "\n";
+
+  lj = m_locationContainer.Begin(); // imprimindo neigh
+  file << (*lj)->IsConnected();
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    file << "," << (*lj)->IsConnected();
+  }
+  file << "\n";
+
+  lj = m_locationContainer.Begin(); // imprimindo distancia para pai
+  file << (*lj)->GetDistanceFather()*r_max;
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    file << "," << (*lj)->GetDistanceFather()*r_max;
+  }
   file.close();
 
-  // os.str ("");
-  // os << "python ./scratch/flynetwork/data/da_loc.py " << m_pathData << " " << int(Simulator::Now().GetSeconds()) << " " << iter << " " << raio_cob << " " << m_locationContainer.GetN();
-  // //NS_LOG_DEBUG (os.str());
-  // system(os.str().c_str());
+  os.str ("");
+  // custo, etapa, main_path, teste, iter
+  os << "python ./scratch/flynetwork/data/da_loc.py custo_" << m_custo << " " << int(Simulator::Now().GetSeconds()) << " ./scratch/flynetwork/data/output/teste_1" << " False " << iter;
+  NS_LOG_DEBUG (os.str());
+  system(os.str().c_str());
   // os.str ("");
   // os << "convert -delay 20 -loop 0 ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/*.png" << " ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/da_loc.gif";
   // //NS_LOG_DEBUG (os.str());
@@ -1640,7 +1671,6 @@ bool ServerApplication::MovimentoA() {
   for (; lj != m_locationContainer.End(); ++lj) {
     retorno = retorno || (*lj)->MovimentoA();
   }
-  //std::cout << "----> MovimentoA: " << ((retorno)?"true":"false") << std::endl;
   return retorno;
 }
 
@@ -1653,16 +1683,14 @@ bool ServerApplication::MovimentoB() {
     retorno = retorno || (*lj)->MovimentoB();
     (*lj)->IniciarMovimentoB(); // atualizar para o novo posicionamento senão fica em laco infinito!
   }
-  // //std::cout << "----> MovimentoB: " << ((retorno)?"true":"false") << std::endl;
   return retorno;
 }
 
-void ServerApplication::CentroDeMassa (Ptr<LocationModel> l, double r_max) {
+void ServerApplication::CentroDeMassa (Ptr<LocationModel> l, Ptr<LocationModel> central, double r_max) {
   double x=0, y=0;
   bool con = true;
   double ccon = 0;
   for (ClientModelContainer::Iterator i = m_clientDaContainer.Begin(); i != m_clientDaContainer.End(); ++i) {
-    // //std::cout << (*i)->ToString();
     con = con && (*i)->IsConnected();
     if (!(*i)->IsConnected()) { // NOVO: considera somente os que nao estao conectados!
       x += (*i)->GetXPosition();
@@ -1671,11 +1699,13 @@ void ServerApplication::CentroDeMassa (Ptr<LocationModel> l, double r_max) {
     }
   }
 
-  // if (con) { // todos os cliente estao conectados
-  //   //std::cout << "==> Todos os clientes conectados.\n";
-  // }
-  //std::cout << "Centro de massa: " << x << " " << y << std::endl;
-  l->SetPosition(x/ccon, y/ccon); // posicionar no centro dos clientes
+  if (con) { // todos os cliente estao conectados
+    std::cout << "==> Todos os clientes conectados.\n";
+    l->SetPosition(central->GetXPosition(), central->GetYPosition()); // posicionar no centro dos clientes
+  } else {
+    std::cout << "Centro de massa: " << x/ccon << " " << y/ccon << std::endl;
+    l->SetPosition(x/ccon, y/ccon); // posicionar no centro dos clientes
+  }
 }
 
 void ServerApplication::runDAPuro() {
@@ -1744,17 +1774,20 @@ void ServerApplication::runDAPuro() {
 
   ObjectFactory lObj;
   lObj.SetTypeId("ns3::LocationModel");
-  Ptr<LocationModel> loc = lObj.Create()->GetObject<LocationModel>();
-  loc->SetId(locId++);
-  CentroDeMassa(loc, r_max);
-  loc->IniciarMovimentoB();
-  m_locationContainer.Add(loc);
 
   Ptr<LocationModel> lCentral = lObj.Create()->GetObject<LocationModel> ();
   lCentral->SetId(9999);
   Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
   lCentral->SetPosition(pos.x, pos.y); // iniciando a localizacao que representará a central
   lCentral->IniciarMovimentoB();
+
+  Ptr<LocationModel> loc = lObj.Create()->GetObject<LocationModel>();
+  loc->SetId(locId++);
+  CentroDeMassa(loc, lCentral, r_max);
+  loc->IniciarMovimentoB();
+  m_locationContainer.Add(loc);
+
+  
 
   int iter = 0;
   do {// laco A
@@ -1830,7 +1863,7 @@ void ServerApplication::runDAPuro() {
     //std::cout << "---> Novo UAV\n";
     Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
     nLoc->SetId(locId++);
-    CentroDeMassa(nLoc, r_max);
+    CentroDeMassa(nLoc, lCentral, r_max);
     nLoc->IniciarMovimentoB();
     m_locationContainer.Add(nLoc);
 

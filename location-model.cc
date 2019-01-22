@@ -240,10 +240,15 @@ void LocationModel::InitializeWij (double v) {
   m_totaCli = 0;
 }
 
-void LocationModel::NewClient (double dataRate, double cons) {
+double LocationModel::GetMaxDistClient () {
+  return m_maxDistCli;
+}
+
+void LocationModel::NewClient (double dataRate, double cons, double dist) {
   m_wij += dataRate;
   m_totalConsumption += cons;
   m_totaCli++;
+  m_maxDistCli = (dist>m_maxDistCli) ? dist : m_maxDistCli;
 }
 
 void LocationModel::RemoveClient (double dataRate, double cons) {
@@ -305,9 +310,9 @@ void LocationModel::UpdatePosition (double mx, double my) { // normalizados
     NS_LOG_DEBUG ("ID\tX\tY");
     for (LocationModelContainer::Iterator clj = m_childList.Begin(); clj != m_childList.End(); ++clj) {
       NS_LOG_DEBUG ((*clj)->GetId() << "\t" << (*clj)->GetXPosition() << "\t" << (*clj)->GetYPosition());
-      x += (*clj)->GetXPosition() * m_punshNeigh;
-      y += (*clj)->GetYPosition() * m_punshNeigh;
-      plj += m_punshNeigh;
+      x += (*clj)->GetXPosition() * (*clj)->GetPunishNeighboor(); // URGENTE: lembrar de atualizar os documentos! usando Wm e nao Wn ! 
+      y += (*clj)->GetYPosition() * (*clj)->GetPunishNeighboor();
+      plj += (*clj)->GetPunishNeighboor();
     }
     NS_LOG_DEBUG ("Child x: " << x << "\ty: " << y << "\tplj: " << plj << "\tx/: " << x/plj << "\ty/: " << y/plj);
     x_f += x; y_f += y; plj_f += plj; // acumulando
@@ -342,20 +347,17 @@ bool LocationModel::UpdatePunishNeighboor (double uav_cob_norm) {
     m_punshNeigh *= 1.2;
     m_punshNeigh = (m_punshNeigh > 2) ? 2 : m_punshNeigh;
   }
-
   return m_connected;
-}
-
-double LocationModel::GetDataRate () {
-  return m_dataRate;
 }
 
 void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, double uav_cob) {
 
   if (dist*r_max <= uav_cob) {
     m_connected = true;
+    m_distFather = dist;
   } else {
     m_connected = false;
+    m_distFather = 0.0; // para nao atrapalhar no grafico do cenario
   }
 
   // FUTURO: pensar na metrica para futuro
@@ -364,6 +366,10 @@ void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, 
 
   m_distFather = dist;
   m_father = l;
+}
+
+double LocationModel::GetDistanceFather () {
+  return m_distFather;
 }
 
 Ptr<LocationModel> LocationModel::GetFather () {
@@ -383,15 +389,6 @@ void LocationModel::ClearChildList () {
 LocationModelContainer LocationModel::GetChildList () {
   return m_childList;
 }
-
-// void LocationModel::LimparAcumuladoPosicionamentoClientes () {
-//   m_xAcumCli = m_yAcumCli = 0.0;
-//   m_plj = 0.0;
-// }
-
-// void LocationModel::LimparAcumuladoPosicionamento () {
-//   m_xAcum = m_yAcum = 0.0;
-// }
 
 double LocationModel::GetXPosition (double r_max) {
   return m_position.at(0)/r_max;
@@ -416,26 +413,6 @@ double LocationModel::GetXPositionA () {
 double LocationModel::GetYPositionA () {
   return m_positionA.at(1);
 }
-
-// double LocationModel::GetXAcum() {
-//   return m_xAcum;
-// }
-
-// double LocationModel::GetYAcum() {
-//   return m_yAcum;
-// }
-
-// double LocationModel::GetXAcumCli() {
-//   return m_xAcumCli;
-// }
-
-// double LocationModel::GetYAcumCli() {
-//   return m_yAcumCli;
-// }
-
-// double LocationModel::GetPlj() {
-//   return m_plj;
-// }
 
 double LocationModel::GetChildListSize() {
   return (double)m_childList.GetN();
