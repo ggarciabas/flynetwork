@@ -83,9 +83,14 @@ ServerApplication::GetTypeId(void)
                                         MakeUintegerAccessor(&ServerApplication::m_cliPort),
                                         MakeUintegerChecker<uint16_t>())
                           .AddAttribute("PathData",
-                                        "Name of scenario",
+                                        "Path",
                                         StringValue(""),
                                         MakeStringAccessor(&ServerApplication::m_pathData),
+                                        MakeStringChecker())
+                          .AddAttribute("ScenarioName",
+                                        "Name of scenario",
+                                        StringValue(""),
+                                        MakeStringAccessor(&ServerApplication::m_scenarioName),
                                         MakeStringChecker())
                           .AddAttribute("Ipv4Address", "The address of the node",
                                         Ipv4AddressValue(),
@@ -1361,9 +1366,9 @@ void ServerApplication::runDA() {
   double pi = 3.141516; // pi
   double maxDrUav = 1024; // Mbps -- verificar alguma Ref!!
   double gain = 4; // dBi - tanto o ganho de recepcao como o de transmissao
-  double N_W = 10e-9*20e7; // dB - N0 = 10e-9 W/Hz -- B = 20MHz - Livro Goldsmith ref para N0 
+  double N_W = 10e-9*2e7; // dB - N0 = 10e-9 W/Hz -- B = 20MHz - Livro Goldsmith ref para N0 
   // Fuck explanation dB and log relation: https://www.physicsforums.com/threads/confusion-with-db-equation-10-or-20.641850/#post-4105917
-  double plRefCli_dB = 2*WattsToDb(4*pi*d0/(comp_onda/fcCli)); // dB - Friis Model
+  double plRefCli_dB = 20*std::log10(4*pi*d0/(comp_onda/fcCli)); // dB - Friis Model
   // --> https://www.isa.org/standards-publications/isa-publications/intech-magazine/2002/november/db-vs-dbm/
   // Use dB when expressing the ratio between two power values. Use dBm when expressing an absolute value of power.
   double prRefCli_dBm = ptUav + gain + gain - plRefCli_dB; // dBm - potencia do sinal na distancia de referencia
@@ -1518,7 +1523,7 @@ void ServerApplication::runDA() {
       if ((tMovCon >= tMov*0.8) && (tFixCon == tFix)) {
         NS_LOG_DEBUG("--> Finalizado - Feeting temp="<<t);
         t *= 0.5; // resfria bastante
-        GraficoCenarioDa(t, iter, lCentral, r_max);
+        GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max);
         break;
       }
     }
@@ -1537,7 +1542,7 @@ void ServerApplication::runDA() {
         nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max, uav_cob); 
     }
 
-    GraficoCenarioDa(t, iter, lCentral, r_max);
+    GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max);
 
     // Reiniciar Movimento A para cada Localizacao
     for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
@@ -1574,13 +1579,14 @@ void ServerApplication::runDA() {
   }
 }
 
-void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double r_max) {
+void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double uav_cob, double r_max) {
   std::ofstream file;
   std::ostringstream os;
   os.str("");
   os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/da_loc_cpp_" << std::setfill ('0') << std::setw (15) << iter << ".txt";
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
   file << iter << std::endl;
+  file << uav_cob << std::endl;
   
   LocationModelContainer::Iterator lj = m_locationContainer.Begin(); 
   lj = m_locationContainer.Begin(); // imprimindo distancia maxima com clientes
@@ -1642,19 +1648,11 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
   for (; lj != m_locationContainer.End(); ++lj) {
     file << "," << (*lj)->IsConnected();
   }
-  file << "\n";
-
-  lj = m_locationContainer.Begin(); // imprimindo distancia para pai
-  file << (*lj)->GetDistanceFather()*r_max;
-  lj++;
-  for (; lj != m_locationContainer.End(); ++lj) {
-    file << "," << (*lj)->GetDistanceFather()*r_max;
-  }
   file.close();
 
   os.str ("");
   // custo, etapa, main_path, teste, iter
-  os << "python ./scratch/flynetwork/data/da_loc.py custo_" << m_custo << " " << int(Simulator::Now().GetSeconds()) << " ./scratch/flynetwork/data/output/teste_1" << " False " << iter;
+  os << "python ./scratch/flynetwork/data/da_loc.py custo_" << m_custo << " " << int(Simulator::Now().GetSeconds()) << " ./scratch/flynetwork/data/output/" << m_scenarioName << "/ False " << iter;
   NS_LOG_DEBUG (os.str());
   system(os.str().c_str());
   // os.str ("");

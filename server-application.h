@@ -83,7 +83,7 @@ private:
   double CalculateDistanceCentral(const std::vector<double> pos);
   bool ValidateMijConvergency(vector<vector<double>> vec, vector<vector<double>> m_ij, unsigned siz);
   void ReplyUav(Ptr<UavModel> uav);
-  void GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double r_max);
+  void GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double uav_cob, double r_max);
   void GraficoCenarioDaPuro (double temp, int iter, Ptr<LocationModel> lCentral, double raio_cob);
 
   bool MovimentoA();
@@ -147,6 +147,7 @@ private:
   TracedCallback<string> m_clientPosition;
   TracedCallback<std::string> m_packetTrace;
   std::string m_pathData;
+  std::string m_scenarioName;
 
   int m_supplyPos;
   int m_totalCliGeral;

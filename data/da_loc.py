@@ -38,6 +38,10 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
         # iteracao do DA
         line = f_cen.readline().strip()
         iteracao = [float(x) for x in line.split(',')]
+        # distance uavcob
+        line = f_cen.readline().strip()
+        uavcob = [float(x) for x in line.split(',')]
+        uavcob = uavcob[0]
         # raio de cobertura
         line = f_cen.readline().strip()
         rcob = [float(x) for x in line.split(',')]
@@ -70,11 +74,7 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
         # connected
         line = f_cen.readline().strip()
         connected = [int(x) for x in line.split(',')]
-        line = f_cen.readline().strip()
-        distance = [float(x) for x in line.split(',')]
-        f_cen.close()
-        
-        uav_cob_max_dist = max(distance)
+        f_cen.close()        
 
         lId = np.arange(0,len(loc),1);        
 
@@ -99,7 +99,7 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
                 ax0.plot(loc_last[i],loc_last[i+1],'cX', markersize=7.0, label="anteior")
                 ax0.plot(loc[i],loc[i+1],'c^', markersize=7.0, label="atual")
                 ax0.add_patch(
-                    patches.Circle((loc[i],loc[i+1]), radius=float(uav_cob_max_dist), color='r', fill=False, linestyle='dashed')
+                    patches.Circle((loc[i],loc[i+1]), radius=float(uavcob), color='r', fill=False, linestyle='dashed')
                 )
                 ax0.add_patch(
                     patches.Circle((loc[i],loc[i+1]), radius=float(rcob[0]), color='b', fill=False, linestyle='dotted')
@@ -110,7 +110,7 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
                 ax0.plot(loc_last[i],loc_last[i+1],'cX', markersize=7.0)
                 ax0.plot(loc[i],loc[i+1],'c^', markersize=7.0)
                 ax0.add_patch(
-                    patches.Circle((loc[i],loc[i+1]), radius=float(uav_cob_max_dist), color='r', fill=False, linestyle='dashed')
+                    patches.Circle((loc[i],loc[i+1]), radius=float(uavcob), color='r', fill=False, linestyle='dashed')
                 )
                 ax0.add_patch(
                     patches.Circle((loc[i],loc[i+1]), radius=float(rcob[0]), color='b', fill=False, linestyle='dotted')
@@ -135,7 +135,7 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
 
         ax0.plot(central[0],central[1],'g*', markersize=7.0, label="central")
 
-        ax0.set_title("Cenario @"+'etapa/'+str(etapa)+"s Temp.:"+str(temp[0])+ " Iter:"+str(iteracao[0])+" CobUav: "+ str(uav_cob_max_dist))
+        ax0.set_title("Cenario @"+'etapa/'+str(etapa)+"s Temp.:"+str(temp[0])+ " Iter:"+str(iteracao[0])+" CobUav: "+ str(uavcob))
         ax0.set_ylabel('Y (m)')
         ax0.set_xlabel('X (m)')
         ax0.set_xlim([0,lim[0]])

@@ -133,8 +133,6 @@ public:
 
   void UpdatePosition (double mx, double my);
 
-  double GetDistanceFather ();
-
 private:
   void DoDispose ();
   std::vector<double> m_positionA;

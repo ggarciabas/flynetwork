@@ -368,10 +368,6 @@ void LocationModel::SetFather (Ptr<LocationModel> l, double dist, double r_max, 
   m_father = l;
 }
 
-double LocationModel::GetDistanceFather () {
-  return m_distFather;
-}
-
 Ptr<LocationModel> LocationModel::GetFather () {
   return m_father;
 }

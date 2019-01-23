@@ -222,6 +222,7 @@ void UavNetwork::Run()
       NS_LOG_ERROR("Não foi possivel identificar o cenario!");
       exit(-1);
   }
+  m_scenarioName = ss.str();
   // ler informacoes do arquivo
   m_PathData = ss.str();
   ss_ << "./scratch/flynetwork/data/scenarios/" << m_PathData << ".txt";
@@ -403,6 +404,7 @@ void UavNetwork::ConfigureServer()
   obj.Set("MaxX", DoubleValue(m_xmax));
   obj.Set("MaxY", DoubleValue(m_ymax));
   obj.Set("PathData", StringValue(m_pathData));
+  obj.Set("ScenarioName", StringValue(m_scenarioName));
   obj.Set("ScheduleServer", DoubleValue(m_scheduleServer));
   obj.Set("Custo", UintegerValue(m_custo));
 
