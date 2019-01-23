@@ -1350,37 +1350,32 @@ void ServerApplication::runDA() {
   double r_max = std::sqrt(std::pow(m_maxx, 2) + std::pow(m_maxy, 2));
   // 1550 series https://www.cisco.com/c/en/us/products/collateral/wireless/aironet-1550-series/data_sheet_c78-641373.html
   // 1570 series https://www.cisco.com/c/en/us/products/wireless/aironet-1570-series/datasheet-listing.html
-  double ptUav = 30; // dBm - potencia de transmissao máxima para o AP Aironet 1570 series 802.11ac 5GHz
-  // double sinrUavMin = -92; // dBm - tabela de Receive sensitivity para 5GHz 802.11ac (VHT20) MCS 0
-  // double fcUav = 5e9; // Hz - frequencia
-  double uav_cob = 408.739; // metros Verificar anotaca Pathloss - valor encontrado para sinrUAvMin - 20dBm=288.964 30dBm=408.739
+  double uav_cob = 280.5; // metros verificar distancia_sinr.py
   double ptCli = 28; // dBm - potencia de transmissao máxima para o Ap Aironet 1550 series 802.11n 2.4GHz
   double fsInterf = 0.0008; // fator de sobreposicao de espaco 5 (50%)
-  // double dRUav = 6.5; // Mbps - taxa considerada por UAV
   double dRCli = 6.5; // Mbps - taxa considerada por usuário
   double raio_cob = 115.47; // metros - para clientes utilizando equação de antena direcional com esparramento verificar Klaine2018
   double sinrCliMin = -93; // dBm - tabela de Receive sensitivity para 2.4GHz 802.11n (HT20) MCS 0
-  double fcCli = 2.4e9; // Hz - frequencia
-  double comp_onda = 3e8; // m - comprimento de onda
-  double d0 = 1; // m - distancia de referencia
+  double lambda = 3e8/2.4e9; // metros
+  double b = 3.7; 
   double pi = 3.141516; // pi
   double maxDrUav = 1024; // Mbps -- verificar alguma Ref!!
   double gain = 4; // dBi - tanto o ganho de recepcao como o de transmissao
   double N_W = 10e-9*2e7; // dB - N0 = 10e-9 W/Hz -- B = 20MHz - Livro Goldsmith ref para N0 
   // Fuck explanation dB and log relation: https://www.physicsforums.com/threads/confusion-with-db-equation-10-or-20.641850/#post-4105917
-  double plRefCli_dB = 20*std::log10(4*pi*d0/(comp_onda/fcCli)); // dB - Friis Model
+  double pl_ref = 20*std::log10(4*pi/lambda); // dB - Friis Model
   // --> https://www.isa.org/standards-publications/isa-publications/intech-magazine/2002/november/db-vs-dbm/
   // Use dB when expressing the ratio between two power values. Use dBm when expressing an absolute value of power.
-  double prRefCli_dBm = ptUav + gain + gain - plRefCli_dB; // dBm - potencia do sinal na distancia de referencia
-  double taxa_capacidade = 1.01; // NOVO: 120%
+  double pr_ref = ptCli + gain + gain - pl_ref; // dBm - potencia do sinal na distancia de referencia
+  double taxa_capacidade = 1.01; 
   double t = 0.6;
   int locId = 0;
   int max_iterB = 5000;
 
-  NS_LOG_DEBUG ("\n\t t_min =" << t_min << "\n \t r_max =" << r_max << "\n \t ptUav ="<< ptUav << "\n \t ptCli =" << ptCli << "\n \t fsInterf ="
-              << fsInterf  << "\n \t dRCli =" << dRCli << "\n \t sinrCliMin =" << sinrCliMin<< "\n \t fcCli ="
-              << fcCli  << "\n \t comp_onda =" << comp_onda << "\n \t pi =" << pi << "\n \t maxDrUav =" << maxDrUav << "\n \t gain =" << gain
-                << "\n \t N_W =" << N_W <<  "\n \t  taxa_capacidade ="  << taxa_capacidade << "\n \t t =" << t <<  "\n \t locId =" << locId << "\n \t max_iterB =" << max_iterB << "\n\tplRefCli_dB: " << plRefCli_dB << "uav_cob: " << uav_cob);
+  // NS_LOG_DEBUG ("\n\t t_min =" << t_min << "\n \t r_max =" << r_max << "\n \t ptUav ="<< ptUav << "\n \t ptCli =" << ptCli << "\n \t fsInterf ="
+  //             << fsInterf  << "\n \t dRCli =" << dRCli << "\n \t sinrCliMin =" << sinrCliMin<< "\n \t fcCli ="
+  //             << fcCli  << "\n \t comp_onda =" << comp_onda << "\n \t pi =" << pi << "\n \t maxDrUav =" << maxDrUav << "\n \t gain =" << gain
+  //               << "\n \t N_W =" << N_W <<  "\n \t  taxa_capacidade ="  << taxa_capacidade << "\n \t t =" << t <<  "\n \t locId =" << locId << "\n \t max_iterB =" << max_iterB << "\n\tplRefCli_dB: " << plRefCli_dB << "uav_cob: " << uav_cob);
 
   ObjectFactory lObj;
   lObj.SetTypeId("ns3::LocationModel");
@@ -1431,8 +1426,8 @@ void ServerApplication::runDA() {
           if (low_dchilj > dcilj) { // achou UAV mais proximo
             low_dchilj = dcilj;
             // https://bitbucket.org/cpgeimestrado/rascunhocpgei/src/master/conversor.cpp
-            double pl_dB = 2*3.32*WattsToDb(dcilj*r_max)+0; // dB - Beta para ambiente outdoor - LogDistance (ver dissertacao)
-            long double pr_W = dBmToWatts(prRefCli_dBm - pl_dB); // W
+            double pl_dB = 10*std::log10(dcilj)*b; // dB - modelo simplificado goldsmith
+            long double pr_W = dBmToWatts(pr_ref - pl_dB); // W
             long double it_W = fsInterf*pr_W; // w        
             long double sinr_W = pr_W / (it_W + N_W); // W - modelo de goldsmith considera para escalar!!!
             long double sinr_dBm = WattsToDbm(sinr_W); // dBm
