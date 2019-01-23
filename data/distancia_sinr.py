@@ -9,10 +9,9 @@ fs = 0.0008 # fator de sobreposicao
 N0 = 10e-9 # W/Hz ruido
 B = 2e7 # 20MHz banda
 co = 3e8 # comprimento de onda M
-pt = 30.0 # dbm potencia de transmissao
 gain = 4.0 # dbi ganho
 
-def busca(fc, sinr_min):
+def busca(fc, pt, sinr_min):
     lamb = co/fc # lambda   
     pl_ref = 20*np.log10(4*3.141516*d0/lamb) # db path loss
     pr_ref = pt + gain + gain - pl_ref # dbm potencia recebida
@@ -81,7 +80,7 @@ def busca(fc, sinr_min):
 
 # uav
 print "UAV"
-busca(5e9, -92)
+busca(5e9, 30, -92)
 # client
 print "CLIENT"
-busca(2.4e9, -93)
+busca(2.4e9, 28, -93)
