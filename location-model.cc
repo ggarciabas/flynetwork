@@ -424,14 +424,16 @@ bool LocationModel::IsConnected () {
 }
 
 bool LocationModel::ValidarCapacidade (double maxDrUav, double taxa_capacidade) {
+  m_punshCapacity = m_wij/maxDrUav;
   if (m_wij > maxDrUav) {
     // atualizar taxa de punicao
-    m_punshCapacity *= taxa_capacidade;
+  //   m_punshCapacity *= taxa_capacidade;
     return false;
-  } else {
-    m_punshCapacity *= 0.6; // NOVO: reduz 60%
-    m_punshCapacity = (m_punshCapacity<0.01)?0.01:m_punshCapacity; // define um minimo!
   }
+  // } else {
+  //   m_punshCapacity *= std::exp (-1+(m_wij/maxDrUav)); 
+  //   m_punshCapacity = (m_punshCapacity>0.01)?m_punshCapacity:0.01;
+  // }
   return true;
 }
 

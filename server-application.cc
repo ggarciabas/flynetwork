@@ -1393,7 +1393,7 @@ void ServerApplication::runDA() {
   CentroDeMassa(loc, lCentral, r_max);
   loc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
   loc->IniciarMovimentoB();
-  loc->SetPunishCapacity(0.5);
+  loc->SetPunishCapacity(0);
   loc->SetPunishNeighboor(0.2); // ALTERADO: valor inicial de punicao!
   loc->InitializeWij (m_clientDaContainer.GetN()*dRCli); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
   loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), r_max, uav_cob);
@@ -1456,7 +1456,7 @@ void ServerApplication::runDA() {
           }
         }
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-          if (Zci < 1e-30) {
+          if (Zci < 1e-90) {
             t = 0.1;
             NS_LOG_DEBUG("--> Solicitando nova localizacao pois Zci esta baixo! @" << Simulator::Now().GetSeconds());
             goto new_uav;
@@ -1540,7 +1540,7 @@ void ServerApplication::runDA() {
         nLoc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
         nLoc->IniciarMovimentoB();
         m_locationContainer.Add(nLoc);
-        nLoc->SetPunishCapacity(0.5);
+        nLoc->SetPunishCapacity(0);
         nLoc->SetPunishNeighboor(0.2);
         nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
         nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max, uav_cob); 
@@ -1553,7 +1553,6 @@ void ServerApplication::runDA() {
       (*lj)->IniciarMovimentoA();
       (*lj)->LimparHistorico();
       (*lj)->UpdatePunishNeighboor(uav_cob/r_max);
-      (*lj)->InitializeWij(0.0); // zerando para calcular novamente os clientes conectados, considerando agora a distancia!
     }
 
     t = t*0.9; // reduz 90%  a tempreatura

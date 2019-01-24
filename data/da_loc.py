@@ -88,7 +88,7 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
         lId = np.arange(0,len(loc),1);        
 
         fig = plt.figure(figsize=(15,4))
-        ax0 = fig.add_subplot(221)
+        ax0 = fig.add_subplot(121)
 
         # https://matplotlib.org/api/markers_api.html points
         first = True
@@ -163,13 +163,13 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
         plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_scenario'+da+'_{:015}'.format(int(iteracao[0]))+'.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
         # plt.savefig('teste.svg')
 
-        fig.set_size_inches(16, 12, forward=False)
+        fig.set_size_inches(16, 6, forward=False)
 
         # All
         # print data
         df = pd.DataFrame(data) #, index=lId)
         # # print df
-        ax1 = fig.add_subplot(222)
+        ax1 = fig.add_subplot(122)
         df.plot.bar(ax=ax1)
         ax1.set_title(u'Informações da Localização')
         ax1.set_ylabel('0-1')
@@ -177,11 +177,11 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
 
         # client datarate
         df_cli = pd.DataFrame(data_cli)
-        ax2 = fig.add_subplot(223)
-        df_cli.plot.bar(ax=ax2)
-        ax2.set_title(u'Informações do Cliente')
-        ax2.set_ylabel('Taxa (Mbps)')
-        ax2.set_xlabel(u'Clientes')
+        # ax2 = fig.add_subplot(223)
+        # df_cli.plot.bar(ax=ax2)
+        # ax2.set_title(u'Informações do Cliente')
+        # ax2.set_ylabel('Taxa (Mbps)')
+        # ax2.set_xlabel(u'Clientes')
 
         plt.tight_layout()
         plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_'+da+'_{:015}'.format(int(iteracao[0]))+'.png')
