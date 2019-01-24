@@ -1423,8 +1423,7 @@ void ServerApplication::runDA() {
           double dcilj = CalculateDistance((*ci)->GetPosition(r_max), (*lj)->GetPosition(r_max));
           double pljci = std::exp ( - ((dcilj + (*lj)->GetPunishCapacity()*(*lj)->GetWij() )/t) );
           Zci += pljci;
-          (*lj)->SetTempPljci(pljci);
-          (*lj)->InitializeWij(0.0); // zerando para calcular novamente os clientes conectados, considerando agora a distancia!
+          (*lj)->SetTempPljci(pljci);          
           if (low_dchilj > dcilj) { // achou UAV mais proximo
             low_dchilj = dcilj;
             // https://bitbucket.org/cpgeimestrado/rascunhocpgei/src/master/conversor.cpp
@@ -1434,7 +1433,7 @@ void ServerApplication::runDA() {
             long double sinr_W = pr_W / (it_W + N_W); // W - modelo de goldsmith considera para escalar!!!
             long double sinr_dBm = WattsToDbm(sinr_W); // dBm
             if (low_dchilj <= raio_cob/r_max && sinr_dBm >= sinrCliMin) { // esta dentro da area de cobertura maxima da antena e recebe SINR min
-              // //NS_LOG_DEBUG ("-> CLI " << (*ci)->GetLogin() <<  " com " << (*lj)->GetId() << "\t Distancia: " << dcilj*r_max << "\t SINR: " << sinr_dBm << "dBm");
+              // NS_LOG_DEBUG ("-> CLI " << (*ci)->GetLogin() <<  " com " << (*lj)->GetId() << "\t Distancia: " << dcilj*r_max << "\t SINR: " << sinr_dBm << "dBm");
               Ptr<LocationModel> lCon = (*ci)->GetLocConnected();
               (*ci)->SetConnected(true);
               (*ci)->SetDataRate(sinr_dBm);                    
@@ -1527,7 +1526,7 @@ void ServerApplication::runDA() {
       if ((tMovCon >= tMov*0.8) && (tFixCon == tFix)) {
         //NS_LOG_DEBUG("--> Finalizado - Feeting temp="<<t);
         t *= 0.5; // resfria bastante
-        GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob);
+        GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
         break;
       }
     }
@@ -1547,13 +1546,14 @@ void ServerApplication::runDA() {
         nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max, uav_cob); 
     }
 
-    GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob);
+    GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
 
     // Reiniciar Movimento A para cada Localizacao
     for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
       (*lj)->IniciarMovimentoA();
       (*lj)->LimparHistorico();
       (*lj)->UpdatePunishNeighboor(uav_cob/r_max);
+      (*lj)->InitializeWij(0.0); // zerando para calcular novamente os clientes conectados, considerando agora a distancia!
     }
 
     t = t*0.9; // reduz 90%  a tempreatura
@@ -1584,7 +1584,7 @@ void ServerApplication::runDA() {
   }
 }
 
-void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double uav_cob, double r_max, double max_antena) {
+void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double uav_cob, double r_max, double max_antena, double maxDrUav) {
   std::ofstream file;
   std::ostringstream os;
   os.str("");
@@ -1657,16 +1657,16 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
   file << "\n";
 
   lj = m_locationContainer.Begin(); // imprimindo Wij
-  file << (*lj)->GetWij();
+  file << (*lj)->GetWij()/maxDrUav;
   lj++;
   for (; lj != m_locationContainer.End(); ++lj) {
-    file << "," << (*lj)->GetWij();
+    file << "," << (*lj)->GetWij()/maxDrUav;
   }
   file << "\n";
   // data rate client
-  ClientModelContainer::Iterator ci = m_clientContainer.Begin();
+  ClientModelContainer::Iterator ci = m_clientDaContainer.Begin();
   file << (*ci)->GetDataRate();
-  for (; ci != m_clientContainer.End(); ++ci) {
+  for (; ci != m_clientDaContainer.End(); ++ci) {
     file << "," << (*ci)->GetDataRate();
   }
 

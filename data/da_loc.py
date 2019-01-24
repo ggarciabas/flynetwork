@@ -178,7 +178,7 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
         # client datarate
         df_cli = pd.DataFrame(data_cli)
         ax2 = fig.add_subplot(223)
-        df.plot.bar(ax=ax1)
+        df_cli.plot.bar(ax=ax2)
         ax2.set_title(u'Informações do Cliente')
         ax2.set_ylabel('Taxa (Mbps)')
         ax2.set_xlabel(u'Clientes')
