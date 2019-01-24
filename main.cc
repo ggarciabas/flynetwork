@@ -55,7 +55,7 @@ int main (int argc, char *argv[])
 
 	// LogComponentEnable("UavNetwork", LOG_DEBUG);
 	LogComponentEnable("ServerApplication", LOG_DEBUG);
-	LogComponentEnable("LocationModel", LOG_DEBUG);
+	// LogComponentEnable("LocationModel", LOG_DEBUG);
 	// LogComponentEnable("UavApplication", LOG_DEBUG);
 	// LogComponentEnable("SmartphoneApplication", LOG_DEBUG);
 	// LogComponentEnable("DhcpClient", LOG_DEBUG);
