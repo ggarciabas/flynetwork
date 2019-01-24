@@ -341,8 +341,9 @@ void LocationModel::UpdatePosition (double mx, double my) { // normalizados
 
 bool LocationModel::UpdatePunishNeighboor (double uav_cob_norm) {
   if (m_distFather <= uav_cob_norm) {
-    m_punshNeigh *= std::exp (-1+(m_distFather/uav_cob_norm)); // m_punshNeigh * 0.9; // 
-    m_punshNeigh = (m_punshNeigh>0.01)?m_punshNeigh:0.01;
+    // m_punshNeigh *= std::exp (-1+(m_distFather/uav_cob_norm)); // m_punshNeigh * 0.9; // 
+    // m_punshNeigh = (m_punshNeigh>0.01)?m_punshNeigh:0.01;
+    m_punshNeigh = 0.1;
   } else {
     m_punshNeigh *= 1.2;
     m_punshNeigh = (m_punshNeigh > 2) ? 2 : m_punshNeigh;
