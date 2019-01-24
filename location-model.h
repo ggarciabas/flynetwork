@@ -51,6 +51,8 @@ public:
   void SetId(uint32_t);
   uint32_t GetId();
 
+  void UpdateDistCli (double);
+
   void SetPosition(double, double);
   const std::vector<double> GetPosition();
 

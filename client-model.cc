@@ -170,6 +170,9 @@ double ClientModel::GetYPosition () {
   return m_position.at(1);
 }
 
+void ClientModel::EraseLocation() {
+  m_locConnected = 0;
+}
 
 void ClientModel::SetLocConnected (Ptr<LocationModel> l) {
   m_locConnected = l;

@@ -49,6 +49,8 @@ public:
 
   void SetPosition(double, double);
   const std::vector<double> GetPosition();
+  
+  void EraseLocation();
 
   const std::vector<double> GetPosition(double);
 

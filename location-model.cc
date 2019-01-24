@@ -244,6 +244,10 @@ double LocationModel::GetMaxDistClient () {
   return m_maxDistCli;
 }
 
+void LocationModel::UpdateDistCli (double d) {
+  m_maxDistCli = (d>m_maxDistCli) ? d : m_maxDistCli;
+}
+
 void LocationModel::NewClient (double dataRate, double cons, double dist) {
   m_wij += dataRate;
   m_totalConsumption += cons;

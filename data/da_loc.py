@@ -19,7 +19,7 @@ t = sys.argv[4]
 i = sys.argv[5]
 
 def da_loc (custo, etapa, main_path, teste, it=-1):
-    print "DA LOc - new Graphic"
+    # print "DA LOc - new Graphic"
     f_cen = open(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/client.txt','r')
     line = f_cen.readline().strip()
     cli = [x for x in line.split(',')]
@@ -42,6 +42,10 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
         line = f_cen.readline().strip()
         uavcob = [float(x) for x in line.split(',')]
         uavcob = uavcob[0]
+        # distance max_antena_cli
+        line = f_cen.readline().strip()
+        maxclicob = [float(x) for x in line.split(',')]
+        maxclicob = maxclicob[0]
         # raio de cobertura
         line = f_cen.readline().strip()
         rcob = [float(x) for x in line.split(',')]
@@ -74,12 +78,17 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
         # connected
         line = f_cen.readline().strip()
         connected = [int(x) for x in line.split(',')]
+        line = f_cen.readline().strip()
+        data["Wij"] = [float(x) for x in line.split(',')]
+        data_cli = {}
+        line = f_cen.readline().strip()
+        data_cli["DR"] = [float(x) for x in line.split(',')]        
         f_cen.close()        
 
         lId = np.arange(0,len(loc),1);        
 
         fig = plt.figure(figsize=(15,4))
-        ax0 = fig.add_subplot(121)
+        ax0 = fig.add_subplot(221)
 
         # https://matplotlib.org/api/markers_api.html points
         first = True
@@ -104,6 +113,9 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
                 ax0.add_patch(
                     patches.Circle((loc[i],loc[i+1]), radius=float(rcob[0]), color='b', fill=False, linestyle='dotted')
                 )
+                ax0.add_patch(
+                    patches.Circle((loc[i],loc[i+1]), radius=float(maxclicob), color='g', fill=False, linestyle='dotted')
+                )
                 ax0.plot(x,y,'c-', markersize=7.0)
                 first = False
             else:
@@ -114,6 +126,9 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
                 )
                 ax0.add_patch(
                     patches.Circle((loc[i],loc[i+1]), radius=float(rcob[0]), color='b', fill=False, linestyle='dotted')
+                )
+                ax0.add_patch(
+                    patches.Circle((loc[i],loc[i+1]), radius=float(maxclicob), color='g', fill=False, linestyle='dotted')
                 )
                 ax0.plot(x,y,'c-', markersize=7.0)
             
@@ -148,17 +163,26 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
         plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_scenario'+da+'_{:015}'.format(int(iteracao[0]))+'.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
         # plt.savefig('teste.svg')
 
-        fig.set_size_inches(16, 6, forward=False)
+        fig.set_size_inches(16, 12, forward=False)
 
         # All
-        print data
+        # print data
         df = pd.DataFrame(data) #, index=lId)
-        # print df
-        ax1 = fig.add_subplot(122)
+        # # print df
+        ax1 = fig.add_subplot(222)
         df.plot.bar(ax=ax1)
         ax1.set_title(u'Informações da Localização')
         ax1.set_ylabel('0-1')
         ax1.set_xlabel(u'Localizações')
+
+        # client datarate
+        df_cli = pd.DataFrame(data_cli)
+        ax2 = fig.add_subplot(223)
+        df.plot.bar(ax=ax1)
+        ax2.set_title(u'Informações do Cliente')
+        ax2.set_ylabel('Taxa (Mbps)')
+        ax2.set_xlabel(u'Clientes')
+
         plt.tight_layout()
         plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_'+da+'_{:015}'.format(int(iteracao[0]))+'.png')
         plt.clf()
@@ -169,11 +193,22 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
         ax.set_ylabel('0-1')
         ax.set_xlabel(u'Localizações')
 
-        plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_hsit_'+da+'_{:015}'.format(int(iteracao[0]))+'.svg')
-        plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_hsit_'+da+'_{:015}'.format(int(iteracao[0]))+'.eps')
+        # plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_hist_'+da+'_{:015}'.format(int(iteracao[0]))+'.svg')
+        # plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_hist_'+da+'_{:015}'.format(int(iteracao[0]))+'.eps')
         plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_hist_'+da+'_{:015}'.format(int(iteracao[0]))+'.png')
         plt.clf()
 
+        ax = df_cli.plot.bar(rot=0)
+
+        ax.set_title(u'Informações do Cliente')
+        ax.set_ylabel('Taxa (Mbps)')
+        ax.set_xlabel(u'Clientes')
+
+        # plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/client_dr_'+da+'_{:015}'.format(int(iteracao[0]))+'.svg')
+        # plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/client_dr_'+da+'_{:015}'.format(int(iteracao[0]))+'.eps')
+        plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/client_dr_'+da+'_{:015}'.format(int(iteracao[0]))+'.png')
+        plt.clf()
+
 if __name__ == "__main__":
-    print m
+    # print m
     da_loc(c, e, m, t, i)    

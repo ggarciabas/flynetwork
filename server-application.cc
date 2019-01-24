@@ -1320,6 +1320,7 @@ void ServerApplication::runDA() {
   double pFix = 2; // peso dos clientes fixos - clientes móveis sempre com peso de 1"
   for (ClientModelContainer::Iterator i = m_clientContainer.Begin(); i != m_clientContainer.End(); ++i)
   {
+    (*i)->EraseLocation();
     (*i)->SetPci(1/(tMov+tFix*pFix));
     if (first) {
       file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
@@ -1330,6 +1331,7 @@ void ServerApplication::runDA() {
   }
   for (ClientModelContainer::Iterator i = m_fixedClientContainer.Begin(); i != m_fixedClientContainer.End(); ++i)
   {
+    (*i)->EraseLocation();
     (*i)->SetPci(pFix/(tMov+tFix*pFix));
     if (first) {
       file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
@@ -1434,16 +1436,23 @@ void ServerApplication::runDA() {
             if (low_dchilj <= raio_cob/r_max && sinr_dBm >= sinrCliMin) { // esta dentro da area de cobertura maxima da antena e recebe SINR min
               // //NS_LOG_DEBUG ("-> CLI " << (*ci)->GetLogin() <<  " com " << (*lj)->GetId() << "\t Distancia: " << dcilj*r_max << "\t SINR: " << sinr_dBm << "dBm");
               Ptr<LocationModel> lCon = (*ci)->GetLocConnected();
+              (*ci)->SetConnected(true);
+              (*ci)->SetDataRate(sinr_dBm);                    
               if (lCon) { // caso tenha alguma informacao anterior, desconsidera nos calculos, para isto atualiza o loc
+                lCon->toString();
+                if (lCon->GetId() == (*lj)->GetId()) {
+                  lCon->UpdateDistCli (dcilj);
+                  lCon = 0;
+                  continue; // nao faz alteracoes! Desnecessario!
+                } 
                 lCon->RemoveClient(dRCli, (*ci)->GetConsumption());
               }
               lCon = 0;
               (*ci)->SetLocConnected((*lj));
               // calcular a SNR e caso seja maior que o mínimo, considerar cliente conectado
               (*lj)->NewClient(dRCli, (*ci)->GetConsumption(), dcilj);
-              (*ci)->SetConnected(true);
               (*ci)->SetDataRate(sinr_dBm);               
-              //NS_LOG_DEBUG("tFix: " << tFixCon << "\ttMovCon: " << tMovCon);            
+              //NS_LOG_DEBUG("tFix: " << tFixCon << "\ttMovCon: " << tMovCon);   
             }
           }
         }
@@ -1518,7 +1527,7 @@ void ServerApplication::runDA() {
       if ((tMovCon >= tMov*0.8) && (tFixCon == tFix)) {
         //NS_LOG_DEBUG("--> Finalizado - Feeting temp="<<t);
         t *= 0.5; // resfria bastante
-        GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max);
+        GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob);
         break;
       }
     }
@@ -1538,7 +1547,7 @@ void ServerApplication::runDA() {
         nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max, uav_cob); 
     }
 
-    GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max);
+    GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob);
 
     // Reiniciar Movimento A para cada Localizacao
     for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
@@ -1575,7 +1584,7 @@ void ServerApplication::runDA() {
   }
 }
 
-void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double uav_cob, double r_max) {
+void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double uav_cob, double r_max, double max_antena) {
   std::ofstream file;
   std::ostringstream os;
   os.str("");
@@ -1583,6 +1592,7 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
   file << iter << std::endl;
   file << uav_cob << std::endl;
+  file << max_antena << std::endl;
   
   LocationModelContainer::Iterator lj = m_locationContainer.Begin(); 
   lj = m_locationContainer.Begin(); // imprimindo distancia maxima com clientes
@@ -1644,6 +1654,22 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
   for (; lj != m_locationContainer.End(); ++lj) {
     file << "," << (*lj)->IsConnected();
   }
+  file << "\n";
+
+  lj = m_locationContainer.Begin(); // imprimindo Wij
+  file << (*lj)->GetWij();
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    file << "," << (*lj)->GetWij();
+  }
+  file << "\n";
+  // data rate client
+  ClientModelContainer::Iterator ci = m_clientContainer.Begin();
+  file << (*ci)->GetDataRate();
+  for (; ci != m_clientContainer.End(); ++ci) {
+    file << "," << (*ci)->GetDataRate();
+  }
+
   file.close();
 
   os.str ("");
