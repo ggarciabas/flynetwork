@@ -218,14 +218,6 @@ bool LocationModel::MovimentoB () {
   return true;
 }
 
-void LocationModel::SetPunishCapacity (double pn) {
-  m_punshCapacity = pn;
-}
-
-double LocationModel::GetPunishCapacity () {
-  return m_punshCapacity;
-}
-
 void LocationModel::SetPunishNeighboor (double pn) {
   m_punshNeigh = pn;
 }
@@ -267,23 +259,14 @@ double LocationModel::GetWij () {
 
 void LocationModel::SetTempPljci (double pljci) {
   m_tempPljci = pljci;
-  // std::cout << " " << pljci;
 }
 
 double LocationModel::AddPljCiPuro (Ptr<ClientModel> ci, double Zci, double r_max) {
-  // calculando parte do novo posicionamento da localização
-  // m_xAcumCli += ci->GetPci()*(m_tempPljci/Zci)*ci->GetXPosition();
-  // m_yAcumCli += ci->GetPci()*(m_tempPljci/Zci)*ci->GetYPosition();
-  // m_plj += ci->GetPci()*(m_tempPljci/Zci);
   return (m_tempPljci/Zci);
 }
 
 void LocationModel::AddPljCi (Ptr<ClientModel> ci, double Zci, double r_max) {
   m_pljci[ci] = m_tempPljci/Zci;
-  // calculando parte do novo posicionamento da localização
-  // m_xAcumCli += ci->GetPci()*(m_pljci[ci])*ci->GetXPosition(r_max);
-  // m_yAcumCli += ci->GetPci()*(m_pljci[ci])*ci->GetYPosition(r_max);
-  // m_plj += ci->GetPci()*(m_pljci[ci]);
 }
 
 void LocationModel::UpdatePosition (double mx, double my) { // normalizados
@@ -423,18 +406,11 @@ bool LocationModel::IsConnected () {
   return m_connected;
 }
 
-bool LocationModel::ValidarCapacidade (double maxDrUav, double taxa_capacidade) {
-  m_punshCapacity = m_wij/maxDrUav;
-  if (m_wij > maxDrUav) {
-    // atualizar taxa de punicao
-  //   m_punshCapacity *= taxa_capacidade;
-    return false;
+bool LocationModel::ValidarCapacidade (double maxDr) {
+  if (m_wij <= maxDr) {
+    return true;
   }
-  // } else {
-  //   m_punshCapacity *= std::exp (-1+(m_wij/maxDrUav)); 
-  //   m_punshCapacity = (m_punshCapacity>0.01)?m_punshCapacity:0.01;
-  // }
-  return true;
+  return false;
 }
 
 void LocationModel::LimparMapaPljci () {

@@ -70,7 +70,6 @@ public:
       << ")\n\tPosA: (" << m_positionA.at(0) << "," << m_positionA.at(1)
       << ")\n\tPosB: (" << m_positionB.at(0) << "," << m_positionB.at(1)
       << ")\n\tConsumption: " << m_totalConsumption
-      << "\n\tPunCap: " << m_punshCapacity
       << "\n\tPunNeigh: " << m_punshNeigh
       << "\n\tWij: " << m_wij
       << "\n\tConnected: " << ((m_connected) ? "true" : "false") << std::endl;
@@ -90,9 +89,6 @@ public:
   void IniciarMovimentoB();
   bool MovimentoA ();
   bool MovimentoB ();
-
-  void SetPunishCapacity (double);
-  double GetPunishCapacity ();
 
   void SetPunishNeighboor (double);
   double GetPunishNeighboor ();
@@ -122,7 +118,7 @@ public:
   void SetConnected (bool);
   bool IsConnected ();
 
-  bool ValidarCapacidade (double, double);
+  bool ValidarCapacidade (double);
 
   void LimparMapaPljci ();
 
@@ -143,7 +139,6 @@ private:
   bool m_changePosition; // variavel para permitir trocar de posicao, verificar issue: https://github.com/ggarciabas/flynetwork/issues/10
   double m_tempPljci;
   double m_wij;
-  double m_punshCapacity; // punicao de capacidade
   double m_punshNeigh; // punicao de conexao com vizinho
   bool m_used;
   int m_totaCli;

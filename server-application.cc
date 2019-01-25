@@ -1369,7 +1369,6 @@ void ServerApplication::runDA() {
   // --> https://www.isa.org/standards-publications/isa-publications/intech-magazine/2002/november/db-vs-dbm/
   // Use dB when expressing the ratio between two power values. Use dBm when expressing an absolute value of power.
   double pr_ref = ptCli + gain + gain - pl_ref; // dBm - potencia do sinal na distancia de referencia
-  double taxa_capacidade = 1.01; 
   double t = 0.6;
   int locId = 0;
   int max_iterB = 5000;
@@ -1377,7 +1376,7 @@ void ServerApplication::runDA() {
   // //NS_LOG_DEBUG ("\n\t t_min =" << t_min << "\n \t r_max =" << r_max << "\n \t ptUav ="<< ptUav << "\n \t ptCli =" << ptCli << "\n \t fsInterf ="
   //             << fsInterf  << "\n \t dRCli =" << dRCli << "\n \t sinrCliMin =" << sinrCliMin<< "\n \t fcCli ="
   //             << fcCli  << "\n \t comp_onda =" << comp_onda << "\n \t pi =" << pi << "\n \t maxDrUav =" << maxDrUav << "\n \t gain =" << gain
-  //               << "\n \t N_W =" << N_W <<  "\n \t  taxa_capacidade ="  << taxa_capacidade << "\n \t t =" << t <<  "\n \t locId =" << locId << "\n \t max_iterB =" << max_iterB << "\n\tplRefCli_dB: " << plRefCli_dB << "uav_cob: " << uav_cob);
+  //               << "\n \t N_W =" << N_W << "\n \t t =" << t <<  "\n \t locId =" << locId << "\n \t max_iterB =" << max_iterB << "\n\tplRefCli_dB: " << plRefCli_dB << "uav_cob: " << uav_cob);
 
   ObjectFactory lObj;
   lObj.SetTypeId("ns3::LocationModel");
@@ -1393,7 +1392,6 @@ void ServerApplication::runDA() {
   CentroDeMassa(loc, lCentral, r_max);
   loc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
   loc->IniciarMovimentoB();
-  loc->SetPunishCapacity(0);
   loc->SetPunishNeighboor(0.2); // ALTERADO: valor inicial de punicao!
   loc->InitializeWij (m_clientDaContainer.GetN()*dRCli); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
   loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), r_max, uav_cob);
@@ -1421,7 +1419,7 @@ void ServerApplication::runDA() {
         double low_dchilj = 1.5; // maior distancia é 1.0, valores normalizados!
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           double dcilj = CalculateDistance((*ci)->GetPosition(r_max), (*lj)->GetPosition(r_max));
-          double pljci = std::exp ( - ((dcilj + (*lj)->GetPunishCapacity()*(*lj)->GetWij() )/t) );
+          double pljci = std::exp ( - ((dcilj + (*lj)->GetWij()/maxDrUav )/t) ); // NOVO
           Zci += pljci;
           (*lj)->SetTempPljci(pljci);          
           if (low_dchilj > dcilj) { // achou UAV mais proximo
@@ -1458,11 +1456,9 @@ void ServerApplication::runDA() {
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           if (Zci < 1e-90) {
             t = 0.1;
-            NS_LOG_DEBUG("--> Solicitando nova localizacao pois Zci esta baixo! @" << Simulator::Now().GetSeconds());
-            goto new_uav;
+            // NS_LOG_DEBUG("--> Solicitando nova localizacao pois Zci esta baixo! @" << Simulator::Now().GetSeconds());
+            // goto new_uav;
           }
-          // PENSAR: preciso guardar o valor de pljci?! Não é suficiente calcular já a parte da equacao de lj e descartar estes valores?!
-          // PENSAR: Se houver estratégia para remover UAVs, ai seria interessante armazenar para que se possa calcular os clientes que estão conectados e saber se os pais conseguem suprir o cliente
           (*lj)->AddPljCi((*ci), Zci, r_max); // finaliza o calculo do pljci na funcao e cadastra no map relacionando o ci
         }
         if ((*ci)->IsConnected()) {
@@ -1482,7 +1478,7 @@ void ServerApplication::runDA() {
         //NS_LOG_DEBUG ("-------------------------------");
 
         // Avalia a utilizacao de capacidade das localizações
-        capacidade = capacidade && (*lj)->ValidarCapacidade(maxDrUav, taxa_capacidade);
+        capacidade = capacidade && (*lj)->ValidarCapacidade(maxDrUav);
 
         (*lj)->ClearChildList();
       }
@@ -1533,14 +1529,13 @@ void ServerApplication::runDA() {
 
     if (!MovimentoA()) {
       NS_LOG_DEBUG("--> Solicitando nova localizacao por não existir movimento em A @" << Simulator::Now().GetSeconds());
-      new_uav:
+      // new_uav:
         Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
         nLoc->SetId(locId++);
         CentroDeMassa(nLoc, lCentral, r_max);
         nLoc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
         nLoc->IniciarMovimentoB();
         m_locationContainer.Add(nLoc);
-        nLoc->SetPunishCapacity(0);
         nLoc->SetPunishNeighboor(0.2);
         nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
         nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max, uav_cob); 
@@ -1628,14 +1623,6 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
   lj++;
   for (; lj != m_locationContainer.End(); ++lj) {
     file << "," << (*lj)->GetFather()->GetXPosition() << "," << (*lj)->GetFather()->GetYPosition();
-  }
-  file << "\n";
-
-  lj = m_locationContainer.Begin(); // imprimindo capacidade
-  file << (*lj)->GetPunishCapacity();
-  lj++;
-  for (; lj != m_locationContainer.End(); ++lj) {
-    file << "," << (*lj)->GetPunishCapacity();
   }
   file << "\n";
 
