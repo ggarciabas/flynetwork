@@ -1455,9 +1455,8 @@ void ServerApplication::runDA() {
         }
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           if (Zci < 1e-90) {
+            NS_LOG_DEBUG("--> Zci esta baixo! @" << Simulator::Now().GetSeconds());
             t = 0.1;
-            // NS_LOG_DEBUG("--> Solicitando nova localizacao pois Zci esta baixo! @" << Simulator::Now().GetSeconds());
-            // goto new_uav;
           }
           (*lj)->AddPljCi((*ci), Zci, r_max); // finaliza o calculo do pljci na funcao e cadastra no map relacionando o ci
         }
@@ -1472,14 +1471,9 @@ void ServerApplication::runDA() {
 
       // calcular lj novos - não consigo fazer no laco anterior pela falta dos valores acumulados (não tentar colcoar la!)
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-        // validar calculos
-        //NS_LOG_DEBUG("====> Loc: " << (*lj)->GetId());
         (*lj)->UpdatePosition (m_maxx, m_maxy);
-        //NS_LOG_DEBUG ("-------------------------------");
-
         // Avalia a utilizacao de capacidade das localizações
         capacidade = capacidade && (*lj)->ValidarCapacidade(maxDrUav);
-
         (*lj)->ClearChildList();
       }
 
@@ -1520,8 +1514,8 @@ void ServerApplication::runDA() {
 
     if (locConnected && capacidade) { // 1- NOVO: 80% dos clientes tem que ter conexao
       if ((tMovCon >= tMov*0.8) && (tFixCon == tFix)) {
-        //NS_LOG_DEBUG("--> Finalizado - Feeting temp="<<t);
-        t *= 0.5; // resfria bastante
+        NS_LOG_DEBUG("--> Finalizado - Feeting temp="<<t);
+        // t *= 0.5; // resfria bastante
         GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
         break;
       }

@@ -65,7 +65,7 @@ LocationModel::~LocationModel()
   NS_LOG_INFO ("LocationModel::~LocationModel @" << Simulator::Now().GetSeconds());
   m_position.clear();
   m_childList.Clear();
-  // m_pljci.clear();
+  m_pljci.clear();
 }
 
 void LocationModel::SetId(uint32_t id)
@@ -284,9 +284,9 @@ void LocationModel::UpdatePosition (double mx, double my) { // normalizados
     plj += (ci->first)->GetPci() * ci->second;
   }
   NS_LOG_DEBUG ("Client x: " << x << "\ty: " << y << "\tplj: " << plj << "\tx/: " << x/plj << "\ty/: " << y/plj);
-  if (plj > 1.0) {
-    NS_FATAL_ERROR (" Client -- fuu plj maior que 1!");
-  }
+  // if (plj > 1.0) {
+  //   NS_FATAL_ERROR (" Client -- fuu plj maior que 1!");
+  // }
   if (std::isnan(plj)) {
     NS_FATAL_ERROR ("With client -- plj got nan value");
   }
@@ -330,7 +330,6 @@ bool LocationModel::UpdatePunishNeighboor (double uav_cob_norm) {
   if (m_distFather <= uav_cob_norm) {
     m_punshNeigh *= std::exp (-1+(m_distFather/uav_cob_norm)); // m_punshNeigh * 0.9; // 
     m_punshNeigh = (m_punshNeigh>0.01)?m_punshNeigh:0.01;
-    // m_punshNeigh = 0.1;
   } else {
     m_punshNeigh *= 1.2;
     m_punshNeigh = (m_punshNeigh > 2) ? 2 : m_punshNeigh;
@@ -362,8 +361,6 @@ Ptr<LocationModel> LocationModel::GetFather () {
 
 void LocationModel::AddChild (Ptr<LocationModel> l, double r_max) {
   m_childList.Add(l);
-  // m_xAcum += l->GetXPosition(r_max); // PENSAR: m_punishNeigh -> é interessante somente para manter o UAV próximo ao pai, para garantir conexão, não sei se vale a pena forçar com a mesma intensidade no sentido dos clientes.
-  // m_yAcum += l->GetYPosition(r_max); // ESTÁ NA EQUAÇAO, NAO PODE MUDAR -- : Modificado para 50%! Considerando como peso os filhos somente no valor de 50%!
 }
 
 void LocationModel::ClearChildList () {
