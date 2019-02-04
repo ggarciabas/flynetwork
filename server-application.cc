@@ -1323,10 +1323,10 @@ void ServerApplication::runDA() {
     (*i)->EraseLocation();
     (*i)->SetPci(1/(tMov+tFix*pFix));
     if (first) {
-      file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
+      file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();;
       first = false;
     } else {
-      file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
+      file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();;
     }
   }
   for (ClientModelContainer::Iterator i = m_fixedClientContainer.Begin(); i != m_fixedClientContainer.End(); ++i)
@@ -1334,10 +1334,10 @@ void ServerApplication::runDA() {
     (*i)->EraseLocation();
     (*i)->SetPci(pFix/(tMov+tFix*pFix));
     if (first) {
-      file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
+      file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();;
       first = false;
     } else {
-      file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
+      file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();;
     }
   }
   file << std::endl;
@@ -1516,7 +1516,7 @@ void ServerApplication::runDA() {
       if ((tMovCon >= tMov*0.8) && (tFixCon == tFix)) {
         NS_LOG_DEBUG("--> Finalizado - Feeting temp="<<t);
         // t *= 0.5; // resfria bastante
-        GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
+        // GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
         break;
       }
     }
