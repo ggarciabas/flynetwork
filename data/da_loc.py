@@ -86,7 +86,7 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
 
         # https://matplotlib.org/api/markers_api.html points
         first = True
-        for i in range(0, len(cli), 2):
+        for i in range(0, len(cli), 3):
             if first:
                 ax0.plot(float(cli[i]),float(cli[i+1]), 'b.', markersize=7.0, label="clientes")
                 first = False

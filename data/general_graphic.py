@@ -44,7 +44,7 @@ for custo_name in glob.glob(main_path+'custo_*/'):
     uav_mov = {}
     uavs_id = {}
     # Initial scenario
-    # VOLTAR initial_scenario.scenario(str(list_folder[0]), main_path+custo+'/', teste)
+    initial_scenario.scenario(str(list_folder[0]), main_path+custo+'/', teste)
     activated = {}
     file_ac = open(main_path+custo+'/uav_network_log.txt', 'r')
     for line in file_ac:
@@ -81,11 +81,11 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         else:
             t_ini = -0.5
         # Client
-        # VOLTAR client.scenario (str(etapa), main_path+custo+'/', teste)
+        client.scenario (str(etapa), main_path+custo+'/', teste)
         # Location
-        # VOLTAR location.scenario (str(etapa), main_path+custo+'/', teste)
+        location.scenario (str(etapa), main_path+custo+'/', teste)
         # Uav Loc
-        # VOLTAR uav_loc_graphic.uav_loc (str(etapa), main_path+custo+'/', teste, raio_cli, raio_uav)
+        uav_loc_graphic.uav_loc (str(etapa), main_path+custo+'/', teste, raio_cli, raio_uav)
         # Mij
         mij_graphic.mij(str(etapa), main_path+custo+'/', teste)
         all_uav.extend(uavs_id[:])

@@ -1342,6 +1342,7 @@ void ServerApplication::runDA() {
   }
   file << std::endl;
   file.close ();
+  m_clientPosition (os.str ()); // Adicionando informacoes reais do ambiente
 
   m_clientDaContainer.Clear();
   m_clientDaContainer.Add(m_clientContainer);
