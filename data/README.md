@@ -1,28 +1,32 @@
 
 # Estrutura de pasta dos resultados
 - scenario
--   custo_
--       client
--       course-changed
--       dhcp
--       etapa
--       python 
--       uav_depletion
--       uav_energy_threshold
--       uav_hover
--       uav_move
--       uav_recharged
--       uav_remaining_energy
--       uav_stop
+    - custo_
+        - client
+        - course-changed
+        - dhcp
+        - etapa
+        - python 
+        - uav_depletion
+        - uav_energy_threshold
+        - uav_hover
+        - uav_move
+        - uav_recharged
+        - uav_remaining_energy
+        - uav_stop
 
 # Scripts para processamento pós-resultados
 - run_pos_processing
     - general_graphic
+        - gera os graficos genericos tais como bij, mij, cenario inicial, etc
     - uav_removed_energy
+        - verificar a quantidade de energia desperdicada ao remover o UAV
     - connected_cli
+        - verifica o total de clientes que consegue conexao com a configuracao atual. Avaliar se até a próxima etapa existira bateria suficiente. Assim, verifica se o UAv não tera que ser trocado durante a etapa, desconectando todos os clientes nele conectados
 
 - run_slide_processing
     - process_slide
+    - gera a estrutura de slides para cada custo. Necessario utilizar i main do projeto comparacao-custo-slide
 
 - run_exaustive
     - parametros:
