@@ -64,7 +64,7 @@ for custo_name in glob.glob(main_path+'custo_*/'):
     if len(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_hover_acum_uav.tex'))>0:
         file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_hover_acum_uav.tex')[0])+"}\n")
     if len(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_move.tex'))>0:
-        file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_move_acum_uav.tex')[0])+"}\n")
+        file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_move.tex')[0])+"}\n")
     if len(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_move_acum_uav.tex'))>0:
         file.write("\\input{"+folder+'/'+os.path.basename(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_move.tex')[0])+"}\n")
     if len(glob.glob(main_path+'../slide/'+scenario+'/'+folder+'/slide_uav_remaining_energy.tex'))>0:

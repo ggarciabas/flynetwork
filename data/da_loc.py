@@ -12,12 +12,6 @@ import pandas as pd
 
 da = "cpp"
 
-c = sys.argv[1]
-e = sys.argv[2]
-m = sys.argv[3]
-t = sys.argv[4]
-i = sys.argv[5]
-
 def da_loc (custo, etapa, main_path, teste, it=-1):
     # print "DA LOc - new Graphic"
     f_cen = open(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/client.txt','r')
@@ -29,6 +23,8 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
     arquivos.sort()
     if int(it) != -1:
         arquivos = [arquivos[int(it)-1]]
+    if int(it) == -2: # somente ultima iteracao
+        arquivos = arquivos[-2:]
     for i in np.arange(0, len(arquivos), 10):
         arquivo = arquivos[i]
         try:
@@ -209,4 +205,10 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
 
 if __name__ == "__main__":
     # print m
+    c = sys.argv[1]
+    e = sys.argv[2]
+    m = sys.argv[3]
+    t = sys.argv[4]
+    i = sys.argv[5]
+
     da_loc(c, e, m, t, i)    
