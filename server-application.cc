@@ -1517,7 +1517,7 @@ void ServerApplication::runDA() {
       if ((tMovCon >= tMov*0.8) && (tFixCon == tFix)) {
         NS_LOG_DEBUG("--> Finalizado - Feeting temp="<<t);
         // t *= 0.5; // resfria bastante
-        // GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
+        GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
         break;
       }
     }
@@ -1534,7 +1534,7 @@ void ServerApplication::runDA() {
         nLoc->SetPunishNeighboor(0.2);
         nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
         nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max, uav_cob); 
-    }
+    }    
 
     GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
 
@@ -1558,7 +1558,7 @@ void ServerApplication::runDA() {
   // for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
   //   file << (*lj)->GetId() << "," << (*lj)->GetDataRate() << std::endl;
   // }
-  // file.close();
+  // file.close();  
 
   os.str("");
   os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/client_data_rate.txt";
@@ -1653,11 +1653,11 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
 
   file.close();
 
-  os.str ("");
-  // custo, etapa, main_path, teste, iter
-  os << "python ./scratch/flynetwork/data/da_loc.py custo_" << m_custo << " " << int(Simulator::Now().GetSeconds()) << " ./scratch/flynetwork/data/output/" << m_scenarioName << "/ False " << iter;
-  //NS_LOG_DEBUG (os.str());
-  system(os.str().c_str());
+  // os.str ("");
+  // // custo, etapa, main_path, teste, iter
+  // os << "python ./scratch/flynetwork/data/da_loc.py custo_" << m_custo << " " << int(Simulator::Now().GetSeconds()) << " ./scratch/flynetwork/data/output/" << m_scenarioName << "/ False " << iter;
+  // //NS_LOG_DEBUG (os.str());
+  // system(os.str().c_str());
   // os.str ("");
   // os << "convert -delay 20 -loop 0 ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/*.png" << " ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/da_loc.gif";
   // ////NS_LOG_DEBUG (os.str());

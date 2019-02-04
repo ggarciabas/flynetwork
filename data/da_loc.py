@@ -21,10 +21,10 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
     arquivos = glob.glob(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_'+da+'_*.txt')
     arquivos = np.array(arquivos)
     arquivos.sort()
-    if int(it) != -1:
-        arquivos = [arquivos[int(it)-1]]
     if int(it) == -2: # somente ultima iteracao
         arquivos = [arquivos[-1]]
+    elif int(it) != -1:
+        arquivos = [arquivos[int(it)-1]]
     for i in np.arange(0, len(arquivos), 10):
         arquivo = arquivos[i]
         try:
