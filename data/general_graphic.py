@@ -67,7 +67,7 @@ for custo_name in glob.glob(main_path+'custo_*/'):
     all_uav = []
     # Bij
     for etapa in list_folder:
-        da_loc.da_loc (custo, etapa, main_path, teste, -2) # somente das duas ultimas iteracoes
+        da_loc.da_loc (custo, etapa, main_path, teste, -2) # somente a ultima iteracao
         if teste:
             print etapa
         (uavs_id, uav_mov) = bij_graphic.bij(custo, str(etapa), main_path, teste)

@@ -24,7 +24,7 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
     if int(it) != -1:
         arquivos = [arquivos[int(it)-1]]
     if int(it) == -2: # somente ultima iteracao
-        arquivos = arquivos[-2:]
+        arquivos = [arquivos[-1]]
     for i in np.arange(0, len(arquivos), 10):
         arquivo = arquivos[i]
         try:
