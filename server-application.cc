@@ -1345,8 +1345,8 @@ void ServerApplication::runDA() {
   m_clientPosition (os.str ()); // Adicionando informacoes reais do ambiente
 
   m_clientDaContainer.Clear();
+  m_clientDaContainer.Add(m_fixedClientContainer); // clientes fixos antes pra dar prioridade na capacidade do UAV!
   m_clientDaContainer.Add(m_clientContainer);
-  m_clientDaContainer.Add(m_fixedClientContainer); 
 
   // constantes
   double t_min = 1e-7;
@@ -1457,8 +1457,10 @@ void ServerApplication::runDA() {
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           if (Zci < 1e-90) {
             NS_LOG_DEBUG("--> Zci esta baixo! @" << Simulator::Now().GetSeconds());
-            t *= 1.2; // aumenta 120%
+            // t *= 1.2; // aumenta 120%
+            t = 0.1;
             percentCli *= 0.7; // reduz 70%
+            break;
           }
           (*lj)->AddPljCi((*ci), Zci, r_max); // finaliza o calculo do pljci na funcao e cadastra no map relacionando o ci
         }
@@ -1514,16 +1516,28 @@ void ServerApplication::runDA() {
 
     } while (movimentoB && iterB < max_iterB);
 
-    if (locConnected && capacidade) { // 1- NOVO: 80% dos clientes tem que ter conexao
-      if ((tMovCon >= tMov*percentCli) && (tFixCon == tFix)) {
-        NS_LOG_DEBUG("--> Finalizado - Feeting temp="<<t);
-        // t *= 0.5; // resfria bastante
-        GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
-        break;
+    if (locConnected) { 
+      if (capacidade) {
+        if (tFixCon == tFix) {
+          if (tMovCon >= tMov*percentCli) {
+            NS_LOG_DEBUG("--> Finalizado - Feeting temp="<<t);
+            // t *= 0.5; // resfria bastante
+            GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
+            break;
+          } else {
+            NS_LOG_DEBUG("--> " << iter << " @"<< Simulator::Now().GetSeconds() << " clientes móveis nao conectados [" << percentCli << "] !");
+          }
+        } else {
+          NS_LOG_DEBUG("--> " << iter << " @"<< Simulator::Now().GetSeconds() << " clientes fixos nao conectados! t[" << t << "]");
+        }
+      } else {
+        NS_LOG_DEBUG("--> " << iter << " @"<< Simulator::Now().GetSeconds() << " capacidade superior!");
       }
+    } else {
+      NS_LOG_DEBUG("--> " << iter << " @"<< Simulator::Now().GetSeconds() << " localizações não conecatadas!");
     }
 
-    if (!MovimentoA()) {
+    if (!MovimentoA() || (tFixCon != tFix && t == 0.1)) {
       NS_LOG_DEBUG("--> Solicitando nova localizacao por não existir movimento em A @" << Simulator::Now().GetSeconds());
       // new_uav:
         Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
