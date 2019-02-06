@@ -1317,7 +1317,7 @@ void ServerApplication::runDA() {
   bool first = true;
   double tMov = m_clientContainer.GetN();
   double tFix = m_fixedClientContainer.GetN();
-  double pFix = 2; // peso dos clientes fixos - clientes móveis sempre com peso de 1"
+  double pFix = 8; // peso dos clientes fixos - clientes móveis sempre com peso de 1"
   for (ClientModelContainer::Iterator i = m_clientContainer.Begin(); i != m_clientContainer.End(); ++i)
   {
     (*i)->EraseLocation();
@@ -1420,7 +1420,7 @@ void ServerApplication::runDA() {
         double low_dchilj = 1.5; // maior distancia é 1.0, valores normalizados!
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           double dcilj = CalculateDistance((*ci)->GetPosition(r_max), (*lj)->GetPosition(r_max));
-          double pljci = std::exp ( - ((dcilj + (*lj)->GetWij()/maxDrUav )/t) ); // NOVO
+          double pljci = std::exp ( - ((dcilj + (*lj)->GetWij()/maxDrUav + (((*ci)->IsConnected()) ? 1 : 0))/t) ); // NOVO - Verifica se o cliente possui conexao, caso nao tenha calcula normalmente, senao adiciona 1 para que a probabilidade deste em relacao ao UAv seja insignificante.
           Zci += pljci;
           (*lj)->SetTempPljci(pljci);          
           if (low_dchilj > dcilj) { // achou UAV mais proximo
