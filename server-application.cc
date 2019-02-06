@@ -1397,7 +1397,7 @@ void ServerApplication::runDA() {
   loc->InitializeWij (m_clientDaContainer.GetN()*dRCli); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
   loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), r_max, uav_cob);
   m_locationContainer.Add(loc);
-
+  double percentCli = 0.8;
   int iter = 0;
   do {// laco A
     iter++;
@@ -1457,7 +1457,8 @@ void ServerApplication::runDA() {
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           if (Zci < 1e-90) {
             NS_LOG_DEBUG("--> Zci esta baixo! @" << Simulator::Now().GetSeconds());
-            t = 0.1;
+            t *= 1.2; // aumenta 120%
+            percentCli *= 0.7; // reduz 70%
           }
           (*lj)->AddPljCi((*ci), Zci, r_max); // finaliza o calculo do pljci na funcao e cadastra no map relacionando o ci
         }
@@ -1514,7 +1515,7 @@ void ServerApplication::runDA() {
     } while (movimentoB && iterB < max_iterB);
 
     if (locConnected && capacidade) { // 1- NOVO: 80% dos clientes tem que ter conexao
-      if ((tMovCon >= tMov*0.8) && (tFixCon == tFix)) {
+      if ((tMovCon >= tMov*percentCli) && (tFixCon == tFix)) {
         NS_LOG_DEBUG("--> Finalizado - Feeting temp="<<t);
         // t *= 0.5; // resfria bastante
         GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
