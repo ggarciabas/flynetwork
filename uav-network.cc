@@ -831,7 +831,7 @@ void UavNetwork::ConfigureCli()
     (*i)->AddApplication(smart);
 
     // configure OnOff application para server
-    int app_code = 3; //app_rand->GetValue();
+    int app_code = app_rand->GetValue();
     int port = 0;
     ObjectFactory onoffFac;
     Ptr<Application> appOnOff = 0;
