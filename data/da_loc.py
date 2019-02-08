@@ -25,7 +25,7 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
         arquivos = [arquivos[-1]]
     elif int(it) != -1:
         arquivos = [arquivos[int(it)-1]]
-    for i in np.arange(0, len(arquivos), 10):
+    for i in np.arange(0, len(arquivos), 1):
         arquivo = arquivos[i]
         try:
             f_cen = open(arquivo,'r')
