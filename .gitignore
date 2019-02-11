@@ -4,3 +4,4 @@ scratch/flynetwork/da_python
 da_python
 data/output/**
 .DS_Store
+.vscode/

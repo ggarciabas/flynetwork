@@ -46,10 +46,10 @@ def bij (custo, time, main_path, teste):
     sns.heatmap(df_bij, cmap=cmap, vmin=0, vmax=1)
 
     plt.xlabel("UAV")
-    plt.ylabel(u"Localização")
+    plt.ylabel(u"Location")
 
     # general title
-    plt.title("Bij", fontsize=13, fontweight=0, color='black', style='italic')
+    # plt.title("Bij", fontsize=13, fontweight=0, color='black', style='italic')
 
     plt.savefig(main_path+custo+'/'+'etapa/'+time+'/bij.svg')
     plt.savefig(main_path+custo+'/'+'etapa/'+time+'/bij.png')
@@ -61,10 +61,10 @@ def bij (custo, time, main_path, teste):
     sns.heatmap(df_bij, cmap=cmap)
 
     plt.xlabel("UAV")
-    plt.ylabel(u"Localização")
+    plt.ylabel(u"Location")
 
     # general title
-    plt.title("Bij", fontsize=13, fontweight=0, color='black', style='italic')
+    # plt.title("Bij", fontsize=13, fontweight=0, color='black', style='italic')
 
     plt.savefig(main_path+custo+'/'+'etapa/'+time+'/bij_.svg')
     plt.savefig(main_path+custo+'/'+'etapa/'+time+'/bij_.png')

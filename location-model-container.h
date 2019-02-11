@@ -22,12 +22,15 @@
 #ifndef LOCATION_MODEL_CONTAINER_H
 #define LOCATION_MODEL_CONTAINER_H
 
-#include "location-model.h"
+// #include "location-model.h"
+#include "ns3/core-module.h"
 #include <vector>
 #include <stdint.h>
 
 namespace ns3
 {
+
+  class LocationModel;
 
 /**
  * \ingroup FlyNetwork
@@ -105,6 +108,10 @@ public:
    * \brief Removes all elements in the container.
    */
   void Clear(void);
+
+  void Remove (uint32_t id);
+
+  void Erase (uint32_t id);
 
 private:
   std::vector<Ptr<LocationModel>> m_models;
