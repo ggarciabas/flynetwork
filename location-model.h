@@ -67,8 +67,6 @@ public:
   std::string toString() {
     std::ostringstream os;
     os << "Id: " << m_id << "\n\tPos: (" << m_position.at(0) << "," << m_position.at(1)
-      << ")\n\tPosA: (" << m_positionA.at(0) << "," << m_positionA.at(1)
-      << ")\n\tPosB: (" << m_positionB.at(0) << "," << m_positionB.at(1)
       << ")\n\tConsumption: " << m_totalConsumption
       << "\n\tPunNeigh: " << m_punshNeigh
       << "\n\tWij: " << m_wij

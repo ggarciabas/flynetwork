@@ -1,0 +1,2781 @@
+Waf: Entering directory `/home/dell/Desktop/nsnam_ns3/build'
+Waf: Leaving directory `/home/dell/Desktop/nsnam_ns3/build'
+Build commands will be stored in build/compile_commands.json
+'build' finished successfully (3.067s)
+GNU gdb (Ubuntu 8.1-0ubuntu3) 8.1.0.20180409-git
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from /home/dell/Desktop/nsnam_ns3/build/scratch/flynetwork/flynetwork...done.
+(gdb) r
+Starting program: /home/dell/Desktop/nsnam_ns3/build/scratch/flynetwork/flynetwork --SimTime=1000 -CliUpdate=5.0 -Scenario=99 -Env=2 -Protocol=2 -Custo=4
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+Server Address: 10.1.1.1
+Uav #1 IP 10.1.1.2
+Uav #2 IP 10.1.1.3
+Uav #3 IP 10.1.1.4
+Uav #4 IP 10.1.1.5
+Uav #5 IP 10.1.1.6
+Centro de massa: 307.5 223.75
+--> 1 @0 clientes fixos nao conectados! t[0.6]
+--> 2 @0 clientes fixos nao conectados! t[0.54]
+--> 3 @0 clientes fixos nao conectados! t[0.486]
+--> 4 @0 clientes fixos nao conectados! t[0.4374]
+--> 5 @0 clientes fixos nao conectados! t[0.39366]
+--> 6 @0 clientes fixos nao conectados! t[0.354294]
+--> Solicitando nova localizacao por não existir movimento em A @0
+Centro de massa: 276 220
+--> 7 @0 clientes fixos nao conectados! t[0.318865]
+--> 8 @0 clientes fixos nao conectados! t[0.286978]
+--> 9 @0 clientes fixos nao conectados! t[0.25828]
+--> 10 @0 clientes fixos nao conectados! t[0.232452]
+--> 11 @0 clientes fixos nao conectados! t[0.209207]
+--> 12 @0 clientes fixos nao conectados! t[0.188286]
+--> 13 @0 clientes fixos nao conectados! t[0.169458]
+--> 14 @0 clientes fixos nao conectados! t[0.152512]
+--> 15 @0 clientes fixos nao conectados! t[0.137261]
+--> 16 @0 clientes fixos nao conectados! t[0.123535]
+--> 17 @0 clientes fixos nao conectados! t[0.111181]
+--> 18 @0 clientes fixos nao conectados! t[0.100063]
+--> 19 @0 clientes fixos nao conectados! t[0.0900568]
+--> 20 @0 clientes fixos nao conectados! t[0.0810511]
+--> 21 @0 clientes fixos nao conectados! t[0.072946]
+--> 22 @0 clientes fixos nao conectados! t[0.0656514]
+--> 23 @0 clientes fixos nao conectados! t[0.0590863]
+--> 24 @0 clientes fixos nao conectados! t[0.0531776]
+--> 25 @0 clientes fixos nao conectados! t[0.0478599]
+--> 26 @0 clientes fixos nao conectados! t[0.0430739]
+--> 27 @0 clientes fixos nao conectados! t[0.0387665]
+--> 28 @0 clientes fixos nao conectados! t[0.0348898]
+--> Solicitando nova localizacao por não existir movimento em A @0
+Centro de massa: 375 300
+--> 29 @0 clientes fixos nao conectados! t[0.0314009]
+--> 30 @0 clientes fixos nao conectados! t[0.0282608]
+--> 31 @0 clientes fixos nao conectados! t[0.0254347]
+--> 32 @0 clientes fixos nao conectados! t[0.0228912]
+--> 33 @0 clientes fixos nao conectados! t[0.0206021]
+--> 34 @0 clientes fixos nao conectados! t[0.0185419]
+--> 35 @0 clientes fixos nao conectados! t[0.0166877]
+--> Solicitando nova localizacao por não existir movimento em A @0
+Centro de massa: 200 350
+--> Finalizado - Feeting temp=0.0150189
+SERVER - Solicitando novos UAVs @0
+SERVER - Iniciando estrutura do DA para agendamento @0
+RunAgendamento: 
+ [1,0]
+ [2,1]
+ [3,2]
+ [4,3]
+FIM custo ---------------------------- @0
+SERVER - inicializando matrizes.
+SERVER - iniciando execucao das partes A, B e C @0
+GOING OUT!! ------------------------>>>>>>
+SERVER - Finalizada estrutura do DA para agendamento @0
+SERVER - Atualizando posicionamento dos UAVs @0
+SERVER - UAV 1 REF 1
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (378.602,198.003)
+	Consumption: 1.36
+	PunNeigh: 0.01
+	Wij: 78
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+	Maior valor LOC 	Id: 3
+	Pos: (240.306,255.952)
+	Consumption: 0.34
+	PunNeigh: 0.145051
+	Wij: 6.5
+	Connected: true
+
+## ===> UAV 1 to LOC 3
+SERVER - LOC 3
+	Id: 3
+	Pos: (240.306,255.952)
+	Consumption: 0.34
+	PunNeigh: 0.145051
+	Wij: 6.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @0
+SERVER - UAV 2 REF 1
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (378.602,198.003)
+	Consumption: 1.36
+	PunNeigh: 0.01
+	Wij: 78
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+## ===> UAV 2 to LOC 0
+SERVER - LOC 0
+	Id: 0
+	Pos: (378.602,198.003)
+	Consumption: 1.36
+	PunNeigh: 0.01
+	Wij: 78
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @0
+SERVER - UAV 3 REF 1
+\t--- j = 0
+\t--- j = 1
+	Maior valor LOC 	Id: 1
+	Pos: (106.783,199.124)
+	Consumption: 0.68
+	PunNeigh: 0.01
+	Wij: 13
+	Connected: true
+
+\t--- j = 2
+	Maior valor LOC 	Id: 2
+	Pos: (537.304,246.148)
+	Consumption: 0.34
+	PunNeigh: 0.01
+	Wij: 6.5
+	Connected: true
+
+\t--- j = 3
+## ===> UAV 3 to LOC 2
+SERVER - LOC 2
+	Id: 2
+	Pos: (537.304,246.148)
+	Consumption: 0.34
+	PunNeigh: 0.01
+	Wij: 6.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @0
+SERVER - UAV 4 REF 1
+\t--- j = 0
+\t--- j = 1
+	Maior valor LOC 	Id: 1
+	Pos: (106.783,199.124)
+	Consumption: 0.68
+	PunNeigh: 0.01
+	Wij: 13
+	Connected: true
+
+\t--- j = 2
+\t--- j = 3
+## ===> UAV 4 to LOC 1
+SERVER - LOC 1
+	Id: 1
+	Pos: (106.783,199.124)
+	Consumption: 0.68
+	PunNeigh: 0.01
+	Wij: 13
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @0
+-- Finalizado posicionamento dos UAVs @0
+Centro de massa: 337.447 223.616
+--> 1 @65 clientes fixos nao conectados! t[0.6]
+--> 2 @65 clientes fixos nao conectados! t[0.54]
+--> 3 @65 clientes fixos nao conectados! t[0.486]
+--> 4 @65 clientes fixos nao conectados! t[0.4374]
+--> 5 @65 clientes fixos nao conectados! t[0.39366]
+--> 6 @65 clientes fixos nao conectados! t[0.354294]
+--> Solicitando nova localizacao por não existir movimento em A @65
+Centro de massa: 329.81 240.577
+--> 7 @65 clientes fixos nao conectados! t[0.318865]
+--> 8 @65 clientes fixos nao conectados! t[0.286978]
+--> 9 @65 clientes fixos nao conectados! t[0.25828]
+--> 10 @65 clientes fixos nao conectados! t[0.232452]
+--> 11 @65 clientes fixos nao conectados! t[0.209207]
+--> 12 @65 clientes fixos nao conectados! t[0.188286]
+--> 13 @65 clientes fixos nao conectados! t[0.169458]
+--> 14 @65 clientes fixos nao conectados! t[0.152512]
+--> 15 @65 clientes fixos nao conectados! t[0.137261]
+--> 16 @65 clientes fixos nao conectados! t[0.123535]
+--> 17 @65 clientes fixos nao conectados! t[0.111181]
+--> 18 @65 clientes fixos nao conectados! t[0.100063]
+--> 19 @65 clientes fixos nao conectados! t[0.0900568]
+--> 20 @65 clientes fixos nao conectados! t[0.0810511]
+--> 21 @65 clientes fixos nao conectados! t[0.072946]
+--> Solicitando nova localizacao por não existir movimento em A @65
+Centro de massa: 326.544 239.274
+--> 22 @65 clientes fixos nao conectados! t[0.0656514]
+--> 23 @65 clientes fixos nao conectados! t[0.0590863]
+--> 24 @65 clientes fixos nao conectados! t[0.0531776]
+--> 25 @65 clientes fixos nao conectados! t[0.0478599]
+--> 26 @65 clientes fixos nao conectados! t[0.0430739]
+--> 27 @65 clientes fixos nao conectados! t[0.0387665]
+--> 28 @65 clientes fixos nao conectados! t[0.0348898]
+--> Solicitando nova localizacao por não existir movimento em A @65
+Centro de massa: 254.969 297.278
+--> 29 @65 clientes fixos nao conectados! t[0.0314009]
+--> 30 @65 clientes fixos nao conectados! t[0.0282608]
+--> 31 @65 clientes fixos nao conectados! t[0.0254347]
+--> 32 @65 clientes fixos nao conectados! t[0.0228912]
+--> 33 @65 clientes fixos nao conectados! t[0.0206021]
+--> 34 @65 clientes fixos nao conectados! t[0.0185419]
+--> 35 @65 clientes fixos nao conectados! t[0.0166877]
+--> Solicitando nova localizacao por não existir movimento em A @65
+Centro de massa: 430 100
+--> Finalizado - Feeting temp=0.0150189
+SERVER - Solicitando novos UAVs @65
+SERVER - Iniciando estrutura do DA para agendamento @65
+RunAgendamento: 
+ [1,0]
+ [2,1]
+ [3,2]
+ [4,3]
+ [5,4]
+FIM custo ---------------------------- @65
+SERVER - inicializando matrizes.
+SERVER - iniciando execucao das partes A, B e C @65
+GOING OUT!! ------------------------>>>>>>
+SERVER - Finalizada estrutura do DA para agendamento @65
+SERVER - Atualizando posicionamento dos UAVs @65
+SERVER - UAV 1 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (346.673,214.145)
+	Consumption: 7.82
+	PunNeigh: 0.01
+	Wij: 559
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+	Maior valor LOC 	Id: 3
+	Pos: (196.485,334.497)
+	Consumption: 1.7
+	PunNeigh: 0.01
+	Wij: 32.5
+	Connected: true
+
+\t--- j = 4
+## ===> UAV 1 to LOC 3
+SERVER - LOC 3
+	Id: 3
+	Pos: (196.485,334.497)
+	Consumption: 1.7
+	PunNeigh: 0.01
+	Wij: 32.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @65
+SERVER - UAV 2 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (346.673,214.145)
+	Consumption: 7.82
+	PunNeigh: 0.01
+	Wij: 559
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+\t--- j = 4
+## ===> UAV 2 to LOC 0
+SERVER - LOC 0
+	Id: 0
+	Pos: (346.673,214.145)
+	Consumption: 7.82
+	PunNeigh: 0.01
+	Wij: 559
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @65
+SERVER - UAV 3 REF 3
+\t--- j = 0
+\t--- j = 1
+	Maior valor LOC 	Id: 1
+	Pos: (115.72,203.586)
+	Consumption: 3.74
+	PunNeigh: 0.01
+	Wij: 71.5
+	Connected: true
+
+\t--- j = 2
+	Maior valor LOC 	Id: 2
+	Pos: (536.429,245.139)
+	Consumption: 4.42
+	PunNeigh: 0.01
+	Wij: 84.5
+	Connected: true
+
+\t--- j = 3
+\t--- j = 4
+## ===> UAV 3 to LOC 2
+SERVER - LOC 2
+	Id: 2
+	Pos: (536.429,245.139)
+	Consumption: 4.42
+	PunNeigh: 0.01
+	Wij: 84.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @65
+SERVER - UAV 4 REF 3
+\t--- j = 0
+\t--- j = 1
+	Maior valor LOC 	Id: 1
+	Pos: (115.72,203.586)
+	Consumption: 3.74
+	PunNeigh: 0.01
+	Wij: 71.5
+	Connected: true
+
+\t--- j = 2
+\t--- j = 3
+\t--- j = 4
+## ===> UAV 4 to LOC 1
+SERVER - LOC 1
+	Id: 1
+	Pos: (115.72,203.586)
+	Consumption: 3.74
+	PunNeigh: 0.01
+	Wij: 71.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @65
+SERVER - UAV 5 REF 1
+\t--- j = 0
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+\t--- j = 4
+	Maior valor LOC 	Id: 4
+	Pos: (326.263,150.196)
+	Consumption: 3.74
+	PunNeigh: 0.135937
+	Wij: 71.5
+	Connected: true
+
+## ===> UAV 5 to LOC 4
+SERVER - LOC 4
+	Id: 4
+	Pos: (326.263,150.196)
+	Consumption: 3.74
+	PunNeigh: 0.135937
+	Wij: 71.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @65
+-- Finalizado posicionamento dos UAVs @65
+Centro de massa: 305.194 257.184
+--> 1 @135 clientes fixos nao conectados! t[0.6]
+--> 2 @135 clientes fixos nao conectados! t[0.54]
+--> 3 @135 clientes fixos nao conectados! t[0.486]
+--> 4 @135 clientes fixos nao conectados! t[0.4374]
+--> 5 @135 clientes fixos nao conectados! t[0.39366]
+--> 6 @135 clientes fixos nao conectados! t[0.354294]
+--> Solicitando nova localizacao por não existir movimento em A @135
+Centro de massa: 284.484 285.359
+--> 7 @135 clientes fixos nao conectados! t[0.318865]
+--> 8 @135 clientes fixos nao conectados! t[0.286978]
+--> 9 @135 clientes fixos nao conectados! t[0.25828]
+--> 10 @135 clientes fixos nao conectados! t[0.232452]
+--> 11 @135 clientes fixos nao conectados! t[0.209207]
+--> 12 @135 clientes fixos nao conectados! t[0.188286]
+--> 13 @135 clientes fixos nao conectados! t[0.169458]
+--> 14 @135 clientes fixos nao conectados! t[0.152512]
+--> 15 @135 clientes fixos nao conectados! t[0.137261]
+--> 16 @135 clientes fixos nao conectados! t[0.123535]
+--> 17 @135 clientes fixos nao conectados! t[0.111181]
+--> 18 @135 clientes fixos nao conectados! t[0.100063]
+--> 19 @135 clientes fixos nao conectados! t[0.0900568]
+--> 20 @135 clientes fixos nao conectados! t[0.0810511]
+--> 21 @135 clientes fixos nao conectados! t[0.072946]
+--> Solicitando nova localizacao por não existir movimento em A @135
+Centro de massa: 290.61 278.171
+--> 22 @135 clientes fixos nao conectados! t[0.0656514]
+--> 23 @135 clientes fixos nao conectados! t[0.0590863]
+--> 24 @135 clientes fixos nao conectados! t[0.0531776]
+--> 25 @135 clientes fixos nao conectados! t[0.0478599]
+--> 26 @135 clientes fixos nao conectados! t[0.0430739]
+--> 27 @135 clientes fixos nao conectados! t[0.0387665]
+--> 28 @135 clientes fixos nao conectados! t[0.0348898]
+--> 29 @135 clientes fixos nao conectados! t[0.0314009]
+--> 30 @135 clientes fixos nao conectados! t[0.0282608]
+--> 31 @135 clientes fixos nao conectados! t[0.0254347]
+--> Solicitando nova localizacao por não existir movimento em A @135
+Centro de massa: 201.728 135.993
+--> 32 @135 clientes fixos nao conectados! t[0.0228912]
+--> 33 @135 clientes fixos nao conectados! t[0.0206021]
+--> 34 @135 clientes fixos nao conectados! t[0.0185419]
+--> 35 @135 clientes fixos nao conectados! t[0.0166877]
+--> 36 @135 clientes fixos nao conectados! t[0.0150189]
+--> 37 @135 clientes fixos nao conectados! t[0.013517]
+--> 38 @135 clientes fixos nao conectados! t[0.0121653]
+--> Solicitando nova localizacao por não existir movimento em A @135
+Centro de massa: 430 100
+--> 39 @135 clientes fixos nao conectados! t[0.0109488]
+--> Finalizado - Feeting temp=0.00985392
+SERVER - Iniciando estrutura do DA para agendamento @135
+RunAgendamento: 
+ [1,0]
+ [2,1]
+ [3,2]
+ [4,3]
+ [5,4]
+FIM custo ---------------------------- @135
+SERVER - inicializando matrizes.
+SERVER - iniciando execucao das partes A, B e C @135
+GOING OUT!! ------------------------>>>>>>
+SERVER - Finalizada estrutura do DA para agendamento @135
+SERVER - Atualizando posicionamento dos UAVs @135
+SERVER - UAV 1 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (353.912,205.996)
+	Consumption: 10.88
+	PunNeigh: 0.01
+	Wij: 734.5
+	Connected: true
+
+\t--- j = 1
+	Maior valor LOC 	Id: 1
+	Pos: (204.095,346.577)
+	Consumption: 7.82
+	PunNeigh: 0.01
+	Wij: 149.5
+	Connected: true
+
+\t--- j = 2
+\t--- j = 3
+\t--- j = 4
+## ===> UAV 1 to LOC 1
+SERVER - LOC 1
+	Id: 1
+	Pos: (204.095,346.577)
+	Consumption: 7.82
+	PunNeigh: 0.01
+	Wij: 149.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @135
+SERVER - UAV 2 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (353.912,205.996)
+	Consumption: 10.88
+	PunNeigh: 0.01
+	Wij: 734.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+\t--- j = 4
+	Maior valor LOC 	Id: 4
+	Pos: (391.396,153.778)
+	Consumption: 0.68
+	PunNeigh: 0.0601387
+	Wij: 13
+	Connected: true
+
+## ===> UAV 2 to LOC 4
+SERVER - LOC 4
+	Id: 4
+	Pos: (391.396,153.778)
+	Consumption: 0.68
+	PunNeigh: 0.0601387
+	Wij: 13
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @135
+SERVER - UAV 3 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (353.912,205.996)
+	Consumption: 10.88
+	PunNeigh: 0.01
+	Wij: 734.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+	Maior valor LOC 	Id: 2
+	Pos: (539.035,248.381)
+	Consumption: 4.42
+	PunNeigh: 0.01
+	Wij: 84.5
+	Connected: true
+
+\t--- j = 3
+\t--- j = 4
+## ===> UAV 3 to LOC 2
+SERVER - LOC 2
+	Id: 2
+	Pos: (539.035,248.381)
+	Consumption: 4.42
+	PunNeigh: 0.01
+	Wij: 84.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @135
+SERVER - UAV 4 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (353.912,205.996)
+	Consumption: 10.88
+	PunNeigh: 0.01
+	Wij: 734.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+	Maior valor LOC 	Id: 3
+	Pos: (115.61,196.609)
+	Consumption: 3.74
+	PunNeigh: 0.01
+	Wij: 71.5
+	Connected: true
+
+\t--- j = 4
+## ===> UAV 4 to LOC 3
+SERVER - LOC 3
+	Id: 3
+	Pos: (115.61,196.609)
+	Consumption: 3.74
+	PunNeigh: 0.01
+	Wij: 71.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @135
+SERVER - UAV 5 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (353.912,205.996)
+	Consumption: 10.88
+	PunNeigh: 0.01
+	Wij: 734.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+\t--- j = 4
+## ===> UAV 5 to LOC 0
+SERVER - LOC 0
+	Id: 0
+	Pos: (353.912,205.996)
+	Consumption: 10.88
+	PunNeigh: 0.01
+	Wij: 734.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @135
+-- Finalizado posicionamento dos UAVs @135
+Centro de massa: 299.229 264.108
+--> 1 @200 clientes fixos nao conectados! t[0.6]
+--> 2 @200 clientes fixos nao conectados! t[0.54]
+--> 3 @200 clientes fixos nao conectados! t[0.486]
+--> 4 @200 clientes fixos nao conectados! t[0.4374]
+--> 5 @200 clientes fixos nao conectados! t[0.39366]
+--> 6 @200 clientes fixos nao conectados! t[0.354294]
+--> Solicitando nova localizacao por não existir movimento em A @200
+Centro de massa: 290.439 275.064
+--> 7 @200 clientes fixos nao conectados! t[0.318865]
+--> 8 @200 clientes fixos nao conectados! t[0.286978]
+--> 9 @200 clientes fixos nao conectados! t[0.25828]
+--> 10 @200 clientes fixos nao conectados! t[0.232452]
+--> 11 @200 clientes fixos nao conectados! t[0.209207]
+--> 12 @200 clientes fixos nao conectados! t[0.188286]
+--> 13 @200 clientes fixos nao conectados! t[0.169458]
+--> 14 @200 clientes fixos nao conectados! t[0.152512]
+--> 15 @200 clientes fixos nao conectados! t[0.137261]
+--> 16 @200 clientes fixos nao conectados! t[0.123535]
+--> 17 @200 clientes fixos nao conectados! t[0.111181]
+--> 18 @200 clientes fixos nao conectados! t[0.100063]
+--> 19 @200 clientes fixos nao conectados! t[0.0900568]
+--> 20 @200 clientes fixos nao conectados! t[0.0810511]
+--> 21 @200 clientes fixos nao conectados! t[0.072946]
+--> 22 @200 clientes fixos nao conectados! t[0.0656514]
+--> 23 @200 clientes fixos nao conectados! t[0.0590863]
+--> 24 @200 clientes fixos nao conectados! t[0.0531776]
+--> Solicitando nova localizacao por não existir movimento em A @200
+Centro de massa: 299.339 270.594
+--> 25 @200 clientes fixos nao conectados! t[0.0478599]
+--> 26 @200 clientes fixos nao conectados! t[0.0430739]
+--> 27 @200 clientes fixos nao conectados! t[0.0387665]
+--> 28 @200 clientes fixos nao conectados! t[0.0348898]
+--> 29 @200 clientes fixos nao conectados! t[0.0314009]
+--> 30 @200 clientes fixos nao conectados! t[0.0282608]
+--> 31 @200 clientes fixos nao conectados! t[0.0254347]
+--> Solicitando nova localizacao por não existir movimento em A @200
+Centro de massa: 194.053 210.06
+--> 32 @200 clientes fixos nao conectados! t[0.0228912]
+--> 33 @200 clientes fixos nao conectados! t[0.0206021]
+--> 34 @200 clientes fixos nao conectados! t[0.0185419]
+--> 35 @200 clientes fixos nao conectados! t[0.0166877]
+--> 36 @200 clientes fixos nao conectados! t[0.0150189]
+--> 37 @200 clientes fixos nao conectados! t[0.013517]
+--> 38 @200 clientes fixos nao conectados! t[0.0121653]
+--> Solicitando nova localizacao por não existir movimento em A @200
+Centro de massa: 426.452 104.4
+--> Finalizado - Feeting temp=0.0109488
+SERVER - Iniciando estrutura do DA para agendamento @200
+RunAgendamento: 
+ [1,0]
+ [2,1]
+ [3,2]
+ [4,3]
+ [5,4]
+FIM custo ---------------------------- @200
+SERVER - inicializando matrizes.
+SERVER - iniciando execucao das partes A, B e C @200
+GOING OUT!! ------------------------>>>>>>
+SERVER - Finalizada estrutura do DA para agendamento @200
+SERVER - Atualizando posicionamento dos UAVs @200
+SERVER - UAV 1 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (350.472,214.127)
+	Consumption: 4.08
+	PunNeigh: 0.01
+	Wij: 513.5
+	Connected: true
+
+\t--- j = 1
+	Maior valor LOC 	Id: 1
+	Pos: (207.548,342.088)
+	Consumption: 7.82
+	PunNeigh: 0.01
+	Wij: 149.5
+	Connected: true
+
+\t--- j = 2
+\t--- j = 3
+\t--- j = 4
+## ===> UAV 1 to LOC 1
+SERVER - LOC 1
+	Id: 1
+	Pos: (207.548,342.088)
+	Consumption: 7.82
+	PunNeigh: 0.01
+	Wij: 149.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @200
+SERVER - UAV 2 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (350.472,214.127)
+	Consumption: 4.08
+	PunNeigh: 0.01
+	Wij: 513.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+\t--- j = 4
+	Maior valor LOC 	Id: 4
+	Pos: (329.6,148.792)
+	Consumption: 2.72
+	PunNeigh: 0.133491
+	Wij: 52
+	Connected: true
+
+## ===> UAV 2 to LOC 4
+SERVER - LOC 4
+	Id: 4
+	Pos: (329.6,148.792)
+	Consumption: 2.72
+	PunNeigh: 0.133491
+	Wij: 52
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @200
+SERVER - UAV 3 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (350.472,214.127)
+	Consumption: 4.08
+	PunNeigh: 0.01
+	Wij: 513.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+	Maior valor LOC 	Id: 2
+	Pos: (540.776,250.285)
+	Consumption: 4.42
+	PunNeigh: 0.01
+	Wij: 84.5
+	Connected: true
+
+\t--- j = 3
+\t--- j = 4
+## ===> UAV 3 to LOC 2
+SERVER - LOC 2
+	Id: 2
+	Pos: (540.776,250.285)
+	Consumption: 4.42
+	PunNeigh: 0.01
+	Wij: 84.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @200
+SERVER - UAV 4 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (350.472,214.127)
+	Consumption: 4.08
+	PunNeigh: 0.01
+	Wij: 513.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+	Maior valor LOC 	Id: 3
+	Pos: (112.753,198.742)
+	Consumption: 3.74
+	PunNeigh: 0.01
+	Wij: 71.5
+	Connected: true
+
+\t--- j = 4
+## ===> UAV 4 to LOC 3
+SERVER - LOC 3
+	Id: 3
+	Pos: (112.753,198.742)
+	Consumption: 3.74
+	PunNeigh: 0.01
+	Wij: 71.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @200
+SERVER - UAV 5 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (350.472,214.127)
+	Consumption: 4.08
+	PunNeigh: 0.01
+	Wij: 513.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+\t--- j = 4
+## ===> UAV 5 to LOC 0
+SERVER - LOC 0
+	Id: 0
+	Pos: (350.472,214.127)
+	Consumption: 4.08
+	PunNeigh: 0.01
+	Wij: 513.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @200
+-- Finalizado posicionamento dos UAVs @200
+Centro de massa: 291.102 260.843
+--> 1 @265 clientes fixos nao conectados! t[0.6]
+--> 2 @265 clientes fixos nao conectados! t[0.54]
+--> 3 @265 clientes fixos nao conectados! t[0.486]
+--> 4 @265 clientes fixos nao conectados! t[0.4374]
+--> 5 @265 clientes fixos nao conectados! t[0.39366]
+--> 6 @265 clientes fixos nao conectados! t[0.354294]
+--> Solicitando nova localizacao por não existir movimento em A @265
+Centro de massa: 288.147 271.138
+--> 7 @265 clientes fixos nao conectados! t[0.318865]
+--> 8 @265 clientes fixos nao conectados! t[0.286978]
+--> 9 @265 clientes fixos nao conectados! t[0.25828]
+--> 10 @265 clientes fixos nao conectados! t[0.232452]
+--> 11 @265 clientes fixos nao conectados! t[0.209207]
+--> 12 @265 clientes fixos nao conectados! t[0.188286]
+--> 13 @265 clientes fixos nao conectados! t[0.169458]
+--> 14 @265 clientes fixos nao conectados! t[0.152512]
+--> 15 @265 clientes fixos nao conectados! t[0.137261]
+--> 16 @265 clientes fixos nao conectados! t[0.123535]
+--> 17 @265 clientes fixos nao conectados! t[0.111181]
+--> 18 @265 clientes fixos nao conectados! t[0.100063]
+--> 19 @265 clientes fixos nao conectados! t[0.0900568]
+--> 20 @265 clientes fixos nao conectados! t[0.0810511]
+--> 21 @265 clientes fixos nao conectados! t[0.072946]
+--> 22 @265 clientes fixos nao conectados! t[0.0656514]
+--> 23 @265 clientes fixos nao conectados! t[0.0590863]
+--> 24 @265 clientes fixos nao conectados! t[0.0531776]
+--> Solicitando nova localizacao por não existir movimento em A @265
+Centro de massa: 294.537 268.962
+--> 25 @265 clientes fixos nao conectados! t[0.0478599]
+--> 26 @265 clientes fixos nao conectados! t[0.0430739]
+--> 27 @265 clientes fixos nao conectados! t[0.0387665]
+--> 28 @265 clientes fixos nao conectados! t[0.0348898]
+--> 29 @265 clientes fixos nao conectados! t[0.0314009]
+--> 30 @265 clientes fixos nao conectados! t[0.0282608]
+--> 31 @265 clientes fixos nao conectados! t[0.0254347]
+--> 32 @265 clientes fixos nao conectados! t[0.0228912]
+--> Solicitando nova localizacao por não existir movimento em A @265
+Centro de massa: 290.159 183.522
+--> 33 @265 clientes fixos nao conectados! t[0.0206021]
+--> 34 @265 clientes fixos nao conectados! t[0.0185419]
+--> 35 @265 clientes fixos nao conectados! t[0.0166877]
+--> 36 @265 clientes fixos nao conectados! t[0.0150189]
+--> 37 @265 clientes fixos nao conectados! t[0.013517]
+--> 38 @265 clientes fixos nao conectados! t[0.0121653]
+--> 39 @265 clientes fixos nao conectados! t[0.0109488]
+--> Solicitando nova localizacao por não existir movimento em A @265
+Centro de massa: 455.601 148.648
+--> Finalizado - Feeting temp=0.00985392
+SERVER - Iniciando estrutura do DA para agendamento @265
+ServerApplication::runAgendamento --> Enviar UAV 1 para a central  REF 3
+Uav #92 IP 10.1.1.7
+ServerApplication::runAgendamento --> Enviar UAV 2 para a central  REF 3
+Uav #93 IP 10.1.1.8
+ServerApplication::runAgendamento --> Enviar UAV 3 para a central  REF 3
+Uav #94 IP 10.1.1.9
+ServerApplication::runAgendamento --> Enviar UAV 4 para a central  REF 3
+Uav #95 IP 10.1.1.10
+RunAgendamento: 
+ [5,0]
+ [92,1]
+ [93,2]
+ [94,3]
+ [95,4]
+FIM custo ---------------------------- @265
+SERVER - inicializando matrizes.
+SERVER - iniciando execucao das partes A, B e C @265
+GOING OUT!! ------------------------>>>>>>
+SERVER - Finalizada estrutura do DA para agendamento @265
+SERVER - Atualizando posicionamento dos UAVs @265
+SERVER - UAV 5 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (350.278,214.056)
+	Consumption: 3.74
+	PunNeigh: 0.01
+	Wij: 513.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+	Maior valor LOC 	Id: 2
+	Pos: (535.594,251.397)
+	Consumption: 4.42
+	PunNeigh: 0.01
+	Wij: 84.5
+	Connected: true
+
+\t--- j = 3
+\t--- j = 4
+## ===> UAV 5 to LOC 2
+SERVER - LOC 2
+	Id: 2
+	Pos: (535.594,251.397)
+	Consumption: 4.42
+	PunNeigh: 0.01
+	Wij: 84.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @265
+SERVER - UAV 92 REF 1
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (350.278,214.056)
+	Consumption: 3.74
+	PunNeigh: 0.01
+	Wij: 513.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+\t--- j = 4
+	Maior valor LOC 	Id: 4
+	Pos: (329.672,147.969)
+	Consumption: 3.4
+	PunNeigh: 0.141032
+	Wij: 65
+	Connected: true
+
+## ===> UAV 92 to LOC 4
+SERVER - LOC 4
+	Id: 4
+	Pos: (329.672,147.969)
+	Consumption: 3.4
+	PunNeigh: 0.141032
+	Wij: 65
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @265
+SERVER - UAV 93 REF 1
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (350.278,214.056)
+	Consumption: 3.74
+	PunNeigh: 0.01
+	Wij: 513.5
+	Connected: true
+
+\t--- j = 1
+	Maior valor LOC 	Id: 1
+	Pos: (202.471,343.224)
+	Consumption: 7.82
+	PunNeigh: 0.01
+	Wij: 149.5
+	Connected: true
+
+\t--- j = 2
+\t--- j = 3
+\t--- j = 4
+## ===> UAV 93 to LOC 1
+SERVER - LOC 1
+	Id: 1
+	Pos: (202.471,343.224)
+	Consumption: 7.82
+	PunNeigh: 0.01
+	Wij: 149.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @265
+SERVER - UAV 94 REF 1
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (350.278,214.056)
+	Consumption: 3.74
+	PunNeigh: 0.01
+	Wij: 513.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+\t--- j = 4
+## ===> UAV 94 to LOC 0
+SERVER - LOC 0
+	Id: 0
+	Pos: (350.278,214.056)
+	Consumption: 3.74
+	PunNeigh: 0.01
+	Wij: 513.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @265
+SERVER - UAV 95 REF 1
+\t--- j = 0
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+	Maior valor LOC 	Id: 3
+	Pos: (114.254,200.853)
+	Consumption: 3.74
+	PunNeigh: 0.01
+	Wij: 71.5
+	Connected: true
+
+\t--- j = 4
+## ===> UAV 95 to LOC 3
+SERVER - LOC 3
+	Id: 3
+	Pos: (114.254,200.853)
+	Consumption: 3.74
+	PunNeigh: 0.01
+	Wij: 71.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @265
+-- Finalizado posicionamento dos UAVs @265
+Centro de massa: 287.78 245.719
+--> 1 @330 clientes fixos nao conectados! t[0.6]
+--> 2 @330 clientes fixos nao conectados! t[0.54]
+--> 3 @330 clientes fixos nao conectados! t[0.486]
+--> 4 @330 clientes fixos nao conectados! t[0.4374]
+--> 5 @330 clientes fixos nao conectados! t[0.39366]
+--> 6 @330 clientes fixos nao conectados! t[0.354294]
+--> Solicitando nova localizacao por não existir movimento em A @330
+Centro de massa: 286.904 256.037
+--> 7 @330 clientes fixos nao conectados! t[0.318865]
+--> 8 @330 clientes fixos nao conectados! t[0.286978]
+--> 9 @330 clientes fixos nao conectados! t[0.25828]
+--> 10 @330 clientes fixos nao conectados! t[0.232452]
+--> 11 @330 clientes fixos nao conectados! t[0.209207]
+--> 12 @330 clientes fixos nao conectados! t[0.188286]
+--> 13 @330 clientes fixos nao conectados! t[0.169458]
+--> 14 @330 clientes fixos nao conectados! t[0.152512]
+--> 15 @330 clientes fixos nao conectados! t[0.137261]
+--> 16 @330 clientes fixos nao conectados! t[0.123535]
+--> 17 @330 clientes fixos nao conectados! t[0.111181]
+--> 18 @330 clientes fixos nao conectados! t[0.100063]
+--> 19 @330 clientes fixos nao conectados! t[0.0900568]
+--> 20 @330 clientes fixos nao conectados! t[0.0810511]
+--> 21 @330 clientes fixos nao conectados! t[0.072946]
+--> 22 @330 clientes fixos nao conectados! t[0.0656514]
+--> 23 @330 clientes fixos nao conectados! t[0.0590863]
+--> 24 @330 clientes fixos nao conectados! t[0.0531776]
+--> 25 @330 clientes fixos nao conectados! t[0.0478599]
+--> 26 @330 clientes fixos nao conectados! t[0.0430739]
+--> 27 @330 clientes fixos nao conectados! t[0.0387665]
+--> 28 @330 clientes fixos nao conectados! t[0.0348898]
+--> Solicitando nova localizacao por não existir movimento em A @330
+Centro de massa: 293.428 257.489
+--> 29 @330 clientes fixos nao conectados! t[0.0314009]
+--> 30 @330 clientes fixos nao conectados! t[0.0282608]
+--> 31 @330 clientes fixos nao conectados! t[0.0254347]
+--> 32 @330 clientes fixos nao conectados! t[0.0228912]
+--> 33 @330 clientes fixos nao conectados! t[0.0206021]
+--> 34 @330 clientes fixos nao conectados! t[0.0185419]
+--> Solicitando nova localizacao por não existir movimento em A @330
+Centro de massa: 288.489 234.393
+--> 35 @330 clientes fixos nao conectados! t[0.0166877]
+--> Finalizado - Feeting temp=0.0150189
+SERVER - Solicitando novas localizações @330
+SERVER - Iniciando estrutura do DA para agendamento @330
+RunAgendamento: 
+ [5,0]
+ [92,1]
+ [93,2]
+ [94,3]
+ [95,5]
+FIM custo ---------------------------- @330
+SERVER - inicializando matrizes.
+SERVER - iniciando execucao das partes A, B e C @330
+GOING OUT!! ------------------------>>>>>>
+SERVER - Finalizada estrutura do DA para agendamento @330
+SERVER - Atualizando posicionamento dos UAVs @330
+SERVER - UAV 5 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (352.581,214.892)
+	Consumption: 5.1
+	PunNeigh: 0.01
+	Wij: 364
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+	Maior valor LOC 	Id: 2
+	Pos: (491.912,189.934)
+	Consumption: 2.38
+	PunNeigh: 0.01
+	Wij: 45.5
+	Connected: true
+
+\t--- j = 3
+\t--- j = 4
+## ===> UAV 5 to LOC 2
+SERVER - LOC 2
+	Id: 2
+	Pos: (491.912,189.934)
+	Consumption: 2.38
+	PunNeigh: 0.01
+	Wij: 45.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @330
+SERVER - UAV 92 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (352.581,214.892)
+	Consumption: 5.1
+	PunNeigh: 0.01
+	Wij: 364
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+\t--- j = 4
+	Maior valor LOC 	Id: 5
+	Pos: (275,175)
+	Consumption: 0
+	PunNeigh: 0
+	Wij: 0
+	Connected: false
+
+## ===> UAV 92 to LOC 4
+SERVER - LOC 4
+	Id: 5
+	Pos: (275,175)
+	Consumption: 0
+	PunNeigh: 0
+	Wij: 0
+	Connected: false
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @330
+SERVER - UAV 93 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (352.581,214.892)
+	Consumption: 5.1
+	PunNeigh: 0.01
+	Wij: 364
+	Connected: true
+
+\t--- j = 1
+	Maior valor LOC 	Id: 1
+	Pos: (206.28,338.082)
+	Consumption: 3.74
+	PunNeigh: 0.01
+	Wij: 71.5
+	Connected: true
+
+\t--- j = 2
+\t--- j = 3
+\t--- j = 4
+## ===> UAV 93 to LOC 1
+SERVER - LOC 1
+	Id: 1
+	Pos: (206.28,338.082)
+	Consumption: 3.74
+	PunNeigh: 0.01
+	Wij: 71.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @330
+SERVER - UAV 94 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (352.581,214.892)
+	Consumption: 5.1
+	PunNeigh: 0.01
+	Wij: 364
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+\t--- j = 4
+## ===> UAV 94 to LOC 0
+SERVER - LOC 0
+	Id: 0
+	Pos: (352.581,214.892)
+	Consumption: 5.1
+	PunNeigh: 0.01
+	Wij: 364
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @330
+SERVER - UAV 95 REF 3
+\t--- j = 0
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+	Maior valor LOC 	Id: 3
+	Pos: (144.919,190.361)
+	Consumption: 2.38
+	PunNeigh: 0.0503628
+	Wij: 45.5
+	Connected: true
+
+\t--- j = 4
+## ===> UAV 95 to LOC 3
+SERVER - LOC 3
+	Id: 3
+	Pos: (144.919,190.361)
+	Consumption: 2.38
+	PunNeigh: 0.0503628
+	Wij: 45.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @330
+-- Finalizado posicionamento dos UAVs @330
+Centro de massa: 309.511 236.492
+--> 1 @395 clientes fixos nao conectados! t[0.6]
+--> 2 @395 clientes fixos nao conectados! t[0.54]
+--> 3 @395 clientes fixos nao conectados! t[0.486]
+--> 4 @395 clientes fixos nao conectados! t[0.4374]
+--> 5 @395 clientes fixos nao conectados! t[0.39366]
+--> 6 @395 clientes fixos nao conectados! t[0.354294]
+--> Solicitando nova localizacao por não existir movimento em A @395
+Centro de massa: 285.342 270.654
+--> 7 @395 clientes fixos nao conectados! t[0.318865]
+--> 8 @395 clientes fixos nao conectados! t[0.286978]
+--> 9 @395 clientes fixos nao conectados! t[0.25828]
+--> 10 @395 clientes fixos nao conectados! t[0.232452]
+--> 11 @395 clientes fixos nao conectados! t[0.209207]
+--> 12 @395 clientes fixos nao conectados! t[0.188286]
+--> 13 @395 clientes fixos nao conectados! t[0.169458]
+--> 14 @395 clientes fixos nao conectados! t[0.152512]
+--> 15 @395 clientes fixos nao conectados! t[0.137261]
+--> 16 @395 clientes fixos nao conectados! t[0.123535]
+--> 17 @395 clientes fixos nao conectados! t[0.111181]
+--> 18 @395 clientes fixos nao conectados! t[0.100063]
+--> 19 @395 clientes fixos nao conectados! t[0.0900568]
+--> 20 @395 clientes fixos nao conectados! t[0.0810511]
+--> 21 @395 clientes fixos nao conectados! t[0.072946]
+--> 22 @395 clientes fixos nao conectados! t[0.0656514]
+--> 23 @395 clientes fixos nao conectados! t[0.0590863]
+--> 24 @395 clientes fixos nao conectados! t[0.0531776]
+--> 25 @395 clientes fixos nao conectados! t[0.0478599]
+--> Solicitando nova localizacao por não existir movimento em A @395
+Centro de massa: 295.72 273.339
+--> 26 @395 clientes fixos nao conectados! t[0.0430739]
+--> 27 @395 clientes fixos nao conectados! t[0.0387665]
+--> 28 @395 clientes fixos nao conectados! t[0.0348898]
+--> 29 @395 clientes fixos nao conectados! t[0.0314009]
+--> Finalizado - Feeting temp=0.0282608
+SERVER - Solicitando novas localizações @395
+SERVER - Iniciando estrutura do DA para agendamento @395
+ServerApplication::runAgendamento --> Enviar UAV 5 para a central  REF 3
+RunAgendamento: 
+ [93,0]
+ [94,1]
+ [95,2]
+ [2,4]
+FIM custo ---------------------------- @395
+SERVER - inicializando matrizes.
+SERVER - iniciando execucao das partes A, B e C @395
+GOING OUT!! ------------------------>>>>>>
+SERVER - Finalizada estrutura do DA para agendamento @395
+SERVER - Atualizando posicionamento dos UAVs @395
+SERVER - UAV 93 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (343.511,214.933)
+	Consumption: 8.5
+	PunNeigh: 0.01
+	Wij: 487.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+	Maior valor LOC 	Id: 2
+	Pos: (493.932,195.901)
+	Consumption: 2.72
+	PunNeigh: 0.0107635
+	Wij: 52
+	Connected: true
+
+\t--- j = 3
+	Maior valor LOC 	Id: 4
+	Pos: (275,175)
+	Consumption: 0
+	PunNeigh: 0
+	Wij: 0
+	Connected: false
+
+## ===> UAV 93 to LOC 3
+SERVER - LOC 3
+	Id: 4
+	Pos: (275,175)
+	Consumption: 0
+	PunNeigh: 0
+	Wij: 0
+	Connected: false
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @395
+SERVER - UAV 94 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (343.511,214.933)
+	Consumption: 8.5
+	PunNeigh: 0.01
+	Wij: 487.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+	Maior valor LOC 	Id: 2
+	Pos: (493.932,195.901)
+	Consumption: 2.72
+	PunNeigh: 0.0107635
+	Wij: 52
+	Connected: true
+
+\t--- j = 3
+## ===> UAV 94 to LOC 2
+SERVER - LOC 2
+	Id: 2
+	Pos: (493.932,195.901)
+	Consumption: 2.72
+	PunNeigh: 0.0107635
+	Wij: 52
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @395
+SERVER - UAV 95 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (343.511,214.933)
+	Consumption: 8.5
+	PunNeigh: 0.01
+	Wij: 487.5
+	Connected: true
+
+\t--- j = 1
+	Maior valor LOC 	Id: 1
+	Pos: (151.306,265.204)
+	Consumption: 4.76
+	PunNeigh: 0.01
+	Wij: 91
+	Connected: true
+
+\t--- j = 2
+\t--- j = 3
+## ===> UAV 95 to LOC 1
+SERVER - LOC 1
+	Id: 1
+	Pos: (151.306,265.204)
+	Consumption: 4.76
+	PunNeigh: 0.01
+	Wij: 91
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @395
+SERVER - UAV 2 REF 1
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (343.511,214.933)
+	Consumption: 8.5
+	PunNeigh: 0.01
+	Wij: 487.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+## ===> UAV 2 to LOC 0
+SERVER - LOC 0
+	Id: 0
+	Pos: (343.511,214.933)
+	Consumption: 8.5
+	PunNeigh: 0.01
+	Wij: 487.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @395
+-- Finalizado posicionamento dos UAVs @395
+Centro de massa: 309.676 202.73
+--> 1 @460 clientes fixos nao conectados! t[0.6]
+--> 2 @460 clientes fixos nao conectados! t[0.54]
+--> 3 @460 clientes fixos nao conectados! t[0.486]
+--> 4 @460 clientes fixos nao conectados! t[0.4374]
+--> 5 @460 clientes fixos nao conectados! t[0.39366]
+--> 6 @460 clientes fixos nao conectados! t[0.354294]
+--> Solicitando nova localizacao por não existir movimento em A @460
+Centro de massa: 248.012 233.653
+--> 7 @460 clientes fixos nao conectados! t[0.318865]
+--> 8 @460 clientes fixos nao conectados! t[0.286978]
+--> 9 @460 clientes fixos nao conectados! t[0.25828]
+--> 10 @460 clientes fixos nao conectados! t[0.232452]
+--> 11 @460 clientes fixos nao conectados! t[0.209207]
+--> 12 @460 clientes fixos nao conectados! t[0.188286]
+--> 13 @460 clientes fixos nao conectados! t[0.169458]
+--> 14 @460 clientes fixos nao conectados! t[0.152512]
+--> 15 @460 clientes fixos nao conectados! t[0.137261]
+--> 16 @460 clientes fixos nao conectados! t[0.123535]
+--> 17 @460 clientes fixos nao conectados! t[0.111181]
+--> 18 @460 clientes fixos nao conectados! t[0.100063]
+--> 19 @460 clientes fixos nao conectados! t[0.0900568]
+--> 20 @460 clientes fixos nao conectados! t[0.0810511]
+--> 21 @460 clientes fixos nao conectados! t[0.072946]
+--> 22 @460 clientes fixos nao conectados! t[0.0656514]
+--> 23 @460 clientes fixos nao conectados! t[0.0590863]
+--> 24 @460 clientes fixos nao conectados! t[0.0531776]
+--> 25 @460 clientes fixos nao conectados! t[0.0478599]
+--> 26 @460 clientes fixos nao conectados! t[0.0430739]
+--> Solicitando nova localizacao por não existir movimento em A @460
+Centro de massa: 233.813 227.018
+--> 27 @460 clientes fixos nao conectados! t[0.0387665]
+--> 28 @460 clientes fixos nao conectados! t[0.0348898]
+--> 29 @460 clientes fixos nao conectados! t[0.0314009]
+--> 30 @460 clientes fixos nao conectados! t[0.0282608]
+--> 31 @460 clientes fixos nao conectados! t[0.0254347]
+--> 32 @460 clientes fixos nao conectados! t[0.0228912]
+--> 33 @460 clientes fixos nao conectados! t[0.0206021]
+--> Solicitando nova localizacao por não existir movimento em A @460
+Centro de massa: 207.446 250.326
+--> Finalizado - Feeting temp=0.0185419
+SERVER - Solicitando novos UAVs @460
+SERVER - Iniciando estrutura do DA para agendamento @460
+RunAgendamento: 
+ [94,0]
+ [95,1]
+ [2,2]
+ [4,3]
+FIM custo ---------------------------- @460
+SERVER - inicializando matrizes.
+SERVER - iniciando execucao das partes A, B e C @460
+GOING OUT!! ------------------------>>>>>>
+SERVER - Finalizada estrutura do DA para agendamento @460
+SERVER - Atualizando posicionamento dos UAVs @460
+SERVER - UAV 94 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (346.018,213.351)
+	Consumption: 9.18
+	PunNeigh: 0.01
+	Wij: 435.5
+	Connected: true
+
+\t--- j = 1
+	Maior valor LOC 	Id: 1
+	Pos: (482.276,181.148)
+	Consumption: 1.02
+	PunNeigh: 0.01
+	Wij: 19.5
+	Connected: true
+
+\t--- j = 2
+\t--- j = 3
+## ===> UAV 94 to LOC 1
+SERVER - LOC 1
+	Id: 1
+	Pos: (482.276,181.148)
+	Consumption: 1.02
+	PunNeigh: 0.01
+	Wij: 19.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @460
+SERVER - UAV 95 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (346.018,213.351)
+	Consumption: 9.18
+	PunNeigh: 0.01
+	Wij: 435.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+	Maior valor LOC 	Id: 2
+	Pos: (109.379,197.588)
+	Consumption: 1.7
+	PunNeigh: 0.01
+	Wij: 32.5
+	Connected: true
+
+\t--- j = 3
+## ===> UAV 95 to LOC 2
+SERVER - LOC 2
+	Id: 2
+	Pos: (109.379,197.588)
+	Consumption: 1.7
+	PunNeigh: 0.01
+	Wij: 32.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @460
+SERVER - UAV 2 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (346.018,213.351)
+	Consumption: 9.18
+	PunNeigh: 0.01
+	Wij: 435.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+## ===> UAV 2 to LOC 0
+SERVER - LOC 0
+	Id: 0
+	Pos: (346.018,213.351)
+	Consumption: 9.18
+	PunNeigh: 0.01
+	Wij: 435.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @460
+SERVER - UAV 4 REF 1
+\t--- j = 0
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+	Maior valor LOC 	Id: 3
+	Pos: (238.504,252.9)
+	Consumption: 1.7
+	PunNeigh: 0.105534
+	Wij: 32.5
+	Connected: true
+
+## ===> UAV 4 to LOC 3
+SERVER - LOC 3
+	Id: 3
+	Pos: (238.504,252.9)
+	Consumption: 1.7
+	PunNeigh: 0.105534
+	Wij: 32.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @460
+-- Finalizado posicionamento dos UAVs @460
+Centro de massa: 311.837 213.484
+--> 1 @525 clientes fixos nao conectados! t[0.6]
+--> 2 @525 clientes fixos nao conectados! t[0.54]
+--> 3 @525 clientes fixos nao conectados! t[0.486]
+--> 4 @525 clientes fixos nao conectados! t[0.4374]
+--> 5 @525 clientes fixos nao conectados! t[0.39366]
+--> 6 @525 clientes fixos nao conectados! t[0.354294]
+--> Solicitando nova localizacao por não existir movimento em A @525
+Centro de massa: 223.82 222.34
+--> 7 @525 clientes fixos nao conectados! t[0.318865]
+--> 8 @525 clientes fixos nao conectados! t[0.286978]
+--> 9 @525 clientes fixos nao conectados! t[0.25828]
+--> 10 @525 clientes fixos nao conectados! t[0.232452]
+--> 11 @525 clientes fixos nao conectados! t[0.209207]
+--> 12 @525 clientes fixos nao conectados! t[0.188286]
+--> 13 @525 clientes fixos nao conectados! t[0.169458]
+--> 14 @525 clientes fixos nao conectados! t[0.152512]
+--> 15 @525 clientes fixos nao conectados! t[0.137261]
+--> 16 @525 clientes fixos nao conectados! t[0.123535]
+--> 17 @525 clientes fixos nao conectados! t[0.111181]
+--> 18 @525 clientes fixos nao conectados! t[0.100063]
+--> 19 @525 clientes fixos nao conectados! t[0.0900568]
+--> 20 @525 clientes fixos nao conectados! t[0.0810511]
+--> 21 @525 clientes fixos nao conectados! t[0.072946]
+--> 22 @525 clientes fixos nao conectados! t[0.0656514]
+--> 23 @525 clientes fixos nao conectados! t[0.0590863]
+--> 24 @525 clientes fixos nao conectados! t[0.0531776]
+--> 25 @525 clientes fixos nao conectados! t[0.0478599]
+--> 26 @525 clientes fixos nao conectados! t[0.0430739]
+--> 27 @525 clientes fixos nao conectados! t[0.0387665]
+--> 28 @525 clientes fixos nao conectados! t[0.0348898]
+--> 29 @525 clientes fixos nao conectados! t[0.0314009]
+--> Solicitando nova localizacao por não existir movimento em A @525
+Centro de massa: 228.523 227.342
+--> 30 @525 clientes fixos nao conectados! t[0.0282608]
+--> 31 @525 clientes fixos nao conectados! t[0.0254347]
+--> 32 @525 clientes fixos nao conectados! t[0.0228912]
+--> 33 @525 clientes fixos nao conectados! t[0.0206021]
+--> 34 @525 clientes fixos nao conectados! t[0.0185419]
+--> 35 @525 clientes fixos nao conectados! t[0.0166877]
+--> 36 @525 clientes fixos nao conectados! t[0.0150189]
+--> Solicitando nova localizacao por não existir movimento em A @525
+Centro de massa: 200 350
+--> Finalizado - Feeting temp=0.013517
+SERVER - Iniciando estrutura do DA para agendamento @525
+ServerApplication::runAgendamento --> Enviar UAV 94 para a central  REF 3
+ServerApplication::runAgendamento --> Enviar UAV 95 para a central  REF 3
+RunAgendamento: 
+ [2,0]
+ [4,1]
+ [1,2]
+ [3,3]
+FIM custo ---------------------------- @525
+SERVER - inicializando matrizes.
+SERVER - iniciando execucao das partes A, B e C @525
+GOING OUT!! ------------------------>>>>>>
+SERVER - Finalizada estrutura do DA para agendamento @525
+SERVER - Atualizando posicionamento dos UAVs @525
+SERVER - UAV 2 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (354.882,219.776)
+	Consumption: 7.14
+	PunNeigh: 0.01
+	Wij: 344.5
+	Connected: true
+
+\t--- j = 1
+	Maior valor LOC 	Id: 1
+	Pos: (482.298,180.766)
+	Consumption: 1.02
+	PunNeigh: 0.01
+	Wij: 19.5
+	Connected: true
+
+\t--- j = 2
+\t--- j = 3
+## ===> UAV 2 to LOC 1
+SERVER - LOC 1
+	Id: 1
+	Pos: (482.298,180.766)
+	Consumption: 1.02
+	PunNeigh: 0.01
+	Wij: 19.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @525
+SERVER - UAV 4 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (354.882,219.776)
+	Consumption: 7.14
+	PunNeigh: 0.01
+	Wij: 344.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+	Maior valor LOC 	Id: 2
+	Pos: (108.546,197.499)
+	Consumption: 2.04
+	PunNeigh: 0.01
+	Wij: 39
+	Connected: true
+
+\t--- j = 3
+## ===> UAV 4 to LOC 2
+SERVER - LOC 2
+	Id: 2
+	Pos: (108.546,197.499)
+	Consumption: 2.04
+	PunNeigh: 0.01
+	Wij: 39
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @525
+SERVER - UAV 1 REF 1
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (354.882,219.776)
+	Consumption: 7.14
+	PunNeigh: 0.01
+	Wij: 344.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+## ===> UAV 1 to LOC 0
+SERVER - LOC 0
+	Id: 0
+	Pos: (354.882,219.776)
+	Consumption: 7.14
+	PunNeigh: 0.01
+	Wij: 344.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @525
+SERVER - UAV 3 REF 1
+\t--- j = 0
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+	Maior valor LOC 	Id: 3
+	Pos: (243.377,246.786)
+	Consumption: 0.68
+	PunNeigh: 0.145051
+	Wij: 13
+	Connected: true
+
+## ===> UAV 3 to LOC 3
+SERVER - LOC 3
+	Id: 3
+	Pos: (243.377,246.786)
+	Consumption: 0.68
+	PunNeigh: 0.145051
+	Wij: 13
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @525
+-- Finalizado posicionamento dos UAVs @525
+--> 1 @590 clientes fixos nao conectados! t[0.6]
+--> 2 @590 clientes fixos nao conectados! t[0.54]
+--> 3 @590 clientes fixos nao conectados! t[0.486]
+--> 4 @590 clientes fixos nao conectados! t[0.4374]
+--> 5 @590 clientes fixos nao conectados! t[0.39366]
+--> 6 @590 clientes fixos nao conectados! t[0.354294]
+--> Solicitando nova localizacao por não existir movimento em A @590
+==> Todos os clientes conectados.
+Centro de massa: 299.106 202.246
+--> 7 @590 clientes fixos nao conectados! t[0.318865]
+--> 8 @590 clientes fixos nao conectados! t[0.286978]
+--> 9 @590 clientes fixos nao conectados! t[0.25828]
+--> 10 @590 clientes fixos nao conectados! t[0.232452]
+--> 11 @590 clientes fixos nao conectados! t[0.209207]
+--> 12 @590 clientes fixos nao conectados! t[0.188286]
+--> 13 @590 clientes fixos nao conectados! t[0.169458]
+--> 14 @590 clientes fixos nao conectados! t[0.152512]
+--> 15 @590 clientes fixos nao conectados! t[0.137261]
+--> 16 @590 clientes fixos nao conectados! t[0.123535]
+--> 17 @590 clientes fixos nao conectados! t[0.111181]
+--> 18 @590 clientes fixos nao conectados! t[0.100063]
+--> 19 @590 clientes fixos nao conectados! t[0.0900568]
+--> 20 @590 clientes fixos nao conectados! t[0.0810511]
+--> 21 @590 clientes fixos nao conectados! t[0.072946]
+--> 22 @590 clientes fixos nao conectados! t[0.0656514]
+--> 23 @590 clientes fixos nao conectados! t[0.0590863]
+--> 24 @590 clientes fixos nao conectados! t[0.0531776]
+--> 25 @590 clientes fixos nao conectados! t[0.0478599]
+--> 26 @590 clientes fixos nao conectados! t[0.0430739]
+--> 27 @590 clientes fixos nao conectados! t[0.0387665]
+--> 28 @590 clientes fixos nao conectados! t[0.0348898]
+--> 29 @590 clientes fixos nao conectados! t[0.0314009]
+--> 30 @590 clientes fixos nao conectados! t[0.0282608]
+--> 31 @590 clientes fixos nao conectados! t[0.0254347]
+--> Solicitando nova localizacao por não existir movimento em A @590
+Centro de massa: 323.754 244.107
+--> 32 @590 clientes fixos nao conectados! t[0.0228912]
+--> 33 @590 clientes fixos nao conectados! t[0.0206021]
+--> 34 @590 clientes fixos nao conectados! t[0.0185419]
+--> 35 @590 clientes fixos nao conectados! t[0.0166877]
+--> 36 @590 clientes fixos nao conectados! t[0.0150189]
+--> 37 @590 clientes fixos nao conectados! t[0.013517]
+--> Solicitando nova localizacao por não existir movimento em A @590
+Centro de massa: 200 350
+--> Finalizado - Feeting temp=0.0121653
+SERVER - Iniciando estrutura do DA para agendamento @590
+RunAgendamento: 
+ [2,0]
+ [4,1]
+ [1,2]
+ [3,3]
+FIM custo ---------------------------- @590
+SERVER - inicializando matrizes.
+SERVER - iniciando execucao das partes A, B e C @590
+GOING OUT!! ------------------------>>>>>>
+SERVER - Finalizada estrutura do DA para agendamento @590
+SERVER - Atualizando posicionamento dos UAVs @590
+SERVER - UAV 2 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (351.641,228.091)
+	Consumption: 2.72
+	PunNeigh: 0.01
+	Wij: 156
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+	Maior valor LOC 	Id: 2
+	Pos: (480.125,173.685)
+	Consumption: 1.02
+	PunNeigh: 0.01
+	Wij: 19.5
+	Connected: true
+
+\t--- j = 3
+## ===> UAV 2 to LOC 2
+SERVER - LOC 2
+	Id: 2
+	Pos: (480.125,173.685)
+	Consumption: 1.02
+	PunNeigh: 0.01
+	Wij: 19.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @590
+SERVER - UAV 4 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (351.641,228.091)
+	Consumption: 2.72
+	PunNeigh: 0.01
+	Wij: 156
+	Connected: true
+
+\t--- j = 1
+	Maior valor LOC 	Id: 1
+	Pos: (107.591,199.014)
+	Consumption: 0.68
+	PunNeigh: 0.01
+	Wij: 13
+	Connected: true
+
+\t--- j = 2
+\t--- j = 3
+## ===> UAV 4 to LOC 1
+SERVER - LOC 1
+	Id: 1
+	Pos: (107.591,199.014)
+	Consumption: 0.68
+	PunNeigh: 0.01
+	Wij: 13
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @590
+SERVER - UAV 1 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (351.641,228.091)
+	Consumption: 2.72
+	PunNeigh: 0.01
+	Wij: 156
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+## ===> UAV 1 to LOC 0
+SERVER - LOC 0
+	Id: 0
+	Pos: (351.641,228.091)
+	Consumption: 2.72
+	PunNeigh: 0.01
+	Wij: 156
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @590
+SERVER - UAV 3 REF 3
+\t--- j = 0
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+	Maior valor LOC 	Id: 3
+	Pos: (242.492,250.853)
+	Consumption: 1.02
+	PunNeigh: 0.145051
+	Wij: 19.5
+	Connected: true
+
+## ===> UAV 3 to LOC 3
+SERVER - LOC 3
+	Id: 3
+	Pos: (242.492,250.853)
+	Consumption: 1.02
+	PunNeigh: 0.145051
+	Wij: 19.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @590
+-- Finalizado posicionamento dos UAVs @590
+Centro de massa: 267.232 211.157
+--> 1 @655 clientes fixos nao conectados! t[0.6]
+--> 2 @655 clientes fixos nao conectados! t[0.54]
+--> 3 @655 clientes fixos nao conectados! t[0.486]
+--> 4 @655 clientes fixos nao conectados! t[0.4374]
+--> 5 @655 clientes fixos nao conectados! t[0.39366]
+--> 6 @655 clientes fixos nao conectados! t[0.354294]
+--> Solicitando nova localizacao por não existir movimento em A @655
+Centro de massa: 267.783 218.624
+--> 7 @655 clientes fixos nao conectados! t[0.318865]
+--> 8 @655 clientes fixos nao conectados! t[0.286978]
+--> 9 @655 clientes fixos nao conectados! t[0.25828]
+--> 10 @655 clientes fixos nao conectados! t[0.232452]
+--> 11 @655 clientes fixos nao conectados! t[0.209207]
+--> 12 @655 clientes fixos nao conectados! t[0.188286]
+--> 13 @655 clientes fixos nao conectados! t[0.169458]
+--> 14 @655 clientes fixos nao conectados! t[0.152512]
+--> 15 @655 clientes fixos nao conectados! t[0.137261]
+--> 16 @655 clientes fixos nao conectados! t[0.123535]
+--> 17 @655 clientes fixos nao conectados! t[0.111181]
+--> 18 @655 clientes fixos nao conectados! t[0.100063]
+--> 19 @655 clientes fixos nao conectados! t[0.0900568]
+--> 20 @655 clientes fixos nao conectados! t[0.0810511]
+--> 21 @655 clientes fixos nao conectados! t[0.072946]
+--> 22 @655 clientes fixos nao conectados! t[0.0656514]
+--> 23 @655 clientes fixos nao conectados! t[0.0590863]
+--> 24 @655 clientes fixos nao conectados! t[0.0531776]
+--> 25 @655 clientes fixos nao conectados! t[0.0478599]
+--> 26 @655 clientes fixos nao conectados! t[0.0430739]
+--> 27 @655 clientes fixos nao conectados! t[0.0387665]
+--> 28 @655 clientes fixos nao conectados! t[0.0348898]
+--> 29 @655 clientes fixos nao conectados! t[0.0314009]
+--> 30 @655 clientes fixos nao conectados! t[0.0282608]
+--> 31 @655 clientes fixos nao conectados! t[0.0254347]
+--> 32 @655 clientes fixos nao conectados! t[0.0228912]
+--> 33 @655 clientes fixos nao conectados! t[0.0206021]
+--> 34 @655 clientes fixos nao conectados! t[0.0185419]
+--> 35 @655 clientes fixos nao conectados! t[0.0166877]
+--> 36 @655 clientes fixos nao conectados! t[0.0150189]
+--> 37 @655 clientes fixos nao conectados! t[0.013517]
+--> Solicitando nova localizacao por não existir movimento em A @655
+Centro de massa: 237.771 219.688
+--> 38 @655 clientes fixos nao conectados! t[0.0121653]
+--> 39 @655 clientes fixos nao conectados! t[0.0109488]
+--> 40 @655 clientes fixos nao conectados! t[0.00985392]
+--> 41 @655 clientes fixos nao conectados! t[0.00886853]
+--> 42 @655 clientes fixos nao conectados! t[0.00798168]
+--> 43 @655 clientes fixos nao conectados! t[0.00718351]
+--> 44 @655 clientes fixos nao conectados! t[0.00646516]
+--> Solicitando nova localizacao por não existir movimento em A @655
+Centro de massa: 216.156 251.428
+--> Finalizado - Feeting temp=0.00581864
+SERVER - Iniciando estrutura do DA para agendamento @655
+ServerApplication::runAgendamento --> Enviar UAV 2 para a central  REF 3
+RunAgendamento: 
+ [4,0]
+ [1,1]
+ [3,2]
+ [92,3]
+FIM custo ---------------------------- @655
+SERVER - inicializando matrizes.
+SERVER - iniciando execucao das partes A, B e C @655
+GOING OUT!! ------------------------>>>>>>
+SERVER - Finalizada estrutura do DA para agendamento @655
+SERVER - Atualizando posicionamento dos UAVs @655
+SERVER - UAV 4 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (345.304,225.625)
+	Consumption: 4.42
+	PunNeigh: 0.01
+	Wij: 247
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+	Maior valor LOC 	Id: 2
+	Pos: (101.982,206.268)
+	Consumption: 1.36
+	PunNeigh: 0.01
+	Wij: 26
+	Connected: true
+
+\t--- j = 3
+## ===> UAV 4 to LOC 2
+SERVER - LOC 2
+	Id: 2
+	Pos: (101.982,206.268)
+	Consumption: 1.36
+	PunNeigh: 0.01
+	Wij: 26
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @655
+SERVER - UAV 1 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (345.304,225.625)
+	Consumption: 4.42
+	PunNeigh: 0.01
+	Wij: 247
+	Connected: true
+
+\t--- j = 1
+	Maior valor LOC 	Id: 1
+	Pos: (479.863,174.178)
+	Consumption: 1.36
+	PunNeigh: 0.01
+	Wij: 26
+	Connected: true
+
+\t--- j = 2
+\t--- j = 3
+## ===> UAV 1 to LOC 1
+SERVER - LOC 1
+	Id: 1
+	Pos: (479.863,174.178)
+	Consumption: 1.36
+	PunNeigh: 0.01
+	Wij: 26
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @655
+SERVER - UAV 3 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (345.304,225.625)
+	Consumption: 4.42
+	PunNeigh: 0.01
+	Wij: 247
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+	Maior valor LOC 	Id: 3
+	Pos: (238.076,254.163)
+	Consumption: 1.36
+	PunNeigh: 0.103771
+	Wij: 26
+	Connected: true
+
+## ===> UAV 3 to LOC 3
+SERVER - LOC 3
+	Id: 3
+	Pos: (238.076,254.163)
+	Consumption: 1.36
+	PunNeigh: 0.103771
+	Wij: 26
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @655
+SERVER - UAV 92 REF 1
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (345.304,225.625)
+	Consumption: 4.42
+	PunNeigh: 0.01
+	Wij: 247
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+## ===> UAV 92 to LOC 0
+SERVER - LOC 0
+	Id: 0
+	Pos: (345.304,225.625)
+	Consumption: 4.42
+	PunNeigh: 0.01
+	Wij: 247
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @655
+-- Finalizado posicionamento dos UAVs @655
+Centro de massa: 256.794 237.969
+--> 1 @720 clientes fixos nao conectados! t[0.6]
+--> 2 @720 clientes fixos nao conectados! t[0.54]
+--> 3 @720 clientes fixos nao conectados! t[0.486]
+--> 4 @720 clientes fixos nao conectados! t[0.4374]
+--> 5 @720 clientes fixos nao conectados! t[0.39366]
+--> 6 @720 clientes fixos nao conectados! t[0.354294]
+--> Solicitando nova localizacao por não existir movimento em A @720
+Centro de massa: 233.971 239.889
+--> 7 @720 clientes fixos nao conectados! t[0.318865]
+--> 8 @720 clientes fixos nao conectados! t[0.286978]
+--> 9 @720 clientes fixos nao conectados! t[0.25828]
+--> 10 @720 clientes fixos nao conectados! t[0.232452]
+--> 11 @720 clientes fixos nao conectados! t[0.209207]
+--> 12 @720 clientes fixos nao conectados! t[0.188286]
+--> 13 @720 clientes fixos nao conectados! t[0.169458]
+--> 14 @720 clientes fixos nao conectados! t[0.152512]
+--> 15 @720 clientes fixos nao conectados! t[0.137261]
+--> 16 @720 clientes fixos nao conectados! t[0.123535]
+--> 17 @720 clientes fixos nao conectados! t[0.111181]
+--> 18 @720 clientes fixos nao conectados! t[0.100063]
+--> 19 @720 clientes fixos nao conectados! t[0.0900568]
+--> 20 @720 clientes fixos nao conectados! t[0.0810511]
+--> 21 @720 clientes fixos nao conectados! t[0.072946]
+--> 22 @720 clientes fixos nao conectados! t[0.0656514]
+--> 23 @720 clientes fixos nao conectados! t[0.0590863]
+--> 24 @720 clientes fixos nao conectados! t[0.0531776]
+--> 25 @720 clientes fixos nao conectados! t[0.0478599]
+--> 26 @720 clientes fixos nao conectados! t[0.0430739]
+--> 27 @720 clientes fixos nao conectados! t[0.0387665]
+--> 28 @720 clientes fixos nao conectados! t[0.0348898]
+--> 29 @720 clientes fixos nao conectados! t[0.0314009]
+--> 30 @720 clientes fixos nao conectados! t[0.0282608]
+--> 31 @720 clientes fixos nao conectados! t[0.0254347]
+--> 32 @720 clientes fixos nao conectados! t[0.0228912]
+--> 33 @720 clientes fixos nao conectados! t[0.0206021]
+--> 34 @720 clientes fixos nao conectados! t[0.0185419]
+--> 35 @720 clientes fixos nao conectados! t[0.0166877]
+--> 36 @720 clientes fixos nao conectados! t[0.0150189]
+--> 37 @720 clientes fixos nao conectados! t[0.013517]
+--> Solicitando nova localizacao por não existir movimento em A @720
+Centro de massa: 192.636 244.726
+--> 38 @720 clientes fixos nao conectados! t[0.0121653]
+--> 39 @720 clientes fixos nao conectados! t[0.0109488]
+--> 40 @720 clientes fixos nao conectados! t[0.00985392]
+--> 41 @720 clientes fixos nao conectados! t[0.00886853]
+--> 42 @720 clientes fixos nao conectados! t[0.00798168]
+--> 43 @720 clientes fixos nao conectados! t[0.00718351]
+--> 44 @720 clientes fixos nao conectados! t[0.00646516]
+--> Solicitando nova localizacao por não existir movimento em A @720
+Centro de massa: 217.302 251.853
+--> Finalizado - Feeting temp=0.00581864
+SERVER - Iniciando estrutura do DA para agendamento @720
+ServerApplication::runAgendamento --> Enviar UAV 4 para a central  REF 3
+RunAgendamento: 
+ [1,0]
+ [3,1]
+ [92,2]
+ [93,3]
+FIM custo ---------------------------- @720
+SERVER - inicializando matrizes.
+SERVER - iniciando execucao das partes A, B e C @720
+GOING OUT!! ------------------------>>>>>>
+SERVER - Finalizada estrutura do DA para agendamento @720
+SERVER - Atualizando posicionamento dos UAVs @720
+SERVER - UAV 1 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (345.042,230.447)
+	Consumption: 4.08
+	PunNeigh: 0.01
+	Wij: 240.5
+	Connected: true
+
+\t--- j = 1
+	Maior valor LOC 	Id: 1
+	Pos: (483.015,177.672)
+	Consumption: 1.02
+	PunNeigh: 0.01
+	Wij: 19.5
+	Connected: true
+
+\t--- j = 2
+\t--- j = 3
+## ===> UAV 1 to LOC 1
+SERVER - LOC 1
+	Id: 1
+	Pos: (483.015,177.672)
+	Consumption: 1.02
+	PunNeigh: 0.01
+	Wij: 19.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @720
+SERVER - UAV 3 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (345.042,230.447)
+	Consumption: 4.08
+	PunNeigh: 0.01
+	Wij: 240.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+	Maior valor LOC 	Id: 2
+	Pos: (100.144,211.992)
+	Consumption: 1.7
+	PunNeigh: 0.01
+	Wij: 32.5
+	Connected: true
+
+\t--- j = 3
+## ===> UAV 3 to LOC 2
+SERVER - LOC 2
+	Id: 2
+	Pos: (100.144,211.992)
+	Consumption: 1.7
+	PunNeigh: 0.01
+	Wij: 32.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @720
+SERVER - UAV 92 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (345.042,230.447)
+	Consumption: 4.08
+	PunNeigh: 0.01
+	Wij: 240.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+## ===> UAV 92 to LOC 0
+SERVER - LOC 0
+	Id: 0
+	Pos: (345.042,230.447)
+	Consumption: 4.08
+	PunNeigh: 0.01
+	Wij: 240.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @720
+SERVER - UAV 93 REF 1
+\t--- j = 0
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+	Maior valor LOC 	Id: 3
+	Pos: (238.185,254.26)
+	Consumption: 1.7
+	PunNeigh: 0.10364
+	Wij: 32.5
+	Connected: true
+
+## ===> UAV 93 to LOC 3
+SERVER - LOC 3
+	Id: 3
+	Pos: (238.185,254.26)
+	Consumption: 1.7
+	PunNeigh: 0.10364
+	Wij: 32.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @720
+-- Finalizado posicionamento dos UAVs @720
+Centro de massa: 300.317 242.522
+--> 1 @785 clientes fixos nao conectados! t[0.6]
+--> 2 @785 clientes fixos nao conectados! t[0.54]
+--> 3 @785 clientes fixos nao conectados! t[0.486]
+--> 4 @785 clientes fixos nao conectados! t[0.4374]
+--> 5 @785 clientes fixos nao conectados! t[0.39366]
+--> 6 @785 clientes fixos nao conectados! t[0.354294]
+--> Solicitando nova localizacao por não existir movimento em A @785
+Centro de massa: 279.226 236.856
+--> 7 @785 clientes fixos nao conectados! t[0.318865]
+--> 8 @785 clientes fixos nao conectados! t[0.286978]
+--> 9 @785 clientes fixos nao conectados! t[0.25828]
+--> 10 @785 clientes fixos nao conectados! t[0.232452]
+--> 11 @785 clientes fixos nao conectados! t[0.209207]
+--> 12 @785 clientes fixos nao conectados! t[0.188286]
+--> 13 @785 clientes fixos nao conectados! t[0.169458]
+--> 14 @785 clientes fixos nao conectados! t[0.152512]
+--> 15 @785 clientes fixos nao conectados! t[0.137261]
+--> 16 @785 clientes fixos nao conectados! t[0.123535]
+--> 17 @785 clientes fixos nao conectados! t[0.111181]
+--> 18 @785 clientes fixos nao conectados! t[0.100063]
+--> 19 @785 clientes fixos nao conectados! t[0.0900568]
+--> 20 @785 clientes fixos nao conectados! t[0.0810511]
+--> 21 @785 clientes fixos nao conectados! t[0.072946]
+--> 22 @785 clientes fixos nao conectados! t[0.0656514]
+--> 23 @785 clientes fixos nao conectados! t[0.0590863]
+--> 24 @785 clientes fixos nao conectados! t[0.0531776]
+--> 25 @785 clientes fixos nao conectados! t[0.0478599]
+--> 26 @785 clientes fixos nao conectados! t[0.0430739]
+--> 27 @785 clientes fixos nao conectados! t[0.0387665]
+--> 28 @785 clientes fixos nao conectados! t[0.0348898]
+--> 29 @785 clientes fixos nao conectados! t[0.0314009]
+--> 30 @785 clientes fixos nao conectados! t[0.0282608]
+--> 31 @785 clientes fixos nao conectados! t[0.0254347]
+--> 32 @785 clientes fixos nao conectados! t[0.0228912]
+--> 33 @785 clientes fixos nao conectados! t[0.0206021]
+--> 34 @785 clientes fixos nao conectados! t[0.0185419]
+--> 35 @785 clientes fixos nao conectados! t[0.0166877]
+--> 36 @785 clientes fixos nao conectados! t[0.0150189]
+--> 37 @785 clientes fixos nao conectados! t[0.013517]
+--> 38 @785 clientes fixos nao conectados! t[0.0121653]
+--> 39 @785 clientes fixos nao conectados! t[0.0109488]
+--> Solicitando nova localizacao por não existir movimento em A @785
+Centro de massa: 286.035 224.333
+--> 40 @785 clientes fixos nao conectados! t[0.00985392]
+--> Finalizado - Feeting temp=0.00886853
+SERVER - Solicitando novas localizações @785
+SERVER - Iniciando estrutura do DA para agendamento @785
+ServerApplication::runAgendamento --> Enviar UAV 1 para a central  REF 3
+ServerApplication::runAgendamento --> Enviar UAV 3 para a central  REF 3
+RunAgendamento: 
+ [92,0]
+ [93,1]
+ [5,2]
+ [95,4]
+FIM custo ---------------------------- @785
+SERVER - inicializando matrizes.
+SERVER - iniciando execucao das partes A, B e C @785
+GOING OUT!! ------------------------>>>>>>
+SERVER - Finalizada estrutura do DA para agendamento @785
+SERVER - Atualizando posicionamento dos UAVs @785
+SERVER - UAV 92 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (351.961,226.265)
+	Consumption: 5.1
+	PunNeigh: 0.01
+	Wij: 247
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+	Maior valor LOC 	Id: 2
+	Pos: (461.815,181.301)
+	Consumption: 1.02
+	PunNeigh: 0.0458688
+	Wij: 19.5
+	Connected: true
+
+\t--- j = 3
+## ===> UAV 92 to LOC 2
+SERVER - LOC 2
+	Id: 2
+	Pos: (461.815,181.301)
+	Consumption: 1.02
+	PunNeigh: 0.0458688
+	Wij: 19.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @785
+SERVER - UAV 93 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (351.961,226.265)
+	Consumption: 5.1
+	PunNeigh: 0.01
+	Wij: 247
+	Connected: true
+
+\t--- j = 1
+	Maior valor LOC 	Id: 1
+	Pos: (144.163,254.346)
+	Consumption: 1.7
+	PunNeigh: 0.01
+	Wij: 32.5
+	Connected: true
+
+\t--- j = 2
+\t--- j = 3
+## ===> UAV 93 to LOC 1
+SERVER - LOC 1
+	Id: 1
+	Pos: (144.163,254.346)
+	Consumption: 1.7
+	PunNeigh: 0.01
+	Wij: 32.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @785
+SERVER - UAV 5 REF 1
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (351.961,226.265)
+	Consumption: 5.1
+	PunNeigh: 0.01
+	Wij: 247
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+## ===> UAV 5 to LOC 0
+SERVER - LOC 0
+	Id: 0
+	Pos: (351.961,226.265)
+	Consumption: 5.1
+	PunNeigh: 0.01
+	Wij: 247
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @785
+SERVER - UAV 95 REF 1
+\t--- j = 0
+\t--- j = 1
+\t--- j = 2
+\t--- j = 3
+	Maior valor LOC 	Id: 4
+	Pos: (275,175)
+	Consumption: 0
+	PunNeigh: 0
+	Wij: 0
+	Connected: false
+
+## ===> UAV 95 to LOC 3
+SERVER - LOC 3
+	Id: 4
+	Pos: (275,175)
+	Consumption: 0
+	PunNeigh: 0
+	Wij: 0
+	Connected: false
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @785
+-- Finalizado posicionamento dos UAVs @785
+Centro de massa: 243.141 251.933
+--> 1 @850 clientes fixos nao conectados! t[0.6]
+--> 2 @850 clientes fixos nao conectados! t[0.54]
+--> 3 @850 clientes fixos nao conectados! t[0.486]
+--> 4 @850 clientes fixos nao conectados! t[0.4374]
+--> 5 @850 clientes fixos nao conectados! t[0.39366]
+--> 6 @850 clientes fixos nao conectados! t[0.354294]
+--> Solicitando nova localizacao por não existir movimento em A @850
+Centro de massa: 262.335 264.337
+--> 7 @850 clientes fixos nao conectados! t[0.318865]
+--> 8 @850 clientes fixos nao conectados! t[0.286978]
+--> 9 @850 clientes fixos nao conectados! t[0.25828]
+--> 10 @850 clientes fixos nao conectados! t[0.232452]
+--> 11 @850 clientes fixos nao conectados! t[0.209207]
+--> 12 @850 clientes fixos nao conectados! t[0.188286]
+--> 13 @850 clientes fixos nao conectados! t[0.169458]
+--> 14 @850 clientes fixos nao conectados! t[0.152512]
+--> 15 @850 clientes fixos nao conectados! t[0.137261]
+--> 16 @850 clientes fixos nao conectados! t[0.123535]
+--> 17 @850 clientes fixos nao conectados! t[0.111181]
+--> 18 @850 clientes fixos nao conectados! t[0.100063]
+--> 19 @850 clientes fixos nao conectados! t[0.0900568]
+--> 20 @850 clientes fixos nao conectados! t[0.0810511]
+--> 21 @850 clientes fixos nao conectados! t[0.072946]
+--> 22 @850 clientes fixos nao conectados! t[0.0656514]
+--> 23 @850 clientes fixos nao conectados! t[0.0590863]
+--> 24 @850 clientes fixos nao conectados! t[0.0531776]
+--> 25 @850 clientes fixos nao conectados! t[0.0478599]
+--> 26 @850 clientes fixos nao conectados! t[0.0430739]
+--> 27 @850 clientes fixos nao conectados! t[0.0387665]
+--> 28 @850 clientes fixos nao conectados! t[0.0348898]
+--> 29 @850 clientes fixos nao conectados! t[0.0314009]
+--> 30 @850 clientes fixos nao conectados! t[0.0282608]
+--> Solicitando nova localizacao por não existir movimento em A @850
+Centro de massa: 377.491 258.782
+--> 31 @850 clientes fixos nao conectados! t[0.0254347]
+--> Finalizado - Feeting temp=0.0228912
+SERVER - Iniciando estrutura do DA para agendamento @850
+RunAgendamento: 
+ [92,0]
+ [93,1]
+ [5,2]
+FIM custo ---------------------------- @850
+SERVER - inicializando matrizes.
+SERVER - iniciando execucao das partes A, B e C @850
+GOING OUT!! ------------------------>>>>>>
+SERVER - Finalizada estrutura do DA para agendamento @850
+SERVER - Atualizando posicionamento dos UAVs @850
+SERVER - UAV 92 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (363.367,218.707)
+	Consumption: 3.06
+	PunNeigh: 0.01
+	Wij: 188.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+	Maior valor LOC 	Id: 2
+	Pos: (458.353,188.888)
+	Consumption: 0.68
+	PunNeigh: 0.0568203
+	Wij: 13
+	Connected: true
+
+## ===> UAV 92 to LOC 2
+SERVER - LOC 2
+	Id: 2
+	Pos: (458.353,188.888)
+	Consumption: 0.68
+	PunNeigh: 0.0568203
+	Wij: 13
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @850
+SERVER - UAV 93 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (363.367,218.707)
+	Consumption: 3.06
+	PunNeigh: 0.01
+	Wij: 188.5
+	Connected: true
+
+\t--- j = 1
+	Maior valor LOC 	Id: 1
+	Pos: (151.953,256.56)
+	Consumption: 3.06
+	PunNeigh: 0.01
+	Wij: 58.5
+	Connected: true
+
+\t--- j = 2
+## ===> UAV 93 to LOC 1
+SERVER - LOC 1
+	Id: 1
+	Pos: (151.953,256.56)
+	Consumption: 3.06
+	PunNeigh: 0.01
+	Wij: 58.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @850
+SERVER - UAV 5 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (363.367,218.707)
+	Consumption: 3.06
+	PunNeigh: 0.01
+	Wij: 188.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+## ===> UAV 5 to LOC 0
+SERVER - LOC 0
+	Id: 0
+	Pos: (363.367,218.707)
+	Consumption: 3.06
+	PunNeigh: 0.01
+	Wij: 188.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @850
+-- Finalizado posicionamento dos UAVs @850
+--> 1 @915 clientes fixos nao conectados! t[0.6]
+--> 2 @915 clientes fixos nao conectados! t[0.54]
+--> 3 @915 clientes fixos nao conectados! t[0.486]
+--> 4 @915 clientes fixos nao conectados! t[0.4374]
+--> 5 @915 clientes fixos nao conectados! t[0.39366]
+--> 6 @915 clientes fixos nao conectados! t[0.354294]
+--> Solicitando nova localizacao por não existir movimento em A @915
+==> Todos os clientes conectados.
+Centro de massa: 258.26 255.873
+--> 7 @915 clientes fixos nao conectados! t[0.318865]
+--> 8 @915 clientes fixos nao conectados! t[0.286978]
+--> 9 @915 clientes fixos nao conectados! t[0.25828]
+--> 10 @915 clientes fixos nao conectados! t[0.232452]
+--> 11 @915 clientes fixos nao conectados! t[0.209207]
+--> 12 @915 clientes fixos nao conectados! t[0.188286]
+--> 13 @915 clientes fixos nao conectados! t[0.169458]
+--> 14 @915 clientes fixos nao conectados! t[0.152512]
+--> 15 @915 clientes fixos nao conectados! t[0.137261]
+--> 16 @915 clientes fixos nao conectados! t[0.123535]
+--> 17 @915 clientes fixos nao conectados! t[0.111181]
+--> 18 @915 clientes fixos nao conectados! t[0.100063]
+--> 19 @915 clientes fixos nao conectados! t[0.0900568]
+--> 20 @915 clientes fixos nao conectados! t[0.0810511]
+--> 21 @915 clientes fixos nao conectados! t[0.072946]
+--> 22 @915 clientes fixos nao conectados! t[0.0656514]
+--> 23 @915 clientes fixos nao conectados! t[0.0590863]
+--> 24 @915 clientes fixos nao conectados! t[0.0531776]
+--> 25 @915 clientes fixos nao conectados! t[0.0478599]
+--> 26 @915 clientes fixos nao conectados! t[0.0430739]
+--> 27 @915 clientes fixos nao conectados! t[0.0387665]
+--> 28 @915 clientes fixos nao conectados! t[0.0348898]
+--> 29 @915 clientes fixos nao conectados! t[0.0314009]
+--> Solicitando nova localizacao por não existir movimento em A @915
+Centro de massa: 349.341 262.779
+--> Finalizado - Feeting temp=0.0282608
+SERVER - Iniciando estrutura do DA para agendamento @915
+ServerApplication::runAgendamento --> Enviar UAV 92 para a central  REF 3
+RunAgendamento: 
+ [93,0]
+ [5,1]
+ [94,2]
+FIM custo ---------------------------- @915
+SERVER - inicializando matrizes.
+SERVER - iniciando execucao das partes A, B e C @915
+GOING OUT!! ------------------------>>>>>>
+SERVER - Finalizada estrutura do DA para agendamento @915
+SERVER - Atualizando posicionamento dos UAVs @915
+SERVER - UAV 93 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (388.674,201.827)
+	Consumption: 2.72
+	PunNeigh: 0.01
+	Wij: 169
+	Connected: true
+
+\t--- j = 1
+	Maior valor LOC 	Id: 1
+	Pos: (150.803,252.74)
+	Consumption: 3.06
+	PunNeigh: 0.01
+	Wij: 58.5
+	Connected: true
+
+\t--- j = 2
+## ===> UAV 93 to LOC 1
+SERVER - LOC 1
+	Id: 1
+	Pos: (150.803,252.74)
+	Consumption: 3.06
+	PunNeigh: 0.01
+	Wij: 58.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @915
+SERVER - UAV 5 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (388.674,201.827)
+	Consumption: 2.72
+	PunNeigh: 0.01
+	Wij: 169
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+	Maior valor LOC 	Id: 2
+	Pos: (465.964,225.389)
+	Consumption: 0.34
+	PunNeigh: 0.110875
+	Wij: 6.5
+	Connected: true
+
+## ===> UAV 5 to LOC 2
+SERVER - LOC 2
+	Id: 2
+	Pos: (465.964,225.389)
+	Consumption: 0.34
+	PunNeigh: 0.110875
+	Wij: 6.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @915
+SERVER - UAV 94 REF 1
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (388.674,201.827)
+	Consumption: 2.72
+	PunNeigh: 0.01
+	Wij: 169
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+## ===> UAV 94 to LOC 0
+SERVER - LOC 0
+	Id: 0
+	Pos: (388.674,201.827)
+	Consumption: 2.72
+	PunNeigh: 0.01
+	Wij: 169
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @915
+-- Finalizado posicionamento dos UAVs @915
+Centro de massa: 264.706 237.508
+--> 1 @980 clientes fixos nao conectados! t[0.6]
+--> 2 @980 clientes fixos nao conectados! t[0.54]
+--> 3 @980 clientes fixos nao conectados! t[0.486]
+--> 4 @980 clientes fixos nao conectados! t[0.4374]
+--> 5 @980 clientes fixos nao conectados! t[0.39366]
+--> 6 @980 clientes fixos nao conectados! t[0.354294]
+--> Solicitando nova localizacao por não existir movimento em A @980
+Centro de massa: 267.422 242.913
+--> 7 @980 clientes fixos nao conectados! t[0.318865]
+--> 8 @980 clientes fixos nao conectados! t[0.286978]
+--> 9 @980 clientes fixos nao conectados! t[0.25828]
+--> 10 @980 clientes fixos nao conectados! t[0.232452]
+--> 11 @980 clientes fixos nao conectados! t[0.209207]
+--> 12 @980 clientes fixos nao conectados! t[0.188286]
+--> 13 @980 clientes fixos nao conectados! t[0.169458]
+--> 14 @980 clientes fixos nao conectados! t[0.152512]
+--> 15 @980 clientes fixos nao conectados! t[0.137261]
+--> 16 @980 clientes fixos nao conectados! t[0.123535]
+--> 17 @980 clientes fixos nao conectados! t[0.111181]
+--> 18 @980 clientes fixos nao conectados! t[0.100063]
+--> 19 @980 clientes fixos nao conectados! t[0.0900568]
+--> 20 @980 clientes fixos nao conectados! t[0.0810511]
+--> 21 @980 clientes fixos nao conectados! t[0.072946]
+--> 22 @980 clientes fixos nao conectados! t[0.0656514]
+--> 23 @980 clientes fixos nao conectados! t[0.0590863]
+--> 24 @980 clientes fixos nao conectados! t[0.0531776]
+--> 25 @980 clientes fixos nao conectados! t[0.0478599]
+--> 26 @980 clientes fixos nao conectados! t[0.0430739]
+--> 27 @980 clientes fixos nao conectados! t[0.0387665]
+--> 28 @980 clientes fixos nao conectados! t[0.0348898]
+--> 29 @980 clientes fixos nao conectados! t[0.0314009]
+--> 30 @980 clientes fixos nao conectados! t[0.0282608]
+--> 31 @980 clientes fixos nao conectados! t[0.0254347]
+--> 32 @980 clientes fixos nao conectados! t[0.0228912]
+--> Solicitando nova localizacao por não existir movimento em A @980
+Centro de massa: 428.95 269.215
+--> 33 @980 clientes fixos nao conectados! t[0.0206021]
+--> Finalizado - Feeting temp=0.0185419
+SERVER - Iniciando estrutura do DA para agendamento @980
+ServerApplication::runAgendamento --> Enviar UAV 93 para a central  REF 3
+RunAgendamento: 
+ [5,0]
+ [94,1]
+ [2,2]
+FIM custo ---------------------------- @980
+SERVER - inicializando matrizes.
+SERVER - iniciando execucao das partes A, B e C @980
+GOING OUT!! ------------------------>>>>>>
+SERVER - Finalizada estrutura do DA para agendamento @980
+SERVER - Atualizando posicionamento dos UAVs @980
+SERVER - UAV 5 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (369.848,223.799)
+	Consumption: 3.06
+	PunNeigh: 0.01
+	Wij: 201.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+	Maior valor LOC 	Id: 2
+	Pos: (460.564,186.955)
+	Consumption: 1.02
+	PunNeigh: 0.0665616
+	Wij: 19.5
+	Connected: true
+
+## ===> UAV 5 to LOC 2
+SERVER - LOC 2
+	Id: 2
+	Pos: (460.564,186.955)
+	Consumption: 1.02
+	PunNeigh: 0.0665616
+	Wij: 19.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @980
+SERVER - UAV 94 REF 3
+\t--- j = 0
+	Maior valor LOC 	Id: 0
+	Pos: (369.848,223.799)
+	Consumption: 3.06
+	PunNeigh: 0.01
+	Wij: 201.5
+	Connected: true
+
+\t--- j = 1
+\t--- j = 2
+## ===> UAV 94 to LOC 0
+SERVER - LOC 0
+	Id: 0
+	Pos: (369.848,223.799)
+	Consumption: 3.06
+	PunNeigh: 0.01
+	Wij: 201.5
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @980
+SERVER - UAV 2 REF 1
+\t--- j = 0
+\t--- j = 1
+	Maior valor LOC 	Id: 1
+	Pos: (149.791,247.051)
+	Consumption: 3.4
+	PunNeigh: 0.01
+	Wij: 65
+	Connected: true
+
+\t--- j = 2
+## ===> UAV 2 to LOC 1
+SERVER - LOC 1
+	Id: 1
+	Pos: (149.791,247.051)
+	Consumption: 3.4
+	PunNeigh: 0.01
+	Wij: 65
+	Connected: true
+
+SERVER - Salvando onde o UAV estava e para onde ele será enviado
+SERVER - definindo novo posicionamento @980
+-- Finalizado posicionamento dos UAVs @980
+[Inferior 1 (process 11767) exited normally]
+(gdb) [K(gdb) [K(gdb) q

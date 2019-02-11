@@ -741,11 +741,11 @@ void UavNetwork::ConfigureCli()
         Ptr<PositionAllocator> positionAlloc = CreateObjectWithAttributes<RandomDiscPositionAllocator>
                             ("X", DoubleValue (x),
                               "Y", DoubleValue (y),
-                            "Rho", StringValue("ns3::ConstantRandomVariable[Constant=10.0]"));
+                            "Rho", StringValue("ns3::ConstantRandomVariable[Constant=8.0]"));
         mobilityCLI.SetPositionAllocator(positionAlloc);
         mobilityCLI.SetMobilityModel("ns3::RandomWalk2dMobilityModel",
                                      "Bounds", RectangleValue(Rectangle(m_xmin, m_xmax, m_ymin, m_ymax)),
-                                      "Speed", StringValue("ns3::UniformRandomVariable[Min=4.0|Max=10.0]")); // xmin, xmax, ymin, ymax
+                                      "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=10.0]")); // xmin, xmax, ymin, ymax
         mobilityCLI.Install(nodes);
         m_clientNode.Add(nodes);
       }
@@ -984,9 +984,9 @@ void UavNetwork::Configure()
                                           "ControlMode", StringValue ("VhtMcs0"));
   m_phyHelper = YansWifiPhyHelper::Default();
   m_channelHelper = YansWifiChannelHelper::Default();
-  
+
   // TODO: change ChannelWidth = 20 and Frequency = 5180Hz ac e 2.4GHz
-  
+
   m_channelHelper.SetPropagationDelay ("ns3::ConstantSpeedPropagationDelayModel");
   // ---> isto permite comunicacao entre UAVs!
   // The below FixedRssLossModel will cause the rss to be fixed regardless
