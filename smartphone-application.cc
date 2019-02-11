@@ -236,7 +236,7 @@ SmartphoneApplication::CourseChange(Ptr<const MobilityModel> mobility)
     Simulator::Remove(m_sendEventUav);
     m_lastPosition = actual;
     // TODO: enviar pacote informando novo posicionamento!
-    SendPacketUav();
+    // SendPacketUav(); removendo pois tem um ciclo padrao!
   }
 }
 
