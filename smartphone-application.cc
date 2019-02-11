@@ -161,6 +161,12 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
   Simulator::Remove(m_sendEventUav);
 
   if (!m_connected) { // caso nao esteja com IP conectado ao AP, tentar enviar assim que se conectar!
+    std::ostringstream os;
+    os << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << m_id << "_packet" << ".txt";
+    std::ofstream file;
+    file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    file << Simulator::Now().GetSeconds() << " 0" << std::endl; // NAOCONECTADO
+    file.close();
     m_sendEventUav = Simulator::Schedule(Seconds(5.0), &SmartphoneApplication::SendPacketUav, this);
   }
 
@@ -183,7 +189,7 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
       os << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << m_id << "_packet" << ".txt";
       std::ofstream file;
       file.open(os.str(), std::ofstream::out | std::ofstream::app);
-      file << Simulator::Now().GetSeconds() << " ENVIADO" << std::endl;
+      file << Simulator::Now().GetSeconds() << " 1" << std::endl; // ENVIADO
       file.close();
     }
     else
@@ -194,7 +200,7 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
       os << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << m_id << "_packet" << ".txt";
       std::ofstream file;
       file.open(os.str(), std::ofstream::out | std::ofstream::app);
-      file << Simulator::Now().GetSeconds() << " FALHA" << std::endl;
+      file << Simulator::Now().GetSeconds() << " -1" << std::endl; // FALHA
       file.close();
       if (m_connected) {
         m_sendEventUav = Simulator::Schedule(Seconds(5.0), &SmartphoneApplication::SendPacketUav, this);
@@ -209,15 +215,13 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
     os << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << m_id << "_packet" << ".txt";
     std::ofstream file;
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
-    file << Simulator::Now().GetSeconds() << " NAO_CONECTADO" << std::endl;
+    file << Simulator::Now().GetSeconds() << " 0" << std::endl; // NAO CONECTADO
     file.close();
-    if (m_connected) {
-      m_sendEventUav = Simulator::Schedule(Seconds(10.0), &SmartphoneApplication::SendPacketUav, this);
-    }
+    m_sendEventUav = Simulator::Schedule(Seconds(5.0), &SmartphoneApplication::SendPacketUav, this);
     return;
   }
 
-  m_sendEventUav = Simulator::Schedule(Seconds(120.0), &SmartphoneApplication::SendPacketUav, this);
+  m_sendEventUav = Simulator::Schedule(Seconds(ETAPA), &SmartphoneApplication::SendPacketUav, this);
 }
 
 void

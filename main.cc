@@ -16,6 +16,8 @@
  * Authors: Giovanna Garcia <ggarciabas@gmail.com>
  */
 
+#define ETAPA = 60 // segundos
+
 #include "uav-network.h"
 
 using namespace ns3;

@@ -106,7 +106,7 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         copyfile(main_path+folder+'/etapa/'+str(time)+'/'+comp_custo_file, main_path+folder+'/../../slide/'+scenario+'/'+folder+'/'+str(time)+'_'+comp_custo_file)
 
         f_file = open(main_path+folder+'/../../slide/'+scenario+'/'+folder+'/slide_'+str(time)+'.tex', 'w')
-        f_file.write("""\\begin{frame}{"""+title+"""}
+        f_file.write("""\\begin{frame}{"""+title+' - Etapa @'+str(time)+"""}
             \\begin{columns}
                 \\begin{column}{0.45\\textwidth}
                 \\begin{figure}[!htb]
@@ -120,7 +120,7 @@ for custo_name in glob.glob(main_path+'custo_*/'):
                 \\end{column}
             \\end{columns}
         \\end{frame}""")
-        f_file.write("""\n\\begin{frame}{"""+title+"""}
+        f_file.write("""\n\\begin{frame}{"""+title+' - Etapa @'+str(time)+"""}
             \\begin{columns}
                 \\begin{column}{0.45\\textwidth}
                 \\begin{figure}[!htb]
@@ -142,14 +142,20 @@ for custo_name in glob.glob(main_path+'custo_*/'):
                 \\end{column}
             \\end{columns}
         \\end{frame}""")
-        f_file.write("""\n\\begin{frame}{"""+title+"""}
+        f_file.write("""\n\\begin{frame}{"""+title+' - Etapa @'+str(time)+"""}
             \\begin{figure}[!htb]
                 \\includegraphics[width=\\textwidth]{"""+folder+'/'+str(time)+'_'+comp_custo_file+"""}
             \\end{figure}
         \\end{frame}""")
         f_file.close()
-
         file.write("\\input{"+folder+'/slide_'+str(time)+'.tex}\n')
+
+    copyfile(main_path+folder+'/client_packet.eps', main_path+folder+'/../../slide/'+scenario+'/'+folder+'/client_packet.eps')
+    file.write("""\\begin{frame}{"""+title+' - Envio de pacotes pelo cliente'+"""}
+        \\begin{figure}[!htb]
+            \\includegraphics[width=0.9\\textwidth]{"""+folder+"""/client_packet.eps}
+        \\end{figure}
+    \\end{frame}""")
         
     # # UAV LOC Slide
     # for time in list_folder:
