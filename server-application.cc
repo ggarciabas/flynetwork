@@ -710,7 +710,7 @@ ServerApplication::CalculateDistance(const std::vector<double> pos1, const std::
   return dist; // euclidean, sempre considera a distância atual calculada pelo DA
 }
 
-bool ServerApplication::ValidateMijConvergency(vector<vector<double>> vec, vector<vector<double>> m_ij, unsigned siz)
+bool ServerApplication::ValidateMijConvergency(vector<vector<long double>> vec, vector<vector<long double>> m_ij, unsigned siz)
 {
   // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << vec << m_ij << siz);
   for (unsigned i = 0; i < siz; ++i)
@@ -765,8 +765,8 @@ void ServerApplication::runAgendamento(void)
   //  - calcular o CUSTO ENERGETICO de atribuição do uav para cada localizacao, criando uma matriz Bij
   NS_LOG_DEBUG("SERVER - Iniciando estrutura do DA para agendamento @" << Simulator::Now().GetSeconds());
 
-  vector<vector<double>> b_ij; // i - UAVs, j - localizacoes
-  vector<vector<double>> custo_x; // i - UAVs, j - localizacoes x=1,2ou3
+  vector<vector<long double>> b_ij; // i - UAVs, j - localizacoes
+  vector<vector<long double>> custo_x; // i - UAVs, j - localizacoes x=1,2ou3
   // Uav id
   vector<int> uav_ids;
   // Loc id
@@ -784,8 +784,8 @@ void ServerApplication::runAgendamento(void)
   for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
        u_i != m_uavContainer.End(); ++u_i, ++count)
   {
-    b_ij.push_back(vector<double>());
-    custo_x.push_back(vector<double>());
+    b_ij.push_back(vector<long double>());
+    custo_x.push_back(vector<long double>());
     recalcule: // utilizado para permitir recalcular quando o UAV for suprido!
     uav_ids.push_back((*u_i)->GetId());
     NS_LOG_INFO ("UAV :: " << (*u_i)->toString());
@@ -830,13 +830,13 @@ void ServerApplication::runAgendamento(void)
   NS_LOG_INFO ("SERVER - inicializando matrizes.");
   double temp = 0.99;
   // Mai
-  vector<vector<double>> m_ij;
+  vector<vector<long double>> m_ij;
   // variavel da tranformacao algebrica (parte do self-amplification)
-  vector<vector<double>> o_ij;
+  vector<vector<long double>> o_ij;
   // variavel da transformacao algebrica (parte o Y_sch)
-  vector<vector<double>> lamb_ij;
+  vector<vector<long double>> lamb_ij;
   // q_ai
-  vector<vector<double>> q_ij;
+  vector<vector<long double>> q_ij;
   double N = m_uavContainer.GetN();
   unsigned siz = m_uavContainer.GetN();
   // Ptr<UniformRandomVariable> e_ai = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
@@ -844,10 +844,10 @@ void ServerApplication::runAgendamento(void)
 
   for (unsigned i = 0; i < siz; ++i)
   {
-    m_ij.push_back(vector<double>());
-    o_ij.push_back(vector<double>());
-    lamb_ij.push_back(vector<double>());
-    q_ij.push_back(vector<double>());
+    m_ij.push_back(vector<long double>());
+    o_ij.push_back(vector<long double>());
+    lamb_ij.push_back(vector<long double>());
+    q_ij.push_back(vector<long double>());
     for (unsigned j = 0; j < (unsigned)m_locationContainer.GetN(); ++j)
     {
       // e_ai->SetAttribute ("Max", DoubleValue (max));
@@ -863,8 +863,8 @@ void ServerApplication::runAgendamento(void)
   unsigned itA_max = 1000;
   unsigned itC_max = 50;
   double gamma = 0.95;
-  vector<vector<double>> copyB_mij;
-  vector<vector<double>> copyC_mij;
+  vector<vector<long double>> copyB_mij;
+  vector<vector<long double>> copyC_mij;
   NS_LOG_INFO ("SERVER - iniciando execucao das partes A, B e C @" << Simulator::Now().GetSeconds());
 
   PrintBij(b_ij, int(Simulator::Now().GetSeconds()), true, uav_ids, loc_ids);
@@ -907,7 +907,7 @@ void ServerApplication::runAgendamento(void)
         unsigned check = 0;
         for (unsigned i = 0; i < siz; ++i)
         {
-          double total_linha = 0.0;
+          long double total_linha = 0.0;
           for (unsigned k = 0; k < siz; ++k)
           {
             if (m_ij[i][k] == 1.0) {
@@ -929,7 +929,7 @@ void ServerApplication::runAgendamento(void)
         // normalizando colunas
         for (unsigned j = 0; j < siz; ++j)
         {
-          double total_coluna = 0.0;
+          long double total_coluna = 0.0;
           for (unsigned k = 0; k < siz; ++k)
           {
             total_coluna += m_ij[k][j];
@@ -966,12 +966,12 @@ void ServerApplication::runAgendamento(void)
   std::ofstream file;
   std::ostringstream osbij, osloc, osuav;
   os.str("");
-  vector<vector<double> > f_mij;
-  double val;
+  vector<vector<long double> > f_mij;
+  long double val;
   for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
        u_i != m_uavContainer.End(); ++u_i, ++i)
   {
-    f_mij.push_back(vector<double>());
+    f_mij.push_back(vector<long double>());
 
     recalcule_2:
     NS_LOG_INFO("SERVER - UAV "<< (*u_i)->GetId() << " REF " << (*u_i)->GetReferenceCount());
@@ -1085,18 +1085,18 @@ void ServerApplication::runAgendamento(void)
   f_mij.clear();
 }
 
-double
+long double
 ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, vector<double> central_pos)
 {
   NS_LOG_DEBUG ("ServerApplication::CalculateCusto > uavId: " << uav->GetId() << " locId: " << loc->GetId());
-  double custo = 1.0;
-  double b_ui_atu = uav->GetTotalEnergy(); // bateria atual
-  double ce_ui_la_lj = uav->CalculateEnergyCost(CalculateDistance(uav->GetPosition(), loc->GetPosition())); // custo energetico
-  double ce_ui_lj_lc = uav->CalculateEnergyCost(CalculateDistance(loc->GetPosition(), central_pos));
-  double b_ui_tot = uav->GetTotalBattery();
-  double b_ui_res = b_ui_atu*0.98 - ce_ui_la_lj - ce_ui_lj_lc; // bateria residual
-  double ce_te_lj = loc->GetTotalConsumption() * m_scheduleServer;
-  double P_te = b_ui_res/ce_te_lj;
+  long double custo = 1.0;
+  long double b_ui_atu = uav->GetTotalEnergy(); // bateria atual
+  long double ce_ui_la_lj = uav->CalculateEnergyCost(CalculateDistance(uav->GetPosition(), loc->GetPosition())); // custo energetico
+  long double ce_ui_lj_lc = uav->CalculateEnergyCost(CalculateDistance(loc->GetPosition(), central_pos));
+  long double b_ui_tot = uav->GetTotalBattery();
+  long double b_ui_res = b_ui_atu*0.98 - ce_ui_la_lj - ce_ui_lj_lc; // bateria residual
+  long double ce_te_lj = loc->GetTotalConsumption() * m_scheduleServer;
+  long double P_te = b_ui_res/ce_te_lj;
 
   if (b_ui_res > 0) {
     // sobre os custo ver: https://github.com/ggarciabas/Calculo-de-Posicionamento
@@ -1132,7 +1132,7 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
 }
 
 void
-ServerApplication::PrintBij (vector<vector<double>> b_ij, int print, bool before, vector<int> uav_ids, vector<int> loc_ids)
+ServerApplication::PrintBij (vector<vector<long double>> b_ij, int print, bool before, vector<int> uav_ids, vector<int> loc_ids)
 {
   std::ostringstream os;
   if (before) {
@@ -1158,9 +1158,9 @@ ServerApplication::PrintBij (vector<vector<double>> b_ij, int print, bool before
     file << "," << (*l_j);
   }
   file << std::endl;
-  for (vector<vector<double>>::iterator i = b_ij.begin(); i != b_ij.end(); ++i)
+  for (vector<vector<long double>>::iterator i = b_ij.begin(); i != b_ij.end(); ++i)
   {
-    vector<double>::iterator j = (*i).begin();
+    vector<long double>::iterator j = (*i).begin();
     file << (*j);
     j++;
     for (; j != (*i).end(); ++j)
@@ -1171,7 +1171,7 @@ ServerApplication::PrintBij (vector<vector<double>> b_ij, int print, bool before
   }
 
   file.close();
-  for (vector<vector<double>>::iterator i = b_ij.begin(); i != b_ij.end(); ++i)
+  for (vector<vector<long double>>::iterator i = b_ij.begin(); i != b_ij.end(); ++i)
   {
     (*i).clear();
   }
@@ -1179,7 +1179,7 @@ ServerApplication::PrintBij (vector<vector<double>> b_ij, int print, bool before
 }
 
 void
-ServerApplication::PrintCusto (vector<vector<double>> custo, int print, bool before, vector<int> uav_ids, vector<int> loc_ids)
+ServerApplication::PrintCusto (vector<vector<long double>> custo, int print, bool before, vector<int> uav_ids, vector<int> loc_ids)
 {
   std::ostringstream os;
   if (before) {
@@ -1205,8 +1205,8 @@ ServerApplication::PrintCusto (vector<vector<double>> custo, int print, bool bef
     file << "," << (*l_j);
   }
   file << std::endl;
-  for (vector<vector<double>>::iterator i = custo.begin(); i != custo.end(); ++i) {
-    vector<double>::iterator j = (*i).begin();
+  for (vector<vector<long double>>::iterator i = custo.begin(); i != custo.end(); ++i) {
+    vector<long double>::iterator j = (*i).begin();
     if (j != (*i).end()) {
       file << (*j);
       j++;
@@ -1220,7 +1220,7 @@ ServerApplication::PrintCusto (vector<vector<double>> custo, int print, bool bef
 
   file.close();
 
-  for (vector<vector<double>>::iterator i = custo.begin(); i != custo.end(); ++i)
+  for (vector<vector<long double>>::iterator i = custo.begin(); i != custo.end(); ++i)
   {
     (*i).clear();
   }
@@ -1228,7 +1228,7 @@ ServerApplication::PrintCusto (vector<vector<double>> custo, int print, bool bef
 }
 
 void
-ServerApplication::PrintMij (vector<vector<double>> m_ij, double temp, std::string nameFile, vector<int> uav_ids, vector<int> loc_ids)
+ServerApplication::PrintMij (vector<vector<long double>> m_ij, double temp, std::string nameFile, vector<int> uav_ids, vector<int> loc_ids)
 {
   std::ofstream file;
   file.open(nameFile.c_str(), std::ofstream::out | std::ofstream::app);
@@ -1249,9 +1249,9 @@ ServerApplication::PrintMij (vector<vector<double>> m_ij, double temp, std::stri
     file << "," << (*l_j);
   }
   file << std::endl;
-  for (vector<vector<double>>::iterator i = m_ij.begin(); i != m_ij.end(); ++i)
+  for (vector<vector<long double>>::iterator i = m_ij.begin(); i != m_ij.end(); ++i)
   {
-    vector<double>::iterator j = (*i).begin();
+    vector<long double>::iterator j = (*i).begin();
     file << (*j);
     j++;
     for (; j != (*i).end(); ++j)
@@ -1261,7 +1261,7 @@ ServerApplication::PrintMij (vector<vector<double>> m_ij, double temp, std::stri
     file << std::endl;
   }
   file.close();
-  for (vector<vector<double>>::iterator i = m_ij.begin(); i != m_ij.end(); ++i)
+  for (vector<vector<long double>>::iterator i = m_ij.begin(); i != m_ij.end(); ++i)
   {
     (*i).clear();
   }
