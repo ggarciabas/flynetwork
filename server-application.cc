@@ -364,11 +364,11 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             }
             uav = 0;
           } else {
-              std::ostringstream mm;
-              mm << "SERVER\t-1\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tCLIENT";
-              m_packetTrace(mm.str());
-              NS_LOG_INFO("SERVER -- CLIENT ::: recebida informacoes de aplicacao do cliente no endereco " << add.GetIpv4());
-            }
+            std::ostringstream mm;
+            mm << "SERVER\t-1\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tCLIENT";
+            m_packetTrace(mm.str());
+            NS_LOG_INFO("SERVER -- CLIENT ::: recebida informacoes de aplicacao do cliente no endereco " << add.GetIpv4());
+          }
     results.clear();
 }
 

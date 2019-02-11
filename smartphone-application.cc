@@ -235,6 +235,7 @@ SmartphoneApplication::CourseChange(Ptr<const MobilityModel> mobility)
   {
     Simulator::Remove(m_sendEventUav);
     m_lastPosition = actual;
+
     // TODO: enviar pacote informando novo posicionamento!
     // SendPacketUav(); removendo pois tem um ciclo padrao!
   }
@@ -245,6 +246,12 @@ SmartphoneApplication::TracedCallbackTxApp (Ptr<const Packet> packet, const Addr
 {
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - SERVER ");
+  // std::ostringstream os;
+  // os << "./scratch/flynetwork/data/output/" << m_pathData << "/packet/" << m_login << ".txt";
+  // std::ofstream file;
+  // file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  // file << Simulator::Now().GetSeconds() << " CLIENTE " << packet->GetSize() << std::endl; // em bites
+  // file.close();
 }
 
 void SmartphoneApplication::TracedCallbackExpiryLease (const Ipv4Address& ip)
