@@ -868,20 +868,29 @@ void ServerApplication::runAgendamento(void)
     }
   }
 
-  unsigned itB_max = 1000;
-  unsigned itA_max = 1000;
+  int print = 0;
+  std::ostringstream os;
+  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/mij_" << std::setfill ('0') << std::setw (7) << print << ".txt";
+  PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
+  os.str("");
+  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/o_ij_" << std::setfill ('0') << std::setw (7) << print << ".txt";
+  PrintMij (o_ij, 1.0, os.str(), uav_ids, loc_ids);
+  os.str("");
+  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/lamb_ij_" << std::setfill ('0') << std::setw (7) << print << ".txt";
+  PrintMij (lamb_ij, 1.0, os.str(), uav_ids, loc_ids);
+  os.str("");
+  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/q_ij_" << std::setfill ('0') << std::setw (7) << print++ << ".txt";
+  PrintMij (q_ij, 1.0, os.str(), uav_ids, loc_ids);
+
+  unsigned itB_max = 500;
+  unsigned itA_max = 500;
   unsigned itC_max = 50;
   double gamma = 0.95;
   vector<vector<long double>> copyB_mij;
   vector<vector<long double>> copyC_mij;
   NS_LOG_INFO ("SERVER - iniciando execucao das partes A, B e C @" << Simulator::Now().GetSeconds());
 
-  PrintBij(b_ij, int(Simulator::Now().GetSeconds()), true, uav_ids, loc_ids);
-
-  int print = 0;
-  std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/mij_" << std::setfill ('0') << std::setw (7) << print++ << ".txt";
-  PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
+  PrintBij(b_ij, int(Simulator::Now().GetSeconds()), true, uav_ids, loc_ids);  
 
   // Part A
   unsigned itA = 0;
@@ -905,6 +914,16 @@ void ServerApplication::runAgendamento(void)
           m_ij[i][j] = exp(q_ij[i][j] / temp);
         }
       }
+
+      os.str("");
+      os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_q_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+      PrintMij (q_ij, 1.0, os.str(), uav_ids, loc_ids);
+      os.str("");
+      os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_lamb_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+      PrintMij (lamb_ij, 1.0, os.str(), uav_ids, loc_ids);
+      os.str("");
+      os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_m_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+      PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
 
       // Part C
       unsigned itC = 0;
@@ -950,11 +969,15 @@ void ServerApplication::runAgendamento(void)
           }
         }
 
+        os.str("");
+        os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/C_m_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << "_" << itC << ".txt";
+        PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
+
         itC++;
       } while (!ValidateMijConvergency(copyC_mij, m_ij, siz) && itC < itC_max);
 
       itB++;
-    } while (!ValidateMijConvergency(copyB_mij, m_ij, siz) && itB < itB_max);
+    } while (!ValidateMijConvergency(copyB_mij, m_ij, siz) && itB < itB_max);    
 
     os.str("");
     os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/mij_" << std::setfill ('0') << std::setw (7) << print++ << ".txt";
