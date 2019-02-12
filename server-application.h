@@ -81,7 +81,7 @@ private:
   void CreateCentralLocation(void);
   double CalculateDistance(const std::vector<double> pos1, const std::vector<double> pos2);
   double CalculateDistanceCentral(const std::vector<double> pos);
-  bool ValidateMijConvergency(vector<vector<double>> vec, vector<vector<double>> m_ij, unsigned siz);
+  bool ValidateMijConvergency(vector<vector<long double>> vec, vector<vector<long double>> m_ij, unsigned siz);
   void ReplyUav(Ptr<UavModel> uav);
   void GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double uav_cob, double r_max, double max_antena, double maxDrUav);
   void GraficoCenarioDaPuro (double temp, int iter, Ptr<LocationModel> lCentral, double raio_cob);
@@ -94,11 +94,11 @@ private:
   void SendAskClientPacket(Ptr<UavModel> uav);
   void ReplyAskCliData(Ptr<UavModel> uav);
 
-  double CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, vector<double> central_pos);
+  long double CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, vector<double> central_pos);
 
-  void PrintCusto (vector<vector<double>> custo, int print, bool before, vector<int> uav_ids, vector<int> loc_ids);
-  void PrintMij (vector<vector<double>> m_ij, double temp, std::string nameFile, vector<int> uav_ids, vector<int> loc_ids);
-  void PrintBij (vector<vector<double>> b_ij, int print, bool before, vector<int> uav_ids, vector<int> loc_ids);
+  void PrintCusto (vector<vector<long double>> custo, int print, bool before, vector<int> uav_ids, vector<int> loc_ids);
+  void PrintMij (vector<vector<long double>> m_ij, double temp, std::string nameFile, vector<int> uav_ids, vector<int> loc_ids);
+  void PrintBij (vector<vector<long double>> b_ij, int print, bool before, vector<int> uav_ids, vector<int> loc_ids);
 
 
   double WattsToDb (double w) {
