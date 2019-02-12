@@ -103,10 +103,10 @@ def battery(main_path, teste, uavs_id, time_ini, time_end, activated, title_f):
         plt.title(str(uav), loc='left', fontsize=7, fontweight=0, color=palette(num), y=0.92)
 
     # general title
-    plt.suptitle("Consumo de bateria por flutuar dos UAVs entre os tempos ["+str(time_ini)+"s, "+str(time_end)+"s]", fontsize=13, fontweight=0, color='black', style='italic')
+    # plt.suptitle("Consumo de bateria por flutuar dos UAVs entre os tempos ["+str(time_ini)+"s, "+str(time_end)+"s]", fontsize=13, fontweight=0, color='black', style='italic')
 
-    plt.xlabel('Tempo (s)')
-    plt.ylabel('Bateria (%)')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Battery (%)')
 
     plt.savefig(main_path+'uav_hover/uav_hover_acum_'+str(title_f)+'.svg')
     plt.savefig(main_path+'uav_hover/uav_hover_acum_'+str(title_f)+'.eps')
@@ -137,10 +137,10 @@ def battery(main_path, teste, uavs_id, time_ini, time_end, activated, title_f):
             plt.title(str(uav), loc='left', fontsize=7, fontweight=0, color=palette(num), y=1.0)
 
             # general title
-            plt.suptitle("Consumo de bateria por flutuar do "+str(uav), fontsize=13, fontweight=0, color='black', style='italic')
+            # plt.suptitle("Consumo de bateria por flutuar do "+str(uav), fontsize=13, fontweight=0, color='black', style='italic')
 
-            plt.xlabel('Tempo (s)')
-            plt.ylabel('Bateria (%)')
+            plt.xlabel('Time (s)')
+            plt.ylabel('Battery (%)')
 
             plt.savefig(main_path+'uav_hover/uav_hover_acum_uav_'+str(num)+'.svg')
             plt.savefig(main_path+'uav_hover/uav_hover_acum_uav_'+str(num)+'.eps')

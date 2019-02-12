@@ -75,12 +75,20 @@ private:
   void SendUavPacket(Ptr<UavModel> uav);
   void SendCentralPacket(Ptr<UavModel> uav);
   void runDAPython();
+  void runDA();
+  void runDAPuro();
   void runAgendamento(void);
   void CreateCentralLocation(void);
   double CalculateDistance(const std::vector<double> pos1, const std::vector<double> pos2);
   double CalculateDistanceCentral(const std::vector<double> pos);
   bool ValidateMijConvergency(vector<vector<long double>> vec, vector<vector<long double>> m_ij, unsigned siz);
   void ReplyUav(Ptr<UavModel> uav);
+  void GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double uav_cob, double r_max, double max_antena, double maxDrUav);
+  void GraficoCenarioDaPuro (double temp, int iter, Ptr<LocationModel> lCentral, double raio_cob);
+
+  bool MovimentoA();
+  bool MovimentoB();
+  void CentroDeMassa (Ptr<LocationModel>, Ptr<LocationModel> central, double);
 
   void AskClientData ();
   void SendAskClientPacket(Ptr<UavModel> uav);
@@ -92,11 +100,33 @@ private:
   void PrintMij (vector<vector<long double>> m_ij, double temp, std::string nameFile, vector<int> uav_ids, vector<int> loc_ids);
   void PrintBij (vector<vector<long double>> b_ij, int print, bool before, vector<int> uav_ids, vector<int> loc_ids);
 
+
+  double WattsToDb (double w) {
+    return 10*std::log10(w); // dB
+  }
+
+  double WattsToDbm (double w) {
+    return 10*std::log10(w)+30; // dB
+  }
+
+  double dBmToWatts (double dbm) {
+    return std::pow(10, (dbm-30)/10);
+  }
+
+  double dbTodBm (double db) {
+    return db+30;
+  }
+
+  double dbmToDb (double dbm) {
+    return dbm-30;
+  }
+
   UavModelContainer   m_uavContainer;
   UavModelContainer   m_uavGoToCentral; // UAVs enviados para central
   LocationModelContainer m_locationContainer;
   ClientModelContainer          m_fixedClientContainer; // utilizando o container de clientes diretamente só mudando o 'login' destes 'nos'
   ClientModelContainer m_clientContainer;
+  ClientModelContainer m_clientDaContainer;
 
   DataRate m_dataRate;
   double m_scheduleServer;
@@ -117,6 +147,7 @@ private:
   TracedCallback<string> m_clientPosition;
   TracedCallback<std::string> m_packetTrace;
   std::string m_pathData;
+  std::string m_scenarioName;
 
   int m_supplyPos;
   int m_totalCliGeral;

@@ -108,7 +108,7 @@ UavApplication::~UavApplication()
 
 void UavApplication::Start(double stoptime) {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds()  << stoptime);
-  NS_LOG_DEBUG("UavApplication::Start [" << m_id << "]");
+  NS_LOG_INFO("UavApplication::Start [" << m_id << "]");
   Simulator::Remove(m_startEvent);
   Simulator::Remove(m_stopEvent);
   // SetStartTime(Simulator::Now());
@@ -119,7 +119,7 @@ void UavApplication::Start(double stoptime) {
 void UavApplication::StartApplication(void)
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  NS_LOG_DEBUG("UavApplication::StartApplication [" << m_id << "]");
+  NS_LOG_INFO("UavApplication::StartApplication [" << m_id << "]");
   m_running = true;
   // criando socket para enviar informacoes ao servidor
   m_sendSck = Socket::CreateSocket(m_node, UdpSocketFactory::GetTypeId());
@@ -131,7 +131,7 @@ void UavApplication::StartApplication(void)
 
 void UavApplication::Stop() {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  NS_LOG_DEBUG("UavApplication::Stop [" << m_id << "]");
+  NS_LOG_INFO("UavApplication::Stop [" << m_id << "]");
   // SetStopTime(Simulator::Now());
   Simulator::Remove(m_stopEvent);
   StopApplication();
@@ -140,7 +140,7 @@ void UavApplication::Stop() {
 void UavApplication::StopApplication()
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  NS_LOG_DEBUG("UavApplication::StopApplication [" << m_id << "]");
+  NS_LOG_INFO("UavApplication::StopApplication [" << m_id << "]");
   m_meanConsumption = 0.0;
   Simulator::Remove(m_stopEvent);
   m_running = false;
@@ -176,7 +176,7 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   NS_LOG_INFO ("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " course changed!!! ---- ~~~~");
 
   Simulator::Remove(m_sendEvent);
-  NS_LOG_DEBUG("UAV #" << m_id << " chegou ao seu posicionamento final.");
+  NS_LOG_INFO("UAV #" << m_id << " chegou ao seu posicionamento final.");
   SendPacket();
 
   Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
@@ -190,18 +190,18 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   dev->StartHover();
 
   // clear ClientModelContainer based on last update time
-  NS_LOG_DEBUG ("UavApplication::CourseChange UAV " << m_id << " total " << m_client.GetN());
+  NS_LOG_INFO ("UavApplication::CourseChange UAV " << m_id << " total " << m_client.GetN());
   for (ClientModelContainer::Iterator it = m_client.Begin(); it != m_client.End(); ++it) {
-     NS_LOG_DEBUG ("\t" << (*it)->GetLogin());
+     NS_LOG_INFO ("\t" << (*it)->GetLogin());
   }
 
   int i = m_client.GetN()-1;
   Ptr<ClientDeviceEnergyModel> c_dev = GetNode()->GetObject<ClientDeviceEnergyModel>();
   for (; i >= 0; i--)
   {
-    NS_LOG_DEBUG ("\t- [" << i << "] Cliente " << m_client.Get(i)->GetLogin());
+    NS_LOG_INFO ("\t- [" << i << "] Cliente " << m_client.Get(i)->GetLogin());
     if ((Simulator::Now().GetSeconds() - m_client.Get(i)->GetUpdatePos().GetSeconds()) > 60.0) {
-      NS_LOG_DEBUG ("\t\t- removendo " << m_client.Get(i)->GetLogin());
+      NS_LOG_INFO ("\t\t- removendo " << m_client.Get(i)->GetLogin());
       m_client.RemoveAt(i);
       c_dev->RemoveClient();
     }
@@ -277,16 +277,16 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
     std::string::size_type sz; // alias of size_t
     if (results.at(0).compare("SERVEROK") == 0) {
       Simulator::Remove(m_sendEvent);
-      NS_LOG_DEBUG("UAV #" << m_id << " recebeu SERVEROK");
+      NS_LOG_INFO("UAV #" << m_id << " recebeu SERVEROK");
     } else if (results.at(0).compare("DATAOK") == 0) {
         Simulator::Remove(m_sendCliDataEvent);
-        NS_LOG_DEBUG("UAV #" << m_id << " recebeu DATAOK");
+        NS_LOG_INFO("UAV #" << m_id << " recebeu DATAOK");
       } else if (results.at(0).compare("GOTO") == 0)
       {
         std::ostringstream mm;
         mm << "UAV\t" << m_id << "\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tGOTO";
         m_packetTrace(mm.str());
-        NS_LOG_DEBUG(mm.str());
+        NS_LOG_INFO(mm.str());
         double z = std::stod(results.at(3), &sz) - GetNode()->GetObject<MobilityModel>()->GetPosition().z;
         // repply to server
         ReplyServer();
@@ -303,7 +303,7 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
           dev->StopHover();
           GetNode()->GetObject<MobilityModel>()->SetPosition(Vector(std::stod(results.at(1), &sz), std::stod(results.at(2), &sz), (z > 0) ? z : 0.0)); // Verficar necessidade de subir em no eixo Z
         } else {
-          NS_LOG_DEBUG ("UAV " << m_id << " na posicao correta, atualizando servidor");
+          NS_LOG_INFO ("UAV " << m_id << " na posicao correta, atualizando servidor");
           SendPacket();
         }
       } else if (results.at(0).compare("GOTOCENTRAL") == 0)
@@ -312,7 +312,7 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
           std::ostringstream mm;
           mm << "UAV\t" << m_id << "\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tGOTOCENTRAL";
           m_packetTrace(mm.str());
-          NS_LOG_DEBUG(mm.str());
+          NS_LOG_INFO(mm.str());
           double z = std::stod(results.at(3), &sz) - GetNode()->GetObject<MobilityModel>()->GetPosition().z;
           // repply to server
           ReplyServerCentral();
@@ -329,7 +329,7 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
             dev->StopHover();
             GetNode()->GetObject<MobilityModel>()->SetPosition(Vector(std::stod(results.at(1), &sz), std::stod(results.at(2), &sz), (z > 0) ? z : 0.0)); // Verficar necessidade de subir em no eixo Z
           } else {
-            NS_LOG_DEBUG ("UAV " << m_id << " na posicao correta, atualizando servidor");
+            NS_LOG_INFO ("UAV " << m_id << " na posicao correta, atualizando servidor");
             SendPacket();
           }
         } else if (results.at(0).compare("SERVERDATA") == 0)
@@ -364,7 +364,7 @@ UavApplication::ReplyServerCentral ()
       m.str("");
       m << "UAV\t" << m_id << "\tSENT\t" << Simulator::Now().GetSeconds() << "\tCENTRALOK";
       m_packetTrace(m.str());
-      NS_LOG_DEBUG("UAV #" << m_id << " enviando CENTRALOK");
+      NS_LOG_INFO("UAV #" << m_id << " enviando CENTRALOK");
     }
     else
     {
@@ -388,7 +388,7 @@ UavApplication::ReplyServer ()
       m.str("");
       m << "UAV\t" << m_id << "\tSENT\t" << Simulator::Now().GetSeconds() << "\tUAVRECEIVED";
       m_packetTrace(m.str());
-      NS_LOG_DEBUG("UAV #" << m_id << " enviando UAVRECEIVED");
+      NS_LOG_INFO("UAV #" << m_id << " enviando UAVRECEIVED");
     }
     else
     {
@@ -459,7 +459,7 @@ void UavApplication::SendCliData ()
       msg.str("");
       msg << "UAV\t" << m_id << "\tSENT\t" << Simulator::Now().GetSeconds() << "\tDATAtoSERVER";
       m_packetTrace(msg.str());
-      NS_LOG_DEBUG("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - DATA to Server.");
+      NS_LOG_INFO("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - DATA to Server.");
     }
 
     m_sendCliDataEvent = Simulator::Schedule (Seconds(5.0), &UavApplication::SendCliData, this);
@@ -516,7 +516,7 @@ void UavApplication::DoDispose() {
 void UavApplication::TotalLeasedTrace (int oldV, int newV)
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds()  << oldV << newV);
-  NS_LOG_DEBUG ("UavApplication::TotalLeasedTrace " << newV);
+  NS_LOG_INFO ("UavApplication::TotalLeasedTrace " << newV);
   m_totalLeased = newV;
 }
 

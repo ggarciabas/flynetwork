@@ -25,6 +25,7 @@
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
+#include "location-model.h"
 #include <string>
 #include <vector>
 
@@ -48,6 +49,10 @@ public:
 
   void SetPosition(double, double);
   const std::vector<double> GetPosition();
+  
+  void EraseLocation();
+
+  const std::vector<double> GetPosition(double);
 
   double GetConsumption ();
   void SetConsumption (double c);
@@ -68,14 +73,35 @@ public:
   // void SetUpdateCons (Time t);
   // Time GetUpdateCons ();
 
+  double GetYPosition(double);
+  double GetXPosition(double);
+  double GetYPosition();
+  double GetXPosition();
+
+  void SetLocConnected (Ptr<LocationModel>);
+  Ptr<LocationModel> GetLocConnected ();
+
+  void SetConnected (bool);
+  bool IsConnected ();
+
+  double GetPci ();
+  void SetPci (double);
+
+  double GetDataRate ();
+  void SetDataRate (double sinr);
+
 private:
   void DoDispose ();
+  double m_pci; // probabilidade do cliente
+  bool m_connected;
+  Ptr<LocationModel> m_locConnected;
   std::string m_login;
   std::vector<double> m_position;
   double m_consumption; // fixed value
   Time m_updatePos;
   // Time m_updateCons;
   Ipv4Address m_addr;
+  double m_dataRate;
 };
 
 } // namespace ns3

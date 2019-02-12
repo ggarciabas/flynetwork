@@ -222,6 +222,7 @@ void UavNetwork::Run()
       NS_LOG_ERROR("Não foi possivel identificar o cenario!");
       exit(-1);
   }
+  m_scenarioName = ss.str();
   // ler informacoes do arquivo
   m_PathData = ss.str();
   ss_ << "./scratch/flynetwork/data/scenarios/" << m_PathData << ".txt";
@@ -403,6 +404,7 @@ void UavNetwork::ConfigureServer()
   obj.Set("MaxX", DoubleValue(m_xmax));
   obj.Set("MaxY", DoubleValue(m_ymax));
   obj.Set("PathData", StringValue(m_pathData));
+  obj.Set("ScenarioName", StringValue(m_scenarioName));
   obj.Set("ScheduleServer", DoubleValue(m_scheduleServer));
   obj.Set("Custo", UintegerValue(m_custo));
 
@@ -739,11 +741,11 @@ void UavNetwork::ConfigureCli()
         Ptr<PositionAllocator> positionAlloc = CreateObjectWithAttributes<RandomDiscPositionAllocator>
                             ("X", DoubleValue (x),
                               "Y", DoubleValue (y),
-                            "Rho", StringValue("ns3::ConstantRandomVariable[Constant=10.0]"));
+                            "Rho", StringValue("ns3::ConstantRandomVariable[Constant=8.0]"));
         mobilityCLI.SetPositionAllocator(positionAlloc);
         mobilityCLI.SetMobilityModel("ns3::RandomWalk2dMobilityModel",
                                      "Bounds", RectangleValue(Rectangle(m_xmin, m_xmax, m_ymin, m_ymax)),
-                                      "Speed", StringValue("ns3::UniformRandomVariable[Min=4.0|Max=10.0]")); // xmin, xmax, ymin, ymax
+                                      "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=10.0]")); // xmin, xmax, ymin, ymax
         mobilityCLI.Install(nodes);
         m_clientNode.Add(nodes);
       }
@@ -964,12 +966,29 @@ void UavNetwork::Configure()
   // configurando INTERNET
   m_stack.SetRoutingHelper(m_list);
 
-  // Ad Hoc
-  m_adhocHelper.SetStandard(WIFI_PHY_STANDARD_80211a);
-  m_phyHelper = YansWifiPhyHelper::Default();
+  // IMPORTANTE: Information similar to the following appears for the show mesh config command:  fala o low SNR e high SNR https://www.cisco.com/c/en/us/td/docs/wireless/technology/mesh/8-0/design/guide/mesh80.pdf
+  // Low Link SNR.................................. 12
+  // High Link SNR................................. 60
+  // Max Association Number........................ 10
 
+  // Considerar o Cisco Aironet 1570 Series
+  // -- https://www.cisco.com/c/en/us/td/docs/wireless/controller/technotes/8-0/1570-DG/b_Aironet_AP1570_DG.pdf
+  // DataSheet: https://www.cisco.com/c/dam/en/us/products/collateral/wireless/aironet-1570-series/datasheet-c78-732348.pdf
+
+  // ns3 exemplo: https://www.nsnam.org/doxygen/vht-wifi-network_8cc_source.html
+  // usar taxa constante para funcionar como o DA. MCS0 para todos!
+
+  // Ad Hoc
+  m_adhocHelper.SetStandard(WIFI_PHY_STANDARD_80211ac); // https://en.wikipedia.org/wiki/IEEE_802.11ac
+  m_adhocHelper.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", StringValue ("VhtMcs0"),
+                                          "ControlMode", StringValue ("VhtMcs0"));
+  m_phyHelper = YansWifiPhyHelper::Default();
   m_channelHelper = YansWifiChannelHelper::Default();
+
+  // TODO: change ChannelWidth = 20 and Frequency = 5180Hz ac e 2.4GHz
+
   m_channelHelper.SetPropagationDelay ("ns3::ConstantSpeedPropagationDelayModel");
+  // ---> isto permite comunicacao entre UAVs!
   // The below FixedRssLossModel will cause the rss to be fixed regardless
   // of the distance between the two stations, and the transmit power
   double rss = -80;  // -dBm
@@ -985,12 +1004,17 @@ void UavNetwork::Configure()
                         "Y", DoubleValue (m_cy),
                         "Rho", StringValue("ns3::ConstantRandomVariable[Constant=3.0]"));
 
+  // Considerar o Ponto de Acesso Cisco Aironet 1550 Series
+  // 16/01/2019 DataSheet: https://www.cisco.com/c/en/us/products/collateral/wireless/aironet-1550-series/data_sheet_c78-641373.pdf
+  // Relacao MCS e SINR: https://www.cisco.com/c/en/us/td/docs/wireless/technology/mesh/8-0/design/guide/mesh80.pdf
+  // If we consider only 802.11n rates, then Table 13: Requirements for LinkSNR with AP1552 for 2.4 and 5 GHz, on page 48 shows LinkSNR requirements with AP1552 for 2.4 and 5 GHz.
   // Wifi
   m_phyHelperCli = YansWifiPhyHelper::Default();
   m_channelHelperCli = YansWifiChannelHelper::Default();
   m_phyHelperCli.SetChannel(m_channelHelperCli.Create());
-  m_wifiHelper.SetStandard(WIFI_PHY_STANDARD_80211b);
-
+  m_wifiHelper.SetStandard(WIFI_PHY_STANDARD_80211n_2_4GHZ); // https://en.wikipedia.org/wiki/IEEE_802.11n-2009
+  m_wifiHelper.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", StringValue ("HtMcs0"),
+                                          "ControlMode", StringValue ("HtMcs0"));
   m_macWifiHelperCli.SetType("ns3::StaWifiMac",
                              "Ssid", SsidValue(Ssid("flynetwork")),
                              "ActiveProbing", BooleanValue(false)); // configuração de scanning passivo

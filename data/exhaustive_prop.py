@@ -14,6 +14,7 @@ teste = True
 # if sys.argv[1] == "False":
 #     teste = False
 scenario = sys.argv[2]
+# time = sys.argv[3]
 main_path = "./output/"+scenario+"/"
 
 for custo_name in glob.glob(main_path+'custo_*/'):
@@ -33,7 +34,11 @@ for custo_name in glob.glob(main_path+'custo_*/'):
     data = {"Exaustivo":[], "Sequencial":[], "Aleatório":[]}
     custo_n = c_name[custo]
     data[custo_n] = []
-    for time in list_folder:
+    size_4 = len(list_folder)/4
+    etapas = list_folder[:] #[list_folder[x] for x in np.arange(0,len(list_folder), 2)]
+    print etapas
+    for time in etapas:
+        plt.clf()
         # read bij
         try:
             file = open(main_path+custo+"/"+'etapa/'+str(time)+"/bij.txt", 'r')
@@ -258,8 +263,25 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/ale_'+str(custo)+'.eps')
         plt.clf()
 
+        data_et = {"Exaustivo":[], "Sequencial":[], "Aleatório":[]}
+        data_et[custo_n] = []
+        data_et["Exaustivo"].append(c_exaustive.sum())
+        data_et[custo_n].append(c_prop.sum())
+        data_et["Sequencial"].append(c_seq.sum())
+        data_et["Aleatório"].append(c_ale.sum())
+        index = [time]
+        df = pd.DataFrame(data_et, index=index)
+        # ax = df.plot.bar(stacked=True, rot=0)
+        ax = df.plot.bar(rot=0)
+        ax.set_title('Comparativo do custo total etapa @'+str(time)+'s')
+        ax.set_ylabel('Custo total')
+        ax.set_xlabel('Tempo (s)')
+        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/comp_'+str(custo)+'.svg')
+        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/comp_'+str(custo)+'.png')
+        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/comp_'+str(custo)+'.eps')
+        plt.clf()
+
         data["Exaustivo"].append(c_exaustive.sum())
-        # data["Proposto"].append(c_prop.sum()-c_exaustive.sum()) # para apresentar a diferença
         data[custo_n].append(c_prop.sum())
         data["Sequencial"].append(c_seq.sum())
         data["Aleatório"].append(c_ale.sum())
@@ -273,7 +295,7 @@ for custo_name in glob.glob(main_path+'custo_*/'):
 
     # plot comparation all times [https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.plot.bar.html]
     # stacked=True
-    index = list_folder[:]
+    index = etapas[:]
     df = pd.DataFrame(data, index=index)
     # ax = df.plot.bar(stacked=True, rot=0)
     ax = df.plot.bar(rot=0)

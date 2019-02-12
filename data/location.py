@@ -116,7 +116,7 @@ def scenario (time, main_path, teste):
     plt.ylim([0,lim[1]])
     plt.xlabel('X (m)')
     plt.ylabel('Y (m)')
-    plt.title("Cenario @"+'etapa/'+time+"s")
+    # plt.title("Cenario @"+'etapa/'+time+"s")
 
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.23), fancybox=True, shadow=True, ncol=5)
 

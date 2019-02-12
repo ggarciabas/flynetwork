@@ -53,6 +53,10 @@ ClientModel::ClientModel() : m_position()
 {
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("ClientModel::ClientModel @" << Simulator::Now().GetSeconds());
+  m_consumption = 0.0;
+  m_locConnected = 0;
+  m_pci = 1.0;
+  m_dataRate = 0.0;
 }
 
 ClientModel::~ClientModel()
@@ -60,6 +64,7 @@ ClientModel::~ClientModel()
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("ClientModel::~ClientModel @" << Simulator::Now().GetSeconds());
   m_position.clear();
+  m_locConnected = 0;
 }
 
 void ClientModel::SetPosition(double x, double y)
@@ -75,6 +80,16 @@ ClientModel::GetPosition()
 {
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   return m_position;
+}
+
+const std::vector<double>
+ClientModel::GetPosition(double r_max)
+{
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
+  std::vector<double> p;
+  p.push_back(m_position.at(0)/r_max);
+  p.push_back(m_position.at(1)/r_max);
+  return p;
 }
 
 void ClientModel::SetLogin(std::string str)
@@ -138,5 +153,75 @@ void ClientModel::DoDispose () {
 // {
 //   return m_updateCons;
 // }
+
+double ClientModel::GetXPosition (double r_max) {
+  return m_position.at(0)/r_max;
+}
+
+double ClientModel::GetYPosition (double r_max) {
+  return m_position.at(1)/r_max;
+}
+
+double ClientModel::GetXPosition () {
+  return m_position.at(0);
+}
+
+double ClientModel::GetYPosition () {
+  return m_position.at(1);
+}
+
+void ClientModel::EraseLocation() {
+  m_locConnected = 0;
+}
+
+void ClientModel::SetLocConnected (Ptr<LocationModel> l) {
+  m_locConnected = l;
+}
+
+Ptr<LocationModel> ClientModel::GetLocConnected () {
+  return m_locConnected;
+}
+
+void ClientModel::SetConnected (bool c) {
+    m_connected = c;
+}
+
+bool ClientModel::IsConnected () {
+  return m_connected;
+}
+
+double ClientModel::GetPci () {
+  return m_pci;
+}
+
+void ClientModel::SetPci (double p) {
+  m_pci = p;
+}
+
+double ClientModel::GetDataRate () {
+  return m_dataRate;
+}
+
+void ClientModel::SetDataRate(double sinr) {
+  if (sinr < -93) { // dBm
+    m_dataRate = 0.0;
+  } else if (sinr < -91) {
+    m_dataRate = 6.5; //Mbps MCS 0
+  } else if (sinr < -89) {
+    m_dataRate = 13; //Mbps MCS 1
+  } else if (sinr < -86) {
+    m_dataRate = 19.5; //Mbps MCS 2
+  } else if (sinr < -82) {
+    m_dataRate = 26; //Mbps MCS 3
+  } else if (sinr < -78) {
+    m_dataRate = 39; //Mbps MCS 4
+  } else if (sinr < -77) {
+    m_dataRate = 52; //Mbps MCS 5
+  } else if (sinr < -75) {
+    m_dataRate = 58.5; //Mbps MCS 6
+  } else {
+    m_dataRate = 65; // Mbps MCS 7
+  }
+}
 
 } // namespace ns3

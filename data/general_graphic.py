@@ -11,6 +11,7 @@ import moving_graphic
 import battery_threshold
 import initial_scenario
 import client
+import da_loc
 import location
 import glob
 import os
@@ -65,27 +66,28 @@ for custo_name in glob.glob(main_path+'custo_*/'):
     t_ini = -1
     all_uav = []
     # Bij
-    for time in list_folder:
+    for etapa in list_folder:
+        da_loc.da_loc (custo, etapa, main_path, teste, -2) # somente a ultima iteracao
         if teste:
-            print time
-        (uavs_id, uav_mov) = bij_graphic.bij(custo, str(time), main_path, teste)
+            print etapa
+        (uavs_id, uav_mov) = bij_graphic.bij(custo, str(etapa), main_path, teste)
         if teste:
             print uavs_id
         # Battery
         if t_ini > -1:
-            battery_hover.battery(main_path+custo+'/', teste, uavs_id, t_ini, time, activated, time)
-            battery_all.battery(main_path+custo+'/', teste, uavs_id, t_ini, time, activated, time)
-            t_ini = time
+            battery_hover.battery(main_path+custo+'/', teste, uavs_id, t_ini, etapa, activated, etapa)
+            battery_all.battery(main_path+custo+'/', teste, uavs_id, t_ini, etapa, activated, etapa)
+            t_ini = etapa
         else:
             t_ini = -0.5
         # Client
-        client.scenario (str(time), main_path+custo+'/', teste)
+        client.scenario (str(etapa), main_path+custo+'/', teste)
         # Location
-        location.scenario (str(time), main_path+custo+'/', teste)
+        location.scenario (str(etapa), main_path+custo+'/', teste)
         # Uav Loc
-        uav_loc_graphic.uav_loc (str(time), main_path+custo+'/', teste, raio_cli, raio_uav)
+        uav_loc_graphic.uav_loc (str(etapa), main_path+custo+'/', teste, raio_cli, raio_uav)
         # Mij
-        mij_graphic.mij(str(time), main_path+custo+'/', teste)
+        mij_graphic.mij(str(etapa), main_path+custo+'/', teste)
         all_uav.extend(uavs_id[:])
 
     if teste:
