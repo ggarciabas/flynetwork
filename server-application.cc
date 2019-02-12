@@ -47,7 +47,7 @@ ServerApplication::GetTypeId(void)
                                         MakeDataRateAccessor(&ServerApplication::m_dataRate),
                                         MakeDataRateChecker())
                           .AddAttribute("ScheduleServer", "Time to schedule server method.",
-                                        DoubleValue(60.0),
+                                        DoubleValue(60),
                                         MakeDoubleAccessor(&ServerApplication::m_scheduleServer),
                                         MakeDoubleChecker<double>())
                           .AddAttribute("Rho", "Taxa de reducao da temperatura",
@@ -364,11 +364,11 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             }
             uav = 0;
           } else {
-              std::ostringstream mm;
-              mm << "SERVER\t-1\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tCLIENT";
-              m_packetTrace(mm.str());
-              NS_LOG_INFO("SERVER -- CLIENT ::: recebida informacoes de aplicacao do cliente no endereco " << add.GetIpv4());
-            }
+            std::ostringstream mm;
+            mm << "SERVER\t-1\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tCLIENT";
+            m_packetTrace(mm.str());
+            NS_LOG_INFO("SERVER -- CLIENT ::: recebida informacoes de aplicacao do cliente no endereco " << add.GetIpv4());
+          }
     results.clear();
 }
 
