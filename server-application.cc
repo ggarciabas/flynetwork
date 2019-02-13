@@ -719,28 +719,28 @@ ServerApplication::CalculateDistance(const std::vector<double> pos1, const std::
   return dist; // euclidean, sempre considera a distância atual calculada pelo DA
 }
 
-bool ServerApplication::ValidateMijConvergency(vector<vector<long double>> vec, vector<vector<long double>> m_ij, unsigned siz)
-{
-  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << vec << m_ij << siz);
-  for (unsigned i = 0; i < siz; ++i)
-  {
-    for (unsigned j = 0; j < siz; ++j)
-    {
-      if (vec[i][j] != m_ij[i][j])
-        return false;
-    }
-  }
+// bool ServerApplication::ValidateMijConvergency(vector<vector<long double>> vec, vector<vector<long double>> m_ij, unsigned siz)
+// {
+//   // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << vec << m_ij << siz);
+//   for (unsigned i = 0; i < siz; ++i)
+//   {
+//     for (unsigned j = 0; j < siz; ++j)
+//     {
+//       if (vec[i][j] != m_ij[i][j])
+//         return false;
+//     }
+//   }
 
-  for (unsigned i = 0; i < siz; ++i)
-  {
-    vec[i].clear();
-    m_ij[i].clear();
-  }
-  m_ij.clear();
-  vec.clear();
+//   for (unsigned i = 0; i < siz; ++i)
+//   {
+//     vec[i].clear();
+//     m_ij[i].clear();
+//   }
+//   m_ij.clear();
+//   vec.clear();
 
-  return true;
-}
+//   return true;
+// }
 
 void ServerApplication::runAgendamento(void)
 {
@@ -837,7 +837,7 @@ void ServerApplication::runAgendamento(void)
 
   // Inicializando
   NS_LOG_DEBUG ("SERVER - inicializando matrizes.");
-  double temp = 0.99;
+  double temp = 0.60;
   // Mai
   vector<vector<long double>> m_ij;
   // variavel da tranformacao algebrica (parte do self-amplification)
@@ -868,6 +868,8 @@ void ServerApplication::runAgendamento(void)
     }
   }
 
+  PrintBij(b_ij, int(Simulator::Now().GetSeconds()), true, uav_ids, loc_ids);  
+
   int print = 0;
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/mij_" << std::setfill ('0') << std::setw (7) << print << ".txt";
@@ -885,54 +887,85 @@ void ServerApplication::runAgendamento(void)
   unsigned itB_max = 500;
   unsigned itA_max = 500;
   unsigned itC_max = 50;
-  double gamma = 0.95;
-  vector<vector<long double>> copyB_mij;
-  vector<vector<long double>> copyC_mij;
+  double gamma = 0.55;
   NS_LOG_INFO ("SERVER - iniciando execucao das partes A, B e C @" << Simulator::Now().GetSeconds());
-
-  PrintBij(b_ij, int(Simulator::Now().GetSeconds()), true, uav_ids, loc_ids);  
 
   // Part A
   unsigned itA = 0;
+  long double new_mij;
+  bool converge_B = true, converge_C = true; // para saber se houve mudanca no valor
   while (temp >= 0.005 && itA < itA_max)
   {
     // Part B
     unsigned itB = 0;
     do
     {
-      copyB_mij = m_ij; // copy assignment copies data
+      converge_B = true;
 
       for (unsigned i = 0; i < siz; ++i)
       {
         for (unsigned j = 0; j < siz; ++j)
         {
           // calculate \lamb_{ij}
+          NS_LOG_DEBUG ("MIJ [" << i << "," << j << "] : " << m_ij[i][j]);
           lamb_ij[i][j] = m_ij[i][j] * b_ij[i][j];
+          if (isnan(lamb_ij[i][j])) {
+            os.str("");
+            os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_q_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+            PrintMij (q_ij, 1.0, os.str(), uav_ids, loc_ids);
+            os.str("");
+            os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_lamb_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+            PrintMij (lamb_ij, 1.0, os.str(), uav_ids, loc_ids);
+            os.str("");
+            os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_m_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+            PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
+            NS_FATAL_ERROR ("Lab is nan: ["<<i<<","<<j<<"] " << m_ij[i][j] << " * " << b_ij[i][j] << " = " << lamb_ij[i][j]);            
+          }
           // calculate Q_{ij}
           q_ij[i][j] = gamma * o_ij[i][j] - lamb_ij[i][j] * b_ij[i][j];
+          if (isnan(q_ij[i][j])) {
+            os.str("");
+            os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_q_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+            PrintMij (q_ij, 1.0, os.str(), uav_ids, loc_ids);
+            os.str("");
+            os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_lamb_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+            PrintMij (lamb_ij, 1.0, os.str(), uav_ids, loc_ids);
+            os.str("");
+            os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_m_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+            PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
+            NS_FATAL_ERROR ("qij is nan: ");            
+          }
           // calculate m_{ij}
-          m_ij[i][j] = exp(q_ij[i][j] / temp);
+          new_mij = exp(q_ij[i][j] / temp);
+          if (m_ij[i][j] != new_mij) { // mudou!
+            converge_B = false;
+            converge_C = false;
+          }
+          m_ij[i][j] = new_mij;
+          if (isnan(m_ij[i][j])) {
+            os.str("");
+            os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_q_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+            PrintMij (q_ij, 1.0, os.str(), uav_ids, loc_ids);
+            os.str("");
+            os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_lamb_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+            PrintMij (lamb_ij, 1.0, os.str(), uav_ids, loc_ids);
+            os.str("");
+            os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_m_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+            PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
+            NS_FATAL_ERROR ("mij is nan");            
+          }
         }
-      }
-
-      os.str("");
-      os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_q_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
-      PrintMij (q_ij, 1.0, os.str(), uav_ids, loc_ids);
-      os.str("");
-      os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_lamb_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
-      PrintMij (lamb_ij, 1.0, os.str(), uav_ids, loc_ids);
-      os.str("");
-      os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_m_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
-      PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
+      }      
 
       // Part C
       unsigned itC = 0;
       do
       {
-        copyC_mij = m_ij; // copy assignment copies data
+        converge_C = true;
 
         // normalizando as linhas
         unsigned check = 0;
+        NS_LOG_DEBUG("Linhas ---------");
         for (unsigned i = 0; i < siz; ++i)
         {
           long double total_linha = 0.0;
@@ -945,7 +978,24 @@ void ServerApplication::runAgendamento(void)
           }
           for (unsigned j = 0; j < siz; ++j)
           {
-            m_ij[i][j] /= total_linha;
+            NS_LOG_DEBUG ("MIJ [" << i << "," << j << "] : " << m_ij[i][j] << " totallinha: " << total_linha);
+            new_mij /= total_linha;
+            if (m_ij[i][j] != new_mij) {
+              converge_B = converge_C = false;
+            }            
+            m_ij[i][j] = new_mij;
+            if (isnan(m_ij[i][j])) {
+              os.str("");
+              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_q_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+              PrintMij (q_ij, 1.0, os.str(), uav_ids, loc_ids);
+              os.str("");
+              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_lamb_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+              PrintMij (lamb_ij, 1.0, os.str(), uav_ids, loc_ids);
+              os.str("");
+              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_m_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+              PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
+              NS_FATAL_ERROR ("mij is nan");            
+            }
           }
         }
 
@@ -955,6 +1005,7 @@ void ServerApplication::runAgendamento(void)
         }
 
         // normalizando colunas
+        NS_LOG_DEBUG("Colunas ---------");
         for (unsigned j = 0; j < siz; ++j)
         {
           long double total_coluna = 0.0;
@@ -965,19 +1016,32 @@ void ServerApplication::runAgendamento(void)
 
           for (unsigned i = 0; i < siz; ++i)
           {
-            m_ij[i][j] /= total_coluna;
+            NS_LOG_DEBUG ("MIJ [" << i << "," << j << "] : " << m_ij[i][j] << " totalcoluna: " << total_coluna);
+            new_mij /= total_coluna;
+            if (m_ij[i][j] != new_mij) {
+              converge_B = converge_C = false;
+            }
+            m_ij[i][j] = new_mij;
+            if (isnan(m_ij[i][j])) {
+              os.str("");
+              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_q_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+              PrintMij (q_ij, 1.0, os.str(), uav_ids, loc_ids);
+              os.str("");
+              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_lamb_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+              PrintMij (lamb_ij, 1.0, os.str(), uav_ids, loc_ids);
+              os.str("");
+              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_m_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+              PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
+              NS_FATAL_ERROR ("mij is nan");            
+            }
           }
         }
 
-        os.str("");
-        os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/C_m_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << "_" << itC << ".txt";
-        PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
-
         itC++;
-      } while (!ValidateMijConvergency(copyC_mij, m_ij, siz) && itC < itC_max);
+      } while (!converge_C && itC < itC_max);
 
       itB++;
-    } while (!ValidateMijConvergency(copyB_mij, m_ij, siz) && itB < itB_max);    
+    } while (!converge_B && itB < itB_max);    
 
     os.str("");
     os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/mij_" << std::setfill ('0') << std::setw (7) << print++ << ".txt";
@@ -1104,7 +1168,6 @@ void ServerApplication::runAgendamento(void)
       lamb_ij[i].clear();
       q_ij[i].clear();
       b_ij[i].clear();
-      copyB_mij[i].clear();
       custo_x[i].clear();
       f_mij[i].clear();
     }
@@ -1113,7 +1176,6 @@ void ServerApplication::runAgendamento(void)
   lamb_ij.clear();
   q_ij.clear();
   b_ij.clear();
-  copyB_mij.clear();
   central_pos.clear();
   custo_x.clear();
   f_mij.clear();
