@@ -1165,7 +1165,7 @@ void ServerApplication::runAgendamento(void)
       f_mij[i].push_back(0.0);
     } // ao final selecionara a localizacao com maior valor de mij
 
-    if (b_ij[i][id] == 1.0) {
+    if (custo_x[i][id] == 1.0) {
       // Uav não tem bateria suficiente para ir até esta localização!
       NS_LOG_DEBUG("ServerApplication::runAgendamento --> Enviar UAV " << (*u_i)->GetId() << " para a central  REF " << (*u_i)->GetReferenceCount());
       // criar um novo nó iniciando na região central, como sempre!
@@ -1290,7 +1290,7 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
         custo = 1-P_te;
         if (custo < 0.0) {
           custo = (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot;
-        }        
+        }
         break;
       case 3:
         custo = 1 - P_te;
