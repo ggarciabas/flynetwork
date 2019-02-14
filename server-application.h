@@ -86,6 +86,8 @@ private:
   void GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double uav_cob, double r_max, double max_antena, double maxDrUav);
   void GraficoCenarioDaPuro (double temp, int iter, Ptr<LocationModel> lCentral, double raio_cob);
 
+  void PrintMatrix (vector<vector<long double>> m, std::string nameFile);
+
   bool MovimentoA();
   bool MovimentoB();
   void CentroDeMassa (Ptr<LocationModel>, Ptr<LocationModel> central, double);
