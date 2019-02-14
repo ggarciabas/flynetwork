@@ -868,7 +868,7 @@ void ServerApplication::runAgendamento(void)
     }
   }
 
-  PrintBij(b_ij, int(Simulator::Now().GetSeconds()), true, uav_ids, loc_ids);  
+  PrintBij(b_ij, int(Simulator::Now().GetSeconds()), true, uav_ids, loc_ids);
 
   int print = 0;
   std::ostringstream os;
@@ -884,10 +884,10 @@ void ServerApplication::runAgendamento(void)
   os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/q_ij_" << std::setfill ('0') << std::setw (7) << print++ << ".txt";
   PrintMij (q_ij, 1.0, os.str(), uav_ids, loc_ids);
 
-  unsigned itB_max = 500;
-  unsigned itA_max = 500;
-  unsigned itC_max = 50;
-  double gamma = 0.55;
+  unsigned itB_max = 2;
+  unsigned itA_max = 2;
+  unsigned itC_max = 2;
+  double gamma = 0.95;
   NS_LOG_INFO ("SERVER - iniciando execucao das partes A, B e C @" << Simulator::Now().GetSeconds());
 
   // Part A
@@ -907,33 +907,39 @@ void ServerApplication::runAgendamento(void)
         for (unsigned j = 0; j < siz; ++j)
         {
           // calculate \lamb_{ij}
-          NS_LOG_DEBUG ("MIJ [" << i << "," << j << "] : " << m_ij[i][j]);
+          // NS_LOG_DEBUG ("MIJ [" << i << "," << j << "] : " << m_ij[i][j]);
           lamb_ij[i][j] = m_ij[i][j] * b_ij[i][j];
           if (isnan(lamb_ij[i][j])) {
             os.str("");
             os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_q_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
             PrintMij (q_ij, 1.0, os.str(), uav_ids, loc_ids);
             os.str("");
+            os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_o_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+            PrintMij (o_ij, 1.0, os.str(), uav_ids, loc_ids);
+            os.str("");
             os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_lamb_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
             PrintMij (lamb_ij, 1.0, os.str(), uav_ids, loc_ids);
             os.str("");
             os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_m_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
             PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
-            NS_FATAL_ERROR ("Lab is nan: ["<<i<<","<<j<<"] " << m_ij[i][j] << " * " << b_ij[i][j] << " = " << lamb_ij[i][j]);            
+            NS_FATAL_ERROR ("Lab is nan: ["<<i<<","<<j<<"] " << m_ij[i][j] << " * " << b_ij[i][j] << " = " << lamb_ij[i][j] << "   " << itB);
           }
           // calculate Q_{ij}
           q_ij[i][j] = gamma * o_ij[i][j] - lamb_ij[i][j] * b_ij[i][j];
           if (isnan(q_ij[i][j])) {
             os.str("");
             os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_q_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
-            PrintMij (q_ij, 1.0, os.str(), uav_ids, loc_ids);
+            PrintMij (q_ij, 1.0, os.str(), uav_ids, loc_ids);os.str("");
+            os.str("");
+            os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_o_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+            PrintMij (o_ij, 1.0, os.str(), uav_ids, loc_ids);
             os.str("");
             os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_lamb_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
             PrintMij (lamb_ij, 1.0, os.str(), uav_ids, loc_ids);
             os.str("");
             os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_m_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
             PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
-            NS_FATAL_ERROR ("qij is nan: ");            
+            NS_FATAL_ERROR ("qij is nan:  " << itB);
           }
           // calculate m_{ij}
           new_mij = exp(q_ij[i][j] / temp);
@@ -947,27 +953,46 @@ void ServerApplication::runAgendamento(void)
             os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_q_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
             PrintMij (q_ij, 1.0, os.str(), uav_ids, loc_ids);
             os.str("");
+            os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_o_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+            PrintMij (o_ij, 1.0, os.str(), uav_ids, loc_ids);
+            os.str("");
             os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_lamb_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
             PrintMij (lamb_ij, 1.0, os.str(), uav_ids, loc_ids);
             os.str("");
             os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_m_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
             PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
-            NS_FATAL_ERROR ("mij is nan");            
+            NS_FATAL_ERROR ("mij is nan  " << itB);
           }
         }
-      }      
+      }
+
+      os.str("");
+      os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_q_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+      PrintMij (q_ij, 1.0, os.str(), uav_ids, loc_ids);
+      os.str("");
+      os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_o_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+      PrintMij (o_ij, 1.0, os.str(), uav_ids, loc_ids);
+      os.str("");
+      os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_lamb_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+      PrintMij (lamb_ij, 1.0, os.str(), uav_ids, loc_ids);
+      os.str("");
+      os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_m_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+      PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
 
       // Part C
       unsigned itC = 0;
+      os.str("");
       do
       {
         converge_C = true;
 
         // normalizando as linhas
         unsigned check = 0;
-        NS_LOG_DEBUG("Linhas ---------");
+        os.str("");
+        os << "Linhas --------- " << itA << " " << itB << " " << itC << "\n";
         for (unsigned i = 0; i < siz; ++i)
         {
+          std::cout << "[";
           long double total_linha = 0.0;
           for (unsigned k = 0; k < siz; ++k)
           {
@@ -976,28 +1001,42 @@ void ServerApplication::runAgendamento(void)
             }
             total_linha += m_ij[i][k];
           }
+
+          if (total_linha == 0) {
+            NS_FATAL_ERROR ("Zerou linha " << i);
+          }
+
+          os << total_linha << " --- ";
           for (unsigned j = 0; j < siz; ++j)
           {
-            NS_LOG_DEBUG ("MIJ [" << i << "," << j << "] : " << m_ij[i][j] << " totallinha: " << total_linha);
-            new_mij /= total_linha;
+            os << " [" << m_ij[i][j] << ",";
+            new_mij = m_ij[i][j] / total_linha;
             if (m_ij[i][j] != new_mij) {
               converge_B = converge_C = false;
-            }            
+            }
             m_ij[i][j] = new_mij;
+            os << m_ij[i][j] << "]\t\t";
             if (isnan(m_ij[i][j])) {
+              NS_LOG_DEBUG (os.str());
               os.str("");
-              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_q_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/C_q_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
               PrintMij (q_ij, 1.0, os.str(), uav_ids, loc_ids);
               os.str("");
-              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_lamb_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/C_o_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+              PrintMij (o_ij, 1.0, os.str(), uav_ids, loc_ids);
+              os.str("");
+              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/C_lamb_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
               PrintMij (lamb_ij, 1.0, os.str(), uav_ids, loc_ids);
               os.str("");
-              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_m_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/C_m_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
               PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
-              NS_FATAL_ERROR ("mij is nan");            
+              NS_FATAL_ERROR ("mij is nan   " << itC);
             }
           }
+          os << "\n";
         }
+        os << "]\n";
+        NS_LOG_DEBUG (os.str());
 
         if (check == siz) {
           NS_LOG_DEBUG ("GOING OUT!! ------------------------>>>>>>");
@@ -1005,43 +1044,72 @@ void ServerApplication::runAgendamento(void)
         }
 
         // normalizando colunas
-        NS_LOG_DEBUG("Colunas ---------");
+        os.str("");
+        os << "Colunas --------- " << itA << " " << itB << " " << itC << "\n";
         for (unsigned j = 0; j < siz; ++j)
         {
+          os << "[";
           long double total_coluna = 0.0;
           for (unsigned k = 0; k < siz; ++k)
           {
             total_coluna += m_ij[k][j];
           }
 
+          if (total_coluna == 0) {
+            os << "----> Zerou coluna, passando pra proxima: " << j << std::endl;
+            continue;
+          }
+
+          os << total_coluna << " --- ";
           for (unsigned i = 0; i < siz; ++i)
           {
-            NS_LOG_DEBUG ("MIJ [" << i << "," << j << "] : " << m_ij[i][j] << " totalcoluna: " << total_coluna);
-            new_mij /= total_coluna;
+            os << " [" << m_ij[i][j] << ",";
+            new_mij = m_ij[i][j] / total_coluna;
             if (m_ij[i][j] != new_mij) {
               converge_B = converge_C = false;
             }
             m_ij[i][j] = new_mij;
+            os << m_ij[i][j] << "]\t\t";
             if (isnan(m_ij[i][j])) {
+              NS_LOG_DEBUG (os.str());
               os.str("");
-              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_q_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/C_q_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
               PrintMij (q_ij, 1.0, os.str(), uav_ids, loc_ids);
               os.str("");
-              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_lamb_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/C_o_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+              PrintMij (o_ij, 1.0, os.str(), uav_ids, loc_ids);
+              os.str("");
+              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/C_lamb_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
               PrintMij (lamb_ij, 1.0, os.str(), uav_ids, loc_ids);
               os.str("");
-              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/B_m_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+              os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/C_m_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
               PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
-              NS_FATAL_ERROR ("mij is nan");            
+              NS_FATAL_ERROR ("mij is nan   " << itC);
             }
           }
+          os << "\n";
         }
+        os << "]\n";
+        NS_LOG_DEBUG (os.str());
 
         itC++;
       } while (!converge_C && itC < itC_max);
 
+      os.str("");
+      os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/C_q_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+      PrintMij (q_ij, 1.0, os.str(), uav_ids, loc_ids);
+      os.str("");
+      os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/C_o_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+      PrintMij (o_ij, 1.0, os.str(), uav_ids, loc_ids);
+      os.str("");
+      os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/C_lamb_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+      PrintMij (lamb_ij, 1.0, os.str(), uav_ids, loc_ids);
+      os.str("");
+      os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/C_m_ij_" << std::setfill ('0') << std::setw (4) << itA << "_" << itB << ".txt";
+      PrintMij (m_ij, 1.0, os.str(), uav_ids, loc_ids);
+
       itB++;
-    } while (!converge_B && itB < itB_max);    
+    } while (!converge_B && itB < itB_max);
 
     os.str("");
     os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij/mij_" << std::setfill ('0') << std::setw (7) << print++ << ".txt";
