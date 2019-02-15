@@ -434,13 +434,16 @@ void UavNetwork::NewUav(int total, int update)
   NS_LOG_DEBUG ("UavNetwork::NewUav " << total << " " << update << " @" << Simulator::Now().GetSeconds());
   // validar se ainda existem UAVs
   uint32_t uav_livre = 0;
+  NS_LOG_DEBUG("Uavs: (" << m_iniX << "," << m_iniY <<")");
   for (UavNodeContainer::Iterator i = m_uavNode.Begin(); i != m_uavNode.End(); ++i) {
     Ptr<MobilityModel> mob = (*i)->GetObject<MobilityModel>();
+    NS_LOG_DEBUG("\t"<<(*i)->GetId() << " (" << mob->GetPosition().x << "," << mob->GetPosition().y << ")");
     if (mob->GetPosition().x == m_iniX && mob->GetPosition().y == m_iniY) { // somente se estiver na "posicao inicial"
       uav_livre++;
     }
   }
-  if (uav_livre < uint32_t(total)) {// Caso nao, configurar um novo
+  NS_LOG_DEBUG ("Uav livre: " << uav_livre);
+  if (uav_livre < uint32_t(total)) { // Caso nao, configurar um novo
     ConfigureUav(total - uav_livre); // diferenca
   }
   while (total--) {
