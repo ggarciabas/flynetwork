@@ -43,7 +43,7 @@ using namespace ns3;
 // https://www.wired.com/story/the-physics-of-why-bigger-drones-can-fly-longer/
 int main (int argc, char *argv[])
 {
-	double sim_time=1200.0, cli_pos_update = 5.0, scheduleServer=60.0;
+	double sim_time=1200.0, cli_pos_update = 5.0, scheduleServer=ETAPA;
 	uint32_t scenario = 7, env = 2, protocol = 2, custo=1;
 	CommandLine cmd;
   cmd.AddValue ("SimTime", "Simulation time", sim_time);

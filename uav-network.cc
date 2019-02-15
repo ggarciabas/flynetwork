@@ -41,6 +41,8 @@
 #include <cstdlib>
 #include <string>
 
+#define ETAPA 120
+
 namespace ns3
 {
 
@@ -76,7 +78,7 @@ UavNetwork::GetTypeId(void)
                                         MakeDoubleAccessor(&UavNetwork::m_zValue),
                                         MakeDoubleChecker<double>())
                           .AddAttribute("ScheduleServer", "Time to schedule server method.",
-                                        DoubleValue(60.0),
+                                        DoubleValue(ETAPA),
                                         MakeDoubleAccessor(&UavNetwork::m_scheduleServer),
                                         MakeDoubleChecker<double>())
                           .AddAttribute("TxGain",

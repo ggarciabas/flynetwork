@@ -28,6 +28,8 @@
 #include <fstream>
 #include <string>
 
+#define ETAPA 60
+
 namespace ns3
 {
 
@@ -47,7 +49,7 @@ ServerApplication::GetTypeId(void)
                                         MakeDataRateAccessor(&ServerApplication::m_dataRate),
                                         MakeDataRateChecker())
                           .AddAttribute("ScheduleServer", "Time to schedule server method.",
-                                        DoubleValue(60),
+                                        DoubleValue(120),
                                         MakeDoubleAccessor(&ServerApplication::m_scheduleServer),
                                         MakeDoubleChecker<double>())
                           .AddAttribute("Rho", "Taxa de reducao da temperatura",

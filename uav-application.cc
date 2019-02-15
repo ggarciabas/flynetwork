@@ -25,6 +25,8 @@
 #include "uav-device-energy-model.h"
 #include "client-device-energy-model.h"
 
+#define ETAPA 60
+
 namespace ns3
 {
 
@@ -200,7 +202,7 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   for (; i >= 0; i--)
   {
     NS_LOG_INFO ("\t- [" << i << "] Cliente " << m_client.Get(i)->GetLogin());
-    if ((Simulator::Now().GetSeconds() - m_client.Get(i)->GetUpdatePos().GetSeconds()) > 60) {
+    if ((Simulator::Now().GetSeconds() - m_client.Get(i)->GetUpdatePos().GetSeconds()) > ETAPA) {
       NS_LOG_INFO ("\t\t- removendo " << m_client.Get(i)->GetLogin());
       m_client.RemoveAt(i);
       c_dev->RemoveClient();
