@@ -8,7 +8,7 @@ import os
 import sys
 
 def battery(main_path, teste, uavs_id, time_ini, time_end, activated, title_f):
-    plt.clf()
+    plt.close()
     uavs = []
     data = {}
     filtred = []

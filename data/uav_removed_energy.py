@@ -47,7 +47,7 @@ if teste:
     print data_c
 
 # plot
-plt.clf()
+plt.close()
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
@@ -59,7 +59,8 @@ for custo,value in data_c.iteritems():
     num+=1
     # Plot the lineplot
     value=np.array(value)
-    plt.plot(value[:,0], value[:,1], marker='', color=palette(num), linewidth=2.4, alpha=0.9, label=custo)
+    if len(value)>0:
+        plt.plot(value[:,0], value[:,1], marker='', color=palette(num), linewidth=2.4, alpha=0.9, label=custo)
 plt.xlabel(u"Tempo (s)")
 plt.ylabel("Bateria (%)")
 # general title
@@ -70,4 +71,4 @@ lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.17), fancybox=True, s
 plt.savefig("./output/"+scenario+'/uav_removed_energy.svg')
 plt.savefig("./output/"+scenario+'/uav_removed_energy.png')
 plt.savefig("./output/"+scenario+'/uav_removed_energy.eps')
-plt.clf()
+plt.close()

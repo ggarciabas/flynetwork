@@ -18,10 +18,10 @@ for custo_name in glob.glob(main_path+'custo_*/'):
     if teste:
         print "Custo: "+custo
     cli_files = glob.glob(main_path+custo+'/client/*')
-    data_ENVIADO = [] 
+    data_ENVIADO = []
     data_FALHA = []
-    data_NAOCONECTADO = []  
-    
+    data_NAOCONECTADO = []
+
     i = 0
     for path in cli_files:
         file_c = open(path, 'r')
@@ -36,17 +36,20 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         i = i + 1
 
     print data_ENVIADO
-    data_ENVIADO = np.array(data_ENVIADO)
-    x,y = data_ENVIADO.T
-    plt.scatter(x,y, s=1, c='b', label="Enviado")
+    if len(data_ENVIADO) > 0:
+        data_ENVIADO = np.array(data_ENVIADO)
+        x,y = data_ENVIADO.T
+        plt.scatter(x,y, s=1, c='b', label="Enviado")
     print data_NAOCONECTADO
-    data_NAOCONECTADO = np.array(data_NAOCONECTADO)
-    x,y = data_NAOCONECTADO.T
-    plt.scatter(x,y, s=1, c='k', label=u"Não conectado")
+    if len(data_NAOCONECTADO) > 0:
+        data_NAOCONECTADO = np.array(data_NAOCONECTADO)
+        x,y = data_NAOCONECTADO.T
+        plt.scatter(x,y, s=1, c='k', label=u"Não conectado")
     print data_FALHA
-    data_FALHA = np.array(data_FALHA)
-    x,y = data_FALHA.T
-    plt.scatter(x,y, s=1, c='r', label="Falha")
+    if len(data_FALHA) > 0:
+        data_FALHA = np.array(data_FALHA)
+        x,y = data_FALHA.T
+        plt.scatter(x,y, s=1, c='r', label="Falha")
     plt.title (u"Envio de posicionamento dos clientes para o UAV conectado")
     plt.xlabel(u"Tempo (s)")
     plt.ylabel(u"Cliente")

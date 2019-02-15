@@ -28,7 +28,7 @@ def mij(time, main_path, teste):
         cont = cont + 1
     file.close()
 
-    plt.clf()
+    plt.close()
     cmap = sns.cubehelix_palette(50, hue=0.05, rot=0, light=0.9, dark=0, as_cmap=True)
 
     # Create a dataset
@@ -38,22 +38,22 @@ def mij(time, main_path, teste):
     pic = sns.heatmap(df_mij, cmap=cmap, vmin=0, vmax=1)
 
     # plt.title("Mij - Temp. "+graphic_temp[0])
-    plt.xlabel("Location")
-    plt.ylabel("UAV")
+    plt.ylabel("Location")
+    plt.xlabel("UAV")
 
     plt.savefig(main_path+'etapa/'+time+'/f_mij.svg')
     plt.savefig(main_path+'etapa/'+time+'/f_mij.png')
     plt.savefig(main_path+'etapa/'+time+'/f_mij.eps')
 
-    plt.clf()
+    plt.close()
     cmap = sns.cubehelix_palette(50, hue=0.05, rot=0, light=0.9, dark=0, as_cmap=True)
 
     # Default heatmap: just a visualization of this square matrix
     pic = sns.heatmap(df_mij, cmap=cmap)
 
     # plt.title("Mij - Temp. "+graphic_temp[0])
-    plt.xlabel("Location")
-    plt.ylabel("UAV")
+    plt.ylabel("Location")
+    plt.xlabel("UAV")
 
     plt.savefig(main_path+'etapa/'+time+'/f_mij_.svg')
     plt.savefig(main_path+'etapa/'+time+'/f_mij_.png')

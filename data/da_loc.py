@@ -179,7 +179,7 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
 
         plt.tight_layout()
         plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_'+da+'_{:015}'.format(int(iteracao[0]))+'.png')
-        plt.clf()
+        plt.close()
         
         ax = df.plot.bar(rot=0)
 
@@ -190,7 +190,7 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
         plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_hist_'+da+'_{:015}'.format(int(iteracao[0]))+'.svg')
         plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_hist_'+da+'_{:015}'.format(int(iteracao[0]))+'.eps')
         plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_hist_'+da+'_{:015}'.format(int(iteracao[0]))+'.png')
-        plt.clf()
+        plt.close()
 
         ax = df_cli.plot.bar(rot=0)
 
@@ -201,7 +201,7 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
         plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/client_dr_'+da+'_{:015}'.format(int(iteracao[0]))+'.svg')
         plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/client_dr_'+da+'_{:015}'.format(int(iteracao[0]))+'.eps')
         plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/client_dr_'+da+'_{:015}'.format(int(iteracao[0]))+'.png')
-        plt.clf()
+        plt.close()
 
 if __name__ == "__main__":
     # print m

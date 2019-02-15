@@ -38,20 +38,23 @@ for custo_name in glob.glob(main_path+'custo_*/'):
     etapas = list_folder[:] #[list_folder[x] for x in np.arange(0,len(list_folder), 2)]
     print etapas
     for time in etapas:
-        plt.clf()
+        plt.close()
         # read bij
         try:
-            file = open(main_path+custo+"/"+'etapa/'+str(time)+"/bij.txt", 'r')
+            file = open(glob.glob(main_path+custo+"/"+'etapa/'+str(time)+"/custo_*.txt")[0], 'r')
         except IOError:
             exit()
         line = file.readline().strip()
         uavs_id = [int(x) for x in line.split(',')]
         line = file.readline().strip()
         locs_id = [int(x) for x in line.split(',')]
-        data_bij = {}
+        data_custo = {}
         cont = 0
+        vals = []
         for line in file:
-            data_bij[uavs_id[cont]] = [float(x) for x in line.split(',')] # read row from file
+            data_custo[uavs_id[cont]] = [float(x) for x in line.split(',')] # read row from file
+            vals.append(min(data_custo[uavs_id[cont]]))
+            vals.append(max(data_custo[uavs_id[cont]]))
             cont = cont + 1
         file.close()
 
@@ -62,16 +65,19 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         line = file.readline().strip()
         line = file.readline().strip()
         line = file.readline().strip()
-        data_mij = {}
-        cont = 0
+        p_conf = []
         for line in file:
-            data_mij[uavs_id[cont]] = [float(x) for x in line.split(',')] # read row from file
-            cont = cont + 1
+            cont = 0
+            for x in line.split(','):
+                if float(x) == 1.0:
+                    p_conf.append(cont)
+                    break
+                cont = cont + 1
         file.close()
 
         if teste:
-            print "Data_bij"
-            print data_bij
+            print "data_custo"
+            print data_custo
             print 'Uavs Ids'
             print uavs_id
             print 'Locs ids'
@@ -90,7 +96,7 @@ for custo_name in glob.glob(main_path+'custo_*/'):
                 value = 0.0
                 p=0
                 for l in uav_loc:
-                    value = value + data_bij[uavs_id[p]][l]
+                    value = value + data_custo[uavs_id[p]][l]
                     p=p+1
                 if value < min_value:
                     min_value = value
@@ -147,29 +153,20 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         c_exaustive = np.zeros((len(uavs_id),len(locs_id)))
         c=0
         for l in min_conf:
-            c_exaustive[c][l] = data_bij[uavs_id[c]][l]
+            c_exaustive[c][l] = data_custo[uavs_id[c]][l]
             c=c+1
 
         c_prop = np.zeros((len(uavs_id),len(locs_id)))
-        if teste:
-            print "MIJ: "+str(data_mij)
-            print "BIJ: "+str(data_bij)
         c=0
-        p_conf = []
-        for key, values in data_mij.iteritems():
-            l=0
-            for v in values:
-                c_prop[c][l] = v*data_bij[uavs_id[c]][l]
-                if v == 1.0:
-                    p_conf.append(l)
-                l=l+1
+        for i in p_conf:
+            c_prop[c][i] = data_custo[uavs_id[c]][i]
             c=c+1
 
         c_seq = np.zeros((len(uavs_id),len(locs_id)))
         s_conf = []
         for i in range(0, len(uavs_id)):
             s_conf.append(i)
-            c_seq[i][i] = data_bij[uavs_id[i]][i]
+            c_seq[i][i] = data_custo[uavs_id[i]][i]
         f_file_s.write(str(locs_id[s_conf[0]]))
         for i in s_conf[1:]:
             f_file_s.write(","+str(locs_id[i]))
@@ -180,7 +177,7 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         shuffle(ale_conf)
         c=0
         for i in ale_conf:
-            c_ale[c][i] = data_bij[uavs_id[c]][i]
+            c_ale[c][i] = data_custo[uavs_id[c]][i]
             c=c+1
         f_file_a.write(str(locs_id[ale_conf[0]]))
         for i in ale_conf[1:]:
@@ -193,20 +190,13 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         if teste:
             print "C_EX: "+str(c_exaustive)+" \nC_PRO: " +str(c_prop)+" \nC_SEQ: " +str(c_seq)+" \nC_ALE: " +str(c_ale)
 
-        # pegar o maior valor para inserir no limite da barra para que fique padronizada e permita comparar melhor
-        m_e = c_exaustive.max()
-        m_p = c_prop.max()
-        m_s = c_seq.max()
-        m_a = c_ale.max()
-        m_v = max(m_e, m_p, m_s, m_a)
-
         # print exaustive heatmap
-        plt.clf()
+        plt.close()
         cmap = sns.cubehelix_palette(50, hue=0.05, rot=0, light=0.9, dark=0, as_cmap=True)
         # Create a dataset
-        df_exh = pd.DataFrame(c_exaustive)
+        df_exh = pd.DataFrame(c_exaustive, index=locs_id)
         # Default heatmap: just a visualization of this square matrix
-        sns.heatmap(df_exh, cmap=cmap, vmin=0, vmax=m_v)
+        sns.heatmap(df_exh, cmap=cmap, vmin=min(vals), vmax=max(vals))
         plt.xlabel("UAV")
         plt.ylabel(u"Localização")
         # general title
@@ -216,28 +206,28 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/exaustive_'+str(custo)+'.eps')
 
         # print propose heatmap
-        plt.clf()
+        plt.close()
         cmap = sns.cubehelix_palette(50, hue=0.05, rot=0, light=0.9, dark=0, as_cmap=True)
         # Create a dataset
-        df_prop = pd.DataFrame(c_prop)
+        df_prop = pd.DataFrame(c_prop, index=locs_id)
         # Default heatmap: just a visualization of this square matrix
-        sns.heatmap(df_prop, cmap=cmap, vmin=0, vmax=m_v)
+        sns.heatmap(df_prop, cmap=cmap, vmin=min(vals), vmax=max(vals))
         plt.xlabel("UAV")
         plt.ylabel(u"Localização")
         # general title
         plt.title("Custo final algoritmo proposto", fontsize=13, fontweight=0, color='black', style='italic')
-        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/'+str(custo)+'.svg')
-        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/'+str(custo)+'.png')
-        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/'+str(custo)+'.eps')
-        plt.clf()
+        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/prop_'+str(custo)+'.svg')
+        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/prop_'+str(custo)+'.png')
+        plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/prop_'+str(custo)+'.eps')
+        plt.close()
 
         # print sequential heatmap
-        plt.clf()
+        plt.close()
         cmap = sns.cubehelix_palette(50, hue=0.05, rot=0, light=0.9, dark=0, as_cmap=True)
         # Create a dataset
-        df_seq = pd.DataFrame(c_seq)
+        df_seq = pd.DataFrame(c_seq, index=locs_id)
         # Default heatmap: just a visualization of this square matrix
-        sns.heatmap(df_seq, cmap=cmap, vmin=0, vmax=m_v)
+        sns.heatmap(df_seq, cmap=cmap, vmin=min(vals), vmax=max(vals))
         plt.xlabel("UAV")
         plt.ylabel(u"Localização")
         # general title
@@ -245,15 +235,15 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/seq_'+str(custo)+'.svg')
         plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/seq_'+str(custo)+'.png')
         plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/seq_'+str(custo)+'.eps')
-        plt.clf()
+        plt.close()
 
         # print aletorio heatmap
-        plt.clf()
+        plt.close()
         cmap = sns.cubehelix_palette(50, hue=0.05, rot=0, light=0.9, dark=0, as_cmap=True)
         # Create a dataset
-        df_ale = pd.DataFrame(c_ale)
+        df_ale = pd.DataFrame(c_ale, index=locs_id)
         # Default heatmap: just a visualization of this square matrix
-        sns.heatmap(df_ale, cmap=cmap, vmin=0, vmax=m_v)
+        sns.heatmap(df_ale, cmap=cmap, vmin=min(vals), vmax=max(vals))
         plt.xlabel("UAV")
         plt.ylabel(u"Localização")
         # general title
@@ -261,14 +251,21 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/ale_'+str(custo)+'.svg')
         plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/ale_'+str(custo)+'.png')
         plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/ale_'+str(custo)+'.eps')
-        plt.clf()
+        plt.close()
 
         data_et = {"Exaustivo":[], "Sequencial":[], "Aleatório":[]}
         data_et[custo_n] = []
+        sums = []
         data_et["Exaustivo"].append(c_exaustive.sum())
+        sums.append(c_exaustive.sum())
         data_et[custo_n].append(c_prop.sum())
+        sums.append(c_prop.sum())
         data_et["Sequencial"].append(c_seq.sum())
+        sums.append(c_seq.sum())
         data_et["Aleatório"].append(c_ale.sum())
+        sums.append(c_ale.sum())
+        mi = min(sums)
+        ma = max(sums)
         index = [time]
         df = pd.DataFrame(data_et, index=index)
         # ax = df.plot.bar(stacked=True, rot=0)
@@ -276,10 +273,11 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         ax.set_title('Comparativo do custo total etapa @'+str(time)+'s')
         ax.set_ylabel('Custo total')
         ax.set_xlabel('Tempo (s)')
+        # ax.set_ylim((mi,ma))
         plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/comp_'+str(custo)+'.svg')
         plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/comp_'+str(custo)+'.png')
         plt.savefig(main_path+custo+"/"+'etapa/'+str(time)+'/comp_'+str(custo)+'.eps')
-        plt.clf()
+        plt.close()
 
         data["Exaustivo"].append(c_exaustive.sum())
         data[custo_n].append(c_prop.sum())
@@ -288,6 +286,7 @@ for custo_name in glob.glob(main_path+'custo_*/'):
 
         if c_prop.sum() < c_exaustive.sum():
             print 'ERROO'
+            print c_prop
             input()
 
         if teste:
@@ -307,4 +306,4 @@ for custo_name in glob.glob(main_path+'custo_*/'):
     plt.savefig(main_path+custo+"/"+'/exh_'+str(custo)+'.svg')
     plt.savefig(main_path+custo+"/"+'/exh_'+str(custo)+'.png')
     plt.savefig(main_path+custo+"/"+'/exh_'+str(custo)+'.eps')
-    plt.clf()
+    plt.close()
