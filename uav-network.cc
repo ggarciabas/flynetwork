@@ -388,7 +388,7 @@ void UavNetwork::ConfigureServer()
 
   ObjectFactory packWww;
   packWww.SetTypeId ("ns3::PacketSink");
-  packWww.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+  packWww.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
   packWww.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), 8080))); // OPS: utilizam Ipv4Address::GetAny ()
   Ptr<Application> appWww = packWww.Create<Application> ();
   appWww->SetStartTime(Seconds(10.0));
@@ -875,7 +875,7 @@ void UavNetwork::ConfigureCli()
     } else if (app_code < 3) { // WWW
         smart->SetApp ("WWW");
         onoffFac.SetTypeId ("ns3::OnOffApplication");
-        onoffFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+        onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
         onoffFac.Set ("PacketSize", UintegerValue (429));
         onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
         onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0.04]"));

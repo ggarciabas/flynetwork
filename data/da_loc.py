@@ -76,22 +76,30 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
         data["Wij"] = [float(x) for x in line.split(',')]
         data_cli = {}
         line = f_cen.readline().strip()
-        data_cli["DR"] = [float(x) for x in line.split(',')]        
-        f_cen.close()        
+        data_cli["DR"] = [float(x) for x in line.split(',')]
+        f_cen.close()
 
-        lId = np.arange(0,len(loc),1);        
+        lId = np.arange(0,len(loc),1);
 
         fig = plt.figure(figsize=(15,4))
         ax0 = fig.add_subplot(121)
 
-        # https://matplotlib.org/api/markers_api.html points
-        first = True
+        # https://matplotlib.org/api/markers_api.html pointsfirst = True
+        firstM = True
+        firstF = True
         for i in range(0, len(cli), 3):
-            if first:
-                ax0.plot(float(cli[i]),float(cli[i+1]), 'b.', markersize=7.0, label="clientes")
-                first = False
+            if cli[i+2][0] == "f":
+                if firstF:
+                    ax0.plot(float(cli[i]),float(cli[i+1]), 'rs', markersize=5.0, label="fixed")
+                    firstF = False
+                else:
+                    ax0.plot(float(cli[i]),float(cli[i+1]), 'rs', markersize=5.0)
             else:
-                ax0.plot(float(cli[i]),float(cli[i+1]), 'b.', markersize=7.0)
+                if firstM:
+                    ax0.plot(float(cli[i]),float(cli[i+1]), '.k', markersize=5.0, label="movel")
+                    firstM = False
+                else:
+                    ax0.plot(float(cli[i]),float(cli[i+1]), '.k', markersize=5.0)
 
         first = True
         c = 0;
@@ -107,9 +115,9 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
                 ax0.add_patch(
                     patches.Circle((loc[i],loc[i+1]), radius=float(rcob[0]), color='b', fill=False, linestyle='dotted')
                 )
-                ax0.add_patch(
-                    patches.Circle((loc[i],loc[i+1]), radius=float(maxclicob), color='g', fill=False, linestyle='dotted')
-                )
+                # ax0.add_patch(
+                #     patches.Circle((loc[i],loc[i+1]), radius=float(maxclicob), color='g', fill=False, linestyle='dotted')
+                # )
                 ax0.plot(x,y,'c-', markersize=7.0)
                 first = False
             else:
@@ -121,11 +129,11 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
                 ax0.add_patch(
                     patches.Circle((loc[i],loc[i+1]), radius=float(rcob[0]), color='b', fill=False, linestyle='dotted')
                 )
-                ax0.add_patch(
-                    patches.Circle((loc[i],loc[i+1]), radius=float(maxclicob), color='g', fill=False, linestyle='dotted')
-                )
+                # ax0.add_patch(
+                #     patches.Circle((loc[i],loc[i+1]), radius=float(maxclicob), color='g', fill=False, linestyle='dotted')
+                # )
                 ax0.plot(x,y,'c-', markersize=7.0)
-            
+
             ax0.annotate(str(int(lId[c])), xy=(loc[i],loc[i+1]-5))
             c=c+1
 
@@ -180,7 +188,7 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
         plt.tight_layout()
         plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_'+da+'_{:015}'.format(int(iteracao[0]))+'.png')
         plt.close()
-        
+
         ax = df.plot.bar(rot=0)
 
         ax.set_title(u'Informações da Localização')
@@ -211,4 +219,4 @@ if __name__ == "__main__":
     t = sys.argv[4]
     i = sys.argv[5]
 
-    da_loc(c, e, m, t, i)    
+    da_loc(c, e, m, t, i)

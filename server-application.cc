@@ -848,7 +848,7 @@ void ServerApplication::runAgendamento(void)
   vector<vector<long double>> lamb_ij;
   // q_ai
   vector<vector<long double>> q_ij;
-  double N = m_uavContainer.GetN();
+  // double N = m_uavContainer.GetN();
   unsigned siz = m_uavContainer.GetN();
   // Ptr<UniformRandomVariable> e_ai = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
   // e_ai->SetAttribute ("Min", DoubleValue (min));
@@ -863,7 +863,7 @@ void ServerApplication::runAgendamento(void)
     {
       // e_ai->SetAttribute ("Max", DoubleValue (max));
       // double rdom = e_ai->GetValue();
-      m_ij[i].push_back(1 / N); // + rdom);
+      m_ij[i].push_back(0.5); // + rdom);
       o_ij[i].push_back(m_ij[i][j]);
       lamb_ij[i].push_back(0.0);
       q_ij[i].push_back(0.0);
@@ -1562,6 +1562,9 @@ void ServerApplication::runDA() {
   int locId = 0;
   int max_iterB = 5000;
 
+  os.str("");
+  os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/da_log.txt";
+  file.open(os.str().c_str(), std::ofstream::out);
   // //NS_LOG_DEBUG ("\n\t t_min =" << t_min << "\n \t r_max =" << r_max << "\n \t ptUav ="<< ptUav << "\n \t ptCli =" << ptCli << "\n \t fsInterf ="
   //             << fsInterf  << "\n \t dRCli =" << dRCli << "\n \t sinrCliMin =" << sinrCliMin<< "\n \t fcCli ="
   //             << fcCli  << "\n \t comp_onda =" << comp_onda << "\n \t pi =" << pi << "\n \t maxDrUav =" << maxDrUav << "\n \t gain =" << gain
@@ -1585,11 +1588,11 @@ void ServerApplication::runDA() {
   loc->InitializeWij (m_clientDaContainer.GetN()*dRCli); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
   loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), r_max, uav_cob);
   m_locationContainer.Add(loc);
-  double percentCli = 0.8;
+  double percentCli = 1.0;
   int iter = 0;
   do {// laco A
     iter++;
-    //NS_LOG_DEBUG("------------------------------> ItA: " << iter  << " temp: " << t);
+    file << "------------------------------> ItA: " << iter  << " temp: " << t << "\n";
     int tMovCon = 0;
     int tFixCon = 0;
     bool locConnected = true;
@@ -1638,13 +1641,13 @@ void ServerApplication::runDA() {
               // calcular a SNR e caso seja maior que o mínimo, considerar cliente conectado
               (*lj)->NewClient(dRCli, (*ci)->GetConsumption(), dcilj);
               (*ci)->SetDataRate(sinr_dBm);
-              //NS_LOG_DEBUG("tFix: " << tFixCon << "\ttMovCon: " << tMovCon);
+              file << "tFix: " << tFixCon << "\ttMovCon: " << tMovCon << std::endl;
             }
           }
         }
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           if (Zci < 1e-90) {
-            NS_LOG_DEBUG("--> Zci esta baixo! @" << Simulator::Now().GetSeconds());
+            file << "--> Zci esta baixo! @" << Simulator::Now().GetSeconds() << "\n";
             // t *= 1.2; // aumenta 120%
             t = 0.1;
             percentCli *= 0.7; // reduz 70%
@@ -1700,7 +1703,7 @@ void ServerApplication::runDA() {
         }
       }
 
-      //NS_LOG_DEBUG ("Itb: " << iterB << "\n\tTemp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false") << "\n\tCapacidade: " << ((capacidade) ? "true":"false"));
+      file << "Itb: " << iterB << "\n\tTemp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false") << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n";
 
     } while (movimentoB && iterB < max_iterB);
 
@@ -1708,39 +1711,46 @@ void ServerApplication::runDA() {
       if (capacidade) {
         if (tFixCon == tFix) {
           if (tMovCon >= tMov*percentCli) {
-            NS_LOG_DEBUG("--> Finalizado - Feeting temp="<<t);
+            file << "--> Finalizado - temp=" << t << std::endl;
             // t *= 0.5; // resfria bastante
             GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
             break;
           } else {
-            NS_LOG_DEBUG("--> " << iter << " @"<< Simulator::Now().GetSeconds() << " clientes móveis nao conectados [" << percentCli << "] !");
+            file << "--> " << iter << " @"<< Simulator::Now().GetSeconds() << " clientes móveis nao conectados [" << percentCli << "] !\n";
           }
         } else {
-          NS_LOG_DEBUG("--> " << iter << " @"<< Simulator::Now().GetSeconds() << " clientes fixos nao conectados! t[" << t << "]");
+          file << "--> " << iter << " @"<< Simulator::Now().GetSeconds() << " clientes fixos nao conectados! t[" << t << "]\n";
         }
       } else {
-        NS_LOG_DEBUG("--> " << iter << " @"<< Simulator::Now().GetSeconds() << " capacidade superior!");
+        file << "--> " << iter << " @"<< Simulator::Now().GetSeconds() << " capacidade superior!\n";
       }
     } else {
-      NS_LOG_DEBUG("--> " << iter << " @"<< Simulator::Now().GetSeconds() << " localizações não conecatadas!");
+      file << "--> " << iter << " @"<< Simulator::Now().GetSeconds() << " localizações não conecatadas!\n";
     }
 
-    if (!MovimentoA() || (tFixCon != tFix && t == 0.1)) {
-      NS_LOG_DEBUG("--> Solicitando nova localizacao por não existir movimento em A @" << Simulator::Now().GetSeconds());
+    if (!MovimentoA()) { // } || (tFixCon != tFix && t == 0.1)) {
+      file << "--> Solicitando nova localizacao por não existir movimento em A @" << Simulator::Now().GetSeconds() << std::endl;
       // new_uav:
-        Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
-        nLoc->SetId(locId++);
-        CentroDeMassa(nLoc, lCentral, r_max);
-        nLoc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
-        nLoc->IniciarMovimentoB();
-        m_locationContainer.Add(nLoc);
-        nLoc->SetPunishNeighboor(0.2);
-        nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
-        nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max, uav_cob);
+      Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
+      nLoc->SetId(locId++);
+      CentroDeMassa(nLoc, lCentral, r_max);
+      nLoc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
+      nLoc->IniciarMovimentoB();
+      m_locationContainer.Add(nLoc);
+      nLoc->SetPunishNeighboor(0.2);
+      nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
+      nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max, uav_cob);
+      t *= 2.0;
+      GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
+      for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+        (*lj)->IniciarMovimentoA();
+        (*lj)->LimparHistorico();
+        (*lj)->UpdatePunishNeighboor(uav_cob/r_max);
+      }
+      continue;
     }
 
     GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
-
     // Reiniciar Movimento A para cada Localizacao
     for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
       (*lj)->IniciarMovimentoA();
@@ -1751,6 +1761,9 @@ void ServerApplication::runDA() {
     t = t*0.9; // reduz 90%  a tempreatura
 
   } while (t > t_min); // laco da temperatura
+
+  file << std::endl;
+  file.close ();
 
   m_totalCliGeral = 0;
   m_locConsTotal = 0; // atualiza total de consumo de todas as localizacoes
