@@ -20,6 +20,7 @@ import location
 import glob
 import os
 import sys
+import custo_graphic
 import numpy as np
 
 raio_uav = 59.8976798195
@@ -75,6 +76,7 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         if teste:
             print etapa
         (uavs_id, uav_mov) = bij_graphic.bij(custo, str(etapa), main_path, teste)
+        custo_graphic.custo(custo, str(etapa), main_path, teste)
         if teste:
             print uavs_id
         # Battery

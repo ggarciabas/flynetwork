@@ -221,7 +221,7 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
     return;
   }
 
-  m_sendEventUav = Simulator::Schedule(Seconds(60), &SmartphoneApplication::SendPacketUav, this);
+  m_sendEventUav = Simulator::Schedule(Seconds(10), &SmartphoneApplication::SendPacketUav, this);
 }
 
 void

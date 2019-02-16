@@ -57,7 +57,7 @@ def uav_loc (time, main_path, teste, raio_cli, raio_uav):
     app_color = {"VOICE":"darksalmon", "VIDEO":"blueviolet", "WWW":"skyblue", "NOTHING":"yellow"}
     apps = {}
     for i in range(0, len(cli_), 4): # x y login app
-        if cli_[i+2] == "fixed":
+        if cli_[i+2][0] == "f":
             if first:
                 plt.plot(float(cli_[i]),float(cli_[i+1]), 'ks', markersize=7.0, label="fixed")
                 first = False
@@ -70,18 +70,19 @@ def uav_loc (time, main_path, teste, raio_cli, raio_uav):
                 apps[cli_[i+3]] = 1
                 plt.plot(float(cli_[i]),float(cli_[i+1]), color=colors[app_color[cli_[i+3]]], marker="v", markersize=7.0, label=cli_[i+3])
 
-    first = True
+    firstF = True
+    firstM = True
     for i in range(0, len(cli), 3):
-        if cli[i+2] == "fixed":
-            if first:
+        if cli[i+2][0] == "f":
+            if firstF:
                 plt.plot(float(cli[i]),float(cli[i+1]), 'bs', markersize=7.0, label="fixed")
-                first = False
+                firstF = False
             else:
                 plt.plot(float(cli[i]),float(cli[i+1]), 'bs', markersize=7.0)
         else:
-            if first:
+            if firstM:
                 plt.plot(float(cli[i]),float(cli[i+1]), 'k1', markersize=7.0, label="movel")
-                first = False
+                firstM = False
             else:
                 plt.plot(float(cli[i]),float(cli[i+1]), 'k1', markersize=7.0)
 

@@ -63,7 +63,7 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         if len(glob.glob(main_path+folder+'/etapa/'+str(time)+'/location.eps')) == 0:
             print "exit location"
             exit()
-        if len(glob.glob(main_path+folder+'/etapa/'+str(time)+'/custo_*.eps')) == 0:
+        if len(glob.glob(main_path+folder+'/etapa/'+str(time)+'/prop_custo_*.eps')) == 0:
             print "exit custo_"
             exit()
         if len(glob.glob(main_path+folder+'/etapa/'+str(time)+'/ale_custo_*.eps')) == 0:
@@ -82,13 +82,13 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         da_loc_file = os.path.basename(glob.glob(main_path+folder+'/etapa/'+str(time)+'/da_loc_cpp_*.eps')[-1])
         location_file = os.path.basename(glob.glob(main_path+folder+'/etapa/'+str(time)+'/location.eps')[-1])
         comp_custo_file = os.path.basename(glob.glob(main_path+folder+'/etapa/'+str(time)+'/comp_custo_*.eps')[-1])
-        custo_file = os.path.basename(glob.glob(main_path+folder+'/etapa/'+str(time)+'/custo_*.eps')[-1])
+        custo_file = os.path.basename(glob.glob(main_path+folder+'/etapa/'+str(time)+'/prop_custo_*.eps')[-1])
         ale_file = os.path.basename(glob.glob(main_path+folder+'/etapa/'+str(time)+'/ale_custo_*.eps')[-1])
         seq_file = os.path.basename(glob.glob(main_path+folder+'/etapa/'+str(time)+'/seq_custo_*.eps')[-1])
         exh_file = os.path.basename(glob.glob(main_path+folder+'/etapa/'+str(time)+'/exaustive_custo_*.eps')[-1])
 
         if teste:
-            print da_loc_file            
+            print da_loc_file
             print location_file
             print custo_file
             print exh_file
@@ -156,7 +156,7 @@ for custo_name in glob.glob(main_path+'custo_*/'):
             \\includegraphics[width=0.9\\textwidth]{"""+folder+"""/client_packet.eps}
         \\end{figure}
     \\end{frame}""")
-        
+
     # # UAV LOC Slide
     # for time in list_folder:
     #     uav_loc_slide.slide (str(time), main_path+custo+'/', teste, title, folder, scenario)

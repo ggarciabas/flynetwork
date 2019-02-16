@@ -8,7 +8,7 @@ import os
 import sys
 
 def battery(main_path, teste, uavs_id, time_ini, time_end, activated, title_f):
-    plt.clf()
+    plt.close()
     uavs = []
     data = {}
     filtred = []
@@ -118,7 +118,7 @@ def battery(main_path, teste, uavs_id, time_ini, time_end, activated, title_f):
         first = 0
         for uav in uavs:
             num+=1
-            plt.clf()
+            plt.close()
             # plot every groups, but discreet
             for key, value in data.iteritems():
                 plt.plot(value[0], value[1], marker='', color='grey', linewidth=0.6, alpha=0.3)

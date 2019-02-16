@@ -115,7 +115,7 @@ if teste:
     print data_c
 
 # plot
-plt.clf()
+plt.close()
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
@@ -138,4 +138,4 @@ lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.17), fancybox=True, s
 plt.savefig("./output/"+scenario+'/connected_cli.svg')
 plt.savefig("./output/"+scenario+'/connected_cli.png')
 plt.savefig("./output/"+scenario+'/connected_cli.eps')
-plt.clf()
+plt.close()

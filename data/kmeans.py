@@ -63,7 +63,7 @@ for custo in custos:
             kmeans = KMeans(n_clusters = i, init = 'random')
             kmeans.fit(X)
             y_kmeans = kmeans.predict(X)
-            plt.clf()
+            plt.close()
             plt.scatter(X[:, 0], X[:,1], c=y_kmeans, label='Clientes')
             plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], c='black', alpha=0.5, label='UAVs')
             plt.title(u'Posicionamento dos UAVs K='+str(i))
@@ -79,7 +79,7 @@ for custo in custos:
                 print i,kmeans.inertia_
             wcss.append(kmeans.inertia_)
 
-        plt.clf()
+        plt.close()
         plt.plot(range(1, X.shape[0]), wcss)
         plt.title('O Metodo Elbow')
         plt.xlabel('Numero de Clusters')

@@ -39,7 +39,7 @@ def moving(main_path, teste, uav_mov):
     #     print ('Data: ' + str(data))
     #     print ('UAVs: ' + str(uavs))
 
-    plt.clf()
+    plt.close()
 
     # Initialize the figure
     plt.style.use('seaborn-darkgrid')
