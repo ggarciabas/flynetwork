@@ -769,7 +769,7 @@ void UavNetwork::ConfigureCli()
 
   Ptr<UniformRandomVariable> app_rand = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
   app_rand->SetAttribute ("Min", DoubleValue (0));
-  app_rand->SetAttribute ("Max", DoubleValue (4));
+  app_rand->SetAttribute ("Max", DoubleValue (3)); // MODIFICADO
 
   std::ofstream cliLogin;
   ss << "./scratch/flynetwork/data/output/" << m_pathData << "/client_login.txt";

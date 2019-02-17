@@ -10,6 +10,9 @@ packet:
 dhcp:
 	python client_dhcp.py $(d) $(s)
 
+data:
+	python client_data.py $(d) $(s)
+
 uav_removed:
 	python uav_removed_energy.py $(d) $(s)
 

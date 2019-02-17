@@ -150,6 +150,13 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         f_file.close()
         file.write("\\input{"+folder+'/slide_'+str(time)+'.tex}\n')
 
+    copyfile(main_path+folder+'/client_packet.eps', main_path+folder+'/../../slide/'+scenario+'/'+folder+'/exh_'+folder+'.eps')
+    file.write("""\\begin{frame}{"""+title+' - Comparativo exaustivo sequencial aleatorio'+"""}
+        \\begin{figure}[!htb]
+            \\includegraphics[width=0.9\\textwidth]{"""+folder+"""/exh_'+folder+'.eps}
+        \\end{figure}
+    \\end{frame}""")
+
     copyfile(main_path+folder+'/client_packet.eps', main_path+folder+'/../../slide/'+scenario+'/'+folder+'/client_packet.eps')
     file.write("""\\begin{frame}{"""+title+' - Envio de pacotes pelo cliente'+"""}
         \\begin{figure}[!htb]
