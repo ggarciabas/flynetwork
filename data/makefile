@@ -12,3 +12,7 @@ dhcp:
 
 uav_removed:
 	python uav_removed_energy.py $(d) $(s)
+
+# make c=custo_3 e=625 m="./output/austin_30" t=True i=-2 da_loc
+da_loc:
+	python da_loc.py $(c) $(e) $(m) $(t) $(i)
