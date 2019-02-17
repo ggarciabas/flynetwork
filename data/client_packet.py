@@ -35,21 +35,24 @@ for custo_name in glob.glob(main_path+'custo_*/'):
                 data_FALHA.append([float(data[0]), i])
         i = i + 1
 
-    print data_ENVIADO
-    if len(data_ENVIADO) > 0:
-        data_ENVIADO = np.array(data_ENVIADO)
-        x,y = data_ENVIADO.T
-        plt.scatter(x,y, s=1, c='b', label="Enviado")
     print data_NAOCONECTADO
     if len(data_NAOCONECTADO) > 0:
         data_NAOCONECTADO = np.array(data_NAOCONECTADO)
         x,y = data_NAOCONECTADO.T
         plt.scatter(x,y, s=1, c='k', label=u"Não conectado")
+
     print data_FALHA
     if len(data_FALHA) > 0:
         data_FALHA = np.array(data_FALHA)
         x,y = data_FALHA.T
         plt.scatter(x,y, s=1, c='r', label="Falha")
+
+    print data_ENVIADO
+    if len(data_ENVIADO) > 0:
+        data_ENVIADO = np.array(data_ENVIADO)
+        x,y = data_ENVIADO.T
+        plt.scatter(x,y, s=1, c='b', label="Enviado")
+
     plt.title (u"Envio de posicionamento dos clientes para o UAV conectado")
     plt.xlabel(u"Tempo (s)")
     plt.ylabel(u"Cliente")
@@ -59,3 +62,4 @@ for custo_name in glob.glob(main_path+'custo_*/'):
     plt.savefig(main_path+custo+'/client_packet.eps', bbox_extra_artists=(lgd,), bbox_inches='tight')
     plt.savefig(main_path+custo+'/client_packet.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
     # plt.show()
+    plt.close()
