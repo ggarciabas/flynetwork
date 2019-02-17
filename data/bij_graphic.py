@@ -69,5 +69,6 @@ def bij (custo, time, main_path, teste):
     plt.savefig(main_path+custo+'/'+'etapa/'+time+'/bij_.svg')
     plt.savefig(main_path+custo+'/'+'etapa/'+time+'/bij_.png')
     plt.savefig(main_path+custo+'/'+'etapa/'+time+'/bij_.eps')
+    plt.close()
 
     return (uavs, uav_mov)

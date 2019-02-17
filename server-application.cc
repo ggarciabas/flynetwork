@@ -1505,7 +1505,7 @@ void ServerApplication::runDA() {
   bool first = true;
   double tMov = m_clientContainer.GetN();
   double tFix = m_fixedClientContainer.GetN();
-  double pFix = 8; // peso dos clientes fixos - clientes móveis sempre com peso de 1"
+  double pFix = 2; // peso dos clientes fixos - clientes móveis sempre com peso de 1"
   for (ClientModelContainer::Iterator i = m_clientContainer.Begin(); i != m_clientContainer.End(); ++i)
   {
     (*i)->EraseLocation();
@@ -1676,28 +1676,10 @@ void ServerApplication::runDA() {
       movimentoB = MovimentoB();
       if (movimentoB) {
         for (int j = m_locationContainer.GetN()-1; j >= 0; j--) { // Obs.: >=0 para que seja feito o calculo da localizacao 0 com a central, não irá entrar no segundo laco devido a condicao imposta lá!
-          std::vector<double> p1 (m_locationContainer.Get(j)->GetPosition(r_max));
-          int id = -1; // a principio se conecta com a central
-          double dist = CalculateDistance(lCentral->GetPosition(r_max), p1);
-          for (int k = j - 1; k >= 0; --k) {
-            std::vector<double> p2 (m_locationContainer.Get(k)->GetPosition(r_max));
-            double d = CalculateDistance(p1, p2);
-            if (d <= dist) { // achou algum nó mais perto
-              id = k;
-              dist = d;
-            }
-          }
-          if (id == -1) { // menor distancia é para com a central
-            m_locationContainer.Get(j)->SetFather(lCentral, dist, r_max, uav_cob);
-            locConnected = m_locationContainer.Get(j)->IsConnected() && locConnected;
-          } else { // menor distancia é para algum outro UAV, cadastrar o pai e o filho!
-            m_locationContainer.Get(j)->SetFather(m_locationContainer.Get(id), dist, r_max, uav_cob);
-            locConnected = m_locationContainer.Get(j)->IsConnected() && locConnected;
-            m_locationContainer.Get(id)->AddChild(m_locationContainer.Get(j), r_max); // novo filho para id!
-          }
+          locConnected = FindFather (j, r_max, uav_cob, lCentral, locConnected);
         }
       }
-      else { // se nao houver movimento e não tiverem conectados deve-se alterar a punicao de conexão e continuar para que ele se movimente em direcao ao pai!
+      else {
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           locConnected = (*lj)->IsConnected() && locConnected;
         }
@@ -1739,7 +1721,7 @@ void ServerApplication::runDA() {
       m_locationContainer.Add(nLoc);
       nLoc->SetPunishNeighboor(0.2);
       nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
-      nLoc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), nLoc->GetPosition(r_max)), r_max, uav_cob);
+      FindFather (m_locationContainer.GetN()-1, r_max, uav_cob, lCentral, true);
       t *= 2.0;
       GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
@@ -1787,6 +1769,30 @@ void ServerApplication::runDA() {
   if ( m_locConsTotal == 0) {
     m_locConsTotal = 1.0; // para nao dar problemas no calculo
   }
+}
+
+bool ServerApplication::FindFather (int pos, double r_max, double uav_cob, Ptr<LocationModel> lCentral, bool locConnected)
+{
+  std::vector<double> p1 (m_locationContainer.Get(pos)->GetPosition(r_max));
+  int id = -1; // a principio se conecta com a central
+  double dist = CalculateDistance(lCentral->GetPosition(r_max), p1);
+  for (int k = pos - 1; k >= 0; --k) {
+    std::vector<double> p2 (m_locationContainer.Get(k)->GetPosition(r_max));
+    double d = CalculateDistance(p1, p2);
+    if (d <= dist) { // achou algum nó mais perto
+      id = k;
+      dist = d;
+    }
+  }
+  if (id == -1) { // menor distancia é para com a central
+    m_locationContainer.Get(pos)->SetFather(lCentral, dist, r_max, uav_cob);
+    locConnected = m_locationContainer.Get(pos)->IsConnected() && locConnected;
+  } else { // menor distancia é para algum outro UAV, cadastrar o pai e o filho!
+    m_locationContainer.Get(pos)->SetFather(m_locationContainer.Get(id), dist, r_max, uav_cob);
+    locConnected = m_locationContainer.Get(pos)->IsConnected() && locConnected;
+    m_locationContainer.Get(id)->AddChild(m_locationContainer.Get(pos), r_max); // novo filho para id!
+  }
+  return locConnected;
 }
 
 void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double uav_cob, double r_max, double max_antena, double maxDrUav) {
