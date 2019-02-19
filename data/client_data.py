@@ -25,7 +25,7 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         if data[1] == "ENVIADO\n":
             data_ENVIADO.append([float(data[0]), "TX"])
         elif data[1] == "RECEBIDO\n":
-            data_NAOCONECTADO.append([float(data[0]), "RX"])
+            data_RECEBIDO.append([float(data[0]), "RX"])
 
     print data_ENVIADO
     if len(data_ENVIADO) > 0:
@@ -39,14 +39,12 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         x,y = data_RECEBIDO.T
         plt.scatter(x,y, s=1, c='b')
 
-
-
     plt.title (u"Envio e recebimento de aplicações cliente")
     plt.xlabel(u"Tempo (s)")
     plt.ylabel(u"TX/RX")
 
-    plt.savefig(main_path+custo+'/client_data.svg', bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.savefig(main_path+custo+'/client_data.eps', bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.savefig(main_path+custo+'/client_data.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+custo+'/client_data.svg') #, bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+custo+'/client_data.eps') #, bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+custo+'/client_data.png') #, bbox_extra_artists=(lgd,), bbox_inches='tight')
     # plt.show()
     plt.close()
