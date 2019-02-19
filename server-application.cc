@@ -814,7 +814,7 @@ void ServerApplication::runAgendamento(void)
       if (l_id) loc_ids.push_back((*l_j)->GetId());
       custo = CalculateCusto((*u_i), (*l_j), central_pos);
       custo_x[count].push_back(custo);
-      b_ij[count].push_back(std::exp(custo)); // NOVO
+      b_ij[count].push_back(1.0-custo); //std::exp(custo)); // NOVO
       verify_uav += custo; // somando o valor dos custos, assim se ao final tiver o mesmo valor que o total de localizações, quer dizer que este UAV somente tem carga para voltar a central
     }
     l_id = false;
@@ -854,7 +854,7 @@ void ServerApplication::runAgendamento(void)
   vector<vector<long double>> lamb_ij;
   // q_ai
   vector<vector<long double>> q_ij;
-  // double N = m_uavContainer.GetN();
+  double N = m_uavContainer.GetN();
   unsigned siz = m_uavContainer.GetN();
   // Ptr<UniformRandomVariable> e_ai = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
   // e_ai->SetAttribute ("Min", DoubleValue (min));
@@ -869,7 +869,7 @@ void ServerApplication::runAgendamento(void)
     {
       // e_ai->SetAttribute ("Max", DoubleValue (max));
       // double rdom = e_ai->GetValue();
-      m_ij[i].push_back(0.5); // + rdom);
+      m_ij[i].push_back(1/N); // + rdom);
       o_ij[i].push_back(m_ij[i][j]);
       lamb_ij[i].push_back(0.0);
       q_ij[i].push_back(0.0);
