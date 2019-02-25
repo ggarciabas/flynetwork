@@ -34,12 +34,12 @@ def uav_loc (time, main_path, teste, raio_cli, raio_uav):
     if teste:
         print (loc)
     #read BIJ
-    line = f_cen.readline().strip()
-    value = [float(x) for x in line.split(',')] # read bij for each x y
-    if teste:
-        print (value)
+    # line = f_cen.readline().strip()
+    # value = [float(x) for x in line.split(',')] # read bij for each x y
+    # if teste:
+    #     print (value)
     f_cen.close()
-    point_value = range(0,len(value)*2)
+    # point_value = range(0,len(value)*2)
 
     f_cen = open(main_path+'/'+'etapa/'+time+'/client.txt','r')
     # read CLIENTS
@@ -86,7 +86,7 @@ def uav_loc (time, main_path, teste, raio_cli, raio_uav):
             else:
                 plt.plot(float(cli[i]),float(cli[i+1]), 'k1', markersize=7.0)
 
-    cont = 0
+    # cont = 0
     first = True
     for i in range(0, len(uav), 3):
         x = [uav[i+1],loc[i+1]]
@@ -104,9 +104,9 @@ def uav_loc (time, main_path, teste, raio_cli, raio_uav):
         # ax.add_patch(
         #     patches.Circle((loc[i+1],loc[i+2]), radius=raio_uav, color='b', fill=False, linestyle='dotted')
         # )
-        point_value[cont] = float(uav[i+1]+loc[i+1])/2.0 # x
-        point_value[cont+1] = float(uav[i+2]+loc[i+2])/2.0 # y
-        cont = cont+1
+        # point_value[cont] = float(uav[i+1]+loc[i+1])/2.0 # x
+        # point_value[cont+1] = float(uav[i+2]+loc[i+2])/2.0 # y
+        # cont = cont+1
 
     first = True
     for i in range(0, len(uav), 3):

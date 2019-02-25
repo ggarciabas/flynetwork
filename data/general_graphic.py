@@ -75,17 +75,17 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         da_loc.da_loc (custo, etapa, main_path, teste, -2) # somente a ultima iteracao
         if teste:
             print etapa
-        (uavs_id, uav_mov) = bij_graphic.bij(custo, str(etapa), main_path, teste)
+        # (uavs_id, uav_mov) = bij_graphic.bij(custo, str(etapa), main_path, teste)
         custo_graphic.custo(custo, str(etapa), main_path, teste)
-        if teste:
-            print uavs_id
+        # if teste:
+        #     print uavs_id
         # Battery
-        if t_ini > -1:
-            battery_hover.battery(main_path+custo+'/', teste, uavs_id, t_ini, etapa, activated, etapa)
-            battery_all.battery(main_path+custo+'/', teste, uavs_id, t_ini, etapa, activated, etapa)
-            t_ini = etapa
-        else:
-            t_ini = -0.5
+        # if t_ini > -1:
+        #     battery_hover.battery(main_path+custo+'/', teste, uavs_id, t_ini, etapa, activated, etapa)
+        #     battery_all.battery(main_path+custo+'/', teste, uavs_id, t_ini, etapa, activated, etapa)
+        #     t_ini = etapa
+        # else:
+        #     t_ini = -0.5
         # Client
         client.scenario (str(etapa), main_path+custo+'/', teste)
         # Location
@@ -94,7 +94,7 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         uav_loc_graphic.uav_loc (str(etapa), main_path+custo+'/', teste, raio_cli, raio_uav)
         # Mij
         mij_graphic.mij(str(etapa), main_path+custo+'/', teste)
-        all_uav.extend(uavs_id[:])
+        # all_uav.extend(uavs_id[:])
 
     if teste:
         print all_uav

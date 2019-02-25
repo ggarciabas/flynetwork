@@ -86,6 +86,8 @@ private:
   void GraficoCenarioDa (double temp, int iter, Ptr<LocationModel> lCentral, double uav_cob, double r_max, double max_antena, double maxDrUav);
   void GraficoCenarioDaPuro (double temp, int iter, Ptr<LocationModel> lCentral, double raio_cob);
 
+  std::vector<int> DaPositioning (std::vector<std::vector<long double> > c_ji, unsigned N);
+
   bool FindFather (int pos, double r_max, double uav_cob, Ptr<LocationModel> lCentral, bool locConnected);
 
   void PrintMatrix (vector<vector<long double>> m, std::string nameFile);
