@@ -241,7 +241,7 @@ UavApplication::EnergyDepletionCallback()
 }
 
 void UavApplication::SendPacketDepletion(void)
-{
+{ // TODO:  Guardar historico do UAV
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   m_packetDepletion.Cancel();
   std::ostringstream msg;

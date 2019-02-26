@@ -1671,6 +1671,14 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
   for (; ci != m_clientDaContainer.End(); ++ci) {
     file << "," << (*ci)->GetDataRate();
   }
+  file << "\n";
+
+  lj = m_locationContainer.Begin(); // imprimindo consumption
+  file << (*lj)->GetTotalConsumption();
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    file << "," << (*lj)->GetTotalConsumption();
+  }
 
   file.close();
 
@@ -1722,10 +1730,10 @@ void ServerApplication::CentroDeMassa (Ptr<LocationModel> l, Ptr<LocationModel> 
   }
 
   if (con) { // todos os cliente estao conectados
-    std::cout << "==> Todos os clientes conectados.\n";
+    // std::cout << "==> Todos os clientes conectados.\n";
     l->SetPosition(central->GetXPosition(), central->GetYPosition()); // posicionar no centro dos clientes
   } else {
-    std::cout << "Centro de massa: " << x/ccon << " " << y/ccon << std::endl;
+    // std::cout << "Centro de massa: " << x/ccon << " " << y/ccon << std::endl;
     l->SetPosition(x/ccon, y/ccon); // posicionar no centro dos clientes
   }
 }

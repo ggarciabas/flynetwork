@@ -178,47 +178,32 @@ void UavNetwork::Run()
     case 0: // teste
       ss << "teste";
       break;
-    case 1: //Austin City Limits
-      ss << "austincitylimits";
+    case 1:
+      ss << "lollapalooza_30";
       break;
     case 2: //Lollapalooza
-      ss << "lollapalooza";
+      ss << "lollapalooza_50";
       break;
-    case 3: //Rock in Rio Brasil
-      ss << "rockinriobrasil";
+    case 3:
+      ss << "lollapalooza_100";
       break;
     case 4: //Rock in Rio Lisboa
-      ss << "rockinriolisboa";
+      ss << "rockinriolisboa_30";
       break;
-    case 5: //Rock in Rio USA
-      ss << "rockinriousa";
+    case 5: 
+      ss << "rockinriolisboa_50";
       break;
-    case 6: // Glastonburry
-      ss << "glastonbury";
+    case 6: 
+      ss << "rockinriolisboa_100";
       break;
-    case 7: // teste_1
-      ss << "teste_1";
-      break;
-    case 8: // teste_2
-      ss << "teste_2";
-      break;
-    case 9: // teste_5
-      ss << "teste_5";
-      break;
-    case 10: // teste_10
-      ss << "teste_10";
-      break;
-    case 15: // teste_15
-      ss << "teste_15";
-      break;
-    case 20: // teste_20
-      ss << "teste_20";
-      break;
-    case 50: // teste_50
-      ss << "teste_50";
-      break;
-    case 99: // austin_30
+    case 7: // austin_30
       ss << "austin_30";
+      break;
+    case 8: // austin
+      ss << "austin_50";
+      break;
+    case 9: // austin
+      ss << "austin_100";
       break;
     default:
       NS_LOG_ERROR("Não foi possivel identificar o cenario!");
