@@ -821,7 +821,7 @@ void ServerApplication::runAgendamento(void)
        u_i != m_uavContainer.End(); ++u_i, ++i)
   {
     id = s_final[i];
-    f_mij.push_back(vector<long double>((int)m_uavContainer.GetN(), 0)); // inicia com zeros
+    f_mij.push_back(vector<long double>((int)m_locationContainer.GetN(), 0)); // inicia com zeros
     f_mij[i][id] = 1.0;
 
     if (custo_x[i][id] == 1.0) { // UAv nao tem bateria suficiente para ir ate a localizacao
