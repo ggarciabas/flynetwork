@@ -233,7 +233,6 @@ SmartphoneApplication::CourseChange(Ptr<const MobilityModel> mobility)
 
   if (distance >= m_changePosition && m_connected)
   {
-    Simulator::Remove(m_sendEventUav);
     m_lastPosition = actual;
 
     // TODO: enviar pacote informando novo posicionamento!
@@ -257,7 +256,6 @@ SmartphoneApplication::TracedCallbackTxApp (Ptr<const Packet> packet, const Addr
 void SmartphoneApplication::TracedCallbackExpiryLease (const Ipv4Address& ip)
 {
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
-  Simulator::Remove(m_sendEventUav);
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/client_" << m_id << ".txt";
   std::ofstream file;
@@ -275,7 +273,6 @@ void SmartphoneApplication::TracedCallbackExpiryLease (const Ipv4Address& ip)
 void SmartphoneApplication::TracedCallbackNewLease (const Ipv4Address& ip)
 {
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
-  Simulator::Remove(m_sendEventUav);
   m_uavPeer = DynamicCast<DhcpClient>(GetNode()->GetApplication(m_idDHCP))->GetDhcpServer();
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/client_" << m_id << ".txt";
@@ -318,7 +315,6 @@ void
 SmartphoneApplication::TracedCallbackAssocLogger (Mac48Address mac)
 {
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
-  Simulator::Remove(m_sendEventUav);
   NS_LOG_INFO ("CLIENT [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - associated to " << mac);
 
   std::ostringstream os;
@@ -333,8 +329,6 @@ SmartphoneApplication::TracedCallbackAssocLogger (Mac48Address mac)
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   file << Simulator::Now().GetSeconds() << " " << m_id << " " << mac << std::endl;
   file.close();
-  m_sendEventUav = Simulator::Schedule(Seconds(20.0), &SmartphoneApplication::SendPacketUav, this);
-
   m_connected = true;
 }
 
@@ -342,7 +336,6 @@ void
 SmartphoneApplication::TracedCallbackDeAssocLogger (Mac48Address mac)
 {
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
-  Simulator::Remove(m_sendEventUav);
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/client_" << m_id << ".txt";
   std::ofstream file;
