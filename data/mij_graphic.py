@@ -11,6 +11,7 @@ import sys
 
 def mij(time, main_path, teste):
     data_mij = {}
+    print main_path+'etapa/'+time+'/f_mij.txt'
     file = open(main_path+'etapa/'+time+'/f_mij.txt', 'r')
     line = file.readline().strip()
     graphic_temp = [x for x in line.split(',')]
@@ -22,7 +23,7 @@ def mij(time, main_path, teste):
     cont = 0
     for line in file:
         print line
-        val = line.split(',')
+        val = line.strip().split(',')
         print val
         data_mij[uavs[cont]] = [float(x) for x in val] # read row from file
         cont = cont + 1
@@ -30,6 +31,8 @@ def mij(time, main_path, teste):
 
     plt.close()
     cmap = sns.cubehelix_palette(50, hue=0.05, rot=0, light=0.9, dark=0, as_cmap=True)
+
+    print data_mij
 
     # Create a dataset
     df_mij = pd.DataFrame(data_mij, index=locs)

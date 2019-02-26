@@ -35,12 +35,12 @@ def scenario (time, main_path, teste):
     # if teste:
     #     print (loc)
     #read BIJ
-    line = f_cen.readline().strip()
-    value = [float(x) for x in line.split(',')] # read bij for each x y
+    # line = f_cen.readline().strip()
+    # value = [float(x) for x in line.split(',')] # read bij for each x y
     # if teste:
     #     print (value)
     f_cen.close()
-    point_value = range(0,len(value)*2)
+    # point_value = range(0,len(value)*2)
 
     try:
         f_cen = open(main_path+'etapa/'+time+'/client.txt','r')

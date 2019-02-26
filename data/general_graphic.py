@@ -98,8 +98,8 @@ for custo_name in glob.glob(main_path+'custo_*/'):
 
     if teste:
         print all_uav
-    battery_all.battery(main_path+custo+'/', teste, all_uav, 0, t_ini+10, activated, 'all')
-    battery_mov.battery(main_path+custo+'/', teste, [], 0, t_ini+10, activated, 'all')
-    battery_hover.battery(main_path+custo+'/', teste, [], 0, t_ini+10, activated, 'all')
-    battery_hover.battery(main_path+custo+'/', teste, all_uav, 0, t_ini+10, activated, 'all')
-    battery_threshold.battery(main_path+custo+'/', teste, all_uav, 0, t_ini+10, activated, '')
+    # battery_all.battery(main_path+custo+'/', teste, all_uav, 0, t_ini+10, activated, 'all')
+    # battery_mov.battery(main_path+custo+'/', teste, [], 0, t_ini+10, activated, 'all')
+    # battery_hover.battery(main_path+custo+'/', teste, [], 0, t_ini+10, activated, 'all')
+    # battery_hover.battery(main_path+custo+'/', teste, all_uav, 0, t_ini+10, activated, 'all')
+    # battery_threshold.battery(main_path+custo+'/', teste, all_uav, 0, t_ini+10, activated, '')
