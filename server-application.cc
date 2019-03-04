@@ -884,181 +884,211 @@ void ServerApplication::runAgendamento(void)
   NS_LOG_DEBUG ("-- Finalizado posicionamento dos UAVs @" << Simulator::Now().GetSeconds());
 }
 
-std::vector<int> ServerApplication::DaPositioning (std::vector<std::vector<long double> > c_ji, unsigned N) {
-  std::vector<std::vector<long double> > b_ji;
-  std::vector<std::vector<long double> > m_ji;
-  std::vector<long double> o_loc; // ocupada
-  std::vector<long double> o_uav; // ocupada
-  std::vector<int> o_conflict;
+std::vector<int> ServerApplication::DaPositioning (std::vector<std::vector<long double> > b_ij, int N) {
+  double temp = 0.9;
   std::vector<int> proposed_FINAL;
-  std::vector<int> proposed_LOC;
-  std::vector<int> proposed_UAV;
+  std::vector<int> used;
+  // Mai
+  std::vector<std::vector<long double> > m_ij;
+  // variavel da tranformacao algebrica (parte do self-amplification)
+  std::vector<std::vector<long double> > o_ij;
+  // variavel da transformacao algebrica (parte o Y_sch)
+  std::vector<std::vector<long double> > lamb_ij;
+  // q_ai
+  std::vector<std::vector<long double> > q_ij;
+  // Ptr<UniformRandomVariable> e_ai = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
+  // e_ai->SetAttribute ("Min", DoubleValue (min));
+  // double rdom;
 
-  for(unsigned j = 0; j < N; j++) // uav
+  for (unsigned i = 0; i < N; ++i) // UAV
   {
-    m_ji.push_back(std::vector<long double>());
-    b_ji.push_back(std::vector<long double>());
-    for(unsigned i = 0; i < N; i++) // location
+    m_ij.push_back(std::vector<long double>());
+    o_ij.push_back(std::vector<long double>());
+    lamb_ij.push_back(std::vector<long double>());
+    q_ij.push_back(std::vector<long double>());
+    for (unsigned j = 0; j < N; ++j) // LOC
     {
-      m_ji[j].push_back(0.01);// para nao dar conflito com a primeira atualizaçao de bij
-      b_ji[j].push_back(c_ji[j][i]);
+      // rdom = (double)rand()/RAND_MAX; // [0,1]
+      m_ij[i].push_back(1.0/(double)N); // + rdom);
+      o_ij[i].push_back(m_ij[i][j]);
+      lamb_ij[i].push_back(0.0);
+      q_ij[i].push_back(0.0);
     }
-    o_loc.push_back(1e-1);
-    o_uav.push_back(1e-1);
-    proposed_LOC.push_back(-1);
-    proposed_UAV.push_back(-1);
     proposed_FINAL.push_back(-1);
-    o_conflict.push_back(0); // para saber se ja teve conflito 
+    used.push_back(-1);
   }
 
-  long double temp = 0.3, t_min=9e-5, validate, alpha, max, cost, z, cost_FINAL = 5.0; // alpha punicao de capacidade
-  int check, p_max;
-  int odd_even = 0;
-  unsigned uav, loc;
-  bool equal;
-  alpha = 1.5; // aumenta 20%
+  long double gamma = 1;
+  long double lamb = 1;
+  long double new_mij;
+  unsigned i, j, k;
+  long double v_max;
+  int check;
 
-  while (temp > t_min) {
-    if (odd_even%2==0) {      
-       // normalizando MIJ, para suavizar a punicao de bji
-      for (uav = 0; uav < N; ++uav) // UAV
-      {
-        max = 0.0;
-        for (loc = 0; loc < N; ++loc) // LOC
-        {
-          if (m_ji[uav][loc] > max) {
-            max = m_ji[uav][loc];
-          }
-        }
-        for (loc = 0; loc < N; ++loc) // LOC
-        {
-          m_ji[uav][loc] /= max;
-          b_ji[uav][loc] = b_ji[uav][loc]*m_ji[uav][loc];
-        }
-        o_conflict[uav] = 0; // reiniciando conflito
-      }
+  int itC_max = 50;
+  int itB_max = 50;
 
-      check = 0;   
-      for(uav = 0; uav < N; uav++) // uavs
-      {        
-        z = 0.0;        
-        for(loc = 0; loc < N; loc++) // locations
-        {        
-          z += std::exp(-((b_ji[uav][loc]+o_loc[loc])/temp));
-        } 
+  // std::cout << std::fixed << std::setw(8) << std::setprecision(8);
 
-        max = 0.0;
-        validate = 0.0;
-        for(loc = 0; loc < N; loc++) // locations
-        {
-          m_ji[uav][loc] = std::exp(-((b_ji[uav][loc]+o_loc[loc])/temp)) / z;
-          validate += m_ji[uav][loc];
-          if (m_ji[uav][loc] > max) {
-            max = m_ji[uav][loc];
-            p_max = loc;
-          }
-          if (std::isnan(m_ji[uav][loc])) {
-            goto out;
-          }
-          if (m_ji[uav][loc] == 1.0) {
-            check++;
-            proposed_UAV[uav] = loc; // proposed é UAV/loc representa para qual loc o UAv irá
-          }
-        }
-        o_loc[p_max] *= alpha; 
-        o_conflict[p_max]++;
-        proposed_UAV[uav] = p_max;
-      }  
-    } else {
-      // normalizando mij para suavizar a punicao de bji
-      for (loc = 0; loc < N; ++loc) // LOC
-      {
-        max = 0.0;
-        for (uav = 0; uav < N; ++uav) // UAV
-        {
-          if (m_ji[uav][loc] > max) {
-            max = m_ji[uav][loc];
-          }
-        }
-        for (uav = 0; uav < N; ++uav) // UAV
-        {
-          m_ji[uav][loc] /= max;
-          b_ji[uav][loc] = b_ji[uav][loc]*m_ji[uav][loc]; // quanto menor a probabilidade, mais mantém de bij, permitindo reduzir o com maior probabilidade
-        }
-        o_conflict[loc] = 0; // reiniciando conflito
-      }
-      check = 0;   
-      for(loc = 0; loc < N; loc++) // locations
-      {        
-        z = 0.0;
-        for(uav = 0; uav < N; uav++) // uavs
-        {        
-          z += std::exp(-((b_ji[uav][loc]+o_uav[uav])/temp)); 
-        }
+  while (temp >= 1e-3)
+  {
+    std::cout << "---------------------------- temp: " << temp << std::endl;
 
-        max = 0.0;
-        validate = 0.0;
-        for(uav = 0; uav < N; uav++) // uavs
-        {
-          m_ji[uav][loc] = std::exp(-((b_ji[uav][loc]+o_uav[uav])/temp)) / z;
-          validate += m_ji[uav][loc];
-          if (m_ji[uav][loc] > max) {
-            max = m_ji[uav][loc];
-            p_max = uav;
-          }
-          if (std::isnan(m_ji[uav][loc])) {
-            goto out;
-          }
-          if (m_ji[uav][loc] == 1.0) {
-            check++;
-            proposed_LOC[p_max] = loc; // proposed é UAV/loc representa para qual loc o UAv irá
-          }
-        }
-        o_uav[p_max] *= alpha; 
-        o_conflict[p_max]++;
-        proposed_LOC[p_max] = loc; // solucao final proposed é UAV/LOC
-      }
-    }  
-
-    cost = 0.0;
-    equal = true;
-    for(uav = 0; uav < N; uav++) // uavs
-    {
-      if (proposed_LOC[uav] != proposed_UAV[uav]) {
-        equal = false;
-        cost = -1; // not a valid solution
-        break;
-      }
-      cost += c_ji[uav][proposed_LOC[uav]];
+    for (i = 0; i < N; ++i)
+    {   
+      used[i] = -1;
     }
 
-    if (equal) {
-      if (cost < cost_FINAL) {
-        cost_FINAL = cost;
-        proposed_FINAL = proposed_UAV;
+    check = 0;
+    bool converge_B = true;
+    int itB = 0;
+    do {
+      converge_B = true;
+
+      for (i = 0; i < N; ++i)
+      {
+        for (j = 0; j < N; ++j)
+        {
+          // calculate \lamb_{ij}
+          lamb_ij[i][j] = m_ij[i][j] * b_ij[i][j];
+          // calculate Q_{ij}
+          q_ij[i][j] =  gamma * o_ij[i][j] - lamb_ij[i][j] * b_ij[i][j];        
+          // calculate m_{ij}
+          new_mij = expl((q_ij[i][j] / (long double) temp)); 
+          if (isnan(new_mij)) {
+            std::cout << "NAN! \n";
+            exit(1);
+          }
+          if (m_ij[i][j] != new_mij) {
+            converge_B = false;
+          }
+          m_ij[i][j] = new_mij;        
+        }
       }
-    }    
-      
-    temp *= 0.9;
-    odd_even++;
+
+      bool converge_C = true;
+      int itC = 0;
+      do {
+        converge_C = true;
+
+        long double total;
+        for (i = 0; i < N; ++i)
+        {
+          total = 0.0;
+          for (k = 0; k < N; ++k)
+          {
+            total += m_ij[i][k];
+          }
+          for (k = 0; k < N; ++k)
+          {
+            new_mij = m_ij[i][k] / total;
+            if (m_ij[i][k] != new_mij) {
+              converge_C = converge_B = false;
+            }
+            m_ij[i][k] = new_mij;
+          }
+        }
+
+        for (i = 0; i < N; ++i)
+        {
+          total = 0.0;
+          for (k = 0; k < N; ++k)
+          {
+              total += m_ij[k][i];
+          }
+          for (k = 0; k < N; ++k)
+          {
+              new_mij = m_ij[k][i] / total;
+              if (m_ij[k][i] != new_mij) {
+                  converge_C = converge_B = false;
+              }
+              m_ij[k][i] = new_mij;
+          }
+        }
+        itC++;
+      } while (!converge_C && itC < itC_max);
+      // if (converge_C) {
+      //   std::cout << "Saiu por convergencia C: " << itC << std::endl;
+      // }
+      itB++;
+    } while (!converge_B && itB < itB_max);
+    // if (converge_B) {
+    //   std::cout << "Saiu por convergencia B: " << itB << std::endl;
+    // }
+
+    // { // validate MIJ
+    //   long double validatel;
+    //   std::vector<long double> validate(N,0);
+    //   std::cout << "...... MIJ --------- line\n";
+    //   for (i = 0; i < N; ++i)
+    //   {
+    //     validatel = 0.0;
+    //     std::cout << "[";
+    //     for (j = 0; j < N; ++j)
+    //     {
+    //       std::cout << m_ij[i][j] << "\t\t";
+    //       validatel += m_ij[i][j];
+    //       validate[i] += m_ij[j][i];
+    //     }  
+    //     std::cout << "] = " << validatel << "\n";    
+    //   }
+    //   std::cout << "---------------------------------------------------------\n";
+    //   std::cout << "[";
+    //   for (i = 0; i < N; ++i)
+    //   {
+    //     std::cout << validate[i] << "\t\t";
+    //   }
+    //   std::cout << "]\n";
+    // }
+
+    // Validate solution
+    for (i = 0; i < N; ++i)
+    {
+      for (j = 0; j < N; ++j)
+      {
+        if (m_ij[i][j] > 0.99999) {
+          check++;
+          proposed_FINAL[i] = j;
+          used[j] = 1;  
+          break;
+        }
+      }
+    }
+
+    // std::cout << "proposed_FINAL \n[";
+    // for(i = 0; i < N; i++)
+    // {
+    //   std::cout << proposed_FINAL[i] << "\t\t";
+    // }
+    // std::cout << "]\n";
+
+    if (check == N) {
+      goto out;
+    }
+
+    temp *= 0.99;
+    o_ij = m_ij;
+    // std::cout << " ---------------------------------------- \n";
   }
+  // permite sair dos lacos ao encontrar 1 para cada localizacao
   out:
-  if (cost == -1) {
-    long double cost_LOC = 0.0;
-    long double cost_UAV = 0.0;
-    for(uav = 0; uav < N; uav++) // uavs
+  if (check < N) {
+    int find = 0;
+    for(i = 0; i < N; i++)
     {
-      cost_LOC += c_ji[uav][proposed_LOC[uav]];
-      cost_UAV += c_ji[uav][proposed_UAV[uav]];
-    }
-    cost = cost_UAV;
-    proposed_FINAL = proposed_UAV;
-    if (cost_LOC < cost_UAV) {
-      cost = cost_LOC;
-      proposed_FINAL = proposed_LOC;
+      if (proposed_FINAL[i] == -1) {
+        // find  sequential unused
+        for (; find < N; find++) {
+          if (used[find] == -1) {
+            proposed_FINAL[i] = find;
+            used[find] = 1;
+            find++;
+            break;
+          }
+        }
+      }
     }
   }
-
   return proposed_FINAL;
 }
 
