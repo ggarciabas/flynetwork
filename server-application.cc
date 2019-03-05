@@ -370,12 +370,12 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             mm << "SERVER\t-1\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tCLIENT";
             m_packetTrace(mm.str());
             NS_LOG_INFO("SERVER -- CLIENT ::: recebida informacoes de aplicacao do cliente no endereco " << add.GetIpv4());
-            std::ostringstream os;
-            os << "./scratch/flynetwork/data/output/" << m_pathData << "/client_data.txt";
-            std::ofstream file;
-            file.open(os.str(), std::ofstream::out | std::ofstream::app);
-            file << Simulator::Now().GetSeconds() << " RECEBIDO" << std::endl; // RECEBIDO pelo servidor
-            file.close();
+            // std::ostringstream os;
+            // os << "./scratch/flynetwork/data/output/" << m_pathData << "/client_data.txt";
+            // std::ofstream file;
+            // file.open(os.str(), std::ofstream::out | std::ofstream::app);
+            // file << Simulator::Now().GetSeconds() << " RECEBIDO" << std::endl; // RECEBIDO pelo servidor
+            // file.close();
           }
     results.clear();
 }
@@ -496,6 +496,11 @@ void ServerApplication::Run ()
     ss << "mkdir -p ./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << int(Simulator::Now().GetSeconds()) << "/mij";
     system(ss.str().c_str());
     ss.str("");
+    #ifdef COMPARE_COST
+      ss << "mkdir -p ./scratch/flynetwork/data/output/"<<m_pathData<<"/compare/" << int(Simulator::Now().GetSeconds());
+      system(ss.str().c_str());
+      ss.str("");
+    #endif
     // runDAPython();
     // runDAPuro();
     runDA();
@@ -572,7 +577,6 @@ void ServerApplication::runDAPython()
   os.str("");
   os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/cenario_in.txt";
   cenario.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
-
   if (cenario.is_open())
   {
     cenario << m_environment << "\n";
@@ -595,7 +599,6 @@ void ServerApplication::runDAPython()
         file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1) << "," << (*i)->GetLogin();
       }
     }
-
     for (ClientModelContainer::Iterator i = m_fixedClientContainer.Begin(); i != m_fixedClientContainer.End(); ++i)
     {
       cenario << std::endl
@@ -607,11 +610,15 @@ void ServerApplication::runDAPython()
         file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1) << "," << (*i)->GetLogin();;
       }
     }
-
     file << std::endl;
     file.close ();
     cenario.close ();
     m_clientPosition (os.str ());
+
+    #ifdef COMPARE_COST
+      os.str("");
+      os << "cp ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/client.txt ./scratch/flynetwork/data/output/" << m_pathData << "/compare/" << int(Simulator::Now().GetSeconds());
+    #endif
   }
 
   m_totalCliGeral = 0;
@@ -806,15 +813,83 @@ void ServerApplication::runAgendamento(void)
 
   PrintCusto (custo_x, int(Simulator::Now().GetSeconds()), true, uav_ids, loc_ids);
 
+  std::ostringstream osloc, osuav, os;
+
+  #ifdef COMPARE_COST
+    std::ofstream file_uav, file_ule, file_l, file_c1, file_c2, file_c3;
+    os.str("");
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/compare/"<<int(Simulator::Now().GetSeconds())<<"/uav_loc_energy_info.txt";
+    file_ule.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
+    os.str("");
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/compare/"<<int(Simulator::Now().GetSeconds())<<"/uav_info.txt";
+    file_uav.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
+    os.str("");
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/compare/"<<int(Simulator::Now().GetSeconds())<<"/compare_c1.txt";
+    file_c1.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
+    os.str("");
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/compare/"<<int(Simulator::Now().GetSeconds())<<"/compare_c2.txt";
+    file_c2.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
+    os.str("");
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/compare/"<<int(Simulator::Now().GetSeconds())<<"/compare_c3.txt";
+    file_c3.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
+    file_c1 << "compare_c1\n";
+    file_c1 << m_uavContainer.GetN() << "\n";
+    file_c2 << "compare_c2\n";
+    file_c2 << m_uavContainer.GetN() << "\n";
+    file_c3 << "compare_c3\n";
+    file_c3 << m_uavContainer.GetN() << "\n";
+    for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
+       u_i != m_uavContainer.End(); ++u_i, ++count)
+    {
+      std::vector<double> vp = (*u_i)->GetPosition();
+      file_uav << vp.at(0) << "," << vp.at(1) << "," << (*u_i)->GetTotalEnergy() << "," << (*u_i)->GetTotalBattery() << "\n";
+      for (LocationModelContainer::Iterator l_j = m_locationContainer.Begin();
+         l_j != m_locationContainer.End(); ++l_j)
+      {
+        file_ule << (*u_i)->CalculateEnergyCost(CalculateDistance((*u_i)->GetPosition(), (*l_j)->GetPosition())) << ",";
+        // custo
+        long double custo = 1.0;
+        long double b_ui_atu = uav->GetTotalEnergy(); // bateria atual
+        long double ce_ui_la_lj = uav->CalculateEnergyCost(CalculateDistance(uav->GetPosition(), loc->GetPosition())); // custo energetico
+        long double ce_ui_lj_lc = uav->CalculateEnergyCost(CalculateDistance(loc->GetPosition(), central_pos));
+        long double b_ui_tot = uav->GetTotalBattery();
+        long double b_ui_res = b_ui_atu*0.98 - ce_ui_la_lj - ce_ui_lj_lc; // bateria residual
+        long double ce_te_lj = loc->GetTotalConsumption() * m_scheduleServer;
+        long double P_te = b_ui_res/ce_te_lj;
+        file_c1 << (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot << ","; 
+        file_c2 << ((1-P_te < 0.0) ? (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot : 1-P_te) << ",";
+        file_c3 << ((1 - P_te < 0.0) ? 0.0 : (1 - P_te + ((ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot))/2.0) << ",";
+      }
+      file_ule << "\n";
+      file_c1 << "\n";
+      file_c2 << "\n";
+      file_c3 << "\n";
+    }
+    file_ule.close();
+    file_uav.close();
+    file_c1.close();
+    file_c2.close();
+    file_c3.close();
+    os.str("");
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/compare/"<<int(Simulator::Now().GetSeconds())<<"/loc_info.txt";
+    file_l.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
+    for (LocationModelContainer::Iterator l_j = m_locationContainer.Begin();
+         l_j != m_locationContainer.End(); ++l_j)
+    {
+      std::vector<double> vp = (*l_j)->GetPosition();
+      file_l << vp.at(0) << "," << vp.at(1) << "," << (*l_j)->GetTotalConsumption() << "," << (*l_j)->GetTotalCli() << "\n";
+    }
+    file_l.close();
+  #endif
+
   // Inicializando
-  std::vector<int> s_final (DaPositioning(custo_x, m_uavContainer.GetN()));
+  std::vector<int> s_final (DaPositioning(custo_x, (int)m_uavContainer.GetN()));
 
   NS_LOG_DEBUG("SERVER - Finalizada estrutura do DA para agendamento @" << Simulator::Now().GetSeconds());
 
   NS_LOG_DEBUG("SERVER - Atualizando posicionamento dos UAVs @" << Simulator::Now().GetSeconds());
   int id, i = 0;
   std::ofstream file;
-  std::ostringstream osloc, osuav, os;
   double t = 0.0;
   vector<vector<long double> > f_mij;
   for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
@@ -919,10 +994,8 @@ std::vector<int> ServerApplication::DaPositioning (std::vector<std::vector<long 
   }
 
   long double gamma = 1;
-  long double lamb = 1;
   long double new_mij;
   unsigned i, j, k;
-  long double v_max;
   int check;
 
   int itC_max = 50;
@@ -1133,6 +1206,7 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
         break;
     }
   }
+
   ////NS_LOG_DEBUG ("ServerApplication::CalculateCusto > mcusto: " << m_custo << " custo: " << custo);
   central_pos.clear();
   return custo;

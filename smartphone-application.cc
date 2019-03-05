@@ -245,12 +245,12 @@ SmartphoneApplication::TracedCallbackTxApp (Ptr<const Packet> packet, const Addr
 {
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - SERVER ");
-  std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/" << m_pathData << "/client_data.txt";
-  std::ofstream file;
-  file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  file << Simulator::Now().GetSeconds() << " ENVIADO " << m_login << std::endl; // ENVIADO por um cliente
-  file.close();
+  // std::ostringstream os;
+  // os << "./scratch/flynetwork/data/output/" << m_pathData << "/client_data.txt";
+  // std::ofstream file;
+  // file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  // file << Simulator::Now().GetSeconds() << " ENVIADO " << m_login << std::endl; // ENVIADO por um cliente
+  // file.close();
 }
 
 void SmartphoneApplication::TracedCallbackExpiryLease (const Ipv4Address& ip)
