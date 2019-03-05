@@ -30,6 +30,8 @@
 
 #define ETAPA 120
 
+#define COMPARE_COST
+
 namespace ns3
 {
 
@@ -848,13 +850,12 @@ void ServerApplication::runAgendamento(void)
       {
         file_ule << (*u_i)->CalculateEnergyCost(CalculateDistance((*u_i)->GetPosition(), (*l_j)->GetPosition())) << ",";
         // custo
-        long double custo = 1.0;
-        long double b_ui_atu = uav->GetTotalEnergy(); // bateria atual
-        long double ce_ui_la_lj = uav->CalculateEnergyCost(CalculateDistance(uav->GetPosition(), loc->GetPosition())); // custo energetico
-        long double ce_ui_lj_lc = uav->CalculateEnergyCost(CalculateDistance(loc->GetPosition(), central_pos));
-        long double b_ui_tot = uav->GetTotalBattery();
+        long double b_ui_atu = (*u_i)->GetTotalEnergy(); // bateria atual
+        long double ce_ui_la_lj = (*u_i)->CalculateEnergyCost(CalculateDistance((*u_i)->GetPosition(), (*l_j)->GetPosition())); // custo energetico
+        long double ce_ui_lj_lc = (*u_i)->CalculateEnergyCost(CalculateDistance((*l_j)->GetPosition(), central_pos));
+        long double b_ui_tot = (*u_i)->GetTotalBattery();
         long double b_ui_res = b_ui_atu*0.98 - ce_ui_la_lj - ce_ui_lj_lc; // bateria residual
-        long double ce_te_lj = loc->GetTotalConsumption() * m_scheduleServer;
+        long double ce_te_lj = (*l_j)->GetTotalConsumption() * m_scheduleServer;
         long double P_te = b_ui_res/ce_te_lj;
         file_c1 << (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot << ","; 
         file_c2 << ((1-P_te < 0.0) ? (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot : 1-P_te) << ",";
