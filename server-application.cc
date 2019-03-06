@@ -884,7 +884,7 @@ void ServerApplication::runAgendamento(void)
   #endif
 
   // Inicializando
-  std::vector<int> s_final (DaPositioning(custo_x, (int)m_uavContainer.GetN()));
+  std::vector<int> s_final (DaPositioning(custo_x, m_uavContainer.GetN()));
 
   NS_LOG_DEBUG("SERVER - Finalizada estrutura do DA para agendamento @" << Simulator::Now().GetSeconds());
 
@@ -960,7 +960,7 @@ void ServerApplication::runAgendamento(void)
   NS_LOG_DEBUG ("-- Finalizado posicionamento dos UAVs @" << Simulator::Now().GetSeconds());
 }
 
-std::vector<int> ServerApplication::DaPositioning (std::vector<std::vector<long double> > b_ij, int N) {
+std::vector<int> ServerApplication::DaPositioning (std::vector<std::vector<long double> > b_ij, unsigned N) {
   double temp = 0.9;
   std::vector<int> proposed_FINAL;
   std::vector<int> used;
@@ -1136,7 +1136,7 @@ std::vector<int> ServerApplication::DaPositioning (std::vector<std::vector<long 
     // }
     // std::cout << "]\n";
 
-    if (check == N) {
+    if (check == (int)N) {
       goto out;
     }
 
@@ -1146,8 +1146,8 @@ std::vector<int> ServerApplication::DaPositioning (std::vector<std::vector<long 
   }
   // permite sair dos lacos ao encontrar 1 para cada localizacao
   out:
-  if (check < N) {
-    int find = 0;
+  if (check < (int)N) {
+    unsigned find = 0;
     for(i = 0; i < N; i++)
     {
       if (proposed_FINAL[i] == -1) {
