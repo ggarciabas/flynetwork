@@ -60,6 +60,11 @@ UavModel::GetTypeId(void)
                                         DoubleValue(0), // joule/meter
                                         MakeDoubleAccessor(&UavModel::m_energyCost),
                                         MakeDoubleChecker<double>())
+                          .AddAttribute("HoverCost",
+                                        "Initial hover cost per second for basic energy source.",
+                                        DoubleValue(0), // joule/s
+                                        MakeDoubleAccessor(&UavModel::m_hoverCost),
+                                        MakeDoubleChecker<double>())
       ;
   return tid;
 }
@@ -136,11 +141,17 @@ UavModel::CalculateEnergyCost(double dist)
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() <<dist);
   return m_energyCost * dist; // in joule
 }
+
 double
 UavModel::GetTotalBattery()
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   return m_totalBattery;
+}
+
+double 
+UavModel::GetHoverCost(){
+  return m_hoverCost;
 }
 
 void UavModel::SetTotalEnergy(double total)

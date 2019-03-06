@@ -139,7 +139,7 @@ ServerApplication::~ServerApplication()
   m_clientContainer.Clear();
 }
 
-void ServerApplication::AddNewUav(uint32_t id, Ipv4Address addrAdhoc, double totalEnergy, double energyCost, double totalBattery, Ptr<MobilityModel> mob)
+void ServerApplication::AddNewUav(uint32_t id, Ipv4Address addrAdhoc, double totalEnergy, double energyCost, double hoverCost, double totalBattery, Ptr<MobilityModel> mob)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << id << addrAdhoc << totalEnergy << energyCost << totalBattery << mob);
 
@@ -153,6 +153,7 @@ void ServerApplication::AddNewUav(uint32_t id, Ipv4Address addrAdhoc, double tot
   obj.Set("AddressAdhoc", Ipv4AddressValue(addrAdhoc));
   obj.Set("TotalEnergy", DoubleValue(totalEnergy));
   obj.Set("EnergyCost", DoubleValue(energyCost));
+  obj.Set("HoverCost", DoubleValue(hoverCost));
   obj.Set("TotalBattery", DoubleValue(totalBattery));
   obj.Set("Socket", PointerValue(socket));
 
@@ -166,7 +167,7 @@ void ServerApplication::AddNewUav(uint32_t id, Ipv4Address addrAdhoc, double tot
   m_uavContainer.Add(uav);
 }
 
-void ServerApplication::AddSupplyUav(uint32_t id, Ipv4Address addrAdhoc, double totalEnergy, double energyCost, double totalBattery, Ptr<MobilityModel> mob)
+void ServerApplication::AddSupplyUav(uint32_t id, Ipv4Address addrAdhoc, double totalEnergy, double energyCost, double hoverCost, double totalBattery, Ptr<MobilityModel> mob)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << id << addrAdhoc << totalEnergy << energyCost << totalBattery << mob << m_supplyPos);
   Ptr<UavModel> supplied = m_uavContainer.RemoveAt(m_supplyPos);
@@ -180,6 +181,7 @@ void ServerApplication::AddSupplyUav(uint32_t id, Ipv4Address addrAdhoc, double 
   obj.Set("AddressAdhoc", Ipv4AddressValue(addrAdhoc));
   obj.Set("TotalEnergy", DoubleValue(totalEnergy));
   obj.Set("EnergyCost", DoubleValue(energyCost)); // joule/meters
+  obj.Set("HoverCost", DoubleValue(hoverCost)); // joule/s
   obj.Set("TotalBattery", DoubleValue(totalBattery));
   obj.Set("Socket", PointerValue(socket));
 
@@ -824,7 +826,7 @@ void ServerApplication::runAgendamento(void)
   std::ostringstream osloc, osuav, os;
 
   #ifdef COMPARE_COST
-    std::ofstream file_uav, file_ule, file_l, file_c1, file_c2, file_c3;
+    std::ofstream file_uav, file_ule, file_l, file_c1, file_c2, file_c3, file_c4;
     os.str("");
     os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/compare/"<<int(Simulator::Now().GetSeconds())<<"/uav_loc_energy_info.txt";
     file_ule.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
@@ -840,12 +842,17 @@ void ServerApplication::runAgendamento(void)
     os.str("");
     os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/compare/"<<int(Simulator::Now().GetSeconds())<<"/compare_c3.txt";
     file_c3.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
+    os.str("");
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/compare/"<<int(Simulator::Now().GetSeconds())<<"/compare_c4.txt";
+    file_c4.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
     file_c1 << "compare_c1\n";
     file_c1 << m_uavContainer.GetN() << "\n";
     file_c2 << "compare_c2\n";
     file_c2 << m_uavContainer.GetN() << "\n";
     file_c3 << "compare_c3\n";
     file_c3 << m_uavContainer.GetN() << "\n";
+    file_c3 << "compare_c4\n";
+    file_c4 << m_uavContainer.GetN() << "\n";
     for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
        u_i != m_uavContainer.End(); ++u_i, ++count)
     {
@@ -866,17 +873,22 @@ void ServerApplication::runAgendamento(void)
         file_c1 << (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot << ","; 
         file_c2 << ((1-P_te < 0.0) ? (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot : 1-P_te) << ",";
         file_c3 << ((1 - P_te < 0.0) ? 0.0 : (1 - P_te + ((ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot))/2.0) << ",";
+        double ce_te = (*l_j)->GetTotalConsumption()*m_scheduleServer + (*u_i)->GetHoverCost()*m_scheduleServer ; // custo para o TE inteiro, considerando locs e hover
+        P_te = b_ui_res/ce_te;
+        file_c4 << ((1-P_te < 0.0) ? (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot : 1-P_te) << ",";
       }
       file_ule << "\n";
       file_c1 << "\n";
       file_c2 << "\n";
       file_c3 << "\n";
+      file_c4 << "\n";
     }
     file_ule.close();
     file_uav.close();
     file_c1.close();
     file_c2.close();
     file_c3.close();
+    file_c4.close();
     os.str("");
     os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/compare/"<<int(Simulator::Now().GetSeconds())<<"/loc_info.txt";
     file_l.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
@@ -1210,6 +1222,14 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
         }
         custo += (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot;
         custo /= 2.0;
+        break;
+      case 4: // custo 2 -> com hover
+        double ce_te = loc->GetTotalConsumption()*m_scheduleServer + uav->GetHoverCost()*m_scheduleServer ; // custo para o TE inteiro, considerando locs e hover
+        P_te = b_ui_res/ce_te;
+        custo = 1 - P_te;
+        if (custo < 0.0) { 
+          custo = (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot; // caso tenha bateria suficiente para o TE, considera por distancia
+        }
         break;
     }
   }

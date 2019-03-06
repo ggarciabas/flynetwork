@@ -91,6 +91,10 @@ UavDeviceEnergyModel::~UavDeviceEnergyModel()
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
 }
 
+double UavDeviceEnergyModel::GetHoverCost() {
+  return m_hoverCost;
+}
+
 double UavDeviceEnergyModel::GetEnergyCost ()
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );

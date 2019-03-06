@@ -478,9 +478,9 @@ void UavNetwork::NewUav(int total, int update)
     NS_LOG_DEBUG("IP " << addr << " -------------");
     if (update == 1 || update == 2) {
       // envia ao servidor informacoes do UAV substituto
-      m_serverApp->AddSupplyUav(n->GetId(), addr, source->GetRemainingEnergy(), n->GetObject<UavDeviceEnergyModel>()->GetEnergyCost(), source->GetInitialEnergy(), n->GetObject<MobilityModel>());
+      m_serverApp->AddSupplyUav(n->GetId(), addr, source->GetRemainingEnergy(), n->GetObject<UavDeviceEnergyModel>()->GetEnergyCost(), n->GetObject<UavDeviceEnergyModel>()->GetHoverCost(), source->GetInitialEnergy(), n->GetObject<MobilityModel>());
     } else { // adiciona um novo UAV no servidor
-      m_serverApp->AddNewUav(n->GetId(), addr, source->GetRemainingEnergy(), n->GetObject<UavDeviceEnergyModel>()->GetEnergyCost(), source->GetInitialEnergy(), n->GetObject<MobilityModel>()); // tell the server to create a new model of UAV, used to identify the actual location of those UAV nodes
+      m_serverApp->AddNewUav(n->GetId(), addr, source->GetRemainingEnergy(), n->GetObject<UavDeviceEnergyModel>()->GetEnergyCost(), n->GetObject<UavDeviceEnergyModel>()->GetHoverCost(), source->GetInitialEnergy(), n->GetObject<MobilityModel>()); // tell the server to create a new model of UAV, used to identify the actual location of those UAV nodes
     }
 
     std::ostringstream os;

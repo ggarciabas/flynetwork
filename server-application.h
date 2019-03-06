@@ -59,8 +59,8 @@ public:
   virtual ~ServerApplication();
 
   void Start();
-  void AddNewUav (uint32_t id, Ipv4Address addrAdhoc, double totalEnergy, double energyCost, double totalBattery, Ptr<MobilityModel> mob);
-  void AddSupplyUav (uint32_t id, Ipv4Address addrAdhoc, double totalEnergy, double energyCost, double totalBattery, Ptr<MobilityModel> mob);
+  void AddNewUav (uint32_t id, Ipv4Address addrAdhoc, double totalEnergy, double energyCost, double hoverCost, double totalBattery, Ptr<MobilityModel> mob);
+  void AddSupplyUav (uint32_t id, Ipv4Address addrAdhoc, double totalEnergy, double energyCost, double hoverCost, double totalBattery, Ptr<MobilityModel> mob);
 
   void TracedCallbackRxApp (Ptr<const Packet> packet, const Address & address);
 

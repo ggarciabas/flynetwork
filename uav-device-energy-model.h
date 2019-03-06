@@ -71,6 +71,8 @@ public:
   virtual void SetNode(Ptr<Node> node);
 
   virtual double GetEnergyCost ();
+
+  double GetHoverCost ();
   /**
    * \brief Gets pointer to node.
    *

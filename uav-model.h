@@ -56,6 +56,7 @@ public:
   void SetTotalEnergy(double);
   double GetTotalEnergy();
   double CalculateEnergyCost(double dist);
+  double GetHoverCost ();
   double GetTotalBattery();
   void SetNewPosition(std::vector<double> pos);
 
@@ -98,6 +99,7 @@ private:
   Ipv4Address m_addressAdhoc;
   double m_totalEnergy; // total de bateria atual do UAV in Joules
   double m_energyCost;
+  double m_hoverCost;
   double m_totalBattery; // total de bateria quando cheia in Joules
   Ptr<Socket> m_socket;
   bool m_confirmed;
