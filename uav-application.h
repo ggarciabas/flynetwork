@@ -93,6 +93,7 @@ private:
   uint32_t m_id;
   uint16_t m_serverPort;
   uint16_t m_cliPort;
+  std::vector<double> m_goto;
   double m_meanConsumption; // consumo medio do UAV
   Ipv4Address m_addressAdhoc;
   double m_updateTime;

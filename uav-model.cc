@@ -67,7 +67,7 @@ UavModel::GetTypeId(void)
 UavModel::UavModel() : m_position()
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  NS_LOG_DEBUG ("UavModel::UavModel @" << Simulator::Now().GetSeconds());
+  // NS_LOG_DEBUG ("UavModel::UavModel @" << Simulator::Now().GetSeconds());
   m_confirmed = true; // para que nao de erro na primera execucao
   m_clientData = true; // para que nao de erro na primeira execucao
 }
@@ -75,7 +75,7 @@ UavModel::UavModel() : m_position()
 UavModel::~UavModel()
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  NS_LOG_DEBUG ("UavModel::~UavModel @" << Simulator::Now().GetSeconds());
+  // NS_LOG_DEBUG ("UavModel::~UavModel @" << Simulator::Now().GetSeconds());
 }
 
 void
@@ -229,17 +229,19 @@ UavModel::NotConfirmed ()
 void
 UavModel::ConfirmPosition () {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  // if (int(m_newPos.at(0)) == int(m_position.at(0)) && int(m_newPos.at(1)) == int(m_position.at(1))) { // compara com a posicao que se deseja que ele chegue // REMOVEr
-    m_confirmed = true; // mantendo confirmacao, pois o UAV somente envia mensagem quando chega ao destino!
-    // NS_LOG_INFO ("UAVMODEL :: posicionamento do uav " << m_id << " confirmado!"); // REMOVEr
-  // } // REMOVER
+  NS_LOG_DEBUG ("UAV [ " << m_id << "] (" << m_position.at(0) << "," << m_position.at(1) << ") === > (" << m_newPos.at(0) << "," << m_newPos.at(1) << ") @" << Simulator::Now().GetSeconds());
+  if (int(m_newPos.at(0)) == int(m_position.at(0)) && int(m_newPos.at(1)) == int(m_position.at(1))) { // compara com a posicao que se deseja que ele chegue 
+    m_confirmed = true; 
+  } else {
+    m_confirmed = false;
+  }
 }
 
 void UavModel::DoDispose () {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   CancelAskCliDataEvent();
   CancelSendPositionEvent();
-  NS_LOG_DEBUG("UavModel::DoDispose id " << m_id << " REF " << GetReferenceCount() << " SKT REF " << m_socket->GetReferenceCount() << "@" << Simulator::Now().GetSeconds());
+  // NS_LOG_DEBUG("UavModel::DoDispose id " << m_id << " REF " << GetReferenceCount() << " SKT REF " << m_socket->GetReferenceCount() << "@" << Simulator::Now().GetSeconds());
   m_socket->ShutdownRecv();
   m_socket->ShutdownSend();
   m_socket->Close();

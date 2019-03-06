@@ -94,14 +94,14 @@ void UavMobilityModel::DoStop()
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_helper.Update();
   m_helper.Pause(); // set the vector to 0.0 and block Update method
-  m_envPos.Cancel();
-  m_event.Cancel();
+  Simulator::Remove(m_event);
+  Simulator::Remove(m_envPos);
 
   Vector position = m_helper.GetCurrentPosition();
-  NS_LOG_INFO ("UavMobilityModel :: [[ FINAL ]] " << Simulator::Now().GetSeconds() << " (" << position.x << "," << position.y << ") deveria estar em (" << m_goTo.x << "," << m_goTo.y << ")");
+  NS_LOG_DEBUG ("UavMobilityModel :: [[ FINAL ]] " << Simulator::Now().GetSeconds() << " (" << position.x << "," << position.y << ") deveria estar em (" << m_goTo.x << "," << m_goTo.y << ")");
 
-  NotifyCourseChange();
   m_courseChangeDevice(this);
+  NotifyCourseChange();
 }
 
 void UavMobilityModel::UpdatePosition()
@@ -122,15 +122,15 @@ UavMobilityModel::DoGetPosition(void) const
 void UavMobilityModel::DoSetPosition(const Vector &position)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<position);
-  if (CalculateDistance(m_goTo, position)) {
+  if (CalculateDistance(m_goTo, position)) { // caso onde se tenha que ir seja distante, entao avancar!
     m_goTo = position; // posicao destino
     // // std::cout << "Vá para a posição: " << position.x << " " << position.y << std::endl;
     Simulator::Remove(m_event);
     Simulator::Remove(m_envPos);
     m_event = Simulator::ScheduleNow(&UavMobilityModel::DoInitializePrivate, this);
-    m_courseChangeDevice(this); // notificacoes intermediarias
+    m_courseChangeDevice(this); // notificacoes intermediarias - somente para o dispositivo para consumo energético
   } else {
-    NotifyCourseChange(); // somente notificacao final
+    NotifyCourseChange(); // somente notificacao final - para UAV Application
   }
 }
 

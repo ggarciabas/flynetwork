@@ -43,6 +43,9 @@
 
 #define ETAPA 120
 
+// permite os clientes enviarem aplicacoes para o servidor
+// #define APP_CLI
+
 namespace ns3
 {
 
@@ -762,6 +765,7 @@ void UavNetwork::ConfigureCli()
   std::ofstream cliLogin;
   ss << "./scratch/flynetwork/data/output/" << m_pathData << "/client_login.txt";
   cliLogin.open(ss.str().c_str());
+  
   // aggregate SmartphoneApp on node and configure it!
   Ptr<UniformRandomVariable> e_ai = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
   int c = 0;
@@ -823,63 +827,65 @@ void UavNetwork::ConfigureCli()
     // aggregate to the node
     (*i)->AddApplication(smart);
 
-    // configure OnOff application para server
-    int app_code = app_rand->GetValue();
-    int port = 0;
-    ObjectFactory onoffFac;
-    Ptr<Application> appOnOff = 0;
-    if (app_code < 1) { // VOICE
-        smart->SetApp ("VOICE");
-        onoffFac.SetTypeId ("ns3::OnOffApplication");
-        onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
-        onoffFac.Set ("PacketSize", UintegerValue (50));
-        onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
-        onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0]"));
-        // P.S.: offTime + DataRate/PacketSize = next packet time
-        onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.024Mbps")));
-        port = 5060;
-        onoffFac.Set ("Remote", AddressValue (InetSocketAddress (m_serverAddress.GetAddress(0), port)));
-        appOnOff = onoffFac.Create<Application> ();
-        appOnOff->SetStartTime(Seconds(10.0));
-        appOnOff->SetStopTime(Seconds(m_simulationTime));
-        (*i)->AddApplication (appOnOff);
-        cliLogin << ss.str() << " VOICE" << std::endl;
-    } else if (app_code < 2) { // VIDEO
-        smart->SetApp ("VIDEO");
-        onoffFac.SetTypeId ("ns3::OnOffApplication");
-        onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
-        onoffFac.Set ("PacketSize", UintegerValue (429));
-        onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
-        onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0]"));
-        // P.S.: offTime + DataRate/PacketSize = next packet time
-        onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.128Mbps")));
-        port = 5070;
-        onoffFac.Set ("Remote", AddressValue (InetSocketAddress (m_serverAddress.GetAddress(0), port)));
-        appOnOff = onoffFac.Create<Application> ();
-        appOnOff->SetStartTime(Seconds(10.0));
-        appOnOff->SetStopTime(Seconds(m_simulationTime));
-        (*i)->AddApplication (appOnOff);
-        cliLogin << ss.str() << " VIDEO" << std::endl;
-    } else if (app_code < 3) { // WWW
-        smart->SetApp ("WWW");
-        onoffFac.SetTypeId ("ns3::OnOffApplication");
-        onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
-        onoffFac.Set ("PacketSize", UintegerValue (429));
-        onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
-        onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0.04]"));
-        // P.S.: offTime + DataRate/PacketSize = next packet time
-        onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.128Mbps")));
-        port = 8080;
-        onoffFac.Set ("Remote", AddressValue (InetSocketAddress (m_serverAddress.GetAddress(0), port)));
-        appOnOff = onoffFac.Create<Application> ();
-        appOnOff->SetStartTime(Seconds(10.0));
-        appOnOff->SetStopTime(Seconds(m_simulationTime));
-        (*i)->AddApplication (appOnOff);
-        cliLogin << ss.str() << " WWW" << std::endl;
-    } else if (app_code < 4) { // NOTHING
-        smart->SetApp ("NOTHING");
-        cliLogin << ss.str() << " NOTHING" << std::endl;
-    } else NS_FATAL_ERROR ("UavNetwork .. application error");
+    #ifdef APP_CLI
+      // configure OnOff application para server
+      int app_code = app_rand->GetValue();
+      int port = 0;
+      ObjectFactory onoffFac;
+      Ptr<Application> appOnOff = 0;
+      if (app_code < 1) { // VOICE
+          smart->SetApp ("VOICE");
+          onoffFac.SetTypeId ("ns3::OnOffApplication");
+          onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+          onoffFac.Set ("PacketSize", UintegerValue (50));
+          onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
+          onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0]"));
+          // P.S.: offTime + DataRate/PacketSize = next packet time
+          onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.024Mbps")));
+          port = 5060;
+          onoffFac.Set ("Remote", AddressValue (InetSocketAddress (m_serverAddress.GetAddress(0), port)));
+          appOnOff = onoffFac.Create<Application> ();
+          appOnOff->SetStartTime(Seconds(10.0));
+          appOnOff->SetStopTime(Seconds(m_simulationTime));
+          (*i)->AddApplication (appOnOff);
+          cliLogin << ss.str() << " VOICE" << std::endl;
+      } else if (app_code < 2) { // VIDEO
+          smart->SetApp ("VIDEO");
+          onoffFac.SetTypeId ("ns3::OnOffApplication");
+          onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+          onoffFac.Set ("PacketSize", UintegerValue (429));
+          onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
+          onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0]"));
+          // P.S.: offTime + DataRate/PacketSize = next packet time
+          onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.128Mbps")));
+          port = 5070;
+          onoffFac.Set ("Remote", AddressValue (InetSocketAddress (m_serverAddress.GetAddress(0), port)));
+          appOnOff = onoffFac.Create<Application> ();
+          appOnOff->SetStartTime(Seconds(10.0));
+          appOnOff->SetStopTime(Seconds(m_simulationTime));
+          (*i)->AddApplication (appOnOff);
+          cliLogin << ss.str() << " VIDEO" << std::endl;
+      } else if (app_code < 3) { // WWW
+          smart->SetApp ("WWW");
+          onoffFac.SetTypeId ("ns3::OnOffApplication");
+          onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+          onoffFac.Set ("PacketSize", UintegerValue (429));
+          onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
+          onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0.04]"));
+          // P.S.: offTime + DataRate/PacketSize = next packet time
+          onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.128Mbps")));
+          port = 8080;
+          onoffFac.Set ("Remote", AddressValue (InetSocketAddress (m_serverAddress.GetAddress(0), port)));
+          appOnOff = onoffFac.Create<Application> ();
+          appOnOff->SetStartTime(Seconds(10.0));
+          appOnOff->SetStopTime(Seconds(m_simulationTime));
+          (*i)->AddApplication (appOnOff);
+          cliLogin << ss.str() << " WWW" << std::endl;
+      } else if (app_code < 4) { // NOTHING
+          smart->SetApp ("NOTHING");
+          cliLogin << ss.str() << " NOTHING" << std::endl;
+      } else NS_FATAL_ERROR ("UavNetwork .. application error");
+    #endif
   }
   cliLogin.close();
 
