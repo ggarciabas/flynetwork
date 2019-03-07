@@ -826,10 +826,13 @@ void ServerApplication::runAgendamento(void)
   std::ostringstream osloc, osuav, os;
 
   #ifdef COMPARE_COST
-    std::ofstream file_uav, file_ule, file_l, file_c1, file_c2, file_c3, file_c4;
+    std::ofstream file_uav, file_ule, file_l, file_c1, file_c2, file_c3, file_c4,file_uce;
     os.str("");
     os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/compare/"<<int(Simulator::Now().GetSeconds())<<"/uav_loc_energy_info.txt";
     file_ule.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
+    os.str("");
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/compare/"<<int(Simulator::Now().GetSeconds())<<"/uav_central_energy_info.txt";
+    file_uce.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
     os.str("");
     os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/compare/"<<int(Simulator::Now().GetSeconds())<<"/uav_info.txt";
     file_uav.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
@@ -851,13 +854,14 @@ void ServerApplication::runAgendamento(void)
     file_c2 << m_uavContainer.GetN() << "\n";
     file_c3 << "compare_c3\n";
     file_c3 << m_uavContainer.GetN() << "\n";
-    file_c3 << "compare_c4\n";
+    file_c4 << "compare_c4\n";
     file_c4 << m_uavContainer.GetN() << "\n";
     for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
        u_i != m_uavContainer.End(); ++u_i, ++count)
     {
       std::vector<double> vp = (*u_i)->GetPosition();
       file_uav << vp.at(0) << "," << vp.at(1) << "," << (*u_i)->GetTotalEnergy() << "," << (*u_i)->GetTotalBattery() << "\n";
+      file_uce << (*u_i)->CalculateEnergyCost(CalculateDistance((*u_i)->GetPosition(), central_pos)) << "\n";
       for (LocationModelContainer::Iterator l_j = m_locationContainer.Begin();
          l_j != m_locationContainer.End(); ++l_j)
       {
@@ -883,6 +887,7 @@ void ServerApplication::runAgendamento(void)
       file_c3 << "\n";
       file_c4 << "\n";
     }
+    file_uce.close();
     file_ule.close();
     file_uav.close();
     file_c1.close();
