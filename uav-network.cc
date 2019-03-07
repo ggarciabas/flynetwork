@@ -41,7 +41,7 @@
 #include <cstdlib>
 #include <string>
 
-#define ETAPA 120
+#define ETAPA 60
 
 // permite os clientes enviarem aplicacoes para o servidor
 // #define APP_CLI

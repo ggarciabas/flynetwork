@@ -25,7 +25,7 @@
 #include "uav-device-energy-model.h"
 #include "client-device-energy-model.h"
 
-#define ETAPA 120
+#define ETAPA 60
 
 namespace ns3
 {
