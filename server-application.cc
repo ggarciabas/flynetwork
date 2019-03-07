@@ -347,6 +347,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [DATA] --- fora da rede?! ID " << results.at(1));
           }
         } else if (results.at(0).compare("DEPLETION") == 0)  {
+           NS_LOG_DEBUG("SERVER - received DEPLETION  from UAV " << results.at(1));
             Ptr<UavModel> uav = m_uavContainer.FindUavModel(std::stoi(results.at(1), &sz));
             if (uav != NULL) {
               Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
@@ -826,7 +827,10 @@ void ServerApplication::runAgendamento(void)
   std::ostringstream osloc, osuav, os;
 
   #ifdef COMPARE_COST
-    std::ofstream file_uav, file_ule, file_l, file_c1, file_c2, file_c3, file_c4,file_uce;
+    std::ofstream file_uav, file_ule, file_l, file_c1, file_c2, file_c3, file_c4, file_uce, file_ult;
+    os.str("");
+    os << "./scratch/flynetwork/data/output/" << m_pathData << "/compare/"<<int(Simulator::Now().GetSeconds())<<"/uav_loc_travel_info.txt";
+    file_ult.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
     os.str("");
     os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/compare/"<<int(Simulator::Now().GetSeconds())<<"/uav_loc_energy_info.txt";
     file_ule.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
@@ -865,6 +869,7 @@ void ServerApplication::runAgendamento(void)
       for (LocationModelContainer::Iterator l_j = m_locationContainer.Begin();
          l_j != m_locationContainer.End(); ++l_j)
       {
+        file_ult << CalculateDistance((*u_i)->GetPosition(), (*l_j)->GetPosition()) / 5.0 << ","; // 5m/s
         file_ule << (*u_i)->CalculateEnergyCost(CalculateDistance((*u_i)->GetPosition(), (*l_j)->GetPosition())) << ",";
         // custo
         long double b_ui_atu = (*u_i)->GetTotalEnergy(); // bateria atual
@@ -875,17 +880,18 @@ void ServerApplication::runAgendamento(void)
         long double ce_te_lj = (*l_j)->GetTotalConsumption() * m_scheduleServer;
         long double P_te = b_ui_res/ce_te_lj;
         file_c1 << (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot << ","; 
-        file_c2 << ((1-P_te < 0.0) ? (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot : 1-P_te) << ",";
-        file_c3 << ((1 - P_te < 0.0) ? 0.0 : (1 - P_te + ((ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot))/2.0) << ",";
+        file_c2 << 1.0/P_te << ","; // invertendo para minimizar
+        file_c3 << (1.0/P_te + ((ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot))/2.0 << ",";
         double ce_te = (*l_j)->GetTotalConsumption()*m_scheduleServer + (*u_i)->GetHoverCost()*m_scheduleServer ; // custo para o TE inteiro, considerando locs e hover
         P_te = b_ui_res/ce_te;
-        file_c4 << ((1-P_te < 0.0) ? (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot : 1-P_te) << ",";
+        file_c4 << 1.0/P_te << ","; // invertendo para minimizar
       }
       file_ule << "\n";
       file_c1 << "\n";
       file_c2 << "\n";
       file_c3 << "\n";
       file_c4 << "\n";
+      file_ult << "\n";
     }
     file_uce.close();
     file_ule.close();
@@ -894,6 +900,7 @@ void ServerApplication::runAgendamento(void)
     file_c2.close();
     file_c3.close();
     file_c4.close();
+    file_ult.close();
     os.str("");
     os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/compare/"<<int(Simulator::Now().GetSeconds())<<"/loc_info.txt";
     file_l.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
@@ -1208,33 +1215,16 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
       case 1:
         custo = (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot; // media do custo
         break;
-      // case 2:
-      //   custo = 1 - P_te;
-      //   if (custo < 0.0) {
-      //     custo = 0.0; // aleatorio ou sequencia! Nao interssa.
-      //   }
-      //   break;
       case 2:
-        custo = 1-P_te;
-        if (custo < 0.0) {
-          custo = (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot;
-        }
+        custo = 1.0/P_te;
         break;
       case 3:
-        custo = 1 - P_te;
-        if (custo < 0.0) {
-          custo = 0.0;
-        }
-        custo += (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot;
-        custo /= 2.0;
+        custo = (1.0/P_te + (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot) / 2.0;
         break;
       case 4: // custo 2 -> com hover
         double ce_te = loc->GetTotalConsumption()*m_scheduleServer + uav->GetHoverCost()*m_scheduleServer ; // custo para o TE inteiro, considerando locs e hover
         P_te = b_ui_res/ce_te;
-        custo = 1 - P_te;
-        if (custo < 0.0) { 
-          custo = (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot; // caso tenha bateria suficiente para o TE, considera por distancia
-        }
+        custo = 1.0/P_te;
         break;
     }
   }
