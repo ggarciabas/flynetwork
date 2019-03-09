@@ -140,6 +140,7 @@ private:
   double m_rho;
   uint32_t m_environment;
   uint16_t m_serverPort;
+  uint32_t m_step; 
   uint16_t m_cliPort;
   uint32_t m_custo;
   double m_maxx, m_maxy;
@@ -148,7 +149,7 @@ private:
   Ipv4Address m_address;
 
   TracedCallback<int, int> m_newUav;
-  TracedCallback<int> m_removeUav;
+  TracedCallback<int, int> m_removeUav;
   TracedCallback<int> m_printUavEnergy;
   TracedCallback<string> m_clientPosition;
   TracedCallback<std::string> m_packetTrace;

@@ -499,7 +499,7 @@ void UavNetwork::NewUav(int total, int update)
   NS_LOG_DEBUG("Id " << m_uavNodeActive.Get(m_uavNodeActive.GetN()-1)->GetId() << " REF " << m_uavNodeActive.Get(m_uavNodeActive.GetN()-1)->GetReferenceCount() << " ------------");
 }
 
-void UavNetwork::RemoveUav(int id)
+void UavNetwork::RemoveUav(int id, int step)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<id);
   NS_LOG_DEBUG ("UavNetwork::RemoveUav [" << id << "]");
@@ -533,7 +533,7 @@ void UavNetwork::RemoveUav(int id)
   m_file.close();
 
   os.str("");
-  os << "./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << int(Simulator::Now().GetSeconds()) << "/uav_removed_energy.txt";
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << step << "/uav_removed_energy.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   Ptr<UavDeviceEnergyModel> dev = n->GetObject<UavDeviceEnergyModel>();
   m_file << dev->GetEnergySource()->GetRemainingEnergy() / dev->GetEnergySource()->GetInitialEnergy() << std::endl;
