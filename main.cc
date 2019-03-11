@@ -54,10 +54,10 @@ int main (int argc, char *argv[])
 	cmd.AddValue ("Custo", "Metrica de análise do DA de Posicionamento", custo);
   cmd.Parse (argc, argv);
 
-	LogComponentEnable("UavNetwork", LOG_DEBUG);
-	LogComponentEnable("ServerApplication", LOG_DEBUG);
+	// LogComponentEnable("UavNetwork", LOG_DEBUG);
+	// LogComponentEnable("ServerApplication", LOG_DEBUG);
 	// LogComponentEnable("LocationModel", LOG_DEBUG);
-	LogComponentEnable("UavApplication", LOG_DEBUG);
+	// LogComponentEnable("UavApplication", LOG_DEBUG);
 	// LogComponentEnable("SmartphoneApplication", LOG_DEBUG);
 	// LogComponentEnable("DhcpClient", LOG_DEBUG);
 
@@ -75,10 +75,10 @@ int main (int argc, char *argv[])
 	// LogComponentEnable("UavDeviceEnergyModelHelper", LOG_FUNCTION);
 	// LogComponentEnable("UavDeviceEnergyModel", LOG_FUNCTION);
 	// LogComponentEnable("UavEnergySourceHelper", LOG_FUNCTION);
-	LogComponentEnable("UavEnergySource", LOG_DEBUG);
-	LogComponentEnable("UavMobilityModel", LOG_DEBUG);
+	// LogComponentEnable("UavEnergySource", LOG_DEBUG);
+	// LogComponentEnable("UavMobilityModel", LOG_DEBUG);
 	// LogComponentEnable("UavModelContainer", LOG_FUNCTION);
-	LogComponentEnable("UavModel", LOG_DEBUG);
+	// LogComponentEnable("UavModel", LOG_DEBUG);
 	// LogComponentEnable("UavNetwork", LOG_FUNCTION);
 	// LogComponentEnable("UavNodeContainer", LOG_FUNCTION);
 
