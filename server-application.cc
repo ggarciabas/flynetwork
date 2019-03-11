@@ -28,7 +28,7 @@
 #include <fstream>
 #include <string>
 
-#define ETAPA 60
+#define ETAPA 300
 
 #define COMPARE_COST
 
