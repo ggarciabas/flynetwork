@@ -101,14 +101,14 @@ UavApplication::UavApplication()
   m_running = false;
   m_meanConsumption = 0.0;
   m_goto.push_back(0.0); // inicializando para nao ocorrer conflito
-  m_goto.push_back(0.0);  
+  m_goto.push_back(0.0);
+  m_central.push_back(0.0); // inicializando para nao ocorrer conflito
+  m_central.push_back(0.0);
   m_depletion = false;
 }
 
 void UavApplication::Reset () {
   m_depletion = false;
-  m_goto.push_back(0.0); // inicializando para nao ocorrer conflito
-  m_goto.push_back(0.0); 
 }
 
 UavApplication::~UavApplication()

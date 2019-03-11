@@ -255,6 +255,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
       }
       else
       {
+        NS_LOG_DEBUG ("SERVER --- nao encontrou UAV no container central, procurando no container padrao -> @" << Simulator::Now().GetSeconds());
         uav = m_uavContainer.FindUavModel(std::stoi(results.at(4), &sz));
         if (uav != NULL)
         {
@@ -270,7 +271,6 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
       }
       uav = 0;      
     } else {
-      NS_LOG_DEBUG ("SERVER --- nao encontrou UAV no container central, procurando no container padrao -> @" << Simulator::Now().GetSeconds());
       Ptr<UavModel> uav = m_uavContainer.FindUavModel(std::stoi(results.at(4), &sz));
       if (uav != NULL)
       {
@@ -315,7 +315,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             }
             uav = 0;
       } else if (results.at(0).compare("DATA") == 0) {
-          NS_LOG_INFO("ServerApplication::TracedCallbackRxApp " << s << " @" << Simulator::Now().GetSeconds());
+          // NS_LOG_INFO("ServerApplication::TracedCallbackRxApp " << s << " @" << Simulator::Now().GetSeconds());
           Ptr<UavModel> uav = m_uavContainer.FindUavModel(std::stoi(results.at(1), &sz));
           if (uav != NULL)
           {
@@ -347,7 +347,6 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
                 m_clientContainer.Add(cli);
                 pos.clear();
               }
-              NS_LOG_DEBUG ("ServerApplication::TracedCallbackRxApp \n" << cli->ToString());
             }
             // repply to UAV
             ReplyAskCliData (uav);
@@ -1204,7 +1203,7 @@ std::vector<int> ServerApplication::DaPositioning (std::vector<std::vector<long 
 long double
 ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, vector<double> central_pos)
 {
-  NS_LOG_DEBUG ("ServerApplication::CalculateCusto > uavId: " << uav->GetId() << " locId: " << loc->GetId());
+  // NS_LOG_DEBUG ("ServerApplication::CalculateCusto > uavId: " << uav->GetId() << " locId: " << loc->GetId());
   long double custo = 1.0;
   long double b_ui_atu = uav->GetTotalEnergy(); // bateria atual
   long double ce_ui_la_lj = uav->CalculateEnergyCost(CalculateDistance(uav->GetPosition(), loc->GetPosition())); // custo energetico

@@ -280,6 +280,8 @@ void UavDeviceEnergyModel::CourseChange (Ptr<const MobilityModel> mob)
   // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   Vector actual = m_node->GetObject<MobilityModel>()->GetPosition();
   double distance = std::sqrt(std::pow(m_lastPosition.x - actual.x, 2) + std::pow(m_lastPosition.y - actual.y, 2));
+  m_lastPosition.x = actual.x;
+  m_lastPosition.y = actual.y;
   NS_ASSERT(distance >= 0);
   // energy to decrease = energy cost * distance from last position to the actual
   double energyToDecrease = m_energyCost * distance;
