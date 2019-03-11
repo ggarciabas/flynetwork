@@ -170,17 +170,18 @@ void UavDeviceEnergyModel::HandleEnergyChanged(void)
 void UavDeviceEnergyModel::HandleEnergyDepletion(void)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
- Vector actual = m_node->GetObject<MobilityModel>()->GetPosition();
- double distance = std::sqrt(std::pow(m_xCentral - actual.x, 2) + std::pow(m_yCentral - actual.y, 2));
- NS_ASSERT(distance >= 0);
- // energy to decrease = energy cost * distance from last position to the actual
- double energy = m_energyCost * distance;
- std::ostringstream os;
- os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_depletion/uav_depletion_" << m_node->GetId() << ".txt";
- m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
- m_file << Simulator::Now().GetSeconds() << "," << m_source->GetRemainingEnergy() - energy << std::endl;
- m_file.close();
- m_energyDepletionCallback(); // avisa a aplicação, helper quem configura!
+  Vector actual = m_node->GetObject<MobilityModel>()->GetPosition();
+  double distance = std::sqrt(std::pow(m_xCentral - actual.x, 2) + std::pow(m_yCentral - actual.y, 2));
+  NS_ASSERT(distance >= 0);
+  // energy to decrease = energy cost * distance from last position to the actual
+  double energy = m_energyCost * distance;
+  std::ostringstream os;
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_depletion/uav_depletion_" << m_node->GetId() << ".txt";
+  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  m_file << Simulator::Now().GetSeconds() << "," << m_source->GetRemainingEnergy() - energy << std::endl;
+  m_file.close();
+  NS_LOG_DEBUG("UavDeviceEnergyModel::HandleEnergyDepletion @" << Simulator::Now().GetSeconds());
+  m_energyDepletionCallback(); // avisa a aplicação, helper quem configura!
 }
 
 void UavDeviceEnergyModel::SetEnergyUpdateInterval(Time interval)

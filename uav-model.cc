@@ -75,6 +75,7 @@ UavModel::UavModel() : m_position()
   // NS_LOG_DEBUG ("UavModel::UavModel @" << Simulator::Now().GetSeconds());
   m_confirmed = true; // para que nao de erro na primera execucao
   m_clientData = true; // para que nao de erro na primeira execucao
+  m_depletion = false;
 }
 
 UavModel::~UavModel()
@@ -97,18 +98,12 @@ UavModel::CancelSendPositionEvent()
   Simulator::Remove(m_sendPosition);
 }
 
-void
-UavModel::SetSendCentralEvent (EventId id)
-{
-  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds());
-  m_sendCentral = id;
+void UavModel::SetDepletion (bool t) {
+  m_depletion = t;
 }
 
-void
-UavModel::CancelSendCentralEvent()
-{
-  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  Simulator::Remove(m_sendCentral);
+bool UavModel::IsDepletion () {
+  return m_depletion;
 }
 
 void UavModel::SetAskCliDataEvent (EventId id)

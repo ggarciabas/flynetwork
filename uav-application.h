@@ -62,6 +62,8 @@ public:
   void EnergyDepletionCallback();
   void EnergyRechargedCallback();
 
+  void Reset();
+
   void CourseChange (Ptr<const MobilityModel>);
 
   void TracedCallbackRxApp (Ptr<const Packet> packet, const Address & address);
@@ -83,7 +85,6 @@ private:
   double CalculateDistance(const std::vector<double> pos1, const std::vector<double> pos2);
 
   void ReplyServer ();
-  void ReplyServerCentral ();
 
   // void ScheduleTx(void);
   void SendPacket(void);
@@ -94,6 +95,7 @@ private:
   uint16_t m_serverPort;
   uint16_t m_cliPort;
   std::vector<double> m_goto;
+  std::vector<double> m_central;
   double m_meanConsumption; // consumo medio do UAV
   Ipv4Address m_addressAdhoc;
   double m_updateTime;
@@ -108,6 +110,8 @@ private:
   TracedCallback<std::string> m_packetTrace;
   Callback<void> m_setOffWifiPhyInfra; // turn off wifiphy
   Callback<void> m_setOffWifiPhyAdhoc; // turn off wifiphy
+
+  bool m_depletion;// para identificar estado de emergencia
 
   ClientModelContainer m_client;
 

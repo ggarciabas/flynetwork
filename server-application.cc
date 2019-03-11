@@ -203,8 +203,8 @@ void ServerApplication::AddSupplyUav(uint32_t id, Ipv4Address addrAdhoc, double 
   p.push_back(pos.y);
   supplied->SetNewPosition(p);
   supplied->NotConfirmed();
-  supplied->CancelSendCentralEvent();
-  supplied->SetSendCentralEvent(Simulator::ScheduleNow(&ServerApplication::SendCentralPacket, this, supplied));
+  supplied->CancelSendPositionEvent();
+  supplied->SetSendPositionEvent(Simulator::ScheduleNow(&ServerApplication::SendUavPacket, this, supplied));
 
   m_uavGoToCentral.Add(supplied);
   supplied = 0;
@@ -243,10 +243,8 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
 
     std::ostringstream mm;
     mm << "SERVER\t-1\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tUAV";
-    //m_packetTrace(mm.str());
-    ////NS_LOG_DEBUG("MSG UAV: " << s);
     pos.push_back(std::stod(results.at(3), &sz)); // UAV tem posição 3D
-    if (CalculateDistanceCentral(pos)<0.05) { // caso o UAV esteja na central, desligar!
+    if (CalculateDistanceCentral(pos)==0.0) { // caso o UAV esteja na central, desligar!
       Ptr<UavModel> uav = m_uavGoToCentral.FindUavModel(std::stoi(results.at(4), &sz));
       if (uav != NULL)
       {
@@ -257,10 +255,22 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
       }
       else
       {
-        NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV que foi pra central [UAV] ID " << results.at(4));
+        uav = m_uavContainer.FindUavModel(std::stoi(results.at(4), &sz));
+        if (uav != NULL)
+        {
+          NS_LOG_DEBUG("SERVER received UAV pos na central @"<< Simulator::Now().GetSeconds() <<"  --- Removendo nó [" << uav->GetId() << "]");
+          m_removeUav(uav->GetId(), (int)m_step); // desligando todas as informacoes do nó
+          uav->Dispose(); // parando eventos do UavModel
+          m_uavContainer.RemoveUav(uav);
+        }
+        else
+        {
+          NS_LOG_DEBUG("SERVER - $$$$ [NÃO -- m_uavContainer] foi possivel encontrar o UAV que foi pra central [UAV] ID " << results.at(4));
+        }
       }
-      uav = 0;
+      uav = 0;      
     } else {
+      NS_LOG_DEBUG ("SERVER --- nao encontrou UAV no container central, procurando no container padrao -> @" << Simulator::Now().GetSeconds());
       Ptr<UavModel> uav = m_uavContainer.FindUavModel(std::stoi(results.at(4), &sz));
       if (uav != NULL)
       {
@@ -292,21 +302,19 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
               uav->CancelSendPositionEvent(); // recebida confirmacao do UAV              
             } else
             {
-              NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [UAVRECEIVED] --- fora da rede?! ID " << results.at(1));
-            }
-            uav = 0;
-      } else if (results.at(0).compare("CENTRALOK") == 0)  {
-              Ptr<UavModel> uav = m_uavGoToCentral.FindUavModel(std::stoi(results.at(1), &sz));
+              NS_LOG_DEBUG("SERVER - nao foi possivel encontrar o UAV [UAVRECEIVED no container padrao] ID " << results.at(1));
+              uav = m_uavGoToCentral.FindUavModel(std::stoi(results.at(1), &sz));
               if (uav != NULL)
               {
-                uav->CancelSendCentralEvent(); // recebida confirmacao do UAV
-                NS_LOG_DEBUG("SERVER - CENTRALOK ::: UAV going to central @" << Simulator::Now().GetSeconds());
+                NS_LOG_DEBUG("SERVER - UAVRECEIVED ::: UAV #" << uav->GetId() << " @" << Simulator::Now().GetSeconds());
+                uav->CancelSendPositionEvent(); // recebida confirmacao do UAV              
               } else
               {
-                NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [CENTRALOK] ID " << results.at(1));
+                NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV fora da rede?! ID " << results.at(1));
               }
-              uav = 0;
-        }  else if (results.at(0).compare("DATA") == 0) {
+            }
+            uav = 0;
+      } else if (results.at(0).compare("DATA") == 0) {
           NS_LOG_INFO("ServerApplication::TracedCallbackRxApp " << s << " @" << Simulator::Now().GetSeconds());
           Ptr<UavModel> uav = m_uavContainer.FindUavModel(std::stoi(results.at(1), &sz));
           if (uav != NULL)
@@ -350,28 +358,26 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
         } else if (results.at(0).compare("DEPLETION") == 0)  {
            NS_LOG_DEBUG("SERVER - received DEPLETION  from UAV " << results.at(1));
             Ptr<UavModel> uav = m_uavContainer.FindUavModel(std::stoi(results.at(1), &sz));
-            if (uav != NULL) {
-              Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
-              vector<double> p;
-              p.push_back(pos.x);
-              p.push_back(pos.y);
-              uav->SetNewPosition(p); // pegar posicao do servidor, ele é a central!
+            if (uav != NULL) {              
               uav->CancelSendPositionEvent();
-              uav->CancelSendCentralEvent();
-              uav->SetSendCentralEvent(Simulator::ScheduleNow(&ServerApplication::SendCentralPacket, this, uav));
-              p.clear();
+              uav->SetDepletion(true); // somente espera enviar informacao quando chegar na central, ao chegar na central o UAv é sempre desligado
+              ReplyDepletion(uav);
+              m_uavGoToCentral.Add(uav);
+              m_uavContainer.RemoveUav(uav);
               uav = 0;
               // solicitar novo UAV para a rede!
               m_newUav(1, 2); // solicita novo UAV
               // atualizar o posicionamento do Uav na última posicao do vetor, mandando ele para a localização do UAV que esta saindo
               uav = m_uavContainer.GetLast();
+              std::vector<double> p;
               p.push_back(std::stod (results.at(2),&sz));
               p.push_back(std::stod (results.at(3),&sz));
-              p.push_back(std::stod(results.at(4), &sz)); // UAV tem posição 3D
-              uav->SetNewPosition(p); // pegar posicao do servidor, ele é a central!
+              p.push_back(std::stod (results.at(4), &sz)); // UAV tem posição 3D
+              uav->SetNewPosition(p); 
               uav->CancelSendPositionEvent();
               uav->NotConfirmed();
               uav->SetSendPositionEvent(Simulator::ScheduleNow(&ServerApplication::SendUavPacket, this, uav));
+              uav = 0;
             } else {
               NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [DEPLETION] --- fora da rede?! ID " << results.at(1));
             }
@@ -404,6 +410,21 @@ void ServerApplication::ReplyAskCliData(Ptr<UavModel> uav)
     //m_packetTrace(msg.str());
     ////NS_LOG_DEBUG (msg.str());
   }
+}
+
+void ServerApplication::ReplyDepletion(Ptr<UavModel> uav)
+{
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << uav->GetId());
+  std::ostringstream msg;
+  msg << "DEPLETIONOK "<< '\0';
+  uint16_t packetSize = msg.str().length() + 1;
+  Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
+  if (uav->GetSocket()->Send(packet, 0) == packetSize) {
+    msg.str("");
+    msg << "SERVER\tSENT\t@" << Simulator::Now().GetSeconds() << "\tDEPLETIONOK";
+    //m_packetTrace(msg.str());
+  }
+  NS_LOG_DEBUG (msg.str());
 }
 
 void ServerApplication::ReplyUav(Ptr<UavModel> uav)
@@ -489,21 +510,22 @@ void ServerApplication::ValidateUavPosition()
 
   }
   if (flag) {
-    ////NS_LOG_DEBUG ("SERVER - todos os UAVs estao na posicao desejada @" << Simulator::Now().GetSeconds());
+    NS_LOG_DEBUG ("SERVER - todos os UAVs estao na posicao desejada @" << Simulator::Now().GetSeconds());
     Run();
   } else {
-    ////NS_LOG_DEBUG ("Server - [" << Simulator::Now().GetSeconds() << "] $$ [NÃO] estao prontos @" << Simulator::Now().GetSeconds());
+    NS_LOG_DEBUG ("Server - [" << Simulator::Now().GetSeconds() << "] $$ UAVs [NÃO] estao prontos @" << Simulator::Now().GetSeconds());
     Simulator::Schedule(Seconds(1.00), &ServerApplication::ValidateUavPosition, this);
   }
 }
 
 void ServerApplication::Run ()
 {
-  //NS_LOG_DEBUG("ServerApplication::Run @" << Simulator::Now().GetSeconds());
+  Simulator::Remove(m_serverEvent);
+  NS_LOG_DEBUG("ServerApplication::Run @" << Simulator::Now().GetSeconds());
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   if (!m_clientContainer.IsEmpty() || !m_fixedClientContainer.IsEmpty())
   {
-    ////NS_LOG_DEBUG("SERVER - Iniciando execução dos DAs @" << Simulator::Now().GetSeconds());
+    NS_LOG_DEBUG("\tSERVER - Iniciando execução dos DAs @" << Simulator::Now().GetSeconds());
     std::ostringstream ss;
     ss << "mkdir -p ./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/" << m_step << "/mij";
     system(ss.str().c_str());
@@ -537,42 +559,16 @@ void ServerApplication::Run ()
   m_serverEvent = Simulator::Schedule(Seconds(m_scheduleServer-1.0), &ServerApplication::AskClientData, this);
 }
 
-void ServerApplication::SendCentralPacket(Ptr<UavModel> uav)
-{
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << uav->GetId());
-  ////NS_LOG_DEBUG ("ServerApplication::SendCentralPacket @" << Simulator::Now().GetSeconds() << " Id: " << uav->GetId());
-  uav->CancelSendCentralEvent();
-  NS_ASSERT(uav != 0);
-  std::vector<double> pos = uav->GetNewPosition();
-  std::ostringstream msg;
-  msg << "GOTOCENTRAL " << pos.at(0) << " " << pos.at(1) << " 10.0" << '\0';
-  uint16_t packetSize = msg.str().length() + 1;
-  Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
-  if (uav->GetSocket()->Send(packet, 0) == packetSize) {
-    NS_LOG_INFO ("SERVER - UAV [" << Simulator::Now().GetSeconds() << "] ::: enviando informacoes da CENTRAL para o UAV #" << uav->GetId());
-    msg.str("");
-    msg << "SERVER\t-1\tSENT\t" << Simulator::Now().GetSeconds() << "\tUAV";
-    //m_packetTrace(msg.str());
-  } else {
-    NS_FATAL_ERROR("SERVER - $$$$ [NÃO] conseguiu enviar informacoes da CENTRAL para o UAV.");
-    uav->SetSendCentralEvent(Simulator::Schedule(Seconds(0.01), &ServerApplication::SendCentralPacket, this, uav));
-    pos.clear();
-    return;
-  }
-  uav->SetSendCentralEvent(Simulator::Schedule(Seconds(5.0), &ServerApplication::SendCentralPacket, this, uav));
-  NS_LOG_INFO (" ------------ SendCentralPacket end @" << Simulator::Now().GetSeconds());
-  pos.clear();
-}
-
 void ServerApplication::SendUavPacket(Ptr<UavModel> uav)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << uav->GetId());
   ////NS_LOG_DEBUG("ServerApplication::SendUavPacket UAV Id "  << uav->GetId() << " @" << Simulator::Now().GetSeconds() << " REF " << uav->GetReferenceCount());
   uav->CancelSendPositionEvent();
   NS_ASSERT(uav != 0);
+  Vector posCentral = GetNode()->GetObject<MobilityModel>()->GetPosition();
   std::vector<double> pos = uav->GetNewPosition();
   std::ostringstream msg;
-  msg << "GOTO " << pos.at(0) << " " << pos.at(1) << " 10.0" << '\0';
+  msg << "GOTO " << pos.at(0) << " " << pos.at(1) << " 10.0 " << posCentral.x << " " << posCentral.y << '\0';
   uint16_t packetSize = msg.str().length() + 1;
   Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
   if (uav->GetSocket()->Send(packet, 0) == packetSize) {
@@ -971,7 +967,7 @@ void ServerApplication::runAgendamento(void)
     (*u_i)->NotConfirmed(); // atualiza o valor para identificar se o UAV chegou a posicao correta
     (*u_i)->CancelSendPositionEvent();
     if (CalculateDistanceCentral(m_locationContainer.Get(id)->GetPosition())==0.0) {
-      (*u_i)->SetSendCentralEvent(Simulator::Schedule(Seconds(t), &ServerApplication::SendCentralPacket, this, (*u_i)));
+      (*u_i)->SetSendPositionEvent(Simulator::Schedule(Seconds(t), &ServerApplication::SendUavPacket, this, (*u_i)));
       m_uavGoToCentral.Add((*u_i));
       m_uavContainer.RemoveUav((*u_i));
       --u_i;
@@ -1045,7 +1041,7 @@ std::vector<int> ServerApplication::DaPositioning (std::vector<std::vector<long 
 
   while (temp >= 1e-3)
   {
-    std::cout << "---------------------------- temp: " << temp << std::endl;
+    // std::cout << "---------------------------- temp: " << temp << std::endl;
 
     for (i = 0; i < N; ++i)
     {   

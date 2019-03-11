@@ -102,6 +102,13 @@ UavApplication::UavApplication()
   m_meanConsumption = 0.0;
   m_goto.push_back(0.0); // inicializando para nao ocorrer conflito
   m_goto.push_back(0.0);  
+  m_depletion = false;
+}
+
+void UavApplication::Reset () {
+  m_depletion = false;
+  m_goto.push_back(0.0); // inicializando para nao ocorrer conflito
+  m_goto.push_back(0.0); 
 }
 
 UavApplication::~UavApplication()
@@ -183,6 +190,10 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   NS_LOG_DEBUG("UAV #" << m_id << " chegou ao seu posicionamento final.");
   SendPacket();
 
+  if (m_depletion) {
+    return; // nao fazer topicos abaixo em estado de emergencia
+  }
+
   Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
   double energy = dev->ChangeThreshold(); // atualiza valor minimo para retorno na bateria
   std::ostringstream os;
@@ -237,13 +248,22 @@ void
 UavApplication::EnergyDepletionCallback()
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  NS_LOG_INFO("---->>> EnergyDepletionCallback - ASK SAFE POSITION");
+  NS_LOG_DEBUG("---->>> EnergyDepletionCallback - ASK SAFE POSITION");
+  m_depletion = true;
   // avisar central e mudar posição para central!
   m_packetDepletion = Simulator::ScheduleNow(&UavApplication::SendPacketDepletion, this);
+
+  // Ir para central
+  Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
+  dev->StopHover();
+  GetNode()->GetObject<MobilityModel>()->SetPosition(Vector(m_central.at(0), m_central.at(1), 1.0)); // Verficar necessidade de subir em no eixo Z
 }
 
+/*
+  Pacote para envio de informacao de onde o UAV estava afim de se repor aquela localizacao, o UAV será redirecionado para a central pois este só tem bateria para voltar!
+*/
 void UavApplication::SendPacketDepletion(void)
-{ // TODO:  Guardar historico do UAV
+{
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   m_packetDepletion.Cancel();
   std::ostringstream msg;
@@ -256,7 +276,7 @@ void UavApplication::SendPacketDepletion(void)
     msg.str("");
     msg << "UAV\t" << m_id << "\tSENT DEPLETION\t" << Simulator::Now().GetSeconds() << "\tSERVER";
     //m_packetTrace(msg.str());
-    NS_LOG_INFO("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - SERVER ::: SENT DEPLETION.");
+    NS_LOG_DEBUG ("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - SERVER ::: SENT DEPLETION.");
   }
   else
   {
@@ -264,7 +284,7 @@ void UavApplication::SendPacketDepletion(void)
     m_packetDepletion = Simulator::Schedule(Seconds(0.01), &UavApplication::SendPacketDepletion, this);
     return;
   }
-  m_packetDepletion = Simulator::Schedule(Seconds(0.5), &UavApplication::SendPacketDepletion, this);
+  m_packetDepletion = Simulator::Schedule(Seconds(0.05), &UavApplication::SendPacketDepletion, this);
 }
 
 void
@@ -287,6 +307,7 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
         NS_LOG_DEBUG("UAV #" << m_id << " recebeu DATAOK");
       } else if (results.at(0).compare("GOTO") == 0)
       {
+        if (m_depletion) return; // nao deixar executar acoes a nao ser voltar para a central em estado de emergencia        
         std::ostringstream mm;
         mm << "UAV\t" << m_id << "\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tGOTO";
         //m_packetTrace(mm.str());
@@ -294,6 +315,9 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
         double z = std::stod(results.at(3), &sz) - GetNode()->GetObject<MobilityModel>()->GetPosition().z;
         // repply to server
         ReplyServer();
+        // atualizar central
+        m_central[0] = std::stod(results.at(4), &sz); // x
+        m_central[1] = std::stod(results.at(5), &sz); // y
         // verificar se já não está na posicao
         vector<double> pa, pn;
         pn.push_back(std::stod(results.at(1), &sz));
@@ -316,34 +340,16 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
         } else {
           NS_LOG_DEBUG ("UAV recebeu pacote com mesmo comando de posicionamento @" << Simulator::Now().GetSeconds());
         }
-      } else if (results.at(0).compare("GOTOCENTRAL") == 0)
+      } else if (results.at(0).compare("DEPLETIONOK") == 0)
         {
           m_packetDepletion.Cancel();
           std::ostringstream mm;
-          mm << "UAV\t" << m_id << "\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tGOTOCENTRAL";
+          mm << "UAV\t" << m_id << "\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tDEPLETIONOK";
           //m_packetTrace(mm.str());
-          NS_LOG_DEBUG(mm.str() << " @" << Simulator::Now().GetSeconds());
-          double z = std::stod(results.at(3), &sz) - GetNode()->GetObject<MobilityModel>()->GetPosition().z;
-          // repply to server
-          ReplyServerCentral();
-          // mudar o posicionamento do UAV
-          vector<double> pa, pn;
-          pa.push_back(GetNode()->GetObject<MobilityModel>()->GetPosition().x);
-          pa.push_back(GetNode()->GetObject<MobilityModel>()->GetPosition().y);
-          pn.push_back(std::stod(results.at(1), &sz));
-          pn.push_back(std::stod(results.at(2), &sz));
-          GetNode()->GetObject<MobilityModel>();
-          if (CalculateDistance(pa, pn) != 0) {
-            // mudar o posicionamento do UAV
-            Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
-            dev->StopHover();
-            GetNode()->GetObject<MobilityModel>()->SetPosition(Vector(std::stod(results.at(1), &sz), std::stod(results.at(2), &sz), (z > 0) ? z : 0.0)); // Verficar necessidade de subir em no eixo Z
-          } else {
-            NS_LOG_DEBUG ("UAV " << m_id << " na posicao correta, atualizando servidor @" << Simulator::Now().GetSeconds());
-            SendPacket();
-          }
+          NS_LOG_DEBUG(mm.str() << " @" << Simulator::Now().GetSeconds());          
         } else if (results.at(0).compare("SERVERDATA") == 0)
           {
+            if (m_depletion) return; // estado de emergencia
             NS_LOG_DEBUG ("UAV " << m_id << " -- SERVERDATA @" << Simulator::Now().GetSeconds());
             SendCliData();
           }
@@ -358,30 +364,6 @@ UavApplication::CalculateDistance(const std::vector<double> pos1, const std::vec
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << pos1 << pos2);
   double dist = std::sqrt(std::pow(pos1.at(0) - pos2.at(0), 2) + std::pow(pos1.at(1) - pos2.at(1), 2));
   return dist; // euclidean
-}
-
-void
-UavApplication::ReplyServerCentral ()
-{ // confirma recebimento do posicionamento para o servidor
-  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  if (m_running) {
-    std::ostringstream m;
-    m << "CENTRALOK " << m_id << "\0";
-    uint16_t packetSize = m.str().length() + 1;
-    Ptr<Packet> packet = Create<Packet>((uint8_t *)m.str().c_str(), packetSize);
-    if (m_sendSck && m_sendSck->Send(packet) == packetSize)
-    {
-      m.str("");
-      m << "UAV\t" << m_id << "\tSENT\t" << Simulator::Now().GetSeconds() << "\tCENTRALOK";
-      //m_packetTrace(m.str());
-      NS_LOG_INFO("UAV #" << m_id << " enviando CENTRALOK");
-    }
-    else
-    {
-      NS_LOG_ERROR("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " [NÃO] CENTRALOK");
-      Simulator::Schedule(Seconds(0.5), &UavApplication::ReplyServerCentral, this);
-    }
-  }
 }
 
 void
@@ -478,37 +460,25 @@ void UavApplication::SendCliData ()
 
 void UavApplication::SendPacket(void)
 {
+  Simulator::Remove(m_sendEvent);
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   std::ostringstream msg;
   Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
   msg << "UAV " << pos.x << " " << pos.y << " " << pos.z << " " << m_id << " " << GetNode()->GetObject<UavDeviceEnergyModel>()->GetEnergySource()->GetRemainingEnergy() << '\0';
   uint16_t packetSize = msg.str().length() + 1;
   Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
-
   if (m_sendSck->Send(packet) == packetSize)
   {
     msg.str("");
     msg << "UAV\t" << m_id << "\tSENT\t" << Simulator::Now().GetSeconds() << "\tSERVER";
     NS_LOG_DEBUG (msg.str() << " @" << Simulator::Now().GetSeconds());
-    //m_packetTrace(msg.str());
-    // NS_LOG_INFO("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - SERVER ::: posicionamento do UAV para o servidor.");
   }
   else
   {
     NS_LOG_ERROR("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " [NÃO] conseguiu enviar a mensagem para o servidor");
   }
-  // ScheduleTx();
-  // ficar enviando até receber confirmacao do servidor! TODO!
+  m_sendEvent = Simulator::Schedule(Seconds(0.5), &UavApplication::SendPacket, this);
 }
-
-// void UavApplication::ScheduleTx(void)
-// {
-//   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-//   if (m_running)
-//   {
-//     m_sendEvent = Simulator::Schedule(Seconds(m_updateTime), &UavApplication::SendPacket, this);
-//   }
-// }
 
 void UavApplication::DoDispose() {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );

@@ -102,14 +102,14 @@ UavDeviceEnergyModelHelper::DoInstall(Ptr<Node> node, Ptr<EnergySource> source) 
   // set energy source pointer
   // buscar o objeto UavApplication do nó
   Ptr<UavApplication> app = node->GetObject<UavApplication>();
-  if (m_depletionCallback.IsNull())
-  {
+  // if (m_depletionCallback.IsNull())
+  // {
     model->SetEnergyDepletionCallback(MakeCallback(&UavApplication::EnergyDepletionCallback, app));
-  }
-  else
-  {
-    model->SetEnergyDepletionCallback(m_depletionCallback);
-  }
+  // }
+  // else
+  // {
+  //   model->SetEnergyDepletionCallback(m_depletionCallback);
+  // }
 
   if (m_rechargedCallback.IsNull())
   {

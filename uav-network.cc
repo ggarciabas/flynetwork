@@ -472,6 +472,7 @@ void UavNetwork::NewUav(int total, int update)
     } while (uavApp == NULL && app >= 0);
     NS_ASSERT (uavApp != NULL);
     uavApp->Start(m_simulationTime);
+    uavApp->Reset(); // atualizando depletion=false e atualizando goto
 
     // Adicionando informacoes na aplicacao servidor!
     Ipv4Address addr = n->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();

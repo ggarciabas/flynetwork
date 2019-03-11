@@ -175,6 +175,7 @@ void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
   if (m_remainingEnergyJ < energyToDecrease)
   {
     m_remainingEnergyJ = 0; // energy never goes below 0
+    NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceClient energy bellow ZERO! @" << Simulator::Now().GetSeconds());
   }
   else
   {
@@ -183,6 +184,7 @@ void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
 
   if (!m_depleted && m_remainingEnergyJ <= m_lowBatteryTh * m_initialEnergyJ)
   {
+    NS_LOG_DEBUG("UavEnergySource::UpdateEnergySourceClient DEPLETION @" << Simulator::Now().GetSeconds());
     m_depleted = true;
     HandleEnergyDrainedEvent();
   }
@@ -208,6 +210,7 @@ void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
   if (m_remainingEnergyJ < energyToDecrease)
   {
     m_remainingEnergyJ = 0; // energy never goes below 0
+    NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceMove energy bellow ZERO! @" << Simulator::Now().GetSeconds());
   }
   else
   {
@@ -216,6 +219,7 @@ void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
 
   if (!m_depleted && m_remainingEnergyJ <= m_lowBatteryTh * m_initialEnergyJ)
   {
+    NS_LOG_DEBUG("UavEnergySource::UpdateEnergySourceMove DEPLETION @" << Simulator::Now().GetSeconds());
     m_depleted = true;
     HandleEnergyDrainedEvent();
   }
@@ -243,6 +247,7 @@ void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
   if (m_remainingEnergyJ < energyToDecrease)
   {
     m_remainingEnergyJ = 0; // energy never goes below 0
+    NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceHover energy bellow ZERO! @" << Simulator::Now().GetSeconds());
   }
   else
   {
@@ -251,6 +256,7 @@ void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
 
   if (!m_depleted && m_remainingEnergyJ <= m_lowBatteryTh * m_initialEnergyJ)
   {
+    NS_LOG_DEBUG("UavEnergySource::UpdateEnergySourceHover DEPLETION @" << Simulator::Now().GetSeconds());
     m_depleted = true;
     HandleEnergyDrainedEvent();
   }
