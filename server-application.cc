@@ -873,7 +873,8 @@ void ServerApplication::runAgendamento(void)
       for (LocationModelContainer::Iterator l_j = m_locationContainer.Begin();
          l_j != m_locationContainer.End(); ++l_j)
       {
-        file_ult << CalculateDistance((*u_i)->GetPosition(), (*l_j)->GetPosition()) / 5.0 << ","; // 5m/s
+        double t_loc = CalculateDistance((*u_i)->GetPosition(), (*l_j)->GetPosition()) / 5.0; // time to go to location
+        file_ult << t_loc << ","; // 5m/s
         file_ule << (*u_i)->CalculateEnergyCost(CalculateDistance((*u_i)->GetPosition(), (*l_j)->GetPosition())) << ",";
         // custo
         long double b_ui_atu = (*u_i)->GetTotalEnergy(); // bateria atual
@@ -881,14 +882,21 @@ void ServerApplication::runAgendamento(void)
         long double ce_ui_lj_lc = (*u_i)->CalculateEnergyCost(CalculateDistance((*l_j)->GetPosition(), central_pos));
         long double b_ui_tot = (*u_i)->GetTotalBattery();
         long double b_ui_res = b_ui_atu*0.98 - ce_ui_la_lj - ce_ui_lj_lc; // bateria residual
-        long double ce_te_lj = (*l_j)->GetTotalConsumption() * m_scheduleServer;
-        long double P_te = b_ui_res/ce_te_lj;
-        file_c1 << (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot << ","; 
-        file_c2 << 1.0/P_te << ","; // invertendo para minimizar
-        file_c3 << (1.0/P_te + ((ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot))/2.0 << ",";
-        double ce_te = (*l_j)->GetTotalConsumption()*m_scheduleServer + (*u_i)->GetHoverCost()*m_scheduleServer ; // custo para o TE inteiro, considerando locs e hover
-        P_te = b_ui_res/ce_te;
-        file_c4 << 1.0/P_te << ","; // invertendo para minimizar
+        if (b_ui_res > 0) {
+          file_c1 << (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot << ","; 
+          long double ce_te_lj = (*l_j)->GetTotalConsumption() * (m_scheduleServer-t_loc);
+          long double P_te = b_ui_res/ce_te_lj;
+          file_c2 << 1.0/P_te << ","; // invertendo para minimizar
+          P_te = b_ui_res/(ce_te_lj+(ce_ui_la_lj + ce_ui_lj_lc));
+          file_c3 << 1.0/P_te << ",";
+          P_te = b_ui_res/(ce_te_lj+(ce_ui_la_lj + ce_ui_lj_lc + (*u_i)->GetHoverCost()*(m_scheduleServer-t_loc)));
+          file_c4 << 1.0/P_te << ","; // invertendo para minimizar
+        } else {
+          file_c1 << "'1.0,";
+          file_c2 << "'1.0,";
+          file_c3 << "'1.0,";
+          file_c4 << "'1.0,";
+        }
       }
       file_ule << "\n";
       file_c1 << "\n";
@@ -1231,6 +1239,8 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
         custo = 1.0/P_te;
         break;
     }
+  } else {
+    custo = 1.0;
   }
 
   ////NS_LOG_DEBUG ("ServerApplication::CalculateCusto > mcusto: " << m_custo << " custo: " << custo);
