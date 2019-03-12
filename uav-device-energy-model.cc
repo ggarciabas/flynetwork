@@ -67,7 +67,7 @@ UavDeviceEnergyModel::GetTypeId(void)
                                         MakeDoubleChecker<double>())
                           .AddAttribute("PeriodicEnergyUpdateInterval",
                                         "Time between two consecutive periodic energy updates - Hover time.",
-                                        TimeValue(Seconds(0.1)), // s
+                                        TimeValue(Seconds(0.5)), // s
                                         MakeTimeAccessor(&UavDeviceEnergyModel::m_energyUpdateInterval),
                                         MakeTimeChecker())
                          .AddTraceSource ("TotalEnergyConsumption",
@@ -128,8 +128,8 @@ double UavDeviceEnergyModel::ChangeThreshold () {
   Vector actual = m_node->GetObject<MobilityModel>()->GetPosition();
   double distance = std::sqrt(std::pow(m_xCentral - actual.x, 2) + std::pow(m_yCentral - actual.y, 2));
   NS_ASSERT(distance >= 0);
-  double thr = (m_energyCost * distance) / m_source->GetInitialEnergy(); // % necessaria para voltar a central de onde está!
-  DynamicCast<UavEnergySource>(m_source)->SetBasicEnergyLowBatteryThreshold(thr*1.1); // +10%!
+  double thr = ((m_energyCost * distance) + m_energyUpdateInterval.GetSeconds()*m_hoverCost)/ m_source->GetInitialEnergy(); // % necessaria para voltar a central de onde está, mais o custo de hover durante o intervalo de atualização
+  DynamicCast<UavEnergySource>(m_source)->SetBasicEnergyLowBatteryThreshold(thr*1.5); // +50%!
   return m_energyCost * distance;
 }
 
