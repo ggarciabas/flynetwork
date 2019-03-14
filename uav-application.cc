@@ -195,13 +195,13 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   }
 
   Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
-  double energy = dev->ChangeThreshold(); // atualiza valor minimo para retorno na bateria
-  std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/" << m_pathData << "/course_changed/course_changed_" << m_id << ".txt";
-  std::ofstream file;
-  file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << "," << energy << std::endl;
-  file.close();
+  // double energy = dev->ChangeThreshold(); // atualiza valor minimo para retorno na bateria
+  // std::ostringstream os;
+  // os << "./scratch/flynetwork/data/output/" << m_pathData << "/course_changed/course_changed_" << m_id << ".txt";
+  // std::ofstream file;
+  // file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  // file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << "," << energy << std::endl;
+  // file.close();
   dev->StartHover();
 
   // clear ClientModelContainer based on last update time
@@ -248,11 +248,11 @@ void
 UavApplication::EnergyDepletionCallback()
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  NS_LOG_DEBUG("---->>> EnergyDepletionCallback - ASK SAFE POSITION");
+  NS_LOG_DEBUG("---->>> EnergyDepletionCallback");
+  std::cout << "---->>> EnergyDepletionCallback\n";
   m_depletion = true;
   // avisar central e mudar posição para central!
   m_packetDepletion = Simulator::ScheduleNow(&UavApplication::SendPacketDepletion, this);
-
   // Ir para central
   Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
   dev->StopHover();

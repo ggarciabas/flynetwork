@@ -120,6 +120,10 @@ UavDeviceEnergyModelHelper::DoInstall(Ptr<Node> node, Ptr<EnergySource> source) 
     model->SetEnergyRechargedCallback(m_rechargedCallback);
   }
 
+  // add model to device model list in energy source
+  // std::cout << "Append\n";
+  DynamicCast<UavEnergySource>(source)->SetDeviceEnergyModel (model); // deveria se utilizar o appendDeviceEnergymodel para agregar ao energy source, mas ocorre um erro!
+  // std::cout << "End app\n";
   // set energy source
   model->SetEnergySource(source);
   // adicionando dispositivo no nó

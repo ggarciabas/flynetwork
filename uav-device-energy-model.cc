@@ -107,7 +107,7 @@ void UavDeviceEnergyModel::SetEnergyDepletionCallback(
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << &callback);
   if (callback.IsNull())
   {
-    NS_LOG_DEBUG("EnergyDepletionCallback:Setting NULL energy depletion callback!");
+    NS_FATAL_ERROR("EnergyDepletionCallback:Setting NULL energy depletion callback!");
   }
   m_energyDepletionCallback = callback;
 }
@@ -128,7 +128,7 @@ double UavDeviceEnergyModel::ChangeThreshold () {
   Vector actual = m_node->GetObject<MobilityModel>()->GetPosition();
   double distance = std::sqrt(std::pow(m_xCentral - actual.x, 2) + std::pow(m_yCentral - actual.y, 2));
   NS_ASSERT(distance >= 0);
-  double thr = ((m_energyCost * distance) + m_energyUpdateInterval.GetSeconds()*m_hoverCost)/ m_source->GetInitialEnergy(); // % necessaria para voltar a central de onde está, mais o custo de hover durante o intervalo de atualização
+  double thr = ((m_energyCost * distance) + m_energyUpdateInterval.GetSeconds()*m_hoverCost) / m_source->GetInitialEnergy(); // % necessaria para voltar a central de onde está, mais o custo de hover durante o intervalo de atualização
   DynamicCast<UavEnergySource>(m_source)->SetBasicEnergyLowBatteryThreshold(thr*1.5); // +50%!
   return m_energyCost * distance;
 }
@@ -181,7 +181,13 @@ void UavDeviceEnergyModel::HandleEnergyDepletion(void)
   m_file << Simulator::Now().GetSeconds() << "," << m_source->GetRemainingEnergy() - energy << std::endl;
   m_file.close();
   NS_LOG_DEBUG("UavDeviceEnergyModel::HandleEnergyDepletion @" << Simulator::Now().GetSeconds());
-  m_energyDepletionCallback(); // avisa a aplicação, helper quem configura!
+  std::cout << "UavDeviceEnergyModel::HandleEnergyDepletion @" << Simulator::Now().GetSeconds() << std::endl;
+  if (m_energyDepletionCallback.IsNull())
+  {
+    NS_FATAL_ERROR ("Energy depletion callback is null\n");
+  } else {
+    m_energyDepletionCallback(); // avisa a aplicação, helper quem configura!
+  }
 }
 
 void UavDeviceEnergyModel::SetEnergyUpdateInterval(Time interval)

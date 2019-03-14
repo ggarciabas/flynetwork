@@ -118,6 +118,8 @@ public:
   void Stop (); // stop, UAV fora da rede
   void Start (); // para iniciar o posicionamento
 
+  void SetDeviceEnergyModel (Ptr<DeviceEnergyModel>);
+
 private:
   /// Defined in ns3::Object
   void DoInitialize (void);
@@ -168,6 +170,8 @@ private:
   double m_cliAcum;
 
   std::string m_pathData;
+
+  Ptr<DeviceEnergyModel> m_devModel;
 
 };
 
