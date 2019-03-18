@@ -99,6 +99,8 @@ void ClientDeviceEnergyModel::HandleEnergyRecharged (void)
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_energyRechargedCallback();
   m_cliEvent.Cancel();
+  m_totalEnergyConsumption = 0;
+  m_clientCount = 0;
   this->m_lastUpdateTime = Simulator::Now ();
   m_cliEvent = Simulator::Schedule(Seconds(m_energyUpdateInterval), &ClientDeviceEnergyModel::ClientConsumption, this);
 }
@@ -113,6 +115,7 @@ void ClientDeviceEnergyModel::HandleEnergyChanged(void)
 void ClientDeviceEnergyModel::HandleEnergyDepletion(void)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  m_clientCount = 0;
   m_energyDepletionCallback();
 }
 
@@ -194,12 +197,6 @@ void ClientDeviceEnergyModel::ClientConsumption ()
   m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease / m_source->GetInitialEnergy() << std::endl;
   m_file.close();
   m_cliEvent = Simulator::Schedule(Seconds(m_energyUpdateInterval), &ClientDeviceEnergyModel::ClientConsumption, this);
-}
-
-void ClientDeviceEnergyModel::Reset()
-{
-  NS_LOG_FUNCTION (this);
-  m_totalEnergyConsumption = 0;
 }
 
 void ClientDeviceEnergyModel::DoDispose (void)

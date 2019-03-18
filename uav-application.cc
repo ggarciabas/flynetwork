@@ -132,12 +132,13 @@ void UavApplication::StartApplication(void)
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG("UavApplication::StartApplication [" << m_id << "]");
   m_running = true;
+  m_socketClient = Socket::CreateSocket (GetNode(), UdpSocketFactory::GetTypeId ());
   // criando socket para enviar informacoes ao servidor
   m_sendSck = Socket::CreateSocket(m_node, UdpSocketFactory::GetTypeId());
   if (m_sendSck->Connect(InetSocketAddress(m_peer, m_serverPort))) {
     NS_FATAL_ERROR ("UAV - $$ [NÃO] conseguiu conectar com Servidor!");
   }
-  // SendPacket();
+  Simulator::Schedule(Seconds(ETAPA-20), &UavApplication::AskCliPosition, this);
 }
 
 void UavApplication::Stop() 
@@ -254,9 +255,8 @@ UavApplication::EnergyDepletionCallback()
   // avisar central e mudar posição para central!
   m_packetDepletion = Simulator::ScheduleNow(&UavApplication::SendPacketDepletion, this);
   // Ir para central
-  Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
-  dev->StopHover();
   GetNode()->GetObject<MobilityModel>()->SetPosition(Vector(m_central.at(0), m_central.at(1), 1.0)); // Verficar necessidade de subir em no eixo Z
+
 }
 
 /*
@@ -412,28 +412,82 @@ UavApplication::TracedCallbackRxAppInfra (Ptr<const Packet> packet, const Addres
     NS_LOG_INFO ("UavApplication::TracedCallbackRxAppInfra :: " << msg << " @" << Simulator::Now().GetSeconds());
 
     if (results.at(0).compare("CLIENT") == 0) { // received a message from a client
+      Ipv4Address ip = InetSocketAddress::ConvertFrom(address).GetIpv4();
+      std::map<Ipv4Address, Ptr<ClientModel> >::iterator it = m_mapClient.find(ip);
       std::string::size_type sz; // alias of size_t
       std::vector<double> pos;
       pos.push_back(std::stod (results.at(1),&sz));
       pos.push_back(std::stod (results.at(2),&sz));
-      Ptr<ClientModel> cli = NULL;
-      cli = m_client.FindClientModel(results.at(3));
-      if (cli == NULL) { // nao existe cadastro por addr
-        ObjectFactory obj;
-        obj.SetTypeId("ns3::ClientModel");
-        obj.Set("Login", StringValue(results.at(3)));
-        cli = obj.Create()->GetObject<ClientModel>();
-        m_client.Add(cli);
-        Ptr<ClientDeviceEnergyModel> c_dev = GetNode()->GetObject<ClientDeviceEnergyModel>();
-        c_dev->AddClient();
+      (it->second)->SetLogin(results.at(3));
+      (it->second)->SetPosition(pos.at(0), pos.at(1));
+      (it->second)->SetUpdatePos (Simulator::Now());
+      // repply to client to stop sending position, cliente para de enviar posicionamento apos 10s
+      if (m_socketClient && !m_socketClient->Connect (InetSocketAddress (ip, m_cliPort))) {
+        std::ostringstream msg;
+        msg << "CLIENTOK " << '\0';
+        uint16_t packetSize = msg.str().length() + 1;
+        Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
+        if (m_socketClient && m_socketClient->Send(packet, 0) == packetSize)
+        {
+          NS_LOG_DEBUG("UavApplication::TracedCallbackRxAppInfra envio pacote para " << ip);
+        } else {
+          NS_LOG_DEBUG("UavApplication::TracedCallbackRxAppInfra erro ao enviar solicitacao de posicionamento ao cliente no endereco " << ip);
+        }
       }
-      cli->SetPosition(pos.at(0), pos.at(1));
-      cli->SetUpdatePos (Simulator::Now());
     }
     results.clear();
-
   }
 }
+
+void 
+UavApplication::AskCliPosition()
+{
+  for(std::map<Ipv4Address, Ptr<ClientModel> >::iterator i = m_mapClient.begin(); i != m_mapClient.end(); i++)
+  {
+    if (m_socketClient && !m_socketClient->Connect (InetSocketAddress (i->first, m_cliPort))) {
+      std::ostringstream msg;
+      msg << "CLIENTLOC " << '\0';
+      uint16_t packetSize = msg.str().length() + 1;
+      Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
+      if (m_socketClient && m_socketClient->Send(packet, 0) == packetSize)
+      {
+        NS_LOG_DEBUG("UavApplication::AskCliPosition envio pacote para " << i->first);
+      } else {
+        NS_LOG_DEBUG("UavApplication::AskCliPosition erro ao enviar solicitacao de posicionamento ao cliente no endereco " << i->first);
+      }
+    }
+  }
+  
+  m_askCliPos = Simulator::Schedule(Seconds(ETAPA), &UavApplication::AskCliPosition, this);
+}
+
+void 
+UavApplication::TracedCallbackExpiryLease (const Ipv4Address& ip)
+{
+  NS_LOG_FUNCTION (m_id << ip);
+  // Remover informacoes do mapa ; m_mapClient
+  std::map<Ipv4Address, Ptr<ClientModel> >::iterator it = m_mapClient.find(ip);
+  (it->second)->SetLogin("NOPOSITION"); // ignorado ao enviar informacoes para o servidor
+
+  Ptr<ClientDeviceEnergyModel> c_dev = GetNode()->GetObject<ClientDeviceEnergyModel>();
+  c_dev->RemoveClient();
+}
+
+void UavApplication::TracedCallbackNewLease (const Ipv4Address& ip)
+{
+  NS_LOG_FUNCTION (m_id << ip);
+  // adicionar IP no mapa
+  if (m_mapClient.find(ip) == m_mapClient.end()) { // nao tem cadastrado este IP
+    ObjectFactory obj;
+    obj.SetTypeId("ns3::ClientModel");
+    obj.Set("Login", StringValue("NOPOSITION")); // id
+    m_mapClient[ip] = obj.Create()->GetObject<ClientModel>();
+  }
+
+  Ptr<ClientDeviceEnergyModel> c_dev = GetNode()->GetObject<ClientDeviceEnergyModel>();
+  c_dev->AddClient();
+}
+
 
 void UavApplication::SendCliData ()
 {
@@ -443,11 +497,15 @@ void UavApplication::SendCliData ()
     std::ostringstream msg;
     msg << "DATA " << m_id << " " << GetNode()->GetObject<UavDeviceEnergyModel>()->GetEnergySource()->GetRemainingEnergy();
     // msg << "CONSUMPTION " << m_id << " " << GetNode()->GetObject<UavDeviceEnergyModel>()->GetEnergySource()->GetRemainingEnergy() << " " << m_meanConsumption;
-    for (ClientModelContainer::Iterator it = m_client.Begin(); it != m_client.End(); ++it) {
-        msg << " " << (*it)->GetLogin();
-        msg << " " << (*it)->GetUpdatePos().GetSeconds();
-        msg << " " << (*it)->GetPosition().at(0) << " " << (*it)->GetPosition().at(1);
+    for(std::map<Ipv4Address, Ptr<ClientModel> >::iterator i = m_mapClient.begin(); i != m_mapClient.end(); i++)
+    {
+      if ((i->second)->GetLogin().compare("NOPOSITION") != 0) { // cliente com posicionamento atualizado
+        msg << " " << (i->second)->GetLogin();
+        msg << " " << (i->second)->GetUpdatePos().GetSeconds();
+        msg << " " << (i->second)->GetPosition().at(0) << " " << (i->second)->GetPosition().at(1);
+      }
     }
+    
     msg << " \0";
     uint16_t packetSize = msg.str().length() + 1;
     Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
@@ -499,13 +557,6 @@ void UavApplication::DoDispose() {
     m_sendSck = 0;
   }
   m_running = false;
-}
-
-void UavApplication::TotalLeasedTrace (int oldV, int newV)
-{
-  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds()  << oldV << newV);
-  NS_LOG_INFO ("UavApplication::TotalLeasedTrace " << newV);
-  m_totalLeased = newV;
 }
 
 void UavApplication::TotalEnergyConsumptionTrace (double oldV, double newV)

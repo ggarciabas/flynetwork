@@ -475,7 +475,7 @@ void UavNetwork::NewUav(int total, int update) // update = 0- normal 1- supply 2
     } while (uavApp == NULL && app >= 0);
     NS_ASSERT (uavApp != NULL);
     uavApp->Start(m_simulationTime);
-    uavApp->Reset(); // atualizando depletion=false e atualizando goto
+    uavApp->Reset(); // atualizando depletion=false e reiniciando os devices
 
     // Adicionando informacoes na aplicacao servidor!
     Ipv4Address addr = n->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();
@@ -692,7 +692,8 @@ void UavNetwork::ConfigureUav(int total)
                         Ipv4Address (poolAddr.str().c_str()), Ipv4Mask ("/24"),
                         Ipv4Address (minAddr.str().c_str()), Ipv4Address (maxAddr.str().c_str()),
                         Ipv4Address (serverAddr.str().c_str()));
-    dhcpServerApp.Get(0)->TraceConnectWithoutContext ("TotalLeased", MakeCallback(&UavApplication::TotalLeasedTrace, uavApp));
+    dhcpServerApp.Get(0)->TraceConnectWithoutContext("NewLease", MakeCallback(&UavApplication::TracedCallbackNewLease, uavApp));
+    dhcpServerApp.Get(0)->TraceConnectWithoutContext("ExpireLease", MakeCallback(&UavApplication::TracedCallbackExpiryLease, uavApp));
     dhcpServerApp.Start (Seconds (0.0));
     dhcpServerApp.Stop (Seconds(m_simulationTime));
     m_uavAppContainer.Add(uavApp); // armazenando informacoes das aplicacoes dos UAVs para que os clientes possam obter informacoes necessarias para se conectar no UAV mais proximo!
@@ -825,7 +826,7 @@ void UavNetwork::ConfigureCli()
     (*i)->GetApplication(id)->TraceConnectWithoutContext("ExpireLease", MakeCallback(&SmartphoneApplication::TracedCallbackExpiryLease, smart));
 
     // configurando trace Packetsink
-    // app->TraceConnectWithoutContext ("Rx", MakeCallback (&SmartphoneApplication::TracedCallbackRxApp, smart));
+    app->TraceConnectWithoutContext ("Rx", MakeCallback (&SmartphoneApplication::TracedCallbackRxApp, smart));
     // appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
 
     // aggregate to the node

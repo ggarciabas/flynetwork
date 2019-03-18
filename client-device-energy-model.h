@@ -117,8 +117,6 @@ public:
    */
   virtual Ptr<Node> GetNode(void) const;
 
-  void Reset();
-
   void AddClient ();
   void RemoveClient();
 

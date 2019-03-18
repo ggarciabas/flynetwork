@@ -119,6 +119,8 @@ public:
   void Start (); // para iniciar o posicionamento
 
   void SetDeviceEnergyModel (Ptr<DeviceEnergyModel>);
+  void SetCliDeviceEnergyModel (Ptr<DeviceEnergyModel>);
+
 
 private:
   /// Defined in ns3::Object
@@ -171,7 +173,8 @@ private:
 
   std::string m_pathData;
 
-  Ptr<DeviceEnergyModel> m_devModel;
+  Ptr<DeviceEnergyModel> m_uavDevModel;
+  Ptr<DeviceEnergyModel> m_cliDevModel;
 
 };
 

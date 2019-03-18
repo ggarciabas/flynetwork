@@ -186,6 +186,7 @@ void UavDeviceEnergyModel::HandleEnergyDepletion(void)
   } else {
     m_energyDepletionCallback(); // avisa a aplicação, helper quem configura!
   }
+  StopHover(); // para o hover para que o UAv consuma por movimentacao
 }
 
 void UavDeviceEnergyModel::SetEnergyUpdateInterval(Time interval)

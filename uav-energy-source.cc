@@ -242,7 +242,11 @@ void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
 }
 
 void UavEnergySource::SetDeviceEnergyModel (Ptr<DeviceEnergyModel> dev) {
-  m_devModel = dev;
+  m_uavDevModel = dev;
+}
+
+void UavEnergySource::SetCliDeviceEnergyModel (Ptr<DeviceEnergyModel> dev) {
+  m_cliDevModel = dev;
 }
 
 void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
@@ -292,7 +296,8 @@ void UavEnergySource::HandleEnergyDrainedEvent(void)
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_INFO("UavEnergySource:Energy depleted!");
   NotifyEnergyDrained(); // notify DeviceEnergyModel objects
-  m_devModel->HandleEnergyDepletion(); // deveria se utilizar o energysource container, porem ocorre um erro não analisado
+  m_uavDevModel->HandleEnergyDepletion(); // deveria se utilizar o energysource container, porem ocorre um erro não analisado
+  m_cliDevModel->HandleEnergyDepletion();
 }
 
 void
@@ -332,7 +337,8 @@ void UavEnergySource::Reset () {
   m_cliAcum = 0.0;
   m_hoverAcum = 0.0;
   NotifyEnergyRecharged();
-  m_devModel->HandleEnergyRecharged(); // deveria se utilizar o energy source container, porem erro!
+  m_uavDevModel->HandleEnergyRecharged(); // deveria se utilizar o energy source container, porem erro!
+  m_cliDevModel->HandleEnergyRecharged(); // deveria se utilizar o energy source container, porem erro!
 }
 
 void UavEnergySource::Start () {
@@ -347,7 +353,8 @@ void UavEnergySource::Stop () {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_depleted = true;
   NotifyEnergyChanged();
-  m_devModel->HandleEnergyChanged(); // deveria se utilizar o energy source container, porem erro!
+  m_uavDevModel->HandleEnergyChanged(); // deveria se utilizar o energy source container, porem erro!
+  m_cliDevModel->HandleEnergyChanged();
 }
 
 

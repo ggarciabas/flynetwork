@@ -72,7 +72,8 @@ public:
   // void SetTurnOffWifiPhyCallback(OffWifiPhyCallback adhoc, OffWifiPhyCallback infra);
 
   void TotalEnergyConsumptionTrace (double oldV, double newV);
-  void TotalLeasedTrace (int oldV, int newV);
+  void TracedCallbackNewLease (const Ipv4Address& ip);
+  void TracedCallbackExpiryLease (const Ipv4Address& ip);
 
   void Start(double);
   void Stop();
@@ -90,6 +91,7 @@ private:
   void SendPacket(void);
   void SendCliData ();
   void SendPacketDepletion(void);
+  void AskCliPosition();
 
   uint32_t m_id;
   uint16_t m_serverPort;
@@ -103,9 +105,11 @@ private:
   Ipv4Address m_peer;
   DataRate m_dataRate;
   Ptr<Socket> m_sendSck; // sending socket
-  EventId m_sendEvent; // nao esta sendo utilizado, remover
+  Ptr<Socket> m_socketClient;
+  EventId m_sendEvent; 
   EventId m_sendCliDataEvent;
   EventId m_packetDepletion;
+  EventId m_askCliPos;
   bool m_running;
   TracedCallback<std::string> m_packetTrace;
   Callback<void> m_setOffWifiPhyInfra; // turn off wifiphy
@@ -114,6 +118,7 @@ private:
   bool m_depletion;// para identificar estado de emergencia
 
   ClientModelContainer m_client;
+  std::map<Ipv4Address, Ptr<ClientModel> > m_mapClient;
 
   Ptr<WifiRadioEnergyModel> m_wifiRadioEnergyModel;
   Ptr<UavEnergySource> m_uavEnergySource;

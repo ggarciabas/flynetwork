@@ -56,6 +56,7 @@ public:
 
   void CourseChange(Ptr<const MobilityModel> mobility);
 
+  void TracedCallbackRxApp (Ptr<const Packet> packet, const Address & address);
   void TracedCallbackTxApp (Ptr<const Packet> packet, const Address &source, const Address &dest);
 
   void TracedCallbackAssocLogger (Mac48Address mac);
@@ -78,6 +79,8 @@ private:
 
   void DoDispose();
 
+  void StopSendingPosition ();
+
   uint32_t m_id;
   uint16_t m_port;
   uint32_t m_idDHCP;
@@ -88,6 +91,8 @@ private:
   DataRate m_dataRate;
   Ptr<Socket> m_socketUav;
   EventId m_sendEventUav;
+  EventId m_stopSending;
+  bool m_stopSendingB;
   bool m_running;
   std::string m_login;
   std::string m_app;

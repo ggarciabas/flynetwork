@@ -108,6 +108,7 @@ SmartphoneApplication::SmartphoneApplication()
   NS_LOG_DEBUG("SmartphoneApplication::SmartphoneApplication @" << Simulator::Now().GetSeconds());
   m_running = false;
   m_connected = false;
+  m_stopSendingB = true;
 }
 
 SmartphoneApplication::~SmartphoneApplication()
@@ -163,18 +164,6 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   Simulator::Remove(m_sendEventUav);
 
-  if (!m_connected) { // caso nao esteja com IP conectado ao AP, tentar enviar assim que se conectar!
-    #ifdef PACKET
-      std::ostringstream os;
-      os << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << m_id << "_packet" << ".txt";
-      std::ofstream file;
-      file.open(os.str(), std::ofstream::out | std::ofstream::app);
-      file << Simulator::Now().GetSeconds() << " NAO_CONECTADO" << std::endl; // NAOCONECTADO
-      file.close();
-    #endif
-    m_sendEventUav = Simulator::Schedule(Seconds(1.0), &SmartphoneApplication::SendPacketUav, this);
-  }
-
   if (m_socketUav && !m_socketUav->Connect (InetSocketAddress (m_uavPeer, m_port))) {
     std::ostringstream msg;
     Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
@@ -228,27 +217,59 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
       file << Simulator::Now().GetSeconds() << " NAO_CONECTADO" << std::endl; // NAO CONECTADO
       file.close();
     #endif
-    m_sendEventUav = Simulator::Schedule(Seconds(1.0), &SmartphoneApplication::SendPacketUav, this);
     return;
   }
 
-  m_sendEventUav = Simulator::Schedule(Seconds(5), &SmartphoneApplication::SendPacketUav, this);
+  m_sendEventUav = Simulator::Schedule(Seconds(1.0), &SmartphoneApplication::SendPacketUav, this);
 }
 
 void
 SmartphoneApplication::CourseChange(Ptr<const MobilityModel> mobility)
 {
-  // NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   Vector actual = mobility->GetPosition();
   double distance = std::sqrt(std::pow(m_lastPosition.x - actual.x, 2) + std::pow(m_lastPosition.y - actual.y, 2));
 
   if (distance >= m_changePosition && m_connected)
   {
     m_lastPosition = actual;
-
-    // TODO: enviar pacote informando novo posicionamento!
-    // SendPacketUav(); removendo pois tem um ciclo padrao!
   }
+}
+
+void
+SmartphoneApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & address)
+{
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds()  << packet << address);
+  if (m_running) {
+    uint8_t *buffer = new uint8_t[packet->GetSize()];
+    packet->CopyData(buffer, packet->GetSize());
+    std::string msg = std::string(buffer, buffer + packet->GetSize());
+    std::istringstream iss(msg);
+    std::vector<std::string> results(std::istream_iterator<std::string>{iss},
+                                     std::istream_iterator<std::string>());
+    if (results.at(0).compare("CLIENTLOC") == 0) {
+      Simulator::Remove(m_sendEventUav);
+      NS_LOG_DEBUG("CLIENT #" << m_id << " recebeu CLIENTLOC");
+      m_sendEventUav = Simulator::ScheduleNow(&SmartphoneApplication::SendPacketUav, this);
+      if (m_stopSendingB) {
+        m_stopSending = Simulator::Schedule(Seconds(10.0), &SmartphoneApplication::StopSendingPosition, this);
+        m_stopSendingB = false;
+      }
+    } else if (results.at(0).compare("CLIENTOK") == 0) {
+      Simulator::Remove(m_sendEventUav);
+      Simulator::Remove(m_stopSending);
+      m_stopSendingB = true;
+      NS_LOG_DEBUG("CLIENT #" << m_id << " recebeu CLIENTOK");
+    }
+  }
+}
+
+void
+SmartphoneApplication::StopSendingPosition ()
+{
+  Simulator::Remove(m_sendEventUav);
+  Simulator::Remove(m_stopSending);
+  m_stopSendingB = true;
 }
 
 void
@@ -256,12 +277,12 @@ SmartphoneApplication::TracedCallbackTxApp (Ptr<const Packet> packet, const Addr
 {
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - SERVER ");
-  // std::ostringstream os;
-  // os << "./scratch/flynetwork/data/output/" << m_pathData << "/client_data.txt";
-  // std::ofstream file;
-  // file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  // file << Simulator::Now().GetSeconds() << " ENVIADO " << m_login << std::endl; // ENVIADO por um cliente
-  // file.close();
+  std::ostringstream os;
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/client_data.txt";
+  std::ofstream file;
+  file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  file << Simulator::Now().GetSeconds() << " ENVIADO " << m_login << std::endl; // ENVIADO por um cliente
+  file.close();
 }
 
 void SmartphoneApplication::TracedCallbackExpiryLease (const Ipv4Address& ip)
@@ -368,6 +389,7 @@ SmartphoneApplication::TracedCallbackDeAssocLogger (Mac48Address mac)
     file.close();
   #endif
   m_connected = false;
+  Simulator::Remove(m_sendEventUav);
 }
 
 void SmartphoneApplication::DoDispose() {
