@@ -206,23 +206,6 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   file.close();
   dev->StartHover();
 
-  // clear ClientModelContainer based on last update time
-  NS_LOG_DEBUG ("UavApplication::CourseChange UAV " << m_id << " totalCli " << m_client.GetN());
-  // for (ClientModelContainer::Iterator it = m_client.Begin(); it != m_client.End(); ++it) {
-  //    NS_LOG_DEBUG ("\t" << (*it)->GetLogin());
-  // }
-
-  int i = m_client.GetN()-1;
-  Ptr<ClientDeviceEnergyModel> c_dev = GetNode()->GetObject<ClientDeviceEnergyModel>();
-  for (; i >= 0; i--)
-  {
-    // NS_LOG_DEBUG ("\t- [" << i << "] Cliente " << m_client.Get(i)->GetLogin());
-    if ((Simulator::Now().GetSeconds() - m_client.Get(i)->GetUpdatePos().GetSeconds()) > ETAPA) {
-      // NS_LOG_DEBUG ("\t\t- removendo " << m_client.Get(i)->GetLogin());
-      m_client.RemoveAt(i);
-      c_dev->RemoveClient();
-    }
-  }
 }
 
 void

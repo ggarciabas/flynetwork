@@ -117,7 +117,6 @@ private:
 
   bool m_depletion;// para identificar estado de emergencia
 
-  ClientModelContainer m_client;
   std::map<Ipv4Address, Ptr<ClientModel> > m_mapClient;
 
   Ptr<WifiRadioEnergyModel> m_wifiRadioEnergyModel;

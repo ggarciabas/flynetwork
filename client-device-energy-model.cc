@@ -97,7 +97,7 @@ void ClientDeviceEnergyModel::SetEnergyRechargedCallback(EnergyCallback callback
 void ClientDeviceEnergyModel::HandleEnergyRecharged (void)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  m_energyRechargedCallback();
+  if (!m_energyRechargedCallback.IsNull()) m_energyRechargedCallback();
   m_cliEvent.Cancel();
   m_totalEnergyConsumption = 0;
   m_clientCount = 0;
@@ -108,15 +108,18 @@ void ClientDeviceEnergyModel::HandleEnergyRecharged (void)
 void ClientDeviceEnergyModel::HandleEnergyChanged(void)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  ClientConsumption(); // update battery
   m_cliEvent.Cancel();
+  ClientConsumption(); // update battery
 }
 
 void ClientDeviceEnergyModel::HandleEnergyDepletion(void)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  if (!m_energyDepletionCallback.IsNull())  m_energyDepletionCallback();
   m_clientCount = 0;
-  m_energyDepletionCallback();
+  m_cliEvent.Cancel();
+  ClientConsumption(); // update battery
+  m_cliEvent.Cancel();// cancel again, to do not allow any consumption from clients
 }
 
 void ClientDeviceEnergyModel::SetEnergyUpdateInterval(Time interval)
