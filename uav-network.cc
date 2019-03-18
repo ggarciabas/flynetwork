@@ -269,6 +269,7 @@ void UavNetwork::Run()
   system(ss.str().c_str());
   ss.str("");
   ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_depletion";
+  system(ss.str().c_str());
   ss.str("");
   ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_client";
   system(ss.str().c_str());
