@@ -91,6 +91,16 @@ UavDeviceEnergyModelHelper::Install(NodeContainer nodeContainer,
   return container;
 }
 
+void UavDeviceEnergyModelHelper::SetEnergyDepletionCallback (UavDeviceEnergyModel::EnergyCallback cb) 
+{
+  m_depletionCallback = cb;
+}
+
+void UavDeviceEnergyModelHelper::SetEnergyRechargedCallback (UavDeviceEnergyModel::EnergyCallback cb)
+{
+  m_rechargedCallback = cb;
+}
+
 Ptr<UavDeviceEnergyModel>
 UavDeviceEnergyModelHelper::DoInstall(Ptr<Node> node, Ptr<EnergySource> source) const
 {
@@ -101,29 +111,12 @@ UavDeviceEnergyModelHelper::DoInstall(Ptr<Node> node, Ptr<EnergySource> source) 
   NS_ASSERT(model != NULL);
   // set energy source pointer
   // buscar o objeto UavApplication do nó
-  Ptr<UavApplication> app = node->GetObject<UavApplication>();
-  // if (m_depletionCallback.IsNull())
-  // {
-    model->SetEnergyDepletionCallback(MakeCallback(&UavApplication::EnergyDepletionCallback, app));
-  // }
-  // else
-  // {
-  //   model->SetEnergyDepletionCallback(m_depletionCallback);
-  // }
-
-  if (m_rechargedCallback.IsNull())
-  {
-    model->SetEnergyRechargedCallback(MakeCallback(&UavApplication::EnergyRechargedCallback, app));
-  }
-  else
-  {
-    model->SetEnergyRechargedCallback(m_rechargedCallback);
-  }
+  if (!m_depletionCallback.IsNull())  model->SetEnergyDepletionCallback(m_depletionCallback);
+  if (!m_rechargedCallback.IsNull()) model->SetEnergyDepletionCallback(m_rechargedCallback);
 
   // add model to device model list in energy source
-  // std::cout << "Append\n";
+  // source->AppendDeviceEnergyModel(model);
   DynamicCast<UavEnergySource>(source)->SetDeviceEnergyModel (model); // deveria se utilizar o appendDeviceEnergymodel para agregar ao energy source, mas ocorre um erro!
-  // std::cout << "End app\n";
   // set energy source
   model->SetEnergySource(source);
   // adicionando dispositivo no nó

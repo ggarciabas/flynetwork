@@ -72,6 +72,9 @@ public:
 
   void Set(std::string name, const AttributeValue &v);
 
+  void SetEnergyDepletionCallback (UavDeviceEnergyModel::EnergyCallback);
+  void SetEnergyRechargedCallback (UavDeviceEnergyModel::EnergyCallback);
+
 private:
   virtual Ptr<UavDeviceEnergyModel> DoInstall(Ptr<Node> node, Ptr<EnergySource> source) const;
 

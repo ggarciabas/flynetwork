@@ -576,7 +576,7 @@ void UavNetwork::ConfigureUav(int total)
     Ptr<MobilityModel> model = objFacMobUAV.Create()->GetObject<MobilityModel>();
     Ptr<Object> object = (*i);
     object->AggregateObject(model);
-  }
+  }  
 
   /** Energy Model **/
   /* energy source */
@@ -592,8 +592,6 @@ void UavNetwork::ConfigureUav(int total)
   energyHelper.Set("PathData", StringValue(m_pathData));
   energyHelper.Set("xCentral", DoubleValue(m_cx)); // utilizado para calcular o threshold dinamicamente
   energyHelper.Set("yCentral", DoubleValue(m_cy));
-  // install device model
-  DeviceEnergyModelContainer uavEnergyModels = energyHelper.Install(uav, sources);
 
   /* client device energy model*/
   ClientDeviceEnergyModelHelper cliHelper;
@@ -663,16 +661,21 @@ void UavNetwork::ConfigureUav(int total)
     // aggregate to the node
     (*i)->AddApplication(uavApp);
 
+    // install device model
+    energyHelper.SetEnergyDepletionCallback(MakeCallback (&UavApplication::EnergyDepletionCallback, uavApp));
+    energyHelper.SetEnergyDepletionCallback(MakeCallback (&UavApplication::EnergyRechargedCallback, uavApp));
+    DeviceEnergyModelContainer uavEnergyModels = energyHelper.Install((*i), sources.Get(c));
+    Ptr<UavDeviceEnergyModel> dev = DynamicCast<UavDeviceEnergyModel>(uavEnergyModels.Get(0));
+
     // Configure TotalEnergyConsumption
     // deviceModelsWifi.Get(c)->TraceConnectWithoutContext ("TotalEnergyConsumption", MakeCallback(&UavApplication::TotalEnergyConsumptionTrace,  uavApp));
 
     // Mobility
     (*i)->GetObject<MobilityModel>()->TraceConnectWithoutContext ("CourseChange", MakeCallback (&UavApplication::CourseChange, uavApp));
-    Ptr<UavDeviceEnergyModel> dev = (*i)->GetObject<UavDeviceEnergyModel>();
     DynamicCast<UavMobilityModel>((*i)->GetObject<MobilityModel>())->TraceConnectWithoutContext ("CourseChangeDevice", MakeCallback (&UavDeviceEnergyModel::CourseChange, dev));
 
     // energy start
-    Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>((*i)->GetObject<UavDeviceEnergyModel>()->GetEnergySource());
+    Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>(dev->GetEnergySource());
     source->Start();
 
     // Configure DHCP
@@ -696,7 +699,8 @@ void UavNetwork::ConfigureUav(int total)
     dhcpServerApp.Start (Seconds (0.0));
     dhcpServerApp.Stop (Seconds(m_simulationTime));
     m_uavAppContainer.Add(uavApp); // armazenando informacoes das aplicacoes dos UAVs para que os clientes possam obter informacoes necessarias para se conectar no UAV mais proximo!
-  }
+  }  
+
 }
 
 void UavNetwork::ConfigureCli()

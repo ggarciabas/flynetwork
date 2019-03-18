@@ -195,13 +195,13 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   }
 
   Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
-  // double energy = dev->ChangeThreshold(); // atualiza valor minimo para retorno na bateria
-  // std::ostringstream os;
-  // os << "./scratch/flynetwork/data/output/" << m_pathData << "/course_changed/course_changed_" << m_id << ".txt";
-  // std::ofstream file;
-  // file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  // file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << "," << energy << std::endl;
-  // file.close();
+  double energy = dev->ChangeThreshold(); // atualiza valor minimo para retorno na bateria
+  std::ostringstream os;
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/course_changed/course_changed_" << m_id << ".txt";
+  std::ofstream file;
+  file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << "," << energy << std::endl;
+  file.close();
   dev->StartHover();
 
   // clear ClientModelContainer based on last update time
@@ -266,24 +266,30 @@ void UavApplication::SendPacketDepletion(void)
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   m_packetDepletion.Cancel();
-  std::ostringstream msg;
-  Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
-  msg << "DEPLETION " << m_id << " " << pos.x << " " << pos.y << " " << pos.z << " " << '\0';
-  uint16_t packetSize = msg.str().length() + 1;
-  Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
-  if (m_sendSck->Send(packet) == packetSize)
-  {
-    msg.str("");
-    msg << "UAV\t" << m_id << "\tSENT DEPLETION\t" << Simulator::Now().GetSeconds() << "\tSERVER";
-    //m_packetTrace(msg.str());
-    NS_LOG_DEBUG ("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - SERVER ::: SENT DEPLETION.");
+
+  if (m_running) {
+    std::ostringstream m;
+    Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
+    m << "DEPLETION " << m_id << " " << pos.x << " " << pos.y << " " << pos.z << " " << '\0';
+    uint16_t packetSize = m.str().length() + 1;
+    Ptr<Packet> packet = Create<Packet>((uint8_t *)m.str().c_str(), packetSize);
+    if (m_sendSck && m_sendSck->Send(packet) == packetSize)
+    {
+      m.str("");
+      m << "UAV\t" << m_id << "\tSENT\t" << Simulator::Now().GetSeconds() << "\tUAVRECEIVED";
+      //m_packetTrace(m.str());
+      NS_LOG_INFO("UAV #" << m_id << " enviando UAVRECEIVED");
+    }
+    else
+    {
+      NS_LOG_ERROR("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " [NÃO] SENT DEPLETION");
+      m_packetDepletion = Simulator::Schedule(Seconds(0.01), &UavApplication::SendPacketDepletion, this);
+      return;
+    }
+  } else {
+    NS_LOG_DEBUG("Uav not running\n");
   }
-  else
-  {
-    NS_LOG_ERROR("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " [NÃO] SENT DEPLETION");
-    m_packetDepletion = Simulator::Schedule(Seconds(0.01), &UavApplication::SendPacketDepletion, this);
-    return;
-  }
+  
   m_packetDepletion = Simulator::Schedule(Seconds(0.05), &UavApplication::SendPacketDepletion, this);
 }
 
