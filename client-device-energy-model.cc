@@ -175,7 +175,7 @@ ClientDeviceEnergyModel::GetTotalEnergyConsumption (void) const
 
 void ClientDeviceEnergyModel::AddClient ()
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_cliEvent.Cancel();
   ClientConsumption(); // update battery
   m_clientCount++;
@@ -183,7 +183,7 @@ void ClientDeviceEnergyModel::AddClient ()
 
 void ClientDeviceEnergyModel::RemoveClient()
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_cliEvent.Cancel();
   ClientConsumption(); // update battery
   m_clientCount--;
@@ -191,7 +191,7 @@ void ClientDeviceEnergyModel::RemoveClient()
 
 void ClientDeviceEnergyModel::ClientConsumption ()
 {
-  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() << m_clientCount << m_node->GetId());
   m_cliEvent.Cancel();
   double energyToDecrease =  UpdateConsumption();
   std::ostringstream os;

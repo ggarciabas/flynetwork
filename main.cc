@@ -63,7 +63,7 @@ int main (int argc, char *argv[])
 
 	// LogComponentEnable("DhcpClient", LOG_FUNCTION);
 	// LogComponentEnable("ClientDeviceEnergyModelHelper", LOG_FUNCTION);
-	// LogComponentEnable("ClientDeviceEnergyModel", LOG_FUNCTION);
+	LogComponentEnable("ClientDeviceEnergyModel", LOG_FUNCTION);
 	// LogComponentEnable("ClientModel", LOG_FUNCTION);
 	// LogComponentEnable("ClientModelContainer", LOG_FUNCTION);
 	// LogComponentEnable("LocationModelContainer", LOG_FUNCTION);
@@ -75,7 +75,7 @@ int main (int argc, char *argv[])
 	// LogComponentEnable("UavDeviceEnergyModelHelper", LOG_FUNCTION);
 	// LogComponentEnable("UavDeviceEnergyModel", LOG_FUNCTION);
 	// LogComponentEnable("UavEnergySourceHelper", LOG_FUNCTION);
-	// LogComponentEnable("UavEnergySource", LOG_DEBUG);
+	LogComponentEnable("UavEnergySource", LOG_FUNCTION);
 	// LogComponentEnable("UavMobilityModel", LOG_DEBUG);
 	// LogComponentEnable("UavModelContainer", LOG_FUNCTION);
 	// LogComponentEnable("UavModel", LOG_DEBUG);
