@@ -111,8 +111,14 @@ UavDeviceEnergyModelHelper::DoInstall(Ptr<Node> node, Ptr<EnergySource> source) 
   NS_ASSERT(model != NULL);
   // set energy source pointer
   // buscar o objeto UavApplication do nó
-  if (!m_depletionCallback.IsNull())  model->SetEnergyDepletionCallback(m_depletionCallback);
-  if (!m_rechargedCallback.IsNull()) model->SetEnergyDepletionCallback(m_rechargedCallback);
+  if (!m_depletionCallback.IsNull()) 
+    model->SetEnergyDepletionCallback(m_depletionCallback);
+  else 
+    NS_FATAL_ERROR("Callback Depletion is null");
+  if (!m_rechargedCallback.IsNull()) 
+    model->SetEnergyRechargedCallback(m_rechargedCallback);
+  else 
+    NS_FATAL_ERROR("Callback Recharged is null");
 
   // add model to device model list in energy source
   // source->AppendDeviceEnergyModel(model);

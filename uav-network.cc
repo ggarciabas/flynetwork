@@ -663,7 +663,7 @@ void UavNetwork::ConfigureUav(int total)
 
     // install device model
     energyHelper.SetEnergyDepletionCallback(MakeCallback (&UavApplication::EnergyDepletionCallback, uavApp));
-    energyHelper.SetEnergyDepletionCallback(MakeCallback (&UavApplication::EnergyRechargedCallback, uavApp));
+    energyHelper.SetEnergyRechargedCallback(MakeCallback (&UavApplication::EnergyRechargedCallback, uavApp));
     DeviceEnergyModelContainer uavEnergyModels = energyHelper.Install((*i), sources.Get(c));
     Ptr<UavDeviceEnergyModel> dev = DynamicCast<UavDeviceEnergyModel>(uavEnergyModels.Get(0));
 

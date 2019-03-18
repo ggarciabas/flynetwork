@@ -112,8 +112,7 @@ void UavDeviceEnergyModel::SetEnergyDepletionCallback(
   m_energyDepletionCallback = callback;
 }
 
-void UavDeviceEnergyModel::SetEnergyRechargedCallback(
-   EnergyCallback callback)
+void UavDeviceEnergyModel::SetEnergyRechargedCallback(EnergyCallback callback)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << &callback);
   if (callback.IsNull())
