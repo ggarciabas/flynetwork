@@ -226,7 +226,7 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
 void
 SmartphoneApplication::CourseChange(Ptr<const MobilityModel> mobility)
 {
-  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
+  // NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   Vector actual = mobility->GetPosition();
   double distance = std::sqrt(std::pow(m_lastPosition.x - actual.x, 2) + std::pow(m_lastPosition.y - actual.y, 2));
 
@@ -252,7 +252,7 @@ SmartphoneApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Addr
       NS_LOG_DEBUG("CLIENT #" << m_id << " recebeu CLIENTLOC");
       m_sendEventUav = Simulator::ScheduleNow(&SmartphoneApplication::SendPacketUav, this);
       if (m_stopSendingB) {
-        m_stopSending = Simulator::Schedule(Seconds(10.0), &SmartphoneApplication::StopSendingPosition, this);
+        m_stopSending = Simulator::Schedule(Seconds(5.0), &SmartphoneApplication::StopSendingPosition, this);
         m_stopSendingB = false;
       }
     } else if (results.at(0).compare("CLIENTOK") == 0) {
