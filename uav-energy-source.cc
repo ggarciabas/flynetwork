@@ -56,7 +56,7 @@ UavEnergySource::GetTypeId(void)
                                       // TODO: o valor de threshold deve ser dinamico em relacao do custo necessario para ele voltar a central de onde ele está
                           .AddAttribute ("BasicEnergyLowBatteryThreshold",
                                         "Low battery threshold for basic energy source.",
-                                        DoubleValue(0.99), // as a fraction of the initial energy
+                                        DoubleValue(0.20), // as a fraction of the initial energy
                                         MakeDoubleAccessor(&UavEnergySource::m_lowBatteryTh),
                                         MakeDoubleChecker<double>())
                         .AddAttribute ("PeriodicEnergyUpdateInterval",
@@ -186,7 +186,6 @@ void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
   if (!m_depleted && m_remainingEnergyJ/m_initialEnergyJ <= m_lowBatteryTh)
   {
     NS_LOG_DEBUG("UavEnergySource::UpdateEnergySourceClient DEPLETION [" << m_node->GetId() << "] @" << Simulator::Now().GetSeconds());
-    std::cout << "UavEnergySource::UpdateEnergySourceClient DEPLETION " << m_remainingEnergyJ/m_initialEnergyJ << " ____ " << m_lowBatteryTh << "\n";
     m_depleted = true;
     HandleEnergyDrainedEvent();
   }
@@ -223,7 +222,6 @@ void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
   if (!m_depleted && m_remainingEnergyJ/m_initialEnergyJ <= m_lowBatteryTh)
   {
     NS_LOG_DEBUG("UavEnergySource::UpdateEnergySourceMove DEPLETION [" << m_node->GetId() << "] @" << Simulator::Now().GetSeconds());
-    std::cout << "UavEnergySource::UpdateEnergySourceClient DEPLETION " << m_remainingEnergyJ/m_initialEnergyJ << " ____ " << m_lowBatteryTh << "\n";
     m_depleted = true;
     HandleEnergyDrainedEvent();
   }
@@ -265,7 +263,6 @@ void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
   if (!m_depleted && m_remainingEnergyJ/m_initialEnergyJ <= m_lowBatteryTh)
   {
     NS_LOG_DEBUG("UavEnergySource::UpdateEnergySourceHover DEPLETION  [" << m_node->GetId() << "] @" << Simulator::Now().GetSeconds());
-    std::cout << "UavEnergySource::UpdateEnergySourceClient DEPLETION " << m_remainingEnergyJ/m_initialEnergyJ << " ____ " << m_lowBatteryTh << "\n";
     m_depleted = true;
     HandleEnergyDrainedEvent();
   }
@@ -294,7 +291,6 @@ void UavEnergySource::HandleEnergyDrainedEvent(void)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_INFO("UavEnergySource:Energy depleted!");
-  std::cout << "UavEnergySource:Energy depleted!\n";
   NotifyEnergyDrained(); // notify DeviceEnergyModel objects
   m_devModel->HandleEnergyDepletion(); // deveria se utilizar o energysource container, porem ocorre um erro não analisado
 }

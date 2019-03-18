@@ -310,8 +310,8 @@ void UavNetwork::Run()
   ConfigurePalcos();
 
   // Configure UAV
-  NS_LOG_INFO("Configurando UAV");
-  ConfigureUav(5);
+  // NS_LOG_INFO("Configurando UAV");
+  // ConfigureUav();
 
   // Configure Client
   NS_LOG_INFO("Configurando Cliente");
@@ -521,7 +521,7 @@ void UavNetwork::RemoveUav(int id, int step)
   Ptr<UavMobilityModel> model = n->GetObject<UavMobilityModel>();
   model->SetFirstPosition(v); // manda para perto da central!
 
-  // Parar Uav
+  // Parar UAV
   Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>(n->GetObject<UavDeviceEnergyModel>()->GetEnergySource());
   source->Stop(); // recarregando
 

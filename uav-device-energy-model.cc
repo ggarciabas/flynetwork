@@ -179,8 +179,7 @@ void UavDeviceEnergyModel::HandleEnergyDepletion(void)
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << Simulator::Now().GetSeconds() << "," << m_source->GetRemainingEnergy() - energy << std::endl;
   m_file.close();
-  NS_LOG_DEBUG("UavDeviceEnergyModel::HandleEnergyDepletion @" << Simulator::Now().GetSeconds());
-  std::cout << "UavDeviceEnergyModel::HandleEnergyDepletion @" << Simulator::Now().GetSeconds() << std::endl;
+  NS_LOG_DEBUG("UavDeviceEnergyModel::HandleEnergyDepletion " << m_node->GetId() << " @" << Simulator::Now().GetSeconds());
   if (m_energyDepletionCallback.IsNull())
   {
     NS_FATAL_ERROR ("Energy depletion callback is null\n");

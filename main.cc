@@ -64,11 +64,11 @@ int main (int argc, char *argv[])
 	// LogComponentEnable("DhcpClient", LOG_FUNCTION);
 	// LogComponentEnable("ClientDeviceEnergyModelHelper", LOG_FUNCTION);
 	// LogComponentEnable("ClientDeviceEnergyModel", LOG_FUNCTION);
-	// // LogComponentEnable("ClientModel", LOG_FUNCTION);
-	// // LogComponentEnable("ClientModelContainer", LOG_FUNCTION);
-	// // LogComponentEnable("LocationModelContainer", LOG_FUNCTION);
-	// // LogComponentEnable("LocationModel", LOG_FUNCTION);
-	// // LogComponentEnable("ServerApplication", LOG_FUNCTION);
+	// LogComponentEnable("ClientModel", LOG_FUNCTION);
+	// LogComponentEnable("ClientModelContainer", LOG_FUNCTION);
+	// LogComponentEnable("LocationModelContainer", LOG_FUNCTION);
+	// LogComponentEnable("LocationModel", LOG_FUNCTION);
+	// LogComponentEnable("ServerApplication", LOG_FUNCTION);
 	// LogComponentEnable("SmartphoneApplication", LOG_FUNCTION);
 	// LogComponentEnable("UavApplicationContainer", LOG_FUNCTION);
 	// LogComponentEnable("UavApplication", LOG_FUNCTION);

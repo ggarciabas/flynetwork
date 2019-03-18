@@ -232,9 +232,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
   std::istringstream iss(s);
   std::vector<std::string> results(std::istream_iterator<std::string>{iss},
                                  std::istream_iterator<std::string>());
-  std::string::size_type sz; // alias of size_t
-
-  InetSocketAddress add = InetSocketAddress::ConvertFrom(address);
+  std::string::size_type sz; // alias of size_t  
 
   if (results.at(0).compare("UAV") == 0) {
     std::vector<double> pos;
@@ -382,10 +380,11 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             }
             uav = 0;
           } else {
-            std::ostringstream mm;
-            mm << "SERVER\t-1\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tCLIENT";
+            // InetSocketAddress add = InetSocketAddress::ConvertFrom(address);
+            // std::ostringstream mm;
+            // mm << "SERVER\t-1\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tCLIENT";
             //m_packetTrace(mm.str());
-            NS_LOG_DEBUG("SERVER -- CLIENT ::: recebida informacoes de aplicacao do cliente no endereco " << add.GetIpv4());
+            // NS_LOG_DEBUG("SERVER -- CLIENT ::: recebida informacoes de aplicacao do cliente no endereco " << add.GetIpv4());
             // std::ostringstream os;
             // os << "./scratch/flynetwork/data/output/" << m_pathData << "/client_data.txt";
             // std::ofstream file;

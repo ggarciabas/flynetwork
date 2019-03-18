@@ -130,7 +130,7 @@ void UavApplication::Start(double stoptime) {
 void UavApplication::StartApplication(void)
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  NS_LOG_INFO("UavApplication::StartApplication [" << m_id << "]");
+  NS_LOG_DEBUG("UavApplication::StartApplication [" << m_id << "]");
   m_running = true;
   // criando socket para enviar informacoes ao servidor
   m_sendSck = Socket::CreateSocket(m_node, UdpSocketFactory::GetTypeId());
@@ -140,9 +140,10 @@ void UavApplication::StartApplication(void)
   // SendPacket();
 }
 
-void UavApplication::Stop() {
+void UavApplication::Stop() 
+{
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  NS_LOG_INFO("UavApplication::Stop [" << m_id << "]");
+  NS_LOG_DEBUG("UavApplication::Stop [" << m_id << "]");
   // SetStopTime(Simulator::Now());
   Simulator::Remove(m_stopEvent);
   StopApplication();
@@ -151,7 +152,7 @@ void UavApplication::Stop() {
 void UavApplication::StopApplication()
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  NS_LOG_INFO("UavApplication::StopApplication [" << m_id << "]");
+  NS_LOG_DEBUG("UavApplication::StopApplication [" << m_id << "]");
   m_meanConsumption = 0.0;
   Simulator::Remove(m_stopEvent);
   m_running = false;
@@ -248,8 +249,7 @@ void
 UavApplication::EnergyDepletionCallback()
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  NS_LOG_DEBUG("---->>> EnergyDepletionCallback");
-  std::cout << "---->>> EnergyDepletionCallback\n";
+  NS_LOG_DEBUG("---->>> EnergyDepletionCallback " << m_id << " @" << Simulator::Now().GetSeconds());
   m_depletion = true;
   // avisar central e mudar posição para central!
   m_packetDepletion = Simulator::ScheduleNow(&UavApplication::SendPacketDepletion, this);
@@ -287,7 +287,7 @@ void UavApplication::SendPacketDepletion(void)
       return;
     }
   } else {
-    NS_LOG_DEBUG("Uav not running\n");
+    NS_LOG_DEBUG("Uav not running " << this->m_id);
   }
   
   m_packetDepletion = Simulator::Schedule(Seconds(0.05), &UavApplication::SendPacketDepletion, this);
