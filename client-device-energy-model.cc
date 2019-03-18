@@ -166,6 +166,12 @@ double ClientDeviceEnergyModel::UpdateConsumption () {
   return energyToDecrease;
 }
 
+double 
+ClientDeviceEnergyModel::CalculateThreshold () {
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  return ((m_clientCost * m_clientCount)*m_energyUpdateInterval.GetSeconds()) / m_source->GetInitialEnergy(); // % necessaria para suprir os clientes durante o intervalo
+}
+
 double
 ClientDeviceEnergyModel::GetTotalEnergyConsumption (void) const
 {

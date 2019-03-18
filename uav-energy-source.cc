@@ -171,7 +171,7 @@ UavEnergySource::UpdateEnergySource (void)
 
 void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
 {
-  // NS_LOG_DEBUG("UavEnergySource:UpdateEnergySourceClient [" << m_node->GetId() << "] rem: " << m_remainingEnergyJ << " @" << Simulator::Now().GetSeconds());
+  NS_LOG_DEBUG("UavEnergySource:UpdateEnergySourceClient [" << m_node->GetId() << "] rem: " << m_remainingEnergyJ << " @" << Simulator::Now().GetSeconds());
 
   if (m_remainingEnergyJ < energyToDecrease)
   {
@@ -208,7 +208,7 @@ void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
 void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
 {
   // NS_LOG_DEBUG("UavEnergySource:UpdateEnergySourceMove [" << m_node->GetId() << "] rem: " << m_remainingEnergyJ << " @" << Simulator::Now().GetSeconds());
-  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << energyToDecrease);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << energyToDecrease);
   if (m_remainingEnergyJ < energyToDecrease)
   {
     m_remainingEnergyJ = 0; // energy never goes below 0
@@ -251,7 +251,7 @@ void UavEnergySource::SetCliDeviceEnergyModel (Ptr<DeviceEnergyModel> dev) {
 
 void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
 {
-  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << energyToDecrease);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << energyToDecrease);
   // NS_LOG_DEBUG("UavEnergySource:UpdateEnergySourceHover [" << m_node->GetId() << "] rem: " << m_remainingEnergyJ << " @" << Simulator::Now().GetSeconds());
 
   if (m_remainingEnergyJ < energyToDecrease)

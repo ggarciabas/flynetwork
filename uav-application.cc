@@ -197,12 +197,16 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   }
 
   Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
-  double energy = dev->ChangeThreshold(); // atualiza valor minimo para retorno na bateria
+  double thrUav = dev->CalculateThreshold(); // atualiza valor minimo para retorno na bateria
+  Ptr<ClientDeviceEnergyModel> c_dev = GetNode()->GetObject<ClientDeviceEnergyModel>();
+  double thrCli = c_dev->CalculateThreshold();
+  DynamicCast<UavEnergySource>(GetNode()->GetObject<UavDeviceEnergyModel>()->GetEnergySource())->SetBasicEnergyLowBatteryThreshold((thrUav+thrCli)*1.1); // +10%!
+  
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/course_changed/course_changed_" << m_id << ".txt";
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << "," << energy << std::endl;
+  file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << "," << (thrUav+thrCli)*1.1 << std::endl;
   file.close();
   dev->StartHover();
 

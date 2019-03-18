@@ -120,6 +120,8 @@ public:
   void AddClient ();
   void RemoveClient();
 
+  double CalculateThreshold ();
+
 private:
 
   void DoDispose (void);

@@ -124,7 +124,7 @@ public:
 
   virtual void HandleEnergyRecharged (void);
 
-  double ChangeThreshold ();
+  double CalculateThreshold ();
 
   /**
    * \brief Handles energy changed.
