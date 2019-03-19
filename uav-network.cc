@@ -592,7 +592,7 @@ void UavNetwork::ConfigureUav(int total)
 
   /* client device energy model*/
   ClientDeviceEnergyModelHelper cliHelper;
-  DeviceEnergyModelContainer cliEnergyModels = cliHelper.Install(uav, sources);
+  DeviceEnergyModelContainer cliEnergyModels = cliHelper.Install(wifi, sources); // install on node, but device is used to set callbacks!
 
   /* device energy model */
   // WifiRadioEnergyModelHelper radioEnergyHelper;
@@ -667,10 +667,8 @@ void UavNetwork::ConfigureUav(int total)
     // Configure TotalEnergyConsumption
     // deviceModelsWifi.Get(c)->TraceConnectWithoutContext ("TotalEnergyConsumption", MakeCallback(&UavApplication::TotalEnergyConsumptionTrace,  uavApp));
 
-    // Mobility
-    
+    // Mobility    
     (*i)->GetObject<MobilityModel>()->TraceConnectWithoutContext ("CourseChange", MakeCallback (&UavApplication::CourseChange, uavApp));
-
     DynamicCast<UavMobilityModel>((*i)->GetObject<MobilityModel>())->TraceConnectWithoutContext ("CourseChangeDevice", MakeCallback (&UavDeviceEnergyModel::CourseChange, dev));
 
     // energy start

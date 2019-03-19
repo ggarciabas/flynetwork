@@ -57,47 +57,68 @@ void ClientDeviceEnergyModelHelper::Set(std::string name, const AttributeValue &
 }
 
 DeviceEnergyModelContainer
-ClientDeviceEnergyModelHelper::Install(Ptr<Node> node,
+ClientDeviceEnergyModelHelper::Install(Ptr<NetDevice> device,
                                     Ptr<EnergySource> source) const
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<node<<source);
-  NS_ASSERT(node != NULL);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() << device << source);
+  NS_ASSERT(device != NULL);
   NS_ASSERT(source != NULL);
   // check to make sure source and net node are on the same node
-  NS_ASSERT(node == source->GetNode());
-  DeviceEnergyModelContainer container(DoInstall(node, source));
+  NS_ASSERT(device->GetNode() == source->GetNode());
+  DeviceEnergyModelContainer container(DoInstall(device, source));
   return container;
 }
 
 DeviceEnergyModelContainer
-ClientDeviceEnergyModelHelper::Install(NodeContainer nodeContainer,
+ClientDeviceEnergyModelHelper::Install(NetDeviceContainer devContainer,
                                     EnergySourceContainer sourceContainer) const
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  NS_ASSERT(nodeContainer.GetN() <= sourceContainer.GetN());
+  NS_ASSERT(devContainer.GetN() <= sourceContainer.GetN());
   DeviceEnergyModelContainer container;
-  NodeContainer::Iterator node = nodeContainer.Begin();
+  NetDeviceContainer::Iterator dev = devContainer.Begin();
   EnergySourceContainer::Iterator src = sourceContainer.Begin();
-  while (node != nodeContainer.End())
+  while (dev != devContainer.End())
   {
     // check to make sure source and net node are on the same node
-    NS_ASSERT(*node == (*src)->GetNode());
-    Ptr<ClientDeviceEnergyModel> model = DoInstall(*node, *src);
+    NS_ASSERT((*dev)->GetNode() == (*src)->GetNode());
+    Ptr<ClientDeviceEnergyModel> model = DoInstall(*dev, *src);
     container.Add(model);
-    node++;
+    dev++;
     src++;
   }
   return container;
 }
 
 Ptr<ClientDeviceEnergyModel>
-ClientDeviceEnergyModelHelper::DoInstall(Ptr<Node> node, Ptr<EnergySource> source) const
+ClientDeviceEnergyModelHelper::DoInstall(Ptr<NetDevice> device, Ptr<EnergySource> source) const
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<node<<source);
-  NS_ASSERT(node != NULL);
-  NS_ASSERT(source != NULL);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() << device << source);
+  NS_ASSERT (device != NULL);
+  NS_ASSERT (source != NULL);
+  // check if device is WifiNetDevice
+  std::string deviceName = device->GetInstanceTypeId ().GetName ();
+  if (deviceName.compare ("ns3::WifiNetDevice") != 0)
+    {
+      NS_FATAL_ERROR ("NetDevice type is not WifiNetDevice!");
+    }
+  Ptr<Node> node = device->GetNode ();
   Ptr<ClientDeviceEnergyModel> model = m_energyModel.Create()->GetObject<ClientDeviceEnergyModel>();
   NS_ASSERT(model != NULL);
+
+  // make a callback to WifiPhy::SetOffMode
+  Ptr<WifiNetDevice> wifiDevice = DynamicCast<WifiNetDevice> (device); 
+  Ptr<WifiPhy> wifiPhy = wifiDevice->GetPhy ();
+  if (m_depletionCallback.IsNull ())
+    {
+      model->SetEnergyDepletionCallback (MakeCallback (&WifiPhy::SetOffMode, wifiPhy));
+    }
+  // make a callback to WifiPhy::ResumeFromOff
+  if (m_rechargedCallback.IsNull ())
+    {
+      model->SetEnergyRechargedCallback (MakeCallback (&WifiPhy::ResumeFromOff, wifiPhy));
+    }
+
   // set energy source
   model->SetEnergySource(source);
   DynamicCast<UavEnergySource>(source)->SetCliDeviceEnergyModel (model); // deveria se utilizar o appendDeviceEnergymodel para agregar ao energy source, mas ocorre um erro!

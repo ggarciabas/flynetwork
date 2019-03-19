@@ -54,7 +54,7 @@ public:
    * Installs an DeviceEnergyModel with a specified EnergySource onto a
    * xNetDevice.
    */
-  DeviceEnergyModelContainer Install(Ptr<Node> node,
+  DeviceEnergyModelContainer Install(Ptr<NetDevice> device,
                                         Ptr<EnergySource> source) const;
 
   /**
@@ -67,13 +67,13 @@ public:
    * Installs DeviceEnergyModels with specified EnergySources onto a list of
    * NetDevices.
    */
-  DeviceEnergyModelContainer Install(NodeContainer nodeContainer,
+  DeviceEnergyModelContainer Install(NetDeviceContainer devContainer,
                                         EnergySourceContainer sourceContainer) const;
 
   void Set(std::string name, const AttributeValue &v);
 
 private:
-  virtual Ptr<ClientDeviceEnergyModel> DoInstall(Ptr<Node> node, Ptr<EnergySource> source) const;
+  virtual Ptr<ClientDeviceEnergyModel> DoInstall(Ptr<NetDevice> dev, Ptr<EnergySource> source) const;
 
   ObjectFactory m_energyModel;
   ClientDeviceEnergyModel::EnergyCallback m_depletionCallback;
