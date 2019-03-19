@@ -138,7 +138,7 @@ void UavApplication::StartApplication(void)
   if (m_sendSck->Connect(InetSocketAddress(m_peer, m_serverPort))) {
     NS_FATAL_ERROR ("UAV - $$ [NÃO] conseguiu conectar com Servidor!");
   }
-  Simulator::Schedule(Seconds(ETAPA-20), &UavApplication::AskCliPosition, this);
+  m_askCliPos = Simulator::Schedule(Seconds(ETAPA-20), &UavApplication::AskCliPosition, this);
 }
 
 void UavApplication::Stop() 
@@ -396,30 +396,35 @@ UavApplication::TracedCallbackRxAppInfra (Ptr<const Packet> packet, const Addres
     std::vector<std::string> results(std::istream_iterator<std::string>{iss},
                                      std::istream_iterator<std::string>());
 
-    NS_LOG_INFO ("UavApplication::TracedCallbackRxAppInfra :: " << msg << " @" << Simulator::Now().GetSeconds());
+    NS_LOG_DEBUG ("UavApplication::TracedCallbackRxAppInfra " << m_id << " :: " << msg << " @" << Simulator::Now().GetSeconds());
 
     if (results.at(0).compare("CLIENT") == 0) { // received a message from a client
       Ipv4Address ip = InetSocketAddress::ConvertFrom(address).GetIpv4();
+      NS_LOG_DEBUG ("CLIENT " << ip << " " << m_id << " @" << Simulator::Now().GetSeconds());
       std::map<Ipv4Address, Ptr<ClientModel> >::iterator it = m_mapClient.find(ip);
-      std::string::size_type sz; // alias of size_t
-      std::vector<double> pos;
-      pos.push_back(std::stod (results.at(1),&sz));
-      pos.push_back(std::stod (results.at(2),&sz));
-      (it->second)->SetLogin(results.at(3));
-      (it->second)->SetPosition(pos.at(0), pos.at(1));
-      (it->second)->SetUpdatePos (Simulator::Now());
-      // repply to client to stop sending position, cliente para de enviar posicionamento apos 10s
-      if (m_socketClient && !m_socketClient->Connect (InetSocketAddress (ip, m_cliPort))) {
-        std::ostringstream msg;
-        msg << "CLIENTOK " << '\0';
-        uint16_t packetSize = msg.str().length() + 1;
-        Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
-        if (m_socketClient && m_socketClient->Send(packet, 0) == packetSize)
-        {
-          NS_LOG_DEBUG("UavApplication::TracedCallbackRxAppInfra envio pacote para " << ip);
-        } else {
-          NS_LOG_DEBUG("UavApplication::TracedCallbackRxAppInfra erro ao enviar solicitacao de posicionamento ao cliente no endereco " << ip);
+      if (it != m_mapClient.end()) {
+        std::string::size_type sz; // alias of size_t
+        std::vector<double> pos;
+        pos.push_back(std::stod (results.at(1),&sz));
+        pos.push_back(std::stod (results.at(2),&sz));
+        (it->second)->SetLogin(results.at(3));
+        (it->second)->SetPosition(pos.at(0), pos.at(1));
+        (it->second)->SetUpdatePos (Simulator::Now());
+        // repply to client to stop sending position, cliente para de enviar posicionamento apos 10s
+        if (m_socketClient && !m_socketClient->Connect (InetSocketAddress (ip, m_cliPort))) {
+          std::ostringstream msg;
+          msg << "CLIENTOK " << '\0';
+          uint16_t packetSize = msg.str().length() + 1;
+          Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
+          if (m_socketClient && m_socketClient->Send(packet, 0) == packetSize)
+          {
+            NS_LOG_DEBUG("UavApplication::TracedCallbackRxAppInfra envio pacote para " << ip);
+          } else {
+            NS_LOG_DEBUG("UavApplication::TracedCallbackRxAppInfra erro ao enviar solicitacao de posicionamento ao cliente no endereco " << ip);
+          }
         }
+      } else {
+        NS_FATAL_ERROR("Não encontrou o IP, problema com callback de envio de IPs. " << m_id);
       }
     }
     results.clear();
@@ -429,6 +434,7 @@ UavApplication::TracedCallbackRxAppInfra (Ptr<const Packet> packet, const Addres
 void 
 UavApplication::AskCliPosition()
 {
+  NS_LOG_FUNCTION (m_id << Simulator::Now().GetSeconds());
   for(std::map<Ipv4Address, Ptr<ClientModel> >::iterator i = m_mapClient.begin(); i != m_mapClient.end(); i++)
   {
     if (m_socketClient && !m_socketClient->Connect (InetSocketAddress (i->first, m_cliPort))) {

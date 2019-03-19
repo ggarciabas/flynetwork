@@ -144,6 +144,7 @@ void SmartphoneApplication::StartApplication(void)
   }
 
   m_socketUav = Socket::CreateSocket (GetNode(), UdpSocketFactory::GetTypeId ());
+  m_running = true;
 }
 
 void SmartphoneApplication::StopApplication(void)
@@ -207,7 +208,7 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
     }
     NS_LOG_INFO("SmartphoneApplication::SendPacketUav " << packet->GetReferenceCount());
   } else {
-    NS_LOG_DEBUG("SmartphoneApplication::SendPacketUa @" << Simulator::Now().GetSeconds() << " " << m_id << " cerro ao conectar com o servidor.");
+    NS_LOG_DEBUG("SmartphoneApplication::SendPacketUav @" << Simulator::Now().GetSeconds() << " " << m_id << " cerro ao conectar com o servidor.");
     NS_LOG_INFO ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " erro ao conectar socket com servidor " << m_uavPeer);
     #ifdef PACKET
       std::ostringstream os;
@@ -239,7 +240,7 @@ SmartphoneApplication::CourseChange(Ptr<const MobilityModel> mobility)
 void
 SmartphoneApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & address)
 {
-  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds()  << packet << address);
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds()  << packet << address);
   if (m_running) {
     uint8_t *buffer = new uint8_t[packet->GetSize()];
     packet->CopyData(buffer, packet->GetSize());
@@ -247,9 +248,12 @@ SmartphoneApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Addr
     std::istringstream iss(msg);
     std::vector<std::string> results(std::istream_iterator<std::string>{iss},
                                      std::istream_iterator<std::string>());
+
+    NS_LOG_DEBUG ("\tSmartphoneApplication::TracedCallbackRxApp " << m_login << " :: " << msg << " @" << Simulator::Now().GetSeconds());
+
     if (results.at(0).compare("CLIENTLOC") == 0) {
       Simulator::Remove(m_sendEventUav);
-      NS_LOG_DEBUG("CLIENT #" << m_id << " recebeu CLIENTLOC");
+      NS_LOG_DEBUG("\tCLIENT #" << m_id << " recebeu CLIENTLOC");
       m_sendEventUav = Simulator::ScheduleNow(&SmartphoneApplication::SendPacketUav, this);
       if (m_stopSendingB) {
         m_stopSending = Simulator::Schedule(Seconds(5.0), &SmartphoneApplication::StopSendingPosition, this);
@@ -259,7 +263,7 @@ SmartphoneApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Addr
       Simulator::Remove(m_sendEventUav);
       Simulator::Remove(m_stopSending);
       m_stopSendingB = true;
-      NS_LOG_DEBUG("CLIENT #" << m_id << " recebeu CLIENTOK");
+      NS_LOG_DEBUG("\tCLIENT #" << m_id << " recebeu CLIENTOK");
     }
   }
 }
@@ -322,8 +326,6 @@ void SmartphoneApplication::TracedCallbackNewLease (const Ipv4Address& ip)
     file.close();
   #endif
   NS_LOG_DEBUG ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " novo IP " << ip << " do servidor " << m_uavPeer);
-
-  SendPacketUav();
 }
 
 void
