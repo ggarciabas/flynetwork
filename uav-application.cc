@@ -460,6 +460,9 @@ UavApplication::TracedCallbackExpiryLease (const Ipv4Address& ip)
   NS_LOG_FUNCTION (m_id << ip);
   // Remover informacoes do mapa ; m_mapClient
   std::map<Ipv4Address, Ptr<ClientModel> >::iterator it = m_mapClient.find(ip);
+  if (m_mapClient.find(ip) == m_mapClient.end()) {
+    NS_FATAL_ERROR("UavApplication::TracedCallbackExpiryLease IP nao encontrado no container!");
+  }
   (it->second)->SetLogin("NOPOSITION"); // ignorado ao enviar informacoes para o servidor
 
   Ptr<ClientDeviceEnergyModel> c_dev = GetNode()->GetObject<ClientDeviceEnergyModel>();
@@ -470,17 +473,19 @@ void UavApplication::TracedCallbackNewLease (const Ipv4Address& ip)
 {
   NS_LOG_FUNCTION (m_id << ip);
   // adicionar IP no mapa
-  if (m_mapClient.find(ip) == m_mapClient.end()) { // nao tem cadastrado este IP
+  std::map<Ipv4Address, Ptr<ClientModel> >::iterator it = m_mapClient.find(ip);
+  if (it == m_mapClient.end()) { // nao tem cadastrado este IP
     ObjectFactory obj;
     obj.SetTypeId("ns3::ClientModel");
     obj.Set("Login", StringValue("NOPOSITION")); // id
     m_mapClient[ip] = obj.Create()->GetObject<ClientModel>();
+  } else {
+    (it->second)->SetLogin("NOPOSITION"); // ignorado ao enviar informacoes para o servidor, esperando atualizar
   }
 
   Ptr<ClientDeviceEnergyModel> c_dev = GetNode()->GetObject<ClientDeviceEnergyModel>();
   c_dev->AddClient();
 }
-
 
 void UavApplication::SendCliData ()
 {
