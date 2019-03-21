@@ -87,6 +87,7 @@ UavEnergySource::UavEnergySource()
   m_movAcum = 0.0;
   m_cliAcum = 0.0;
   m_hoverAcum = 0.0;
+  m_wifiAcum = 0.0;
 }
 
 UavEnergySource::~UavEnergySource()
@@ -164,9 +165,42 @@ UavEnergySource::GetEnergyFraction (void)
 }
 
 void
-UavEnergySource::UpdateEnergySource (void)
+UavEnergySource::UpdateEnergySource (void) // chamado pelo device wifi-radio-energy-model
 {
   NS_LOG_FUNCTION (this);
+  NS_LOG_DEBUG ("UavEnergySource:Updating remaining energy.");
+
+  double remainingEnergy = m_remainingEnergyJ;
+  CalculateRemainingEnergy ();
+
+  m_lastUpdateTime = Simulator::Now ();
+
+  if (m_remainingEnergyJ <= 0)
+  {
+    NS_FATAL_ERROR("UavEnergySource::UpdateEnergySource energy bellow ZERO! [" << m_node->GetId() << "] " << remainingEnergy << " ____  " << (remainingEnergy-m_remainingEnergyJ) << " @" << Simulator::Now().GetSeconds());
+  }
+
+  if (!m_depleted && m_remainingEnergyJ/m_initialEnergyJ <= m_lowBatteryTh)
+  {
+    NS_LOG_DEBUG("UavEnergySource::UpdateEnergySource DEPLETION [" << m_node->GetId() << "] @" << Simulator::Now().GetSeconds());
+    m_depleted = true;
+    HandleEnergyDrainedEvent();
+  }
+  
+  // salvando historico do consumo de bateria por movimentacao
+  if (m_node) {
+    std::ostringstream os;
+    os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_wifi/uav_wifi_acum_" << m_node->GetId() << ".txt";
+    m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    m_wifiAcum += (remainingEnergy-m_remainingEnergyJ);
+    m_file << Simulator::Now().GetSeconds() << "," << m_wifiAcum/m_initialEnergyJ << std::endl;
+    m_file.close();
+    os.str("");
+    os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_remaining_energy/uav_remaining_energy_" << m_node->GetId() << ".txt";
+    m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << "," << m_lowBatteryTh << ",client" << std::endl;
+    m_file.close();
+  }
 }
 
 void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
@@ -296,8 +330,10 @@ void UavEnergySource::HandleEnergyDrainedEvent(void)
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_INFO("UavEnergySource:Energy depleted!");
   NotifyEnergyDrained(); // notify DeviceEnergyModel objects
-  m_cliDevModel->HandleEnergyDepletion();
-  m_uavDevModel->HandleEnergyDepletion(); // deveria se utilizar o energysource container, porem ocorre um erro não analisado
+  if (m_cliDevModel != NULL)
+    m_cliDevModel->HandleEnergyDepletion();
+  if (m_uavDevModel != NULL)
+    m_uavDevModel->HandleEnergyDepletion(); // deveria se utilizar o energysource container, porem ocorre um erro não analisado
 }
 
 void
@@ -335,10 +371,13 @@ void UavEnergySource::Reset () {
   m_remainingEnergyJ = m_initialEnergyJ;
   m_movAcum = 0.0;
   m_cliAcum = 0.0;
+  m_wifiAcum = 0.0;
   m_hoverAcum = 0.0;
   NotifyEnergyRecharged();
-  m_cliDevModel->HandleEnergyRecharged(); // deveria se utilizar o energy source container, porem erro!
-  m_uavDevModel->HandleEnergyRecharged(); // deveria se utilizar o energy source container, porem erro!
+  if (m_cliDevModel != NULL)
+    m_cliDevModel->HandleEnergyRecharged(); // deveria se utilizar o energy source container, porem erro!
+  if (m_uavDevModel != NULL)
+    m_uavDevModel->HandleEnergyRecharged(); // deveria se utilizar o energy source container, porem erro!
 }
 
 void UavEnergySource::Start () {
@@ -353,8 +392,10 @@ void UavEnergySource::Stop () {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_depleted = true;
   NotifyEnergyChanged();
-  m_cliDevModel->HandleEnergyChanged();
-  m_uavDevModel->HandleEnergyChanged(); // deveria se utilizar o energy source container, porem erro!
+  if (m_cliDevModel != NULL)
+    m_cliDevModel->HandleEnergyChanged();
+  if (m_uavDevModel != NULL)
+    m_uavDevModel->HandleEnergyChanged(); // deveria se utilizar o energy source container, porem erro!
 }
 
 

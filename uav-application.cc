@@ -139,6 +139,7 @@ void UavApplication::StartApplication(void)
     NS_FATAL_ERROR ("UAV - $$ [NÃO] conseguiu conectar com Servidor!");
   }
   m_askCliPos = Simulator::Schedule(Seconds(ETAPA-20), &UavApplication::AskCliPosition, this);
+  m_updateThreshold = Simulator::Schedule(Seconds(ETAPA/4),&UavApplication::UpdateThreshold, this);
 }
 
 void UavApplication::Stop() 
@@ -198,9 +199,15 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
 
   Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
   double thrUav = dev->CalculateThreshold(); // atualiza valor minimo para retorno na bateria
-  Ptr<ClientDeviceEnergyModel> c_dev = GetNode()->GetObject<ClientDeviceEnergyModel>();
-  double thrCli = c_dev->CalculateThreshold();
-  DynamicCast<UavEnergySource>(GetNode()->GetObject<UavDeviceEnergyModel>()->GetEnergySource())->SetBasicEnergyLowBatteryThreshold((thrUav+thrCli)*1.1); // +10%!
+  Ptr<ClientDeviceEnergyModel> c_dev = GetNode()->GetObject<ClientDeviceEnergyModel>();   
+  double thrCli = 0.0;
+  if (c_dev != NULL) { 
+    thrCli = c_dev->CalculateThreshold();
+    
+  } else {
+    thrCli = m_meanConsumption;
+  }
+  DynamicCast<UavEnergySource>(GetNode()->GetObject<UavDeviceEnergyModel>()->GetEnergySource())->SetBasicEnergyLowBatteryThreshold((thrUav+thrCli)*2); // +200%!
   
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/course_changed/course_changed_" << m_id << ".txt";
@@ -210,6 +217,26 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   file.close();
   dev->StartHover();
 
+}
+
+void
+UavApplication::UpdateThreshold ()
+{
+  m_updateThreshold.Cancel();
+
+  Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
+  double thrUav = dev->CalculateThreshold(); // atualiza valor minimo para retorno na bateria
+  Ptr<ClientDeviceEnergyModel> c_dev = GetNode()->GetObject<ClientDeviceEnergyModel>();   
+  double thrCli = 0.0;
+  if (c_dev != NULL) { 
+    thrCli = c_dev->CalculateThreshold();
+    
+  } else {
+    thrCli = m_meanConsumption;
+  }
+  DynamicCast<UavEnergySource>(GetNode()->GetObject<UavDeviceEnergyModel>()->GetEnergySource())->SetBasicEnergyLowBatteryThreshold((thrUav+thrCli)*1.5); // +50%!
+
+  m_updateThreshold = Simulator::Schedule(Seconds(ETAPA/4),&UavApplication::UpdateThreshold, this);
 }
 
 void
@@ -466,7 +493,8 @@ UavApplication::TracedCallbackExpiryLease (const Ipv4Address& ip)
   (it->second)->SetLogin("NOPOSITION"); // ignorado ao enviar informacoes para o servidor
 
   Ptr<ClientDeviceEnergyModel> c_dev = GetNode()->GetObject<ClientDeviceEnergyModel>();
-  c_dev->RemoveClient();
+  if (c_dev != NULL)
+    c_dev->RemoveClient();
 }
 
 void UavApplication::TracedCallbackNewLease (const Ipv4Address& ip)
@@ -484,7 +512,8 @@ void UavApplication::TracedCallbackNewLease (const Ipv4Address& ip)
   }
 
   Ptr<ClientDeviceEnergyModel> c_dev = GetNode()->GetObject<ClientDeviceEnergyModel>();
-  c_dev->AddClient();
+  if (c_dev != NULL)
+    c_dev->AddClient();
 }
 
 void UavApplication::SendCliData ()

@@ -93,6 +93,8 @@ private:
   void SendPacketDepletion(void);
   void AskCliPosition();
 
+  void UpdateThreshold ();
+
   uint32_t m_id;
   uint16_t m_serverPort;
   uint16_t m_cliPort;
@@ -110,6 +112,7 @@ private:
   EventId m_sendCliDataEvent;
   EventId m_packetDepletion;
   EventId m_askCliPos;
+  EventId m_updateThreshold;
   bool m_running;
   TracedCallback<std::string> m_packetTrace;
   Callback<void> m_setOffWifiPhyInfra; // turn off wifiphy

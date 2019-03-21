@@ -170,6 +170,7 @@ private:
   double m_hoverAcum;
   double m_movAcum;
   double m_cliAcum;
+  double m_wifiAcum;
 
   std::string m_pathData;
 

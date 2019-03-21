@@ -127,7 +127,7 @@ double UavDeviceEnergyModel::CalculateThreshold () {
   Vector actual = m_node->GetObject<MobilityModel>()->GetPosition();
   double distance = std::sqrt(std::pow(m_xCentral - actual.x, 2) + std::pow(m_yCentral - actual.y, 2));
   NS_ASSERT(distance >= 0);
-  double thr = ((m_energyCost * distance) + m_energyUpdateInterval.GetSeconds()*m_hoverCost) / m_source->GetInitialEnergy(); // % necessaria para voltar a central de onde está, mais o custo de hover durante o intervalo de atualização
+  double thr = ((m_energyCost * distance) + m_energyUpdateInterval.GetSeconds()*m_hoverCost*2) / m_source->GetInitialEnergy(); // % necessaria para voltar a central de onde está, mais o custo de hover durante o intervalo de atualização tanto para sair quanto quando chegar ao local, para enviar informacao a central de que chegou e que necessita se retirado
   return thr;
 }
 

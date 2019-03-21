@@ -43,6 +43,8 @@
 namespace ns3
 {
 
+  class SmartphoneApplication;
+
 /**
  * UavNetwork
  *
@@ -88,6 +90,7 @@ private:
   void ConfigureCli();
   void ConfigurePalcos();
   void ConfigureServer();
+  void ConfigureApplication();
 
 private:
 
@@ -136,6 +139,9 @@ private:
   Ipv4InterfaceContainer m_serverAddress;
   double m_iniX, m_iniY; // posicao inicial do UAV para nao interferir nos resultados!
   double m_scheduleServer;
+
+  EventId m_newApp; // controla as aplicacoes dos usuarios
+  std::vector<Ptr<SmartphoneApplication> > m_appSmart;
 
   // AthstatsHelper m_athstats;
 

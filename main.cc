@@ -45,19 +45,19 @@ int main (int argc, char *argv[])
 	double sim_time=1200.0, cli_pos_update = 5.0, scheduleServer=ETAPA;
 	uint32_t scenario = 7, env = 2, protocol = 2, custo=1;
 	CommandLine cmd;
-  cmd.AddValue ("SimTime", "Simulation time", sim_time);
-  cmd.AddValue ("CliUpdate", "Client update position", cli_pos_update);
-  cmd.AddValue ("Scenario", "Scenario", scenario);
-  cmd.AddValue ("Env", "Environment", env);
-  cmd.AddValue ("Protocol", "Routing Protocol", protocol);
+	cmd.AddValue ("SimTime", "Simulation time", sim_time);
+	cmd.AddValue ("CliUpdate", "Client update position", cli_pos_update);
+	cmd.AddValue ("Scenario", "Scenario", scenario);
+	cmd.AddValue ("Env", "Environment", env);
+	cmd.AddValue ("Protocol", "Routing Protocol", protocol);
 	cmd.AddValue ("ScheduleServer", "Tempo minimo etapa", scheduleServer);
 	cmd.AddValue ("Custo", "Metrica de análise do DA de Posicionamento", custo);
-  cmd.Parse (argc, argv);
+	cmd.Parse (argc, argv);
 
 	// LogComponentEnable("UavNetwork", LOG_DEBUG);
 	// LogComponentEnable("ServerApplication", LOG_DEBUG);
 	// LogComponentEnable("LocationModel", LOG_DEBUG);
-	LogComponentEnable("UavApplication", LOG_FUNCTION);
+	// LogComponentEnable("UavApplication", LOG_FUNCTION);
 	// LogComponentEnable("UavApplication", LOG_DEBUG);
 	// LogComponentEnable("SmartphoneApplication", LOG_DEBUG);
 	// LogComponentEnable("DhcpClient", LOG_DEBUG);
@@ -70,7 +70,7 @@ int main (int argc, char *argv[])
 	// LogComponentEnable("LocationModelContainer", LOG_FUNCTION);
 	// LogComponentEnable("LocationModel", LOG_FUNCTION);
 	// LogComponentEnable("ServerApplication", LOG_FUNCTION);
-	LogComponentEnable("SmartphoneApplication", LOG_FUNCTION);
+	// LogComponentEnable("SmartphoneApplication", LOG_FUNCTION);
 	// LogComponentEnable("SmartphoneApplication", LOG_DEBUG);
 	// LogComponentEnable("UavApplicationContainer", LOG_FUNCTION);
 	// LogComponentEnable("UavApplication", LOG_FUNCTION);
