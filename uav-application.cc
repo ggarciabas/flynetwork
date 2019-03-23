@@ -19,7 +19,7 @@
  */
 
 #include "uav-application.h"
-
+#include "ns3/internet-apps-module.h"
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 #include "uav-device-energy-model.h"
@@ -257,17 +257,20 @@ void
 UavApplication::EnergyRechargedCallback()
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  NS_LOG_INFO("---- EnergyRechargedCallback ");
+  NS_LOG_DEBUG("---- EnergyRechargedCallback #" << m_id << " @" << Simulator::Now().GetSeconds());
 
-  // reiniciando aplicacao DHCP
-  int app = GetNode()->GetNApplications()-1;
-  Ptr<DhcpServer> dhcp = NULL;
-  do {
-    dhcp = DynamicCast<DhcpServer>(GetNode()->GetApplication(app));
-    --app;
-  } while (dhcp==NULL && app >= 0);
-  NS_ASSERT (dhcp != NULL);
-  dhcp->Resume();
+  if (m_depleted) {
+    // reiniciando aplicacao DHCP
+    int app = GetNode()->GetNApplications()-1;
+    Ptr<DhcpServer> dhcp = NULL;
+    do {
+      dhcp = DynamicCast<DhcpServer>(GetNode()->GetApplication(app));
+      --app;
+    } while (dhcp==NULL && app >= 0);
+    NS_ASSERT (dhcp != NULL);
+    dhcp->Resume();
+  }
+  
 }
 
 void

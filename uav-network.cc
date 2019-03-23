@@ -699,7 +699,6 @@ void UavNetwork::ConfigureUav(int total)
                         Ipv4Address (serverAddr.str().c_str()));
     dhcpServerApp.Get(0)->TraceConnectWithoutContext("NewLease", MakeCallback(&UavApplication::TracedCallbackNewLease, uavApp));
     dhcpServerApp.Get(0)->TraceConnectWithoutContext("ExpireLease", MakeCallback(&UavApplication::TracedCallbackExpiryLease, uavApp));
-    dhcpServerApp.Start (Seconds (0.0));
     dhcpServerApp.Stop (Seconds(m_simulationTime));
     m_uavAppContainer.Add(uavApp); // armazenando informacoes das aplicacoes dos UAVs para que os clientes possam obter informacoes necessarias para se conectar no UAV mais proximo!
   }  
