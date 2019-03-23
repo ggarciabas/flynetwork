@@ -74,14 +74,6 @@ public:
 
   double GetHoverCost ();
   /**
-   * \brief Gets pointer to node.
-   *
-   * \returns Pointer to node.
-   *
-   */
-  virtual Ptr<Node> GetNode(void) const;
-
-  /**
    * \returns Total energy consumption of the vehicle.
    *
    * Implements DeviceEnergyModel::GetTotalEnergyConsumption.
@@ -164,7 +156,6 @@ private:
   Vector m_lastPosition;
   double m_energyCost; // energy cost to a unit of distance J/m
   Ptr<EnergySource> m_source;
-  Ptr<Node> m_node;
   EventId m_hoverEvent;
   Time m_lastTime;
   std::ofstream m_file;

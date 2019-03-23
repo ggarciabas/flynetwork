@@ -49,6 +49,7 @@ UavEnergySourceHelper::DoInstall(Ptr<Node> node) const
   Ptr<EnergySource> source = m_uavEnergySource.Create()->GetObject<EnergySource>();
   NS_ASSERT(source != NULL);
   source->SetNode(node);
+  node->AggregateObject(source);
   return source;
 }
 
