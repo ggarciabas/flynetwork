@@ -259,7 +259,7 @@ UavApplication::EnergyRechargedCallback()
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG("---- EnergyRechargedCallback #" << m_id << " @" << Simulator::Now().GetSeconds());
 
-  if (m_depleted) {
+  if (m_depletion) {
     // reiniciando aplicacao DHCP
     int app = GetNode()->GetNApplications()-1;
     Ptr<DhcpServer> dhcp = NULL;
@@ -270,7 +270,7 @@ UavApplication::EnergyRechargedCallback()
     NS_ASSERT (dhcp != NULL);
     dhcp->Resume();
   }
-  
+
 }
 
 void
