@@ -258,6 +258,16 @@ UavApplication::EnergyRechargedCallback()
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   NS_LOG_INFO("---- EnergyRechargedCallback ");
+
+  // reiniciando aplicacao DHCP
+  int app = GetNode()->GetNApplications()-1;
+  Ptr<DhcpServer> dhcp = NULL;
+  do {
+    dhcp = DynamicCast<DhcpServer>(GetNode()->GetApplication(app));
+    --app;
+  } while (dhcp==NULL && app >= 0);
+  NS_ASSERT (dhcp != NULL);
+  dhcp->Resume();
 }
 
 void
@@ -270,6 +280,16 @@ UavApplication::EnergyDepletionCallback()
   m_packetDepletion = Simulator::ScheduleNow(&UavApplication::SendPacketDepletion, this);
   // Ir para central
   GetNode()->GetObject<MobilityModel>()->SetPosition(Vector(m_central.at(0), m_central.at(1), 1.0)); // Verficar necessidade de subir em no eixo Z
+
+  // pausando aplicacao DHCP
+  int app = GetNode()->GetNApplications()-1;
+  Ptr<DhcpServer> dhcp = NULL;
+  do {
+    dhcp = DynamicCast<DhcpServer>(GetNode()->GetApplication(app));
+    --app;
+  } while (dhcp==NULL && app >= 0);
+  NS_ASSERT (dhcp != NULL);
+  dhcp->Pause();
 
 }
 
