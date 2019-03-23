@@ -467,7 +467,7 @@ void UavNetwork::NewUav(int total, int update) // update = 0- normal 1- supply 2
     model->SetFirstPosition(v); // manda para perto da central!
 
     // Aumentar carga de bateria para máximo!
-    Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>(n->GetObject<EnergySource>());
+    Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>(n->GetObject<UavDeviceEnergyModel>()->GetEnergySource());
     source->Reset(); // recarregando
 
     // Start application
@@ -528,7 +528,7 @@ void UavNetwork::RemoveUav(int id, int step)
   model->SetFirstPosition(v); // manda para perto da central!
 
   // Parar UAV
-  Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>(n->GetObject<EnergySource>());
+  Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>(n->GetObject<UavDeviceEnergyModel>()->GetEnergySource());
   source->Stop(); // recarregando
 
   std::ostringstream os;
@@ -677,7 +677,7 @@ void UavNetwork::ConfigureUav(int total)
     DynamicCast<UavMobilityModel>((*i)->GetObject<MobilityModel>())->TraceConnectWithoutContext ("CourseChangeDevice", MakeCallback (&UavDeviceEnergyModel::CourseChange, dev));
 
     // energy start
-    Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>((*i)->GetObject<EnergySource>());
+    Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>((*i)->GetObject<UavDeviceEnergyModel>()->GetEnergySource());
     source->Start();
 
     // Configure DHCP

@@ -121,12 +121,12 @@ UavDeviceEnergyModelHelper::DoInstall(Ptr<Node> node, Ptr<EnergySource> source) 
     NS_FATAL_ERROR("Callback Recharged is null");
 
   // add model to device model list in energy source
-  source->AppendDeviceEnergyModel(model);
-  // DynamicCast<UavEnergySource>(source)->SetDeviceEnergyModel (model); // deveria se utilizar o appendDeviceEnergymodel para agregar ao energy source, mas ocorre um erro!
+  // source->AppendDeviceEnergyModel(model);
+  DynamicCast<UavEnergySource>(source)->SetDeviceEnergyModel (model); // deveria se utilizar o appendDeviceEnergymodel para agregar ao energy source, mas ocorre um erro! por conta da agregacao abaixo, mas esta é necessaria para que se possa obter os devices de energia e fazer configuracoes!
   // set energy source
   model->SetEnergySource(source);
   // adicionando dispositivo no nó
-  // node->AggregateObject(model);
+  node->AggregateObject(model);
   return model;
 }
 
