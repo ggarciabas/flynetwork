@@ -300,6 +300,7 @@ void UavDeviceEnergyModel::StopHover()
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_hoverEvent.Cancel();
   HoverConsumption();
+  m_hoverEvent.Cancel(); /// removendo a programacao 
 }
 
 void UavDeviceEnergyModel::StartHover()

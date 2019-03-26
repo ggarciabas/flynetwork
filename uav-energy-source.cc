@@ -373,11 +373,11 @@ void UavEnergySource::Reset () {
   m_cliAcum = 0.0;
   m_wifiAcum = 0.0;
   m_hoverAcum = 0.0;
-  NotifyEnergyRecharged();
   if (m_cliDevModel != NULL)
     m_cliDevModel->HandleEnergyRecharged(); // deveria se utilizar o energy source container, porem erro!
   if (m_uavDevModel != NULL)
     m_uavDevModel->HandleEnergyRecharged(); // deveria se utilizar o energy source container, porem erro!
+  NotifyEnergyRecharged();
 }
 
 void UavEnergySource::Start () {

@@ -62,7 +62,8 @@ int main (int argc, char *argv[])
 	// LogComponentEnable("SmartphoneApplication", LOG_DEBUG);
 	// LogComponentEnable("WifiPhyStateHelper", LOG_FUNCTION);
 	// LogComponentEnable("WifiPhy", LOG_FUNCTION);
-
+	LogComponentEnable ("WifiPhyStateHelper", LOG_DEBUG);
+	LogComponentEnable ("WifiRadioEnergyModel", LOG_DEBUG);
 
 
 	// LogComponentEnable("DhcpClient", LOG_FUNCTION);
