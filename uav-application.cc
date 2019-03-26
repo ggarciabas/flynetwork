@@ -140,6 +140,10 @@ void UavApplication::StartApplication(void)
   }
   m_askCliPos = Simulator::Schedule(Seconds(ETAPA-20), &UavApplication::AskCliPosition, this);
   m_updateThreshold = Simulator::Schedule(Seconds(ETAPA/4),&UavApplication::UpdateThreshold, this);
+
+  // ao ser inserido na rede inicia hovering
+  Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
+  dev->StartHover();
 }
 
 void UavApplication::Stop() 
@@ -149,6 +153,10 @@ void UavApplication::Stop()
   // SetStopTime(Simulator::Now());
   Simulator::Remove(m_stopEvent);
   StopApplication();
+
+  // Para o hover
+  Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
+  dev->StopHover();
 }
 
 void UavApplication::StopApplication()
@@ -191,9 +199,12 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
 
   Simulator::Remove(m_sendEvent);
   NS_LOG_DEBUG("UAV #" << m_id << " chegou ao seu posicionamento final.");
-  SendPacket();
+  SendPacket();  
 
   if (m_depletion) {
+    Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
+    dev->StartHover();
+    NS_LOG_DEBUG ("[" << m_id << "] Starting hovering in the location waiting central to remove @" << Simulator::Now().GetSeconds());
     return; // nao fazer topicos abaixo em estado de emergencia
   }
 
@@ -282,6 +293,8 @@ UavApplication::EnergyDepletionCallback()
   // avisar central e mudar posição para central!
   m_packetDepletion = Simulator::ScheduleNow(&UavApplication::SendPacketDepletion, this);
   // Ir para central
+  Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
+  dev->StopHover();
   GetNode()->GetObject<MobilityModel>()->SetPosition(Vector(m_central.at(0), m_central.at(1), 1.0)); // Verficar necessidade de subir em no eixo Z
 
   // pausando aplicacao DHCP

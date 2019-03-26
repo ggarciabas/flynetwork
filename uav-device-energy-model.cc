@@ -139,13 +139,15 @@ void UavDeviceEnergyModel::HandleEnergyRecharged (void)
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << Simulator::Now().GetSeconds() << "," << m_source->GetNode()->GetId() << "," << m_source->GetRemainingEnergy() << std::endl;
   m_file.close();
-  m_energyRechargedCallback();
+
   m_totalEnergyConsumption = 0.0;
   m_lastPosition = m_source->GetNode()->GetObject<MobilityModel>()->GetPosition();
   m_lastTime = Simulator::Now();
   m_hoverEvent = Simulator::Schedule(m_energyUpdateInterval,
                                           &UavDeviceEnergyModel::HoverConsumption,
                                             this);
+  
+  m_energyRechargedCallback();
 }
 
 void UavDeviceEnergyModel::HandleEnergyChanged(void)
@@ -303,6 +305,7 @@ void UavDeviceEnergyModel::StopHover()
 void UavDeviceEnergyModel::StartHover()
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_DEBUG ("UavDeviceEnergyModel::StartHover @" << Simulator::Now().GetSeconds());
   m_lastTime = Simulator::Now();
   m_hoverEvent = Simulator::Schedule(m_energyUpdateInterval,
                                           &UavDeviceEnergyModel::HoverConsumption,
