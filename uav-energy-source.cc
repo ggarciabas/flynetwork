@@ -121,6 +121,7 @@ void
 UavEnergySource::SetBasicEnergyLowBatteryThreshold (double thr)
 {
   NS_LOG_FUNCTION (this << thr);
+  NS_LOG_DEBUG ("UavEnergySource::SetBasicEnergyLowBatteryThreshold [" << m_node->GetId() << "] thr: " << thr << "J @" << Simulator::Now().GetSeconds());
   m_lowBatteryTh = thr;
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_energy_threshold/uav_energy_threshold_" << m_node->GetId() << ".txt";
@@ -169,7 +170,7 @@ UavEnergySource::UpdateEnergySource (void) // chamado pelo device wifi-radio-ene
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT(m_onoff);
-  NS_LOG_DEBUG ("UavEnergySource:Updating remaining energy.");
+  // NS_LOG_DEBUG ("UavEnergySource:Updating remaining energy.");
 
   double remainingEnergy = m_remainingEnergyJ;
   CalculateRemainingEnergy ();
@@ -178,12 +179,12 @@ UavEnergySource::UpdateEnergySource (void) // chamado pelo device wifi-radio-ene
 
   if (m_remainingEnergyJ <= 0)
   {
-    NS_FATAL_ERROR("UavEnergySource::UpdateEnergySource energy bellow ZERO! [" << m_node->GetId() << "] " << remainingEnergy << " ____  " << (remainingEnergy-m_remainingEnergyJ) << " @" << Simulator::Now().GetSeconds());
+    NS_FATAL_ERROR("UavEnergySource::UpdateEnergySource energy bellow ZERO! [" << m_node->GetId() << "] ed: " << remainingEnergy-m_remainingEnergyJ << " re: " << remainingEnergy << "J @" << Simulator::Now().GetSeconds());
   }
 
-  if (!m_depleted && m_remainingEnergyJ/m_initialEnergyJ <= m_lowBatteryTh)
+  if (!m_depleted && m_remainingEnergyJ <= m_lowBatteryTh*m_initialEnergyJ)
   {
-    NS_LOG_DEBUG("UavEnergySource::UpdateEnergySource DEPLETION [" << m_node->GetId() << "] @" << Simulator::Now().GetSeconds());
+    NS_LOG_DEBUG("UavEnergySource::UpdateEnergySource DEPLETION [" << m_node->GetId() << "] ed: " << remainingEnergy-m_remainingEnergyJ << " re: " << m_remainingEnergyJ << "J thr: " << m_lowBatteryTh*m_initialEnergyJ << "J @" << Simulator::Now().GetSeconds());
     m_depleted = true;
     HandleEnergyDrainedEvent();
   }
@@ -206,13 +207,12 @@ UavEnergySource::UpdateEnergySource (void) // chamado pelo device wifi-radio-ene
 
 void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
 {
-  NS_LOG_DEBUG("UavEnergySource:UpdateEnergySourceClient [" << m_node->GetId() << "] rem: " << m_remainingEnergyJ << " @" << Simulator::Now().GetSeconds());
+  NS_LOG_DEBUG("UavEnergySource:UpdateEnergySourceClient [" << m_node->GetId() << "] rem: " << m_remainingEnergyJ << "J @" << Simulator::Now().GetSeconds());
   NS_ASSERT(m_onoff);
 
   if (m_remainingEnergyJ < energyToDecrease)
   {
-    m_remainingEnergyJ = 0; // energy never goes below 0
-    NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceClient energy bellow ZERO! [" << m_node->GetId() << "] " << m_remainingEnergyJ << " ____  " << energyToDecrease << " @" << Simulator::Now().GetSeconds());
+    NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceClient energy bellow ZERO! [" << m_node->GetId() << "] " << m_remainingEnergyJ << "J ____  " << energyToDecrease << "J @" << Simulator::Now().GetSeconds());
   }
   else
   {
@@ -221,7 +221,7 @@ void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
 
   if (!m_depleted && m_remainingEnergyJ/m_initialEnergyJ <= m_lowBatteryTh)
   {
-    NS_LOG_DEBUG("UavEnergySource::UpdateEnergySourceClient DEPLETION [" << m_node->GetId() << "] @" << Simulator::Now().GetSeconds());
+    NS_LOG_DEBUG("UavEnergySource::UpdateEnergySourceClient DEPLETION [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << m_lowBatteryTh * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
     m_depleted = true;
     HandleEnergyDrainedEvent();
   }
@@ -248,8 +248,7 @@ void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
   NS_ASSERT(m_onoff);
   if (m_remainingEnergyJ < energyToDecrease)
   {
-    m_remainingEnergyJ = 0; // energy never goes below 0
-    NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceMove energy bellow ZERO! [" << m_node->GetId() << "] ed: " << energyToDecrease/m_remainingEnergyJ << " ___ " << m_remainingEnergyJ << " ____  " << energyToDecrease << " @" << Simulator::Now().GetSeconds());
+    NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceMove energy bellow ZERO! [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << m_lowBatteryTh * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
   }
   else
   {
@@ -258,7 +257,7 @@ void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
 
   if (!m_depleted && m_remainingEnergyJ/m_initialEnergyJ <= m_lowBatteryTh)
   {
-    NS_LOG_DEBUG("UavEnergySource::UpdateEnergySourceMove DEPLETION [" << m_node->GetId() << "] @" << Simulator::Now().GetSeconds());
+    NS_LOG_DEBUG("UavEnergySource::UpdateEnergySourceMove DEPLETION [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << m_lowBatteryTh * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
     m_depleted = true;
     HandleEnergyDrainedEvent();
   }
@@ -290,12 +289,11 @@ void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << energyToDecrease);
   NS_ASSERT(m_onoff);
-  // NS_LOG_DEBUG("UavEnergySource:UpdateEnergySourceHover [" << m_node->GetId() << "] rem: " << m_remainingEnergyJ << " @" << Simulator::Now().GetSeconds());
+  NS_LOG_DEBUG("UavEnergySource:UpdateEnergySourceHover [" << m_node->GetId() << "] rem: " << m_remainingEnergyJ << "J cons: " << energyToDecrease << "J @" << Simulator::Now().GetSeconds());
 
   if (m_remainingEnergyJ < energyToDecrease)
   {
-    m_remainingEnergyJ = 0; // energy never goes below 0
-    NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceHover energy bellow ZERO! [" << m_node->GetId() << "] " << m_remainingEnergyJ << " ____  " << energyToDecrease << " @" << Simulator::Now().GetSeconds());
+    NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceHover energy bellow ZERO! [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << m_lowBatteryTh * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
   }
   else
   {
@@ -304,7 +302,7 @@ void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
 
   if (!m_depleted && m_remainingEnergyJ/m_initialEnergyJ <= m_lowBatteryTh)
   {
-    NS_LOG_DEBUG("UavEnergySource::UpdateEnergySourceHover DEPLETION  [" << m_node->GetId() << "] @" << Simulator::Now().GetSeconds());
+    NS_LOG_DEBUG("UavEnergySource::UpdateEnergySourceHover DEPLETION  [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << m_lowBatteryTh * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
     m_depleted = true;
     HandleEnergyDrainedEvent();
   }

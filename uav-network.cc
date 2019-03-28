@@ -599,7 +599,7 @@ void UavNetwork::ConfigureUav(int total)
   // install device model
   DeviceEnergyModelContainer deviceModelsWifi = radioEnergyHelper.Install (wifi, sources);
   // install device model
-  // DeviceEnergyModelContainer deviceModelsAdhoc = radioEnergyHelper.Install (adhoc, sources);
+  DeviceEnergyModelContainer deviceModelsAdhoc = radioEnergyHelper.Install (adhoc, sources);
 
   // create and configure UAVApp and Sink application
   int c = 0;

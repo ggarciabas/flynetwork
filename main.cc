@@ -79,9 +79,9 @@ int main (int argc, char *argv[])
 	// LogComponentEnable("UavApplicationContainer", LOG_FUNCTION);
 	// LogComponentEnable("UavApplication", LOG_FUNCTION);
 	// LogComponentEnable("UavDeviceEnergyModelHelper", LOG_FUNCTION);
-	// LogComponentEnable("UavDeviceEnergyModel", LOG_FUNCTION);
+	LogComponentEnable("UavDeviceEnergyModel", LOG_DEBUG);
 	// LogComponentEnable("UavEnergySourceHelper", LOG_FUNCTION);
-	// LogComponentEnable("UavEnergySource", LOG_FUNCTION);
+	LogComponentEnable("UavEnergySource", LOG_DEBUG);
 	// LogComponentEnable("UavMobilityModel", LOG_DEBUG);
 	// LogComponentEnable("UavModelContainer", LOG_FUNCTION);
 	// LogComponentEnable("UavModel", LOG_DEBUG);

@@ -237,8 +237,7 @@ UavDeviceEnergyModel::GetTotalEnergyConsumption (void) const
 
 void UavDeviceEnergyModel::HoverConsumption(void)
 {
-  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  NS_LOG_DEBUG("UavDeviceEnergyModel:HoverConsumption.");
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );  
 
   // do not update if simulation has finished
   if (Simulator::IsFinished())
@@ -251,6 +250,7 @@ void UavDeviceEnergyModel::HoverConsumption(void)
   double diff_time = Simulator::Now().GetSeconds() - m_lastTime.GetSeconds();
   double energyToDecrease = m_hoverCost * diff_time;
   m_totalEnergyConsumption += energyToDecrease;
+  NS_LOG_DEBUG("UavDeviceEnergyModel:HoverConsumption diff: " << diff_time << " energy: " << energyToDecrease/ m_source->GetInitialEnergy() << " @" << Simulator::Now().GetSeconds());
   DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceHover(energyToDecrease);
 
   // salvando historico do consumo de bateria
@@ -271,12 +271,13 @@ void UavDeviceEnergyModel::CourseChange (Ptr<const MobilityModel> mob)
   // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   Vector actual = m_source->GetNode()->GetObject<MobilityModel>()->GetPosition();
   double distance = std::sqrt(std::pow(m_lastPosition.x - actual.x, 2) + std::pow(m_lastPosition.y - actual.y, 2));
-  m_lastPosition.x = actual.x;
-  m_lastPosition.y = actual.y;
   NS_ASSERT(distance >= 0);
   // energy to decrease = energy cost * distance from last position to the actual
   double energyToDecrease = m_energyCost * distance;
   m_totalEnergyConsumption += energyToDecrease;
+  NS_LOG_DEBUG("UavDeviceEnergyModel::CourseChange las: (" << m_lastPosition.x << "," << m_lastPosition.y << ") actual: (" << actual.x << "," << actual.y << ") energy: " << energyToDecrease/m_source->GetInitialEnergy());
+  m_lastPosition.x = actual.x;
+  m_lastPosition.y = actual.y;
   DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceMove(energyToDecrease);
 
   // salvando historico do consumo de bateria por movimentacao
@@ -290,6 +291,7 @@ void UavDeviceEnergyModel::CourseChange (Ptr<const MobilityModel> mob)
 void UavDeviceEnergyModel::StopHover()
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_DEBUG("UavDeviceEnergyModel::StopHover lasttime: " << m_lastTime.GetSeconds() << " @" << Simulator::Now().GetSeconds());
   m_hoverEvent.Cancel();
   HoverConsumption();
   Simulator::Remove(m_hoverEvent); /// removendo a programacao 
