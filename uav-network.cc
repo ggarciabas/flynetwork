@@ -480,12 +480,14 @@ void UavNetwork::NewUav(int total, int update) // update = 0- normal 1- supply 2
     // Adicionando informacoes na aplicacao servidor!
     Ipv4Address addr = n->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();
     NS_LOG_DEBUG("IP " << addr << " -------------");
+    Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>(n->GetObject<UavDeviceEnergyModel>()->GetEnergySource());
     if (update == 1) {
       // envia ao servidor informacoes do UAV substituto
       m_serverApp->AddSupplyUav(n->GetId(), addr, source->GetRemainingEnergy(), n->GetObject<UavDeviceEnergyModel>()->GetEnergyCost(), n->GetObject<UavDeviceEnergyModel>()->GetHoverCost(), source->GetInitialEnergy(), n->GetObject<MobilityModel>());
     } else { // adiciona um novo UAV no servidor
       m_serverApp->AddNewUav(n->GetId(), addr, source->GetRemainingEnergy(), n->GetObject<UavDeviceEnergyModel>()->GetEnergyCost(), n->GetObject<UavDeviceEnergyModel>()->GetHoverCost(), source->GetInitialEnergy(), n->GetObject<MobilityModel>()); // tell the server to create a new model of UAV, used to identify the actual location of those UAV nodes
     }
+    source = 0;
 
     std::ostringstream os;
     os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_network_log.txt";

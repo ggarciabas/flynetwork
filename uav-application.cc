@@ -128,10 +128,8 @@ void UavApplication::Start(double stoptime) {
   DynamicCast<UavEnergySource>(dev->GetEnergySource())->Start();
   double thrUav = dev->CalculateThreshold(); // atualiza valor minimo para retorno na bateria, caclulando custo para ida a central e os hovers necessarios  
   DynamicCast<UavEnergySource>(GetNode()->GetObject<UavDeviceEnergyModel>()->GetEnergySource())->SetBasicEnergyLowBatteryThreshold((thrUav)*2); // +200%!
-  StartApplication();
-  // ao ser inserido na rede inicia hovering
-  Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
   dev->StartHover();
+  StartApplication();
   m_depletion = false;
   m_running = true;
   m_meanConsumption = 0.0;
@@ -210,7 +208,7 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/course_changed/course_changed_" << m_id << ".txt";
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << "," << (thrUav+thrCli)*1.1 << std::endl;
+  file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << "," << (thrUav)*1.1 << std::endl;
   file.close();
   dev->StartHover();
 
