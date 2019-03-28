@@ -114,7 +114,6 @@ public:
 
   void SetBasicEnergyLowBatteryThreshold (double thr);
 
-  void Reset ();
   void Stop (); // stop, UAV fora da rede
   void Start (); // para iniciar o posicionamento
 
@@ -166,6 +165,8 @@ private:
   Time m_lastUpdateTime;                  // last update time
   Time m_energyUpdateInterval;           // energy update interval
   std::ofstream m_file;
+
+  bool m_onoff;
 
   double m_hoverAcum;
   double m_movAcum;

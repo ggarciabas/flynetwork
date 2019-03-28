@@ -108,7 +108,6 @@ UavApplication::UavApplication()
 }
 
 void UavApplication::Reset () {
-  m_depletion = false;
 }
 
 UavApplication::~UavApplication()
@@ -124,26 +123,31 @@ void UavApplication::Start(double stoptime) {
   Simulator::Remove(m_stopEvent);
   // SetStartTime(Simulator::Now());
   SetStopTime(Seconds(stoptime));
+  // incia source e atualiza threshold
+  Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
+  DynamicCast<UavEnergySource>(dev->GetEnergySource())->Start();
+  double thrUav = dev->CalculateThreshold(); // atualiza valor minimo para retorno na bateria, caclulando custo para ida a central e os hovers necessarios  
+  DynamicCast<UavEnergySource>(GetNode()->GetObject<UavDeviceEnergyModel>()->GetEnergySource())->SetBasicEnergyLowBatteryThreshold((thrUav)*2); // +200%!
   StartApplication();
+  // ao ser inserido na rede inicia hovering
+  Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
+  dev->StartHover();
+  m_depletion = false;
+  m_running = true;
+  m_meanConsumption = 0.0;
 }
 
 void UavApplication::StartApplication(void)
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG("UavApplication::StartApplication [" << m_id << "]");
-  m_running = true;
   m_socketClient = Socket::CreateSocket (GetNode(), UdpSocketFactory::GetTypeId ());
   // criando socket para enviar informacoes ao servidor
   m_sendSck = Socket::CreateSocket(m_node, UdpSocketFactory::GetTypeId());
   if (m_sendSck->Connect(InetSocketAddress(m_peer, m_serverPort))) {
     NS_FATAL_ERROR ("UAV - $$ [NÃO] conseguiu conectar com Servidor!");
   }
-  m_askCliPos = Simulator::Schedule(Seconds(ETAPA-20), &UavApplication::AskCliPosition, this);
-  m_updateThreshold = Simulator::Schedule(Seconds(ETAPA/4),&UavApplication::UpdateThreshold, this);
-
-  // ao ser inserido na rede inicia hovering
-  Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
-  dev->StartHover();
+  m_askCliPos = Simulator::Schedule(Seconds(ETAPA-20), &UavApplication::AskCliPosition, this);  
 }
 
 void UavApplication::Stop() 
@@ -152,11 +156,13 @@ void UavApplication::Stop()
   NS_LOG_DEBUG("UavApplication::Stop [" << m_id << "]");
   // SetStopTime(Simulator::Now());
   Simulator::Remove(m_stopEvent);
+  m_running = false;
   StopApplication();
-
   // Para o hover
   Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
   dev->StopHover();
+  // para source!
+  DynamicCast<UavEnergySource>(GetNode()->GetObject<UavDeviceEnergyModel>()->GetEnergySource())->Stop();
 }
 
 void UavApplication::StopApplication()
@@ -165,10 +171,10 @@ void UavApplication::StopApplication()
   NS_LOG_DEBUG("UavApplication::StopApplication [" << m_id << "]");
   m_meanConsumption = 0.0;
   Simulator::Remove(m_stopEvent);
-  m_running = false;
   Simulator::Remove(m_sendEvent);
   Simulator::Remove(m_sendCliDataEvent);
   Simulator::Remove(m_packetDepletion);
+  Simulator::Remove(m_askCliPos);
   if (m_sendSck)
   {
     m_sendSck->ShutdownRecv();
@@ -177,18 +183,6 @@ void UavApplication::StopApplication()
     m_sendSck = 0;
   }
 }
-
-// void UavApplication::SetTurnOffWifiPhyCallback(UavApplication::OffWifiPhyCallback adhoc, UavApplication::OffWifiPhyCallback infra)
-// {
-//   m_setOffWifiPhyAdhoc = adhoc;
-//   m_setOffWifiPhyInfra = infra;
-// }
-//
-// void UavApplication::TurnOffWifiPhy ()
-// {
-//   m_setOffWifiPhyAdhoc();
-//   m_setOffWifiPhyInfra();
-// }
 
 void
 UavApplication::CourseChange (Ptr<const MobilityModel> mob)
@@ -209,17 +203,9 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   }
 
   Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
-  double thrUav = dev->CalculateThreshold(); // atualiza valor minimo para retorno na bateria
-  Ptr<ClientDeviceEnergyModel> c_dev = GetNode()->GetObject<ClientDeviceEnergyModel>();   
-  double thrCli = 0.0;
-  if (c_dev != NULL) { 
-    thrCli = c_dev->CalculateThreshold();
-    
-  } else {
-    thrCli = m_meanConsumption;
-  }
-  DynamicCast<UavEnergySource>(GetNode()->GetObject<UavDeviceEnergyModel>()->GetEnergySource())->SetBasicEnergyLowBatteryThreshold((thrUav+thrCli)*2); // +200%!
-  
+  double thrUav = dev->CalculateThreshold(); // atualiza valor minimo para retorno na bateria, caclulando custo para ida a central e os hovers necessarios  
+  DynamicCast<UavEnergySource>(GetNode()->GetObject<UavDeviceEnergyModel>()->GetEnergySource())->SetBasicEnergyLowBatteryThreshold((thrUav)*2); // +200%!
+
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/course_changed/course_changed_" << m_id << ".txt";
   std::ofstream file;
@@ -228,26 +214,6 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   file.close();
   dev->StartHover();
 
-}
-
-void
-UavApplication::UpdateThreshold ()
-{
-  m_updateThreshold.Cancel();
-
-  Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
-  double thrUav = dev->CalculateThreshold(); // atualiza valor minimo para retorno na bateria
-  Ptr<ClientDeviceEnergyModel> c_dev = GetNode()->GetObject<ClientDeviceEnergyModel>();   
-  double thrCli = 0.0;
-  if (c_dev != NULL) { 
-    thrCli = c_dev->CalculateThreshold();
-    
-  } else {
-    thrCli = m_meanConsumption;
-  }
-  DynamicCast<UavEnergySource>(GetNode()->GetObject<UavDeviceEnergyModel>()->GetEnergySource())->SetBasicEnergyLowBatteryThreshold((thrUav+thrCli)*1.5); // +50%!
-
-  m_updateThreshold = Simulator::Schedule(Seconds(ETAPA/4),&UavApplication::UpdateThreshold, this);
 }
 
 void
@@ -281,7 +247,6 @@ UavApplication::EnergyRechargedCallback()
     NS_ASSERT (dhcp != NULL);
     dhcp->Resume();
   }
-
 }
 
 void
@@ -292,6 +257,7 @@ UavApplication::EnergyDepletionCallback()
   m_depletion = true;
   // avisar central e mudar posição para central!
   m_packetDepletion = Simulator::ScheduleNow(&UavApplication::SendPacketDepletion, this);
+  
   // Ir para central
   Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
   dev->StopHover();

@@ -139,7 +139,7 @@ UavEnergySource::GetEnergyUpdateInterval (void) const
 double
 UavEnergySource::GetInitialEnergy(void) const
 {
-  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_initialEnergyJ;
 }
 
@@ -153,7 +153,7 @@ UavEnergySource::GetSupplyVoltage (void) const
 double
 UavEnergySource::GetRemainingEnergy(void)
 {
-  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   return m_remainingEnergyJ;
 }
 
@@ -168,6 +168,7 @@ void
 UavEnergySource::UpdateEnergySource (void) // chamado pelo device wifi-radio-energy-model
 {
   NS_LOG_FUNCTION (this);
+  NS_ASSERT(m_onoff);
   NS_LOG_DEBUG ("UavEnergySource:Updating remaining energy.");
 
   double remainingEnergy = m_remainingEnergyJ;
@@ -206,6 +207,7 @@ UavEnergySource::UpdateEnergySource (void) // chamado pelo device wifi-radio-ene
 void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
 {
   NS_LOG_DEBUG("UavEnergySource:UpdateEnergySourceClient [" << m_node->GetId() << "] rem: " << m_remainingEnergyJ << " @" << Simulator::Now().GetSeconds());
+  NS_ASSERT(m_onoff);
 
   if (m_remainingEnergyJ < energyToDecrease)
   {
@@ -243,6 +245,7 @@ void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
 {
   // NS_LOG_DEBUG("UavEnergySource:UpdateEnergySourceMove [" << m_node->GetId() << "] rem: " << m_remainingEnergyJ << " @" << Simulator::Now().GetSeconds());
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << energyToDecrease);
+  NS_ASSERT(m_onoff);
   if (m_remainingEnergyJ < energyToDecrease)
   {
     m_remainingEnergyJ = 0; // energy never goes below 0
@@ -286,6 +289,7 @@ void UavEnergySource::SetCliDeviceEnergyModel (Ptr<DeviceEnergyModel> dev) {
 void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << energyToDecrease);
+  NS_ASSERT(m_onoff);
   // NS_LOG_DEBUG("UavEnergySource:UpdateEnergySourceHover [" << m_node->GetId() << "] rem: " << m_remainingEnergyJ << " @" << Simulator::Now().GetSeconds());
 
   if (m_remainingEnergyJ < energyToDecrease)
@@ -328,6 +332,7 @@ void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
 void UavEnergySource::HandleEnergyDrainedEvent(void)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_ASSERT(m_onoff);
   NS_LOG_INFO("UavEnergySource:Energy depleted!");
   NotifyEnergyDrained(); // notify DeviceEnergyModel objects
   if (m_cliDevModel != NULL)
@@ -340,6 +345,7 @@ void
 UavEnergySource::CalculateRemainingEnergy (void)
 {
   NS_LOG_FUNCTION (this);
+  NS_ASSERT(m_onoff);
   double totalCurrentA = CalculateTotalCurrent (); // busca nos devices o total de 'current'
   Time duration = Simulator::Now () - m_lastUpdateTime;
   NS_ASSERT (duration.IsPositive ());
@@ -362,8 +368,9 @@ void UavEnergySource::DoDispose() {
   m_energyUpdateEvent.Cancel();
 }
 
-void UavEnergySource::Reset () {
+void UavEnergySource::Start () {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  m_onoff = true;
   NS_ASSERT(m_node != NULL);
   m_lastUpdateTime = Simulator::Now();
   m_depleted = false;
@@ -380,22 +387,14 @@ void UavEnergySource::Reset () {
   NotifyEnergyRecharged();
 }
 
-void UavEnergySource::Start () {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  NS_ASSERT(m_node != NULL);
-  Ptr<MobilityModel> mob = m_node->GetObject<MobilityModel>();
-  NS_ASSERT(mob != NULL);
-  m_lastPosition = mob->GetPosition();
-}
-
 void UavEnergySource::Stop () {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  m_depleted = true;
-  NotifyEnergyChanged();
-  if (m_cliDevModel != NULL)
-    m_cliDevModel->HandleEnergyChanged();
-  if (m_uavDevModel != NULL)
-    m_uavDevModel->HandleEnergyChanged(); // deveria se utilizar o energy source container, porem erro!
+  m_onoff = false;
+  // NotifyEnergyOff();
+  // if (m_cliDevModel != NULL)
+  //   m_cliDevModel->HandleEnergyOff();
+  // if (m_uavDevModel != NULL)
+  //   m_uavDevModel->HandleEnergyOff(); // deveria se utilizar o energy source container, porem erro!
 }
 
 

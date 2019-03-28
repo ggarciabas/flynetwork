@@ -466,10 +466,6 @@ void UavNetwork::NewUav(int total, int update) // update = 0- normal 1- supply 2
     Ptr<UavMobilityModel> model = n->GetObject<UavMobilityModel>();
     model->SetFirstPosition(v); // manda para perto da central!
 
-    // Aumentar carga de bateria para máximo!
-    Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>(n->GetObject<UavDeviceEnergyModel>()->GetEnergySource());
-    source->Reset(); // recarregando
-
     // Start application
     NS_LOG_DEBUG ("Apps " << n->GetNApplications());
     int app = n->GetNApplications()-1;
@@ -480,7 +476,6 @@ void UavNetwork::NewUav(int total, int update) // update = 0- normal 1- supply 2
     } while (uavApp == NULL && app >= 0);
     NS_ASSERT (uavApp != NULL);
     uavApp->Start(m_simulationTime);
-    uavApp->Reset(); // atualizando depletion=false e reiniciando os devices
 
     // Adicionando informacoes na aplicacao servidor!
     Ipv4Address addr = n->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();
@@ -526,10 +521,6 @@ void UavNetwork::RemoveUav(int id, int step)
   Vector v (m_iniX, m_iniY,0);
   Ptr<UavMobilityModel> model = n->GetObject<UavMobilityModel>();
   model->SetFirstPosition(v); // manda para perto da central!
-
-  // Parar UAV
-  Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>(n->GetObject<UavDeviceEnergyModel>()->GetEnergySource());
-  source->Stop(); // recarregando
 
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_network_log.txt";
