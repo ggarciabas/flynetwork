@@ -116,6 +116,8 @@ public:
 
   virtual void HandleEnergyRecharged (void);
 
+  virtual void HandleEnergyOff (void);
+
   double CalculateThreshold ();
 
   /**

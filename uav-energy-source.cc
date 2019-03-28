@@ -390,11 +390,11 @@ void UavEnergySource::Start () {
 void UavEnergySource::Stop () {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_onoff = false;
-  // NotifyEnergyOff();
-  // if (m_cliDevModel != NULL)
-  //   m_cliDevModel->HandleEnergyOff();
-  // if (m_uavDevModel != NULL)
-  //   m_uavDevModel->HandleEnergyOff(); // deveria se utilizar o energy source container, porem erro!
+  NotifyEnergyOff();
+  if (m_cliDevModel != NULL)
+    m_cliDevModel->HandleEnergyOff();
+  if (m_uavDevModel != NULL)
+    m_uavDevModel->HandleEnergyOff(); // deveria se utilizar o energy source container, porem erro!
 }
 
 

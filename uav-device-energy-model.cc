@@ -150,6 +150,11 @@ void UavDeviceEnergyModel::HandleEnergyRecharged (void)
   m_energyRechargedCallback();
 }
 
+void UavDeviceEnergyModel::HandleEnergyOff (void)
+{
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+}
+
 void UavDeviceEnergyModel::HandleEnergyChanged(void)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
