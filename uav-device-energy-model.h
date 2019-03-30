@@ -132,6 +132,8 @@ public:
   void StartHover ();
   void StopHover ();
 
+  void SetFlying(bool);
+
 private:
 
   void DoDispose (void);
@@ -167,6 +169,7 @@ private:
   double m_xCentral, m_yCentral;
   TracedValue<double> m_totalEnergyConsumption;
   std::string m_pathData;
+  bool m_flying;
   /**
    * Callback type for Energy Depletion function. Devices uses this callbak to notify
    * the node about the energy depletion.

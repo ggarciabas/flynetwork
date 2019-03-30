@@ -210,6 +210,7 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << "," << (thrUav)*1.1 << std::endl;
   file.close();
+  dev->SetFlying(false);
   dev->StartHover();
 }
 
@@ -258,6 +259,7 @@ UavApplication::EnergyDepletionCallback()
   // Ir para central
   Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
   dev->StopHover();
+  dev->SetFlying(true);
   GetNode()->GetObject<MobilityModel>()->SetPosition(Vector(m_central.at(0), m_central.at(1), 1.0)); // Verficar necessidade de subir em no eixo Z
 
   // pausando aplicacao DHCP
@@ -351,6 +353,7 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
             // mudar o posicionamento do UAV
             Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
             dev->StopHover();
+            dev->SetFlying(true);
             GetNode()->GetObject<MobilityModel>()->SetPosition(Vector(std::stod(results.at(1), &sz), std::stod(results.at(2), &sz), (z > 0) ? z : 0.0)); // Verficar necessidade de subir em no eixo Z
           } else {
             NS_LOG_DEBUG ("UAV " << m_id << " na posicao correta, atualizando servidor @" << Simulator::Now().GetSeconds());

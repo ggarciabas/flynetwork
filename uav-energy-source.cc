@@ -44,7 +44,7 @@ UavEnergySource::GetTypeId(void)
                           .AddConstructor<UavEnergySource>()
                           .AddAttribute("UavEnergySourceInitialEnergy",
                                         "Initial energy stored in basic energy source.",
-                                        DoubleValue(100), // 156960 in Joules
+                                        DoubleValue(300), // 156960 in Joules
                                         MakeDoubleAccessor(&UavEnergySource::SetInitialEnergy, &UavEnergySource::GetInitialEnergy),
                                         MakeDoubleChecker<double>())
                           .AddAttribute ("BasicEnergySupplyVoltageV",
@@ -121,7 +121,7 @@ void
 UavEnergySource::SetBasicEnergyLowBatteryThreshold (double thr)
 {
   NS_LOG_FUNCTION (this << thr);
-  NS_LOG_DEBUG ("UavEnergySource::SetBasicEnergyLowBatteryThreshold [" << m_node->GetId() << "] thr: " << thr << "J @" << Simulator::Now().GetSeconds());
+  NS_LOG_DEBUG ("UavEnergySource::SetBasicEnergyLowBatteryThreshold [" << m_node->GetId() << "] thr: " << thr << " \% --- " << thr*m_initialEnergyJ << "J @" << Simulator::Now().GetSeconds());
   m_lowBatteryTh = thr;
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_energy_threshold/uav_energy_threshold_" << m_node->GetId() << ".txt";

@@ -84,6 +84,7 @@ UavDeviceEnergyModel::UavDeviceEnergyModel()
   m_energyCost = 0.0;
   m_totalEnergyConsumption = 0.0;
   m_hoverCost = 0.0;
+  m_flying = false;
 }
 
 UavDeviceEnergyModel::~UavDeviceEnergyModel()
@@ -128,6 +129,7 @@ double UavDeviceEnergyModel::CalculateThreshold () {
   double distance = std::sqrt(std::pow(m_xCentral - actual.x, 2) + std::pow(m_yCentral - actual.y, 2));
   NS_ASSERT(distance >= 0);
   double thr = ((m_energyCost * distance) + m_energyUpdateInterval.GetSeconds()*m_hoverCost*2) / m_source->GetInitialEnergy(); // % necessaria para voltar a central de onde está, mais o custo de hover durante o intervalo de atualização tanto para sair quanto quando chegar ao local, para enviar informacao a central de que chegou e que necessita se retirado
+  NS_LOG_DEBUG("UavDeviceEnergyModel::CalculateThreshold distance: " << distance << "m edist: " << (m_energyCost * distance) << "J");
   return thr;
 }
 
@@ -266,7 +268,7 @@ void UavDeviceEnergyModel::HoverConsumption(void)
                                             this);
 }
 
-void UavDeviceEnergyModel::CourseChange (Ptr<const MobilityModel> mob)
+void UavDeviceEnergyModel::CourseChange (Ptr<const MobilityModel> mob) // Chamado pelo Mobility a cada movimento, não representa que chegou ao final! Somente a callback do Uav que representa isto!
 {
   // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   Vector actual = m_source->GetNode()->GetObject<MobilityModel>()->GetPosition();
@@ -275,7 +277,7 @@ void UavDeviceEnergyModel::CourseChange (Ptr<const MobilityModel> mob)
   // energy to decrease = energy cost * distance from last position to the actual
   double energyToDecrease = m_energyCost * distance;
   m_totalEnergyConsumption += energyToDecrease;
-  NS_LOG_DEBUG("UavDeviceEnergyModel::CourseChange las: (" << m_lastPosition.x << "," << m_lastPosition.y << ") actual: (" << actual.x << "," << actual.y << ") energy: " << energyToDecrease/m_source->GetInitialEnergy());
+  NS_LOG_DEBUG("UavDeviceEnergyModel::CourseChange [" << m_source->GetNode()->GetId() << "] last: (" << m_lastPosition.x << "," << m_lastPosition.y << ") actual: (" << actual.x << "," << actual.y << ") energy: " << energyToDecrease << "J distance: " << distance);
   m_lastPosition.x = actual.x;
   m_lastPosition.y = actual.y;
   DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceMove(energyToDecrease);
@@ -285,13 +287,20 @@ void UavDeviceEnergyModel::CourseChange (Ptr<const MobilityModel> mob)
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_move/uav_move_" << m_source->GetNode()->GetId() << ".txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease / m_source->GetInitialEnergy() << std::endl;
-  m_file.close();
+  m_file.close();  
+}
+
+void UavDeviceEnergyModel::SetFlying(bool f) {
+  m_flying = f;
 }
 
 void UavDeviceEnergyModel::StopHover()
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  NS_LOG_DEBUG("UavDeviceEnergyModel::StopHover lasttime: " << m_lastTime.GetSeconds() << " @" << Simulator::Now().GetSeconds());
+  if (m_flying) {
+    NS_FATAL_ERROR("UavDeviceEnergyModel::StopHover UAV não chegou a sua posicao final!");
+  }
+  NS_LOG_DEBUG("UavDeviceEnergyModel::StopHover [" << m_source->GetNode()->GetId() << "] lasttime: " << m_lastTime.GetSeconds() << " @" << Simulator::Now().GetSeconds());
   m_hoverEvent.Cancel();
   HoverConsumption();
   Simulator::Remove(m_hoverEvent); /// removendo a programacao 
@@ -300,8 +309,8 @@ void UavDeviceEnergyModel::StopHover()
 void UavDeviceEnergyModel::StartHover()
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  NS_LOG_DEBUG ("UavDeviceEnergyModel::StartHover @" << Simulator::Now().GetSeconds());
   m_lastTime = Simulator::Now();
+  NS_LOG_DEBUG("UavDeviceEnergyModel::StartHover [" << m_source->GetNode()->GetId() << "] lasttime: " << m_lastTime.GetSeconds() << " @" << Simulator::Now().GetSeconds());
   m_hoverEvent = Simulator::Schedule(m_energyUpdateInterval,
                                           &UavDeviceEnergyModel::HoverConsumption,
                                             this);
