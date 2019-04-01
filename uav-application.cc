@@ -196,6 +196,7 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   if (m_depletion) {
     Ptr<UavDeviceEnergyModel> dev = GetNode()->GetObject<UavDeviceEnergyModel>();
     dev->StartHover();
+    dev->SetFlying(false);
     NS_LOG_DEBUG ("[" << m_id << "] Starting hovering in the location waiting central to remove @" << Simulator::Now().GetSeconds());
     return; // nao fazer topicos abaixo em estado de emergencia
   }
