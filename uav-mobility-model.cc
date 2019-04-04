@@ -130,6 +130,7 @@ void UavMobilityModel::DoSetPosition(const Vector &position)
     m_event = Simulator::ScheduleNow(&UavMobilityModel::DoInitializePrivate, this);
     m_courseChangeDevice(this); // notificacoes intermediarias - somente para o dispositivo para consumo energético
   } else {
+    m_courseChangeDevice(this); // notificacoes intermediarias - somente para o dispositivo para consumo energético
     NotifyCourseChange(); // somente notificacao final - para UAV Application
   }
 }

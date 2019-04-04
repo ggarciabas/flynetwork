@@ -44,7 +44,7 @@ UavEnergySource::GetTypeId(void)
                           .AddConstructor<UavEnergySource>()
                           .AddAttribute("UavEnergySourceInitialEnergy",
                                         "Initial energy stored in basic energy source.",
-                                        DoubleValue(100), // 156960 in Joules
+                                        DoubleValue(300), // 156960 in Joules
                                         MakeDoubleAccessor(&UavEnergySource::SetInitialEnergy, &UavEnergySource::GetInitialEnergy),
                                         MakeDoubleChecker<double>())
                           .AddAttribute ("BasicEnergySupplyVoltageV",
