@@ -56,7 +56,7 @@ UavEnergySource::GetTypeId(void)
                                       // TODO: o valor de threshold deve ser dinamico em relacao do custo necessario para ele voltar a central de onde ele está
                           .AddAttribute ("BasicEnergyLowBatteryThreshold",
                                         "Low battery threshold for basic energy source.",
-                                        DoubleValue(0.50), // as a fraction of the initial energy
+                                        DoubleValue(0.1), // as a fraction of the initial energy
                                         MakeDoubleAccessor(&UavEnergySource::m_lowBatteryTh),
                                         MakeDoubleChecker<double>())
                         .AddAttribute ("PeriodicEnergyUpdateInterval",
@@ -121,13 +121,15 @@ void
 UavEnergySource::SetBasicEnergyLowBatteryThreshold (double thr)
 {
   NS_LOG_FUNCTION (this << thr);
-  NS_LOG_DEBUG ("UavEnergySource::SetBasicEnergyLowBatteryThreshold [" << m_node->GetId() << "] thr: " << thr << "J @" << Simulator::Now().GetSeconds());
-  m_lowBatteryTh = thr;
-  std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_energy_threshold/uav_energy_threshold_" << m_node->GetId() << ".txt";
-  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  m_file << Simulator::Now().GetSeconds() << "," << m_lowBatteryTh << std::endl;
-  m_file.close();
+  if (m_lowBatteryTh < thr) {
+    NS_LOG_DEBUG ("UavEnergySource::SetBasicEnergyLowBatteryThreshold [" << m_node->GetId() << "] thr: " << thr << "J @" << Simulator::Now().GetSeconds());
+    m_lowBatteryTh = thr;
+    std::ostringstream os;
+    os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_energy_threshold/uav_energy_threshold_" << m_node->GetId() << ".txt";
+    m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    m_file << Simulator::Now().GetSeconds() << "," << m_lowBatteryTh << std::endl;
+    m_file.close();
+  } // somente altera se for maior do que o padrao
 }
 
 Time
