@@ -126,7 +126,8 @@ void UavApplication::Start(double stoptime) {
   // incia source e atualiza threshold
   DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->Start();
   double thrUav = m_uavDevice->CalculateThreshold(); // atualiza valor minimo para retorno na bateria, caclulando custo para ida a central e os hovers necessarios  
-  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThreshold((thrUav+0.05)*4); // +400%! +0.05 -> wifi consumption
+  double thrCli = m_cliDevice->CalculateThreshold();
+  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThreshold((thrUav+thrCli)*2); // +200%!
   m_uavDevice->StartHover();
   StartApplication();
   m_depletion = false;
@@ -201,7 +202,8 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   }
 
   double thrUav = m_uavDevice->CalculateThreshold(); // atualiza valor minimo para retorno na bateria, caclulando custo para ida a central e os hovers necessarios  
-  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThreshold((thrUav+0.05)*4); // +400%! +0.05 -> wifi consumption
+  double thrCli = m_cliDevice->CalculateThreshold();
+  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThreshold((thrUav+thrCli)*2); // +200%!
 
   // ligar wifi quando chegar ao posicionamento correto
   // m_wifiDevice->HandleEnergyOn();
@@ -476,6 +478,11 @@ UavApplication::TracedCallbackRxAppInfra (Ptr<const Packet> packet, const Addres
   }
 }
 
+void UavApplication::SetCliDevice (Ptr<ClientDeviceEnergyModel> dev) 
+{
+  m_cliDevice = dev;
+}
+
 void 
 UavApplication::AskCliPosition()
 {
@@ -510,9 +517,8 @@ UavApplication::TracedCallbackExpiryLease (const Ipv4Address& ip)
   }
   (it->second)->SetLogin("NOPOSITION"); // ignorado ao enviar informacoes para o servidor
 
-  // Ptr<ClientDeviceEnergyModel> c_dev = GetNode()->GetObject<ClientDeviceEnergyModel>();
-  // if (c_dev != NULL)
-  //   c_dev->RemoveClient();
+  if (m_cliDevice != NULL)
+    m_cliDevice->RemoveClient();
 }
 
 void UavApplication::TracedCallbackNewLease (const Ipv4Address& ip)
@@ -529,9 +535,8 @@ void UavApplication::TracedCallbackNewLease (const Ipv4Address& ip)
     (it->second)->SetLogin("NOPOSITION"); // ignorado ao enviar informacoes para o servidor, esperando atualizar
   }
 
-  // Ptr<ClientDeviceEnergyModel> c_dev = GetNode()->GetObject<ClientDeviceEnergyModel>();
-  // if (c_dev != NULL)
-  //   c_dev->AddClient();
+  if (m_cliDevice != NULL)
+    m_cliDevice->AddClient();
 }
 
 void UavApplication::SendCliData ()

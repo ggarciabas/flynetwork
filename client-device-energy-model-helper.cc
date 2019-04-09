@@ -122,8 +122,6 @@ ClientDeviceEnergyModelHelper::DoInstall(Ptr<NetDevice> device, Ptr<EnergySource
   // set energy source
   model->SetEnergySource(source);
   DynamicCast<UavEnergySource>(source)->SetCliDeviceEnergyModel (model); // deveria se utilizar o appendDeviceEnergymodel para agregar ao energy source, mas ocorre um erro!
-  // adicionando dispositivo no nó
-  node->AggregateObject(model);
   model->SetNode(node);
   return model;
 }

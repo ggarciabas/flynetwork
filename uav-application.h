@@ -32,6 +32,7 @@
 #include "ns3/energy-module.h"
 #include "uav-energy-source.h"
 #include "uav-device-energy-model.h"
+#include "client-device-energy-model.h"
 
 #include "client-model-container.h"
 #include "client-model.h"
@@ -88,6 +89,10 @@ public:
   Ptr<UavDeviceEnergyModel> GetUavDevice () {
     return m_uavDevice;
   }
+  void SetCliDevice (Ptr<ClientDeviceEnergyModel> dev);
+  Ptr<ClientDeviceEnergyModel> GetCliDevice () {
+    return m_cliDevice;
+  }
 
 private:
   void DoDispose();
@@ -127,6 +132,7 @@ private:
   Callback<void> m_setOffWifiPhyAdhoc; // turn off wifiphy
   Ptr<WifiRadioEnergyModel> m_wifiDevice;
   Ptr<UavDeviceEnergyModel> m_uavDevice;
+  Ptr<ClientDeviceEnergyModel> m_cliDevice;
 
   bool m_depletion;// para identificar estado de emergencia
 

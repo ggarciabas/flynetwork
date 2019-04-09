@@ -52,7 +52,7 @@ ClientDeviceEnergyModel::GetTypeId(void)
                                         MakeDoubleChecker<double>())
                           .AddAttribute("PeriodicEnergyUpdateInterval",
                                         "",
-                                        TimeValue(Seconds(1)), // s
+                                        TimeValue(Seconds(0.01)), // s
                                         MakeTimeAccessor(&ClientDeviceEnergyModel::m_energyUpdateInterval),
                                         MakeTimeChecker())
                          .AddTraceSource ("TotalEnergyConsumption",
@@ -127,7 +127,7 @@ void ClientDeviceEnergyModel::HandleEnergyDepletion(void)
   m_clientCount = 0;
   m_cliEvent.Cancel();
   ClientConsumption(); // update battery
-  m_cliEvent.Cancel();// cancel again, to do not allow any consumption from clients
+  m_cliEvent.Cancel(); // cancel again, to do not allow any consumption from clients
 }
 
 void ClientDeviceEnergyModel::SetEnergyUpdateInterval(Time interval)
