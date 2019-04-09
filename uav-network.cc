@@ -480,12 +480,12 @@ void UavNetwork::NewUav(int total, int update) // update = 0- normal 1- supply 2
     // Adicionando informacoes na aplicacao servidor!
     Ipv4Address addr = n->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();
     NS_LOG_DEBUG("IP " << addr << " -------------");
-    Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>(n->GetObject<UavDeviceEnergyModel>()->GetEnergySource());
+    Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>(uavApp->GetUavDevice()->GetEnergySource());
     if (update == 1) {
       // envia ao servidor informacoes do UAV substituto
-      m_serverApp->AddSupplyUav(n->GetId(), addr, source->GetRemainingEnergy(), n->GetObject<UavDeviceEnergyModel>()->GetEnergyCost(), n->GetObject<UavDeviceEnergyModel>()->GetHoverCost(), source->GetInitialEnergy(), n->GetObject<MobilityModel>());
+      m_serverApp->AddSupplyUav(n->GetId(), addr, source->GetRemainingEnergy(), uavApp->GetUavDevice()->GetEnergyCost(), uavApp->GetUavDevice()->GetHoverCost(), source->GetInitialEnergy(), n->GetObject<MobilityModel>());
     } else { // adiciona um novo UAV no servidor
-      m_serverApp->AddNewUav(n->GetId(), addr, source->GetRemainingEnergy(), n->GetObject<UavDeviceEnergyModel>()->GetEnergyCost(), n->GetObject<UavDeviceEnergyModel>()->GetHoverCost(), source->GetInitialEnergy(), n->GetObject<MobilityModel>()); // tell the server to create a new model of UAV, used to identify the actual location of those UAV nodes
+      m_serverApp->AddNewUav(n->GetId(), addr, source->GetRemainingEnergy(), uavApp->GetUavDevice()->GetEnergyCost(), uavApp->GetUavDevice()->GetHoverCost(), source->GetInitialEnergy(), n->GetObject<MobilityModel>()); // tell the server to create a new model of UAV, used to identify the actual location of those UAV nodes
     }
     source = 0;
 
@@ -533,7 +533,7 @@ void UavNetwork::RemoveUav(int id, int step)
   os.str("");
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << step << "/uav_removed_energy.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  Ptr<UavDeviceEnergyModel> dev = n->GetObject<UavDeviceEnergyModel>();
+  Ptr<UavDeviceEnergyModel> dev = uavApp->GetUavDevice();
   m_file << dev->GetEnergySource()->GetRemainingEnergy() / dev->GetEnergySource()->GetInitialEnergy() << std::endl;
   m_file.close();
 
@@ -662,6 +662,10 @@ void UavNetwork::ConfigureUav(int total)
     DeviceEnergyModelContainer uavEnergyModels = energyHelper.Install((*i), sources.Get(c));
     Ptr<UavDeviceEnergyModel> dev = DynamicCast<UavDeviceEnergyModel>(uavEnergyModels.Get(0));
 
+    // adicionando devices no UAVApp
+    uavApp->SetUavDevice(dev);
+    uavApp->SetWifiDevice(DynamicCast<WifiRadioEnergyModel>(deviceModelsWifi.Get(c)));
+
     // Configure TotalEnergyConsumption
     deviceModelsWifi.Get(c)->TraceConnectWithoutContext ("TotalEnergyConsumption", MakeCallback(&UavApplication::TotalEnergyConsumptionTrace,  uavApp));
 
@@ -670,8 +674,7 @@ void UavNetwork::ConfigureUav(int total)
     DynamicCast<UavMobilityModel>((*i)->GetObject<MobilityModel>())->TraceConnectWithoutContext ("CourseChangeDevice", MakeCallback (&UavDeviceEnergyModel::CourseChange, dev));
 
     // energy start
-    Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>((*i)->GetObject<UavDeviceEnergyModel>()->GetEnergySource());
-    source->Start();
+    DynamicCast<UavEnergySource>(sources.Get(c))->Start();
 
     // Configure DHCP
     // The router must have a fixed IP.
@@ -1045,8 +1048,8 @@ void UavNetwork::PrintUavEnergy (int t)
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << t << "/uav_energy.txt";
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  for (UavNodeContainer::Iterator it = m_uavNodeActive.Begin(); it != m_uavNodeActive.End(); ++it) {
-    Ptr<UavDeviceEnergyModel> dev = (*it)->GetObject<UavDeviceEnergyModel>();
+  for (UavApplicationContainer::Iterator it = m_uavAppContainer.Begin(); it != m_uavAppContainer.End(); ++it) {
+    Ptr<UavDeviceEnergyModel> dev = (*it)->GetUavDevice();
     file << (*it)->GetId()  << "," << dev->GetEnergySource()->GetRemainingEnergy() << "," << dev->GetEnergySource()->GetInitialEnergy() << std::endl;
   }
   file.close();

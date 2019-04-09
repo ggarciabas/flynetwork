@@ -296,8 +296,9 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             Ptr<UavModel> uav = m_uavContainer.FindUavModel(std::stoi(results.at(1), &sz));
             if (uav != NULL)
             {
-              NS_LOG_DEBUG("SERVER - UAVRECEIVED ::: UAV #" << uav->GetId() << " @" << Simulator::Now().GetSeconds());
-              uav->CancelSendPositionEvent(); // recebida confirmacao do UAV              
+              NS_LOG_DEBUG("SERVER - UAVRECEIVED ::: UAV #" << uav->GetId() << " CANCEL SEND POSITION @" << Simulator::Now().GetSeconds());
+              uav->CancelSendPositionEvent(); // recebida confirmacao do UAV      
+              uav->GotoReceived(true);        
             } else
             {
               NS_LOG_DEBUG("SERVER - nao foi possivel encontrar o UAV [UAVRECEIVED no container padrao] ID " << results.at(1));
@@ -305,7 +306,8 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
               if (uav != NULL)
               {
                 NS_LOG_DEBUG("SERVER - UAVRECEIVED ::: UAV #" << uav->GetId() << " @" << Simulator::Now().GetSeconds());
-                uav->CancelSendPositionEvent(); // recebida confirmacao do UAV              
+                uav->CancelSendPositionEvent(); // recebida confirmacao do UAV      
+                uav->GotoReceived(true);        
               } else
               {
                 NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV fora da rede?! ID " << results.at(1));
@@ -501,7 +503,7 @@ void ServerApplication::ValidateUavPosition()
       t += 0.5;
     }
 
-    if (!(*i)->IsConfirmed()) {
+    if (!(*i)->IsConfirmed() && !(*i)->IsGotoReceived()) { // nao reenvia, caso ja tenha recebido informacao do posicionamento
       (*i)->CancelSendPositionEvent();
       SendUavPacket((*i));
     }
@@ -580,6 +582,9 @@ void ServerApplication::SendUavPacket(Ptr<UavModel> uav)
   uav->SetSendPositionEvent(Simulator::Schedule(Seconds(5.0), &ServerApplication::SendUavPacket, this, uav));
   NS_LOG_INFO ("ServerApplication::SendUavPacket  ------------ SendUavPacket end @" << Simulator::Now().GetSeconds());
   pos.clear();
+  
+  // enviando posicionamento!
+  uav->GotoReceived(false);
 }
 
 void ServerApplication::runDAPython()

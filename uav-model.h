@@ -68,6 +68,8 @@ public:
   bool IsConfirmed ();
   void NotConfirmed ();
   void ConfirmPosition ();
+  void GotoReceived (bool);
+  bool IsGotoReceived ();
 
   bool ClientDataConfirmed ();
   void SetClientDataConfirmed (bool);
@@ -91,6 +93,7 @@ private:
 
   uint32_t m_id;
   bool m_depletion;
+  bool m_gotoReceived;
   std::vector<double> m_position;
   std::vector<double> m_newPos;
   EventId m_sendPosition;

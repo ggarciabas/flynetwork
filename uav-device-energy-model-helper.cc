@@ -125,8 +125,6 @@ UavDeviceEnergyModelHelper::DoInstall(Ptr<Node> node, Ptr<EnergySource> source) 
   DynamicCast<UavEnergySource>(source)->SetDeviceEnergyModel (model); // deveria se utilizar o appendDeviceEnergymodel para agregar ao energy source, mas ocorre um erro! por conta da agregacao abaixo, mas esta é necessaria para que se possa obter os devices de energia e fazer configuracoes!
   // set energy source
   model->SetEnergySource(source);
-  // adicionando dispositivo no nó
-  node->AggregateObject(model);
   return model;
 }
 

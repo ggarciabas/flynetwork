@@ -257,7 +257,7 @@ void UavDeviceEnergyModel::HoverConsumption(void)
   double diff_time = Simulator::Now().GetSeconds() - m_lastTime.GetSeconds();
   double energyToDecrease = m_hoverCost * diff_time;
   m_totalEnergyConsumption += energyToDecrease;
-  NS_LOG_DEBUG("UavDeviceEnergyModel:HoverConsumption diff: " << diff_time << " energy: " << energyToDecrease/ m_source->GetInitialEnergy() << " @" << Simulator::Now().GetSeconds());
+  // NS_LOG_DEBUG("UavDeviceEnergyModel:HoverConsumption diff: " << diff_time << " energy: " << energyToDecrease/ m_source->GetInitialEnergy() << " @" << Simulator::Now().GetSeconds());
   DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceHover(energyToDecrease);
 
   // salvando historico do consumo de bateria

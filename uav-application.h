@@ -29,7 +29,9 @@
 #include "ns3/packet-sink.h"
 #include "ns3/simulator.h"
 #include "ns3/internet-module.h"
+#include "ns3/energy-module.h"
 #include "uav-energy-source.h"
+#include "uav-device-energy-model.h"
 
 #include "client-model-container.h"
 #include "client-model.h"
@@ -78,6 +80,15 @@ public:
   void Start(double);
   void Stop();
 
+  void SetWifiDevice (Ptr<WifiRadioEnergyModel> dev);
+  Ptr<WifiRadioEnergyModel> GetWifiDevice() {
+    return m_wifiDevice;
+  }
+  void SetUavDevice (Ptr<UavDeviceEnergyModel> dev);
+  Ptr<UavDeviceEnergyModel> GetUavDevice () {
+    return m_uavDevice;
+  }
+
 private:
   void DoDispose();
   virtual void StartApplication(void);
@@ -114,6 +125,8 @@ private:
   TracedCallback<std::string> m_packetTrace;
   Callback<void> m_setOffWifiPhyInfra; // turn off wifiphy
   Callback<void> m_setOffWifiPhyAdhoc; // turn off wifiphy
+  Ptr<WifiRadioEnergyModel> m_wifiDevice;
+  Ptr<UavDeviceEnergyModel> m_uavDevice;
 
   bool m_depletion;// para identificar estado de emergencia
 

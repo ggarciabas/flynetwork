@@ -209,7 +209,7 @@ UavEnergySource::UpdateEnergySource (void) // chamado pelo device wifi-radio-ene
 
 void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
 {
-  NS_LOG_DEBUG("UavEnergySource:UpdateEnergySourceClient [" << m_node->GetId() << "] rem: " << m_remainingEnergyJ << "J @" << Simulator::Now().GetSeconds());
+  // NS_LOG_DEBUG("UavEnergySource:UpdateEnergySourceClient [" << m_node->GetId() << "] rem: " << m_remainingEnergyJ << "J @" << Simulator::Now().GetSeconds());
   
   if (m_onoff) { // calcula somente se estiver ligada
     if (m_remainingEnergyJ < energyToDecrease)
@@ -293,7 +293,7 @@ void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << energyToDecrease);
   if (m_onoff) { // calcula somente se estiver ligada
-    NS_LOG_DEBUG("UavEnergySource:UpdateEnergySourceHover [" << m_node->GetId() << "] rem: " << m_remainingEnergyJ << "J cons: " << energyToDecrease << "J @" << Simulator::Now().GetSeconds());
+    // NS_LOG_DEBUG("UavEnergySource:UpdateEnergySourceHover [" << m_node->GetId() << "] rem: " << m_remainingEnergyJ << "J cons: " << energyToDecrease << "J @" << Simulator::Now().GetSeconds());
 
     if (m_remainingEnergyJ < energyToDecrease)
     {

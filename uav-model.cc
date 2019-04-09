@@ -91,6 +91,14 @@ UavModel::SetSendPositionEvent (EventId id)
   m_sendPosition = id;
 }
 
+void UavModel::GotoReceived (bool b) {
+  m_gotoReceived = b;
+}
+
+bool UavModel::IsGotoReceived () {
+  return m_gotoReceived;
+}
+
 void
 UavModel::CancelSendPositionEvent()
 {
