@@ -68,7 +68,7 @@ int main (int argc, char *argv[])
 
 	// LogComponentEnable("DhcpClient", LOG_FUNCTION);
 	// LogComponentEnable("ClientDeviceEnergyModelHelper", LOG_FUNCTION);
-	// LogComponentEnable("ClientDeviceEnergyModel", LOG_FUNCTION);
+	LogComponentEnable("ClientDeviceEnergyModel", LOG_DEBUG);
 	// LogComponentEnable("ClientModel", LOG_FUNCTION);
 	// LogComponentEnable("ClientModelContainer", LOG_FUNCTION);
 	// LogComponentEnable("LocationModelContainer", LOG_FUNCTION);
