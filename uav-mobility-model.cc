@@ -85,6 +85,8 @@ void UavMobilityModel::DoInitializePrivate(void)
 
   Time delayLeft = Seconds(distance / m_speed);
 
+  NS_LOG_DEBUG("UavMobilityModel::DoInitializePrivate tempo[" << delayLeft.GetSeconds() << "] distancia[" << distance << "] @" << Simulator::Now().GetSeconds());
+
   m_event = Simulator::Schedule(delayLeft, &UavMobilityModel::DoStop, this);
   m_envPos = Simulator::Schedule(m_updatePosition, &UavMobilityModel::UpdatePosition, this);
 }

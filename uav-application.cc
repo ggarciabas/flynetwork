@@ -369,6 +369,11 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
           }
         } else {
           NS_LOG_DEBUG ("UAV recebeu pacote com mesmo comando de posicionamento @" << Simulator::Now().GetSeconds());
+          pa.push_back(GetNode()->GetObject<MobilityModel>()->GetPosition().x);
+          pa.push_back(GetNode()->GetObject<MobilityModel>()->GetPosition().y);
+          if (CalculateDistance(pa, pn) == 0) { // verificar se já nao está no posicionamento desejado
+            SendPacket(); // atualizando servidor, nao houve alteracao do posicionamento pelo servidor!
+          }
         }
       } else if (results.at(0).compare("DEPLETIONOK") == 0)
         {
