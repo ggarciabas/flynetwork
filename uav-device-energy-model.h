@@ -118,6 +118,8 @@ public:
 
   virtual void HandleEnergyOff (void);
 
+  virtual void HandleEnergyOn (void);
+
   double CalculateThreshold ();
 
   /**

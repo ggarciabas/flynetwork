@@ -110,6 +110,11 @@ void ClientDeviceEnergyModel::HandleEnergyOff(void)
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
 }
 
+void ClientDeviceEnergyModel::HandleEnergyOn (void)
+{
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+}
+
 void ClientDeviceEnergyModel::HandleEnergyChanged(void)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );

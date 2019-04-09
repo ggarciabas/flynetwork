@@ -93,6 +93,7 @@ public:
   virtual void HandleEnergyRecharged (void);
 
   virtual void HandleEnergyOff(void);
+  virtual void HandleEnergyOn(void);
 
   /**
    * \brief Handles energy changed.

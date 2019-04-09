@@ -157,6 +157,11 @@ void UavDeviceEnergyModel::HandleEnergyOff (void)
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
 }
 
+void UavDeviceEnergyModel::HandleEnergyOn (void)
+{
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+}
+
 void UavDeviceEnergyModel::HandleEnergyChanged(void)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
