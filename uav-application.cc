@@ -350,10 +350,10 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
         vector<double> pa, pn;
         pn.push_back(std::stod(results.at(1), &sz));
         pn.push_back(std::stod(results.at(2), &sz));
+        pa.push_back(GetNode()->GetObject<MobilityModel>()->GetPosition().x);
+        pa.push_back(GetNode()->GetObject<MobilityModel>()->GetPosition().y);
         if (CalculateDistance(m_goto, pn) != 0) { // verificar se já nao receberu um pacote com este comando de posicionamento
           NS_LOG_DEBUG("UAV recebeu novo posicionamento @" << Simulator::Now().GetSeconds());
-          pa.push_back(GetNode()->GetObject<MobilityModel>()->GetPosition().x);
-          pa.push_back(GetNode()->GetObject<MobilityModel>()->GetPosition().y);
           m_goto[0] = std::stod(results.at(1), &sz); // atualizando goto
           m_goto[1] = std::stod(results.at(2), &sz); // atualizando goto
           if (CalculateDistance(pa, pn) != 0) { // verificar se já nao está no posicionamento desejado
@@ -368,10 +368,9 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
             SendPacket();
           }
         } else {
-          NS_LOG_DEBUG ("UAV recebeu pacote com mesmo comando de posicionamento @" << Simulator::Now().GetSeconds());
-          pa.push_back(GetNode()->GetObject<MobilityModel>()->GetPosition().x);
-          pa.push_back(GetNode()->GetObject<MobilityModel>()->GetPosition().y);
-          if (CalculateDistance(pa, pn) == 0) { // verificar se já nao está no posicionamento desejado
+          NS_LOG_DEBUG ("UAV recebeu pacote com mesmo comando de posicionamento [" << pn.at(0) << "," << pn.at(1) << "] -> [" << pa.at(0) << "," << pa.at(1) << "] == " << CalculateDistance(pa, pn) << " @" << Simulator::Now().GetSeconds());          
+          if (CalculateDistance(pa, pn) < 1e-3) { // verificar se já nao está no posicionamento desejado
+            NS_LOG_DEBUG(" UAV já no posicionamento! @" << Simulator::Now().GetSeconds());
             SendPacket(); // atualizando servidor, nao houve alteracao do posicionamento pelo servidor!
           }
         }
@@ -486,9 +485,9 @@ UavApplication::AskCliPosition()
       Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
       if (m_socketClient && m_socketClient->Send(packet, 0) == packetSize)
       {
-        NS_LOG_DEBUG("UavApplication::AskCliPosition envio pacote para " << i->first);
+        // NS_LOG_DEBUG("UavApplication::AskCliPosition envio pacote para " << i->first);
       } else {
-        NS_LOG_DEBUG("UavApplication::AskCliPosition erro ao enviar solicitacao de posicionamento ao cliente no endereco " << i->first);
+        // NS_LOG_DEBUG("UavApplication::AskCliPosition erro ao enviar solicitacao de posicionamento ao cliente no endereco " << i->first);
       }
     }
   }
