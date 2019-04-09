@@ -124,10 +124,7 @@ void UavApplication::Start(double stoptime) {
   // SetStartTime(Simulator::Now());
   SetStopTime(Seconds(stoptime));
   // incia source e atualiza threshold
-  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->Start();
-  double thrUav = m_uavDevice->CalculateThreshold(); // atualiza valor minimo para retorno na bateria, caclulando custo para ida a central e os hovers necessarios  
-  double thrCli = m_cliDevice->CalculateThreshold();
-  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThreshold((thrUav+thrCli)*2); // +200%!
+  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->Start();  
   m_uavDevice->StartHover();
   StartApplication();
   m_depletion = false;
@@ -201,10 +198,6 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
     return; // nao fazer topicos abaixo em estado de emergencia
   }
 
-  double thrUav = m_uavDevice->CalculateThreshold(); // atualiza valor minimo para retorno na bateria, caclulando custo para ida a central e os hovers necessarios  
-  double thrCli = m_cliDevice->CalculateThreshold();
-  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThreshold((thrUav+thrCli)*2); // +200%!
-
   // ligar wifi quando chegar ao posicionamento correto
   // m_wifiDevice->HandleEnergyOn();
 
@@ -212,7 +205,7 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/course_changed/course_changed_" << m_id << ".txt";
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << "," << (thrUav)*1.1 << std::endl;
+  file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << std::endl;
   file.close();
   m_uavDevice->SetFlying(false);
   m_uavDevice->StartHover();
