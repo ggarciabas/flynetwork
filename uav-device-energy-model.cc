@@ -282,7 +282,7 @@ void UavDeviceEnergyModel::CourseChange (Ptr<const MobilityModel> mob) // Chamad
   // energy to decrease = energy cost * distance from last position to the actual
   double energyToDecrease = m_energyCost * distance;
   m_totalEnergyConsumption += energyToDecrease;
-  NS_LOG_DEBUG("UavDeviceEnergyModel::CourseChange [" << m_source->GetNode()->GetId() << "] last: (" << m_lastPosition.x << "," << m_lastPosition.y << ") actual: (" << actual.x << "," << actual.y << ") energy: " << energyToDecrease << "J distance: " << distance);
+  // NS_LOG_DEBUG("UavDeviceEnergyModel::CourseChange [" << m_source->GetNode()->GetId() << "] last: (" << m_lastPosition.x << "," << m_lastPosition.y << ") actual: (" << actual.x << "," << actual.y << ") energy: " << energyToDecrease << "J distance: " << distance);
   m_lastPosition.x = actual.x;
   m_lastPosition.y = actual.y;
   DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceMove(energyToDecrease);

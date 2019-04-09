@@ -126,7 +126,7 @@ void UavApplication::Start(double stoptime) {
   // incia source e atualiza threshold
   DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->Start();
   double thrUav = m_uavDevice->CalculateThreshold(); // atualiza valor minimo para retorno na bateria, caclulando custo para ida a central e os hovers necessarios  
-  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThreshold((thrUav+0.05)*2); // +200%!
+  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThreshold((thrUav+0.05)*4); // +400%! +0.05 -> wifi consumption
   m_uavDevice->StartHover();
   StartApplication();
   m_depletion = false;
@@ -201,10 +201,10 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   }
 
   double thrUav = m_uavDevice->CalculateThreshold(); // atualiza valor minimo para retorno na bateria, caclulando custo para ida a central e os hovers necessarios  
-  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThreshold((thrUav+0.05)*2); // +200%! +0.05 -> wifi consumption
+  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThreshold((thrUav+0.05)*4); // +400%! +0.05 -> wifi consumption
 
   // ligar wifi quando chegar ao posicionamento correto
-  m_wifiDevice->HandleEnergyOn();
+  // m_wifiDevice->HandleEnergyOn();
 
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/course_changed/course_changed_" << m_id << ".txt";
@@ -360,7 +360,7 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
           m_goto[1] = std::stod(results.at(2), &sz); // atualizando goto
           if (CalculateDistance(pa, pn) >= 1e-3) { // verificar se já nao está no posicionamento desejado
             // deixar wifi desligado ao se mover
-            m_wifiDevice->HandleEnergyOff();
+            // m_wifiDevice->HandleEnergyOff();
             // mudar o posicionamento do UAV
             m_uavDevice->StopHover();
             m_uavDevice->SetFlying(true);
@@ -374,6 +374,8 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
           if (CalculateDistance(pa, pn) < 1e-3) { // verificar se já nao está no posicionamento desejado
             NS_LOG_DEBUG(" UAV [" << m_id << "] já no posicionamento! @" << Simulator::Now().GetSeconds());
             SendPacket(); // atualizando servidor, nao houve alteracao do posicionamento pelo servidor!
+            // ligar wifi quando chegar ao posicionamento correto
+            // m_wifiDevice->HandleEnergyOn();
           }
         }
       } else if (results.at(0).compare("DEPLETIONOK") == 0)

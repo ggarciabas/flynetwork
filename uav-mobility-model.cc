@@ -101,15 +101,16 @@ void UavMobilityModel::DoStop()
 
   Vector position = m_helper.GetCurrentPosition();
   NS_LOG_DEBUG ("UavMobilityModel :: [[ FINAL ]] " << Simulator::Now().GetSeconds() << " (" << position.x << "," << position.y << ") deveria estar em (" << m_goTo.x << "," << m_goTo.y << ")");
-
-  m_courseChangeDevice(this);
+  
   NotifyCourseChange();
+  m_courseChangeDevice(this);
 }
 
 void UavMobilityModel::UpdatePosition()
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_helper.Update(); // https://www.nsnam.org/doxygen/constant-velocity-helper_8cc_source.html#l00080
+  m_courseChangeDevice(this); // notificacoes intermediarias - somente para o dispositivo para consumo energético
   m_envPos = Simulator::Schedule(m_updatePosition, &UavMobilityModel::UpdatePosition, this);
 }
 
@@ -124,18 +125,12 @@ UavMobilityModel::DoGetPosition(void) const
 void UavMobilityModel::DoSetPosition(const Vector &position)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() << position);
-  NS_LOG_DEBUG ("UavMobilityModel::DoSetPosition [" << position.x << "," << position.y << "] --> [" << m_goTo.x << "," << m_goTo.y << "] @" << Simulator::Now().GetSeconds());
+  NS_LOG_DEBUG ("UavMobilityModel::DoSetPosition [" << position.x << "," << position.y << "] <--- [" << m_goTo.x << "," << m_goTo.y << "] @" << Simulator::Now().GetSeconds());
   if (CalculateDistance(m_goTo, position) >= 1e-3) { // caso onde se tenha que ir seja distante, entao avancar!
     m_goTo = position; // posicao destino
-    // // std::cout << "Vá para a posição: " << position.x << " " << position.y << std::endl;
     Simulator::Remove(m_event);
     Simulator::Remove(m_envPos);
     m_event = Simulator::ScheduleNow(&UavMobilityModel::DoInitializePrivate, this);
-    m_courseChangeDevice(this); // notificacoes intermediarias - somente para o dispositivo para consumo energético
-  } else {
-    NS_LOG_DEBUG ("\tUavMobilityModel::DoSetPosition já está na posicao");
-    m_courseChangeDevice(this); 
-    NotifyCourseChange(); // somente notificacao final - para UAV Application
   }
 }
 
