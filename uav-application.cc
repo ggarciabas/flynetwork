@@ -132,6 +132,8 @@ void UavApplication::Start(double stoptime) {
   m_depletion = false;
   m_running = true;
   m_meanConsumption = 0.0;
+  m_goto[0] = 0.0; // reiniciando posicionamento goto
+  m_goto[1] = 0.0;
 }
 
 void UavApplication::StartApplication(void)
@@ -353,10 +355,10 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
         pa.push_back(GetNode()->GetObject<MobilityModel>()->GetPosition().x);
         pa.push_back(GetNode()->GetObject<MobilityModel>()->GetPosition().y);
         if (CalculateDistance(m_goto, pn) != 0) { // verificar se já nao receberu um pacote com este comando de posicionamento
-          NS_LOG_DEBUG("UAV recebeu novo posicionamento @" << Simulator::Now().GetSeconds());
+          NS_LOG_DEBUG("UAV [" << m_id << "] recebeu novo posicionamento @" << Simulator::Now().GetSeconds());
           m_goto[0] = std::stod(results.at(1), &sz); // atualizando goto
           m_goto[1] = std::stod(results.at(2), &sz); // atualizando goto
-          if (CalculateDistance(pa, pn) != 0) { // verificar se já nao está no posicionamento desejado
+          if (CalculateDistance(pa, pn) >= 1e-3) { // verificar se já nao está no posicionamento desejado
             // deixar wifi desligado ao se mover
             m_wifiDevice->HandleEnergyOff();
             // mudar o posicionamento do UAV
@@ -364,13 +366,13 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
             m_uavDevice->SetFlying(true);
             GetNode()->GetObject<MobilityModel>()->SetPosition(Vector(std::stod(results.at(1), &sz), std::stod(results.at(2), &sz), (z > 0) ? z : 0.0)); // Verficar necessidade de subir em no eixo Z
           } else {
-            NS_LOG_DEBUG ("UAV " << m_id << " na posicao correta, atualizando servidor @" << Simulator::Now().GetSeconds());
+            NS_LOG_DEBUG ("UAV [" << m_id << "] na posicao correta, atualizando servidor @" << Simulator::Now().GetSeconds());
             SendPacket();
           }
         } else {
-          NS_LOG_DEBUG ("UAV recebeu pacote com mesmo comando de posicionamento [" << pn.at(0) << "," << pn.at(1) << "] -> [" << pa.at(0) << "," << pa.at(1) << "] == " << CalculateDistance(pa, pn) << " @" << Simulator::Now().GetSeconds());          
+          NS_LOG_DEBUG ("UAV [" << m_id << "] recebeu pacote com mesmo comando de posicionamento [" << pn.at(0) << "," << pn.at(1) << "] -> [" << pa.at(0) << "," << pa.at(1) << "] == " << CalculateDistance(pa, pn) << " @" << Simulator::Now().GetSeconds());          
           if (CalculateDistance(pa, pn) < 1e-3) { // verificar se já nao está no posicionamento desejado
-            NS_LOG_DEBUG(" UAV já no posicionamento! @" << Simulator::Now().GetSeconds());
+            NS_LOG_DEBUG(" UAV [" << m_id << "] já no posicionamento! @" << Simulator::Now().GetSeconds());
             SendPacket(); // atualizando servidor, nao houve alteracao do posicionamento pelo servidor!
           }
         }
