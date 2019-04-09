@@ -192,7 +192,7 @@ void ClientDeviceEnergyModel::RemoveClient()
 double ClientDeviceEnergyModel::UpdateConsumption () {  
   Time duration = Simulator::Now () - m_lastUpdateTime;
   double energyToDecrease = duration.GetSeconds () * (m_clientCost * m_clientCount);
-  NS_LOG_DEBUG ("ClientDeviceEnergyModel::UpdateConsumption UAV [" << GetNode()->GetId() << "] duration: " << duration.GetSeconds() << " energy: " << energyToDecrease << " clientCount: " << m_clientCount << " @" << Simulator::Now().GetSeconds());
+  // NS_LOG_DEBUG ("ClientDeviceEnergyModel::UpdateConsumption UAV [" << GetNode()->GetId() << "] duration: " << duration.GetSeconds() << " energy: " << energyToDecrease << " clientCount: " << m_clientCount << " @" << Simulator::Now().GetSeconds());
   DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceClient (energyToDecrease);
   // update last update time stamp
   this->m_lastUpdateTime = Simulator::Now ();
