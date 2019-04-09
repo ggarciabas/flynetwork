@@ -88,7 +88,8 @@ int main (int argc, char *argv[])
 	// LogComponentEnable("UavNetwork", LOG_FUNCTION);
 	// LogComponentEnable("UavNodeContainer", LOG_FUNCTION);
 
-	SeedManager::SetSeed(6112018);
+	// SeedManager::SetSeed(6112018);
+	SeedManager::SetSeed(9042019);
 
 	ObjectFactory obj;
 	obj.SetTypeId("ns3::UavNetwork");

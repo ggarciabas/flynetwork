@@ -106,19 +106,6 @@ ClientDeviceEnergyModelHelper::DoInstall(Ptr<NetDevice> device, Ptr<EnergySource
   Ptr<ClientDeviceEnergyModel> model = m_energyModel.Create()->GetObject<ClientDeviceEnergyModel>();
   NS_ASSERT(model != NULL);
 
-  // make a callback to WifiPhy::SetOffMode
-  Ptr<WifiNetDevice> wifiDevice = DynamicCast<WifiNetDevice> (device); 
-  Ptr<WifiPhy> wifiPhy = wifiDevice->GetPhy ();
-  if (m_depletionCallback.IsNull ())
-    {
-      model->SetEnergyDepletionCallback (MakeCallback (&WifiPhy::SetOffMode, wifiPhy));
-    }
-  // make a callback to WifiPhy::ResumeFromOff
-  if (m_rechargedCallback.IsNull ())
-    {
-      model->SetEnergyRechargedCallback (MakeCallback (&WifiPhy::ResumeFromOff, wifiPhy));
-    }
-
   // set energy source
   model->SetEnergySource(source);
   DynamicCast<UavEnergySource>(source)->SetCliDeviceEnergyModel (model); // deveria se utilizar o appendDeviceEnergymodel para agregar ao energy source, mas ocorre um erro!
