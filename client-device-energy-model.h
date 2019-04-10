@@ -123,7 +123,7 @@ public:
   void AddClient ();
   void RemoveClient();
 
-  double CalculateThreshold ();
+  double CalculateThreshold (double);
 
 private:
 

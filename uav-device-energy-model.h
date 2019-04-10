@@ -139,6 +139,10 @@ public:
     return m_flying;
   }
 
+  double GetTimeToCentral () {
+    return m_timeToCentral;
+  }
+
 private:
 
   void DoDispose (void);
@@ -175,6 +179,7 @@ private:
   TracedValue<double> m_totalEnergyConsumption;
   std::string m_pathData;
   bool m_flying;
+  double m_timeToCentral;
   /**
    * Callback type for Energy Depletion function. Devices uses this callbak to notify
    * the node about the energy depletion.

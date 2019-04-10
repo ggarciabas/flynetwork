@@ -52,7 +52,7 @@ ClientDeviceEnergyModel::GetTypeId(void)
                                         MakeDoubleChecker<double>())
                           .AddAttribute("PeriodicEnergyUpdateInterval",
                                         "",
-                                        TimeValue(Seconds(0.01)), // s
+                                        TimeValue(Seconds(0.1)), // s
                                         MakeTimeAccessor(&ClientDeviceEnergyModel::m_energyUpdateInterval),
                                         MakeTimeChecker())
                          .AddTraceSource ("TotalEnergyConsumption",
@@ -163,9 +163,9 @@ ClientDeviceEnergyModel::GetNode() const
 }
 
 double 
-ClientDeviceEnergyModel::CalculateThreshold () {
+ClientDeviceEnergyModel::CalculateThreshold (double time) {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  return ((m_clientCost * m_clientCount)*m_energyUpdateInterval.GetSeconds()) / m_source->GetInitialEnergy(); // % necessaria para suprir os clientes durante o intervalo
+  return ((m_clientCost * m_clientCount)*time) / m_source->GetInitialEnergy(); // % necessaria para suprir os clientes durante o intervalo necessario para o Uav se direcionar a central!
 }
 
 double

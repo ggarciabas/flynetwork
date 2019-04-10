@@ -72,7 +72,7 @@ UavEnergySource::GetTypeId(void)
                                        MakeTimeChecker ())
                         .AddAttribute ("UpdateThresholdInterval",
                                        "Time between two consecutive periodic threshold updates.",
-                                       TimeValue (Seconds (0.05)),
+                                       TimeValue (Seconds (0.5)),
                                        MakeTimeAccessor (&UavEnergySource::SetUpdateThresholdInterval,
                                                          &UavEnergySource::GetUpdateThresholdInterval),
                                        MakeTimeChecker ())
@@ -139,7 +139,7 @@ void
 UavEnergySource::UpdateThreshold ()
 {
   NS_LOG_FUNCTION (this);
-  m_lowBatteryThCli = m_cliDevModel->CalculateThreshold();
+  m_lowBatteryThCli = m_cliDevModel->CalculateThreshold(m_uavDevModel->GetTimeToCentral());
   // std::ostringstream os;
   // os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_energy_threshold/uav_energy_threshold_" << m_node->GetId() << ".txt";
   // m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
@@ -261,6 +261,7 @@ void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
       m_depleted = true;
       HandleEnergyDrainedEvent();
     }
+
     // salvando historico do consumo de bateria por movimentacao
     if (m_node) {
       std::ostringstream os;
