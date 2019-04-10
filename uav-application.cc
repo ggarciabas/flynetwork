@@ -125,6 +125,7 @@ void UavApplication::Start(double stoptime) {
   SetStopTime(Seconds(stoptime));
   // incia source e atualiza threshold
   DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->Start();  
+  m_uavDevice->SetFlying(false);
   m_uavDevice->StartHover();
   StartApplication();
   m_depletion = false;
@@ -159,6 +160,7 @@ void UavApplication::Stop()
   StopApplication();
   // Para o hover
   m_uavDevice->StopHover();
+  m_uavDevice->SetFlying(false);
   // para source!
   DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->Stop();
 }
@@ -194,8 +196,8 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   SendPacket();  
 
   if (m_depletion) {
-    m_uavDevice->StartHover();
     m_uavDevice->SetFlying(false);
+    m_uavDevice->StartHover();
     NS_LOG_DEBUG ("[" << m_id << "] Starting hovering in the location waiting central to remove @" << Simulator::Now().GetSeconds());
     return; // nao fazer topicos abaixo em estado de emergencia
   }
