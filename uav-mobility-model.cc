@@ -59,10 +59,12 @@ UavMobilityModel::GetTypeId(void)
   return tid;
 }
 
-void UavMobilityModel::SetFirstPosition(const Vector &position)
+void UavMobilityModel::SetFirstPosition (const Vector &position)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << position);
+  NS_LOG_DEBUG("UavMobilityModel::SetFirstPosition @" << Simulator::Now().GetSeconds());
   m_helper.SetPosition(position);
+  NS_ASSERT(m_helper.GetCurrentPosition().x == position.x && m_helper.GetCurrentPosition().y == position.y);
 }
 
 void UavMobilityModel::DoInitializePrivate(void)
@@ -122,12 +124,13 @@ UavMobilityModel::DoGetPosition(void) const
   return m_helper.GetCurrentPosition();
 }
 
-void UavMobilityModel::DoSetPosition(const Vector &position)
+void UavMobilityModel::DoSetPosition(const Vector &goto_)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() << position);
-  NS_LOG_DEBUG ("UavMobilityModel::DoSetPosition [" << position.x << "," << position.y << "] <--- [" << m_goTo.x << "," << m_goTo.y << "] @" << Simulator::Now().GetSeconds());
-  if (CalculateDistance(m_goTo, position) >= 1e-3) { // caso onde se tenha que ir seja distante, entao avancar!
-    m_goTo = position; // posicao destino
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() << goto_);
+  Vector position = m_helper.GetCurrentPosition();
+  NS_LOG_DEBUG ("UavMobilityModel::DoSetPosition [" << goto_.x << "," << goto_.y << "] <--- [" << position.x << "," << position.y << "] @" << Simulator::Now().GetSeconds());
+  if (CalculateDistance(goto_, position) >= 1e-3) { // caso onde se tenha que ir seja distante, entao avancar!
+    m_goTo = goto_; // posicao destino
     Simulator::Remove(m_event);
     Simulator::Remove(m_envPos);
     m_event = Simulator::ScheduleNow(&UavMobilityModel::DoInitializePrivate, this);

@@ -132,6 +132,8 @@ void UavApplication::Start(double stoptime) {
   m_meanConsumption = 0.0;
   m_goto[0] = 0.0; // reiniciando posicionamento goto
   m_goto[1] = 0.0;
+  // threshold do uav necessario calcular somente uma vez
+  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold());
 }
 
 void UavApplication::StartApplication(void)
@@ -261,12 +263,15 @@ UavApplication::EnergyDepletionCallback()
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG("---->>> EnergyDepletionCallback [" << m_id << "] going to " << m_central.at(0) << "," << m_central.at(1) << " @" << Simulator::Now().GetSeconds());
   m_depletion = true;
+
   // avisar central e mudar posição para central!
   m_packetDepletion = Simulator::ScheduleNow(&UavApplication::SendPacketDepletion, this);
   
   // Ir para central
-  m_uavDevice->StopHover();
-  m_uavDevice->SetFlying(true);
+  if (!m_uavDevice->IsFlying()) { // caso nao esteja voando
+    m_uavDevice->StopHover();
+    m_uavDevice->SetFlying(true);
+  }
   GetNode()->GetObject<MobilityModel>()->SetPosition(Vector(m_central.at(0), m_central.at(1), 1.0)); // Verficar necessidade de subir em no eixo Z
 
   // pausando aplicacao DHCP
@@ -291,8 +296,11 @@ void UavApplication::SendPacketDepletion(void)
 
   if (m_running) {
     std::ostringstream m;
-    Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
-    m << "DEPLETION " << m_id << " " << pos.x << " " << pos.y << " " << pos.z << " " << '\0';
+    Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();    
+    if (m_uavDevice->IsFlying()) // caso o uav estiver voando, se faz necessario enviar solicitacao para o novo UAV ir direto para a posicao destino
+      m << "DEPLETION " << m_id << " " << m_goto.at(0) << " " << m_goto.at(1) << " " << pos.z << " " << '\0';
+    else // caso contrário, necessario enviar solicitacao para a posicao atual do UAV
+      m << "DEPLETION " << m_id << " " << pos.x << " " << pos.y << " " << pos.z << " " << '\0';    
     uint16_t packetSize = m.str().length() + 1;
     Ptr<Packet> packet = Create<Packet>((uint8_t *)m.str().c_str(), packetSize);
     if (m_sendSck && m_sendSck->Send(packet) == packetSize)

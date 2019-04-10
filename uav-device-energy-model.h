@@ -135,6 +135,9 @@ public:
   void StopHover ();
 
   void SetFlying(bool);
+  bool IsFlying() {
+    return m_flying;
+  }
 
 private:
 
