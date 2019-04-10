@@ -120,7 +120,7 @@ public:
   Time GetEnergyUpdateInterval (void) const;
   Time GetUpdateThresholdInterval (void) const;
 
-  void SetBasicEnergyLowBatteryThreshold (double thr);
+  void SetBasicEnergyLowBatteryThresholdUav (double thr);
 
   void Stop (); // stop, UAV fora da rede
   void Start (); // para iniciar o posicionamento
@@ -165,7 +165,8 @@ private:
 private:
   double m_initialEnergyJ;                // initial energy, in Joules
   double m_supplyVoltageV;                // supply voltage, in Volts
-  double m_lowBatteryTh;                 // low battery threshold, as a fraction of the initial energy
+  double m_lowBatteryThUav;                 // low battery threshold, as a fraction of the initial energy
+  double m_lowBatteryThCli;
   double m_highBatteryTh;                // high battery threshold, as a fraction of the initial energy
   bool m_depleted;                       // set to true when the remaining energy goes below the low threshold,
                                          // set to false again when the remaining energy exceeds the high threshold
@@ -197,3 +198,4 @@ private:
 } // namespace ns3
 
 #endif /* UAV_ENERGY_SOURCE_H */
+

@@ -54,10 +54,15 @@ UavEnergySource::GetTypeId(void)
                                                              &UavEnergySource::GetSupplyVoltage),
                                          MakeDoubleChecker<double> ())
                                       // TODO: o valor de threshold deve ser dinamico em relacao do custo necessario para ele voltar a central de onde ele está
-                          .AddAttribute ("BasicEnergyLowBatteryThreshold",
-                                        "Low battery threshold for basic energy source.",
-                                        DoubleValue(0.05), // as a fraction of the initial energy
-                                        MakeDoubleAccessor(&UavEnergySource::m_lowBatteryTh),
+                          .AddAttribute ("BasicEnergyLowBatteryThresholdUav",
+                                        "Low battery threshold uav device for basic energy source.",
+                                        DoubleValue(0.1), // as a fraction of the initial energy
+                                        MakeDoubleAccessor(&UavEnergySource::m_lowBatteryThUav),
+                                        MakeDoubleChecker<double>())
+                          .AddAttribute ("BasicEnergyLowBatteryThresholdCli",
+                                        "Low battery threshold client device for basic energy source.",
+                                        DoubleValue(0.1), // as a fraction of the initial energy
+                                        MakeDoubleAccessor(&UavEnergySource::m_lowBatteryThCli),
                                         MakeDoubleChecker<double>())
                         .AddAttribute ("PeriodicEnergyUpdateInterval",
                                        "Time between two consecutive periodic energy updates.",
@@ -134,7 +139,7 @@ void
 UavEnergySource::UpdateThreshold ()
 {
   NS_LOG_FUNCTION (this);
-  m_lowBatteryTh = (m_uavDevModel->CalculateThreshold() + m_cliDevModel->CalculateThreshold())*2;
+  m_lowBatteryThCli = m_cliDevModel->CalculateThreshold();
   // std::ostringstream os;
   // os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_energy_threshold/uav_energy_threshold_" << m_node->GetId() << ".txt";
   // m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
@@ -144,15 +149,15 @@ UavEnergySource::UpdateThreshold ()
 }
 
 void
-UavEnergySource::SetBasicEnergyLowBatteryThreshold (double thr)
+UavEnergySource::SetBasicEnergyLowBatteryThresholdUav (double thr)
 {
   NS_LOG_FUNCTION (this << thr);
   NS_LOG_DEBUG ("UavEnergySource::SetBasicEnergyLowBatteryThreshold [" << m_node->GetId() << "] thr: " << thr << "% in joules: " << thr*m_initialEnergyJ << "J @" << Simulator::Now().GetSeconds());
-  m_lowBatteryTh = thr;
+  m_lowBatteryThUav = thr;
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_energy_threshold/uav_energy_threshold_" << m_node->GetId() << ".txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  m_file << Simulator::Now().GetSeconds() << "," << m_lowBatteryTh << std::endl;
+  m_file << Simulator::Now().GetSeconds() << "," << m_lowBatteryThUav << std::endl;
   m_file.close();
 }
 
@@ -214,9 +219,9 @@ UavEnergySource::UpdateEnergySource (void) // chamado pelo device wifi-radio-ene
       NS_FATAL_ERROR("UavEnergySource::UpdateEnergySource energy bellow ZERO! [" << m_node->GetId() << "] ed: " << remainingEnergy-m_remainingEnergyJ << " re: " << remainingEnergy << "J @" << Simulator::Now().GetSeconds());
     }
 
-    if (!m_depleted && m_remainingEnergyJ <= m_lowBatteryTh*m_initialEnergyJ)
+    if (!m_depleted && m_remainingEnergyJ <= (m_lowBatteryThUav+m_lowBatteryThCli)*2*m_initialEnergyJ)
     {
-      NS_LOG_DEBUG("UavEnergySource::UpdateEnergySource DEPLETION [" << m_node->GetId() << "] ed: " << remainingEnergy-m_remainingEnergyJ << " re: " << m_remainingEnergyJ << "J thr: " << m_lowBatteryTh*m_initialEnergyJ << "J @" << Simulator::Now().GetSeconds());
+      NS_LOG_DEBUG("UavEnergySource::UpdateEnergySource DEPLETION [" << m_node->GetId() << "] ed: " << remainingEnergy-m_remainingEnergyJ << " re: " << m_remainingEnergyJ << "J thr: " << (m_lowBatteryThUav+m_lowBatteryThCli)*2*m_initialEnergyJ << "J @" << Simulator::Now().GetSeconds());
       m_depleted = true;
       HandleEnergyDrainedEvent();
     }
@@ -250,9 +255,9 @@ void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
       m_remainingEnergyJ -= energyToDecrease;
     }
 
-    if (!m_depleted && m_remainingEnergyJ <= m_lowBatteryTh*m_initialEnergyJ)
+    if (!m_depleted && m_remainingEnergyJ <= (m_lowBatteryThUav+m_lowBatteryThCli)*2*m_initialEnergyJ)
     {
-      NS_LOG_DEBUG("UavEnergySource::UpdateEnergySourceClient DEPLETION [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << m_lowBatteryTh * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
+      NS_LOG_DEBUG("UavEnergySource::UpdateEnergySourceClient DEPLETION [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << (m_lowBatteryThUav+m_lowBatteryThCli)*2 * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
       m_depleted = true;
       HandleEnergyDrainedEvent();
     }
@@ -267,7 +272,7 @@ void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
       os.str("");
       os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_remaining_energy/uav_remaining_energy_" << m_node->GetId() << ".txt";
       m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-      m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << "," << m_lowBatteryTh << ",client" << std::endl;
+      m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << "," << (m_lowBatteryThUav+m_lowBatteryThCli)*2 << ",client" << std::endl;
       m_file.close();
     }
   }
@@ -279,16 +284,16 @@ void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
   if (m_onoff) { // calcula somente se estiver ligada
     if (m_remainingEnergyJ < energyToDecrease)
     {
-      NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceMove energy bellow ZERO! [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << m_lowBatteryTh * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
+      NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceMove energy bellow ZERO! [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << (m_lowBatteryThUav+m_lowBatteryThCli)*2 * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
     }
     else
     {
       m_remainingEnergyJ -= energyToDecrease;
     }
 
-    if (!m_depleted && m_remainingEnergyJ <= m_lowBatteryTh*m_initialEnergyJ)
+    if (!m_depleted && m_remainingEnergyJ <= (m_lowBatteryThUav+m_lowBatteryThCli)*2*m_initialEnergyJ)
     {
-      NS_LOG_DEBUG("UavEnergySource::UpdateEnergySourceMove DEPLETION [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << m_lowBatteryTh * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
+      NS_LOG_DEBUG("UavEnergySource::UpdateEnergySourceMove DEPLETION [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << (m_lowBatteryThUav+m_lowBatteryThCli)*2 * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
       m_depleted = true;
       HandleEnergyDrainedEvent();
     }
@@ -303,7 +308,7 @@ void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
       os.str("");
       os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_remaining_energy/uav_remaining_energy_" << m_node->GetId() << ".txt";
       m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-      m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << "," << m_lowBatteryTh << ",move" << std::endl;
+      m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << "," << (m_lowBatteryThUav+m_lowBatteryThCli)*2 << ",move" << std::endl;
       m_file.close();
     }
   }
@@ -325,16 +330,16 @@ void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
   if (m_onoff) { // calcula somente se estiver ligada
     if (m_remainingEnergyJ < energyToDecrease)
     {
-      NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceHover energy bellow ZERO! [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << m_lowBatteryTh * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
+      NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceHover energy bellow ZERO! [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << (m_lowBatteryThUav+m_lowBatteryThCli)*2 * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
     }
     else
     {
       m_remainingEnergyJ -= energyToDecrease;
     }
 
-    if (!m_depleted && m_remainingEnergyJ <= m_lowBatteryTh*m_initialEnergyJ)
+    if (!m_depleted && m_remainingEnergyJ <= (m_lowBatteryThUav+m_lowBatteryThCli)*2*m_initialEnergyJ)
     {
-      NS_LOG_DEBUG("UavEnergySource::UpdateEnergySourceHover DEPLETION  [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << m_lowBatteryTh * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
+      NS_LOG_DEBUG("UavEnergySource::UpdateEnergySourceHover DEPLETION  [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << (m_lowBatteryThUav+m_lowBatteryThCli)*2 * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
       m_depleted = true;
       HandleEnergyDrainedEvent();
     }
@@ -350,7 +355,7 @@ void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
       os.str("");
       os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_remaining_energy/uav_remaining_energy_" << m_node->GetId() << ".txt";
       m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-      m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << "," << m_lowBatteryTh << ",hover" << std::endl;
+      m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << "," << (m_lowBatteryThUav+m_lowBatteryThCli)*2 << ",hover" << std::endl;
       m_file.close();
     }
   }
@@ -413,7 +418,8 @@ void UavEnergySource::Start () {
   m_cliAcum = 0.0;
   m_wifiAcum = 0.0;
   m_hoverAcum = 0.0;
-  m_lowBatteryTh = 0.05;
+  m_lowBatteryThUav = 0.1;
+  m_lowBatteryThCli = 0.1;
   if (m_cliDev != NULL)
     m_cliDev->HandleEnergyRecharged(); // deveria se utilizar o energy source container, porem erro!
   if (m_uavDev != NULL)

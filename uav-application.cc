@@ -198,6 +198,9 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
     return; // nao fazer topicos abaixo em estado de emergencia
   }
 
+  // threshold do uav necessario calcular somente uma vez
+  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold());
+
   // ligar wifi quando chegar ao posicionamento correto
   // m_wifiDevice->HandleEnergyOn();
 
