@@ -477,7 +477,7 @@ UavApplication::TracedCallbackRxAppInfra (Ptr<const Packet> packet, const Addres
           }
         }
       } else {
-        NS_FATAL_ERROR("Não encontrou o IP, problema com callback de envio de IPs. " << m_id);
+        NS_LOG_DEBUG("Não encontrou o IP, problema com callback de envio de IPs. " << m_id);
       }
     }
     results.clear();

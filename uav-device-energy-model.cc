@@ -309,6 +309,7 @@ void UavDeviceEnergyModel::StopHover()
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_ASSERT_MSG (!m_flying, "UavDeviceEnergyModel::StopHover [" << m_source->GetNode()->GetId() << "] @" << Simulator::Now().GetSeconds());
   NS_LOG_DEBUG("UavDeviceEnergyModel::StopHover [" << m_source->GetNode()->GetId() << "] lasttime: " << m_lastTime.GetSeconds() << " @" << Simulator::Now().GetSeconds());
+  Simulator::Remove(m_hoverEvent);
   HoverConsumption();
   Simulator::Remove(m_hoverEvent); /// removendo a programacao 
 }
