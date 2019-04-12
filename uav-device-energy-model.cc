@@ -138,6 +138,7 @@ double UavDeviceEnergyModel::CalculateThreshold () {
 void UavDeviceEnergyModel::HandleEnergyRecharged (void)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_DEBUG("UavDeviceEnergyModel::HandleEnergyRecharged [" << m_source->GetNode()->GetId() << "] @" << Simulator::Now().GetSeconds());
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_recharged/uav_recharged.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
@@ -147,10 +148,6 @@ void UavDeviceEnergyModel::HandleEnergyRecharged (void)
   m_totalEnergyConsumption = 0.0;
   m_lastPosition = m_source->GetNode()->GetObject<MobilityModel>()->GetPosition();
   m_lastTime = Simulator::Now();
-  Simulator::Remove(m_hoverEvent);
-  m_hoverEvent = Simulator::Schedule(m_energyUpdateInterval,
-                                          &UavDeviceEnergyModel::HoverConsumption,
-                                            this);
   
   m_energyRechargedCallback();
 }
@@ -247,9 +244,7 @@ UavDeviceEnergyModel::GetTotalEnergyConsumption (void) const
 
 void UavDeviceEnergyModel::HoverConsumption(void)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );  
-  Simulator::Remove(m_hoverEvent);
-
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_ASSERT_MSG (!m_flying, "UavDeviceEnergyModel::HoverConsumption [" << m_source->GetNode()->GetId() << "] @" << Simulator::Now().GetSeconds());
 
   // do not update if simulation has finished
@@ -310,7 +305,7 @@ void UavDeviceEnergyModel::StopHover()
   NS_ASSERT_MSG (!m_flying, "UavDeviceEnergyModel::StopHover [" << m_source->GetNode()->GetId() << "] @" << Simulator::Now().GetSeconds());
   NS_LOG_DEBUG("UavDeviceEnergyModel::StopHover [" << m_source->GetNode()->GetId() << "] lasttime: " << m_lastTime.GetSeconds() << " @" << Simulator::Now().GetSeconds());
   Simulator::Remove(m_hoverEvent);
-  HoverConsumption();
+  m_hoverEvent = Simulator::ScheduleNow(&UavDeviceEnergyModel::HoverConsumption, this);
   Simulator::Remove(m_hoverEvent); /// removendo a programacao 
 }
 
@@ -319,7 +314,6 @@ void UavDeviceEnergyModel::StartHover()
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_lastTime = Simulator::Now();
   NS_LOG_DEBUG("UavDeviceEnergyModel::StartHover [" << m_source->GetNode()->GetId() << "] lasttime: " << m_lastTime.GetSeconds() << " @" << Simulator::Now().GetSeconds());
-  Simulator::Remove(m_hoverEvent);
   m_hoverEvent = Simulator::Schedule(m_energyUpdateInterval,
                                           &UavDeviceEnergyModel::HoverConsumption,
                                             this);
