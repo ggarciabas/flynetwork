@@ -85,6 +85,7 @@ UavDeviceEnergyModel::UavDeviceEnergyModel()
   m_totalEnergyConsumption = 0.0;
   m_hoverCost = 0.0;
   m_flying = false;
+  m_timeToCentral = 0.0;
 }
 
 UavDeviceEnergyModel::~UavDeviceEnergyModel()
@@ -127,15 +128,17 @@ double UavDeviceEnergyModel::CalculateThreshold () {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   Vector actual = m_source->GetNode()->GetObject<MobilityModel>()->GetPosition();
   double distance = std::sqrt(std::pow(m_xCentral - actual.x, 2) + std::pow(m_yCentral - actual.y, 2));
+  m_timeToCentral = distance / 5.0; // 5m/s
   NS_ASSERT(distance >= 0);
   double thr = ((m_energyCost * distance) + m_energyUpdateInterval.GetSeconds()*m_hoverCost*2) / m_source->GetInitialEnergy(); // % necessaria para voltar a central de onde está, mais o custo de hover durante o intervalo de atualização tanto para sair quanto quando chegar ao local, para enviar informacao a central de que chegou e que necessita se retirado
-  NS_LOG_DEBUG("UavDeviceEnergyModel::CalculateThreshold distance: " << distance << "m edist: " << (m_energyCost * distance) << "J");
+  // NS_LOG_DEBUG("UavDeviceEnergyModel::CalculateThreshold distance: " << distance << "m edist: " << (m_energyCost * distance) << "J");
   return thr;
 }
 
 void UavDeviceEnergyModel::HandleEnergyRecharged (void)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_DEBUG("UavDeviceEnergyModel::HandleEnergyRecharged [" << m_source->GetNode()->GetId() << "] @" << Simulator::Now().GetSeconds());
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_recharged/uav_recharged.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
@@ -145,9 +148,6 @@ void UavDeviceEnergyModel::HandleEnergyRecharged (void)
   m_totalEnergyConsumption = 0.0;
   m_lastPosition = m_source->GetNode()->GetObject<MobilityModel>()->GetPosition();
   m_lastTime = Simulator::Now();
-  m_hoverEvent = Simulator::Schedule(m_energyUpdateInterval,
-                                          &UavDeviceEnergyModel::HoverConsumption,
-                                            this);
   
   m_energyRechargedCallback();
 }
@@ -244,15 +244,18 @@ UavDeviceEnergyModel::GetTotalEnergyConsumption (void) const
 
 void UavDeviceEnergyModel::HoverConsumption(void)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );  
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+
+  if (m_flying) {
+    NS_LOG_DEBUG ("UavDeviceEnergyModel::HoverConsumption problema flying == " << m_flying << " [" << m_source->GetNode()->GetId() << "] @" << Simulator::Now().GetSeconds());
+    return;
+  }
 
   // do not update if simulation has finished
   if (Simulator::IsFinished())
   {
     return;
   }
-
-  m_hoverEvent.Cancel();
 
   double diff_time = Simulator::Now().GetSeconds() - m_lastTime.GetSeconds();
   double energyToDecrease = m_hoverCost * diff_time;
@@ -297,17 +300,16 @@ void UavDeviceEnergyModel::CourseChange (Ptr<const MobilityModel> mob) // Chamad
 
 void UavDeviceEnergyModel::SetFlying(bool f) {
   m_flying = f;
+  NS_LOG_DEBUG("UavDeviceEnergyModel::SetFlying [" << m_source->GetNode()->GetId() << "] " << m_flying << " @" << Simulator::Now().GetSeconds());
 }
 
 void UavDeviceEnergyModel::StopHover()
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  if (m_flying) {
-    NS_FATAL_ERROR("UavDeviceEnergyModel::StopHover UAV não chegou a sua posicao final!");
-  }
+  NS_ASSERT_MSG (!m_flying, "UavDeviceEnergyModel::StopHover [" << m_source->GetNode()->GetId() << "] @" << Simulator::Now().GetSeconds());
   NS_LOG_DEBUG("UavDeviceEnergyModel::StopHover [" << m_source->GetNode()->GetId() << "] lasttime: " << m_lastTime.GetSeconds() << " @" << Simulator::Now().GetSeconds());
-  m_hoverEvent.Cancel();
-  HoverConsumption();
+  Simulator::Remove(m_hoverEvent);
+  m_hoverEvent = Simulator::ScheduleNow(&UavDeviceEnergyModel::HoverConsumption, this);
   Simulator::Remove(m_hoverEvent); /// removendo a programacao 
 }
 

@@ -32,8 +32,14 @@
 #include "ns3/energy-module.h"
 #include <cmath>
 
+#include "client-device-energy-model.h"
+#include "uav-device-energy-model.h"
+
 namespace ns3
 {
+
+  class ClientDeviceEnergyModel;
+  class UavDeviceEnergyModel;
 
 /**
  * UavEnergySource decreases/increases remaining energy stored in itself in
@@ -106,13 +112,15 @@ public:
    * This function sets the interval between each energy update.
    */
   void SetEnergyUpdateInterval (Time interval);
+  void SetUpdateThresholdInterval (Time interval);
 
   /**
    * \returns The interval between each energy update.
    */
   Time GetEnergyUpdateInterval (void) const;
+  Time GetUpdateThresholdInterval (void) const;
 
-  void SetBasicEnergyLowBatteryThreshold (double thr);
+  void SetBasicEnergyLowBatteryThresholdUav (double thr);
 
   void Stop (); // stop, UAV fora da rede
   void Start (); // para iniciar o posicionamento
@@ -152,17 +160,22 @@ private:
    */
   void CalculateRemainingEnergy (void);
 
+  void UpdateThreshold ();
+
 private:
   double m_initialEnergyJ;                // initial energy, in Joules
   double m_supplyVoltageV;                // supply voltage, in Volts
-  double m_lowBatteryTh;                 // low battery threshold, as a fraction of the initial energy
+  double m_lowBatteryThUav;                 // low battery threshold, as a fraction of the initial energy
+  double m_lowBatteryThCli;
   double m_highBatteryTh;                // high battery threshold, as a fraction of the initial energy
   bool m_depleted;                       // set to true when the remaining energy goes below the low threshold,
                                          // set to false again when the remaining energy exceeds the high threshold
   TracedValue<double> m_remainingEnergyJ; // remaining energy, in mAs
   EventId m_energyUpdateEvent;           // energy update event
+  EventId m_updateThr;
   Vector m_lastPosition;                 // last position of the node
   Time m_lastUpdateTime;                  // last update time
+  Time m_updateThrTime;
   Time m_energyUpdateInterval;           // energy update interval
   std::ofstream m_file;
 
@@ -175,11 +188,14 @@ private:
 
   std::string m_pathData;
 
-  Ptr<DeviceEnergyModel> m_uavDevModel;
-  Ptr<DeviceEnergyModel> m_cliDevModel;
+  Ptr<DeviceEnergyModel> m_uavDev;
+  Ptr<UavDeviceEnergyModel> m_uavDevModel;
+  Ptr<DeviceEnergyModel> m_cliDev;
+  Ptr<ClientDeviceEnergyModel> m_cliDevModel;
 
 };
 
 } // namespace ns3
 
 #endif /* UAV_ENERGY_SOURCE_H */
+

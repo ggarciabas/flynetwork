@@ -68,7 +68,7 @@ int main (int argc, char *argv[])
 
 	// LogComponentEnable("DhcpClient", LOG_FUNCTION);
 	// LogComponentEnable("ClientDeviceEnergyModelHelper", LOG_FUNCTION);
-	// LogComponentEnable("ClientDeviceEnergyModel", LOG_FUNCTION);
+	LogComponentEnable("ClientDeviceEnergyModel", LOG_DEBUG);
 	// LogComponentEnable("ClientModel", LOG_FUNCTION);
 	// LogComponentEnable("ClientModelContainer", LOG_FUNCTION);
 	// LogComponentEnable("LocationModelContainer", LOG_FUNCTION);
@@ -88,7 +88,8 @@ int main (int argc, char *argv[])
 	// LogComponentEnable("UavNetwork", LOG_FUNCTION);
 	// LogComponentEnable("UavNodeContainer", LOG_FUNCTION);
 
-	SeedManager::SetSeed(6112018);
+	// SeedManager::SetSeed(6112018);
+	SeedManager::SetSeed(9042019);
 
 	ObjectFactory obj;
 	obj.SetTypeId("ns3::UavNetwork");

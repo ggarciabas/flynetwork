@@ -52,7 +52,7 @@ ClientDeviceEnergyModel::GetTypeId(void)
                                         MakeDoubleChecker<double>())
                           .AddAttribute("PeriodicEnergyUpdateInterval",
                                         "",
-                                        TimeValue(Seconds(1)), // s
+                                        TimeValue(Seconds(0.1)), // s
                                         MakeTimeAccessor(&ClientDeviceEnergyModel::m_energyUpdateInterval),
                                         MakeTimeChecker())
                          .AddTraceSource ("TotalEnergyConsumption",
@@ -79,7 +79,7 @@ void ClientDeviceEnergyModel::SetEnergyDepletionCallback(EnergyCallback callback
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<&callback);
   if (callback.IsNull())
   {
-    NS_LOG_DEBUG("EnergyDepletionCallback:Setting NULL energy depletion callback!");
+    //NS_LOG_DEBUG("EnergyDepletionCallback:Setting NULL energy depletion callback!");
   }
   m_energyDepletionCallback = callback;
 }
@@ -89,7 +89,7 @@ void ClientDeviceEnergyModel::SetEnergyRechargedCallback(EnergyCallback callback
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<&callback);
   if (callback.IsNull())
   {
-    NS_LOG_DEBUG("EnergyRechargedCallback:Setting NULL energy Recharged callback!");
+    //NS_LOG_DEBUG("EnergyRechargedCallback:Setting NULL energy Recharged callback!");
   }
   m_energyRechargedCallback = callback;
 }
@@ -102,7 +102,7 @@ void ClientDeviceEnergyModel::HandleEnergyRecharged (void)
   m_totalEnergyConsumption = 0;
   m_clientCount = 0;
   this->m_lastUpdateTime = Simulator::Now ();
-  m_cliEvent = Simulator::Schedule(Seconds(m_energyUpdateInterval), &ClientDeviceEnergyModel::ClientConsumption, this);
+  m_cliEvent = Simulator::Schedule(m_energyUpdateInterval, &ClientDeviceEnergyModel::ClientConsumption, this);
 }
 
 void ClientDeviceEnergyModel::HandleEnergyOff(void)
@@ -125,9 +125,8 @@ void ClientDeviceEnergyModel::HandleEnergyDepletion(void)
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   if (!m_energyDepletionCallback.IsNull())  m_energyDepletionCallback();
   m_clientCount = 0;
-  m_cliEvent.Cancel();
   ClientConsumption(); // update battery
-  m_cliEvent.Cancel();// cancel again, to do not allow any consumption from clients
+  Simulator::Remove(m_cliEvent);
 }
 
 void ClientDeviceEnergyModel::SetEnergyUpdateInterval(Time interval)
@@ -163,21 +162,10 @@ ClientDeviceEnergyModel::GetNode() const
   return m_node;
 }
 
-double ClientDeviceEnergyModel::UpdateConsumption () {
-  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  Time duration = Simulator::Now () - m_lastUpdateTime;
-  double energyToDecrease = duration.GetSeconds () * (m_clientCost * m_clientCount);
-  DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceClient (energyToDecrease);
-  // update last update time stamp
-  this->m_lastUpdateTime = Simulator::Now ();
-  m_totalEnergyConsumption += energyToDecrease;
-  return energyToDecrease;
-}
-
 double 
-ClientDeviceEnergyModel::CalculateThreshold () {
+ClientDeviceEnergyModel::CalculateThreshold (double time) {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  return ((m_clientCost * m_clientCount)*m_energyUpdateInterval.GetSeconds()) / m_source->GetInitialEnergy(); // % necessaria para suprir os clientes durante o intervalo
+  return ((m_clientCost * m_clientCount)*time) / m_source->GetInitialEnergy(); // % necessaria para suprir os clientes durante o intervalo necessario para o Uav se direcionar a central!
 }
 
 double
@@ -190,7 +178,6 @@ ClientDeviceEnergyModel::GetTotalEnergyConsumption (void) const
 void ClientDeviceEnergyModel::AddClient ()
 {
   // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  m_cliEvent.Cancel();
   ClientConsumption(); // update battery
   m_clientCount++;
 }
@@ -198,30 +185,40 @@ void ClientDeviceEnergyModel::AddClient ()
 void ClientDeviceEnergyModel::RemoveClient()
 {
   // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  m_cliEvent.Cancel();
   ClientConsumption(); // update battery
   m_clientCount--;
+}
+
+double ClientDeviceEnergyModel::UpdateConsumption () {  
+  Time duration = Simulator::Now () - m_lastUpdateTime;
+  double energyToDecrease = duration.GetSeconds () * (m_clientCost * m_clientCount);
+  // NS_LOG_DEBUG ("ClientDeviceEnergyModel::UpdateConsumption UAV [" << GetNode()->GetId() << "] duration: " << duration.GetSeconds() << " energy: " << energyToDecrease << " clientCount: " << m_clientCount << " @" << Simulator::Now().GetSeconds());
+  DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceClient (energyToDecrease);
+  // update last update time stamp
+  this->m_lastUpdateTime = Simulator::Now ();
+  m_totalEnergyConsumption += energyToDecrease;
+  return energyToDecrease;
 }
 
 void ClientDeviceEnergyModel::ClientConsumption ()
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() << m_clientCount << m_node->GetId());
-  m_cliEvent.Cancel();
+  Simulator::Remove(m_cliEvent);
   double energyToDecrease =  UpdateConsumption();
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_client_" << m_node->GetId() << ".txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease / m_source->GetInitialEnergy() << std::endl;
   m_file.close();
-  m_cliEvent = Simulator::Schedule(Seconds(m_energyUpdateInterval), &ClientDeviceEnergyModel::ClientConsumption, this);
+  m_cliEvent = Simulator::Schedule(m_energyUpdateInterval, &ClientDeviceEnergyModel::ClientConsumption, this);
 }
 
 void ClientDeviceEnergyModel::DoDispose (void)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  NS_LOG_DEBUG("ClientDeviceEnergyModel::DoDispose");
+  //NS_LOG_DEBUG("ClientDeviceEnergyModel::DoDispose");
   m_source = 0;
-  m_cliEvent.Cancel();
+  Simulator::Remove(m_cliEvent);
 }
 
 void ClientDeviceEnergyModel::DoInitialize (void)
@@ -229,7 +226,7 @@ void ClientDeviceEnergyModel::DoInitialize (void)
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   // update last update time stamp
   m_lastUpdateTime = Simulator::Now ();
-  m_cliEvent = Simulator::Schedule(Seconds(m_energyUpdateInterval), &ClientDeviceEnergyModel::ClientConsumption, this);
+  m_cliEvent = Simulator::Schedule(m_energyUpdateInterval, &ClientDeviceEnergyModel::ClientConsumption, this);
 }
 
 double
