@@ -151,7 +151,7 @@ private:
   Ipv4AddressHelper m_addressHelper;
 
   Ptr<ServerApplication> m_serverApp;
-  std::ostringstream m_ssgnuPalcos;
+  // std::ostringstream m_ssgnuPalcos;
   // AnimationInterface*         m_animation;
   // Ptr<OutputStreamWrapper> m_routintable;
   // Ptr<OutputStreamWrapper> m_routintableUav;

@@ -26,8 +26,8 @@
 #include "ns3/internet-apps-module.h"
 #include <cmath>
 
-// #define PACKET
-// #define DHCP
+#define PACKET
+#define DHCP
 
 namespace ns3
 {
@@ -52,6 +52,11 @@ SmartphoneApplication::GetTypeId(void)
                                         "Smartphone login",
                                         StringValue("login-"),
                                         MakeStringAccessor(&SmartphoneApplication::m_login),
+                                        MakeStringChecker())
+                          .AddAttribute("App",
+                                        "Smartphone application",
+                                        StringValue("NONE"),
+                                        MakeStringAccessor(&SmartphoneApplication::m_app),
                                         MakeStringChecker())
                           .AddAttribute("Port",
                                         "Communication port number",
@@ -143,7 +148,7 @@ void SmartphoneApplication::StartApplication(void)
     staticRouting->RemoveRoute (i); // removendo rotas padrão do static
   }
 
-  m_socketUav = Socket::CreateSocket (GetNode(), UdpSocketFactory::GetTypeId ());
+  m_socketUav = Socket::CreateSocket (GetNode(), TcpSocketFactory::GetTypeId ());
   m_running = true;
 }
 

@@ -360,7 +360,7 @@ void UavNetwork::ConfigureServer()
   // configurando PacketSink
   ObjectFactory packFacAdhoc;
   packFacAdhoc.SetTypeId ("ns3::PacketSink");
-  packFacAdhoc.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+  packFacAdhoc.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
   packFacAdhoc.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), m_serverPort))); // OPS: utilizam Ipv4Address::GetAny ()
   Ptr<Application> appAdhoc = packFacAdhoc.Create<Application> ();
   appAdhoc->SetStartTime(Seconds(10.0));
@@ -378,7 +378,7 @@ void UavNetwork::ConfigureServer()
 
   ObjectFactory packVideo;
   packVideo.SetTypeId ("ns3::PacketSink");
-  packVideo.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+  packVideo.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
   packVideo.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), 5070))); // OPS: utilizam Ipv4Address::GetAny ()
   Ptr<Application> appVideo = packVideo.Create<Application> ();
   appVideo->SetStartTime(Seconds(10.0));
@@ -387,7 +387,7 @@ void UavNetwork::ConfigureServer()
 
   ObjectFactory packWww;
   packWww.SetTypeId ("ns3::PacketSink");
-  packWww.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+  packWww.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
   packWww.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), 8080))); // OPS: utilizam Ipv4Address::GetAny ()
   Ptr<Application> appWww = packWww.Create<Application> ();
   appWww->SetStartTime(Seconds(10.0));
@@ -609,7 +609,7 @@ void UavNetwork::ConfigureUav(int total)
     // configure PacketSink
     ObjectFactory packFac;
     packFac.SetTypeId ("ns3::PacketSink");
-    packFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+    packFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
     packFac.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), m_serverPort))); // OPS: utilizam Ipv4Address::GetAny ()
     Ptr<Application> app = packFac.Create<Application> ();
     app->SetStartTime(Seconds(0.0));
@@ -618,7 +618,7 @@ void UavNetwork::ConfigureUav(int total)
 
     ObjectFactory packFacInfra;
     packFacInfra.SetTypeId ("ns3::PacketSink");
-    packFacInfra.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+    packFacInfra.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
     packFacInfra.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), m_cliPort))); // OPS: utilizam Ipv4Address::GetAny ()
     Ptr<Application> appInfra = packFacInfra.Create<Application> ();
     appInfra->SetStartTime(Seconds(0.0));
@@ -770,10 +770,13 @@ void UavNetwork::ConfigureCli()
   std::ostringstream oss;
   for (NodeContainer::Iterator i = m_clientNode.Begin(); i != m_clientNode.End(); ++i, ++c)
   {
+    ss.str("");
+    ss << "login-" << (*i)->GetId();
+
     // configure PacketSink
     ObjectFactory packFac;
     packFac.SetTypeId ("ns3::PacketSink");
-    packFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+    packFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
     packFac.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), m_cliPort))); // OPS: utilizam Ipv4Address::GetAny ()
     Ptr<Application> app = packFac.Create<Application> ();
     app->SetStartTime(Seconds(0.0));
@@ -869,7 +872,7 @@ void UavNetwork::ConfigureApplication ()
     } else if (app_code < 2) { // VIDEO
         smart->SetApp ("VIDEO");
         onoffFac.SetTypeId ("ns3::OnOffApplication");
-        onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+        onoffFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
         onoffFac.Set ("PacketSize", UintegerValue (429));
         onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
         onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0]"));
@@ -885,7 +888,7 @@ void UavNetwork::ConfigureApplication ()
     } else if (app_code < 3) { // WWW
         smart->SetApp ("WWW");
         onoffFac.SetTypeId ("ns3::OnOffApplication");
-        onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+        onoffFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
         onoffFac.Set ("PacketSize", UintegerValue (429));
         onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
         onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0.04]"));
@@ -916,6 +919,7 @@ void UavNetwork::ConfigurePalcos() // TODO: poderia ser otimizada a leitura do a
   std::ifstream scenario;
   ss << "./scratch/flynetwork/data/scenarios/" << m_PathData << ".txt";
   string file = ss.str();
+  ss.str("");
   scenario.open(file);
   // ler informacoes dos arquivos
   if (scenario.is_open())
@@ -934,14 +938,14 @@ void UavNetwork::ConfigurePalcos() // TODO: poderia ser otimizada a leitura do a
         ss << "fixed-" << i++;
         sscanf(line.c_str(), "%lf,%lf\n", &x, &y);
         NS_LOG_INFO(line.c_str());
-        m_ssgnuPalcos << x << "\t" << y << "\n";
+        // m_ssgnuPalcos << x << "\t" << y << "\n";
         m_palcoPos.push_back(x);
         m_palcoPos.push_back(y);
         // Set fixed nodes on server!
         m_serverApp->AddNewFixedClient(ss.str(), x, y);
       }
     }
-    m_ssgnuPalcos << "e\n";
+    // m_ssgnuPalcos << "e\n";
     scenario.close();
   }
   else
