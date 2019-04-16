@@ -43,7 +43,7 @@ using namespace ns3;
 int main (int argc, char *argv[])
 {
 	double sim_time=1200.0, cli_pos_update = 5.0, scheduleServer=ETAPA;
-	uint32_t scenario = 7, env = 2, protocol = 2, custo=1;
+	uint32_t scenario = 7, env = 2, protocol = 2, custo=1, seed=9042019;
 	CommandLine cmd;
 	cmd.AddValue ("SimTime", "Simulation time", sim_time);
 	cmd.AddValue ("CliUpdate", "Client update position", cli_pos_update);
@@ -52,6 +52,7 @@ int main (int argc, char *argv[])
 	cmd.AddValue ("Protocol", "Routing Protocol", protocol);
 	cmd.AddValue ("ScheduleServer", "Tempo minimo etapa", scheduleServer);
 	cmd.AddValue ("Custo", "Metrica de análise do DA de Posicionamento", custo);
+	cmd.AddValue ("Seed", "Seed", seed);
 	cmd.Parse (argc, argv);
 
 	// LogComponentEnable("UavNetwork", LOG_DEBUG);
@@ -89,7 +90,7 @@ int main (int argc, char *argv[])
 	// LogComponentEnable("UavNodeContainer", LOG_FUNCTION);
 
 	// SeedManager::SetSeed(6112018);
-	SeedManager::SetSeed(9042019);
+	SeedManager::SetSeed(seed);
 
 	ObjectFactory obj;
 	obj.SetTypeId("ns3::UavNetwork");
@@ -99,6 +100,7 @@ int main (int argc, char *argv[])
 	obj.Set("Environment", UintegerValue(env));
 	obj.Set("Protocol", UintegerValue(protocol));
 	obj.Set("Custo", UintegerValue(custo));
+	obj.Set("Seed", UintegerValue(seed));
 	obj.Set("ScheduleServer", DoubleValue(scheduleServer));
 	Ptr<UavNetwork> net = obj.Create()->GetObject<UavNetwork>();
 	net->Run();

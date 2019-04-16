@@ -134,6 +134,11 @@ UavNetwork::GetTypeId(void)
                                         UintegerValue(1),
                                         MakeUintegerAccessor(&UavNetwork::m_custo),
                                         MakeUintegerChecker<uint32_t>())
+                          .AddAttribute("Seed",
+                                        "Seed",
+                                        UintegerValue(1),
+                                        MakeUintegerAccessor(&UavNetwork::m_seed),
+                                        MakeUintegerChecker<uint32_t>())
                           .AddAttribute("Protocol",
                                         "Protocol.",
                                         UintegerValue(1),
@@ -238,7 +243,7 @@ void UavNetwork::Run()
     exit(-1);
   }
 
-  ss << "/custo_" << m_custo;
+  ss << "/" << m_seed << "/custo_" << m_custo; // adicionando seed
   m_pathData = ss.str();
   ss.str("");
   ss << "rm -Rf ./scratch/flynetwork/data/output/" << m_pathData;
