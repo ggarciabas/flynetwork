@@ -245,7 +245,11 @@ UavDeviceEnergyModel::GetTotalEnergyConsumption (void) const
 void UavDeviceEnergyModel::HoverConsumption(void)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  NS_ASSERT_MSG (!m_flying, "UavDeviceEnergyModel::HoverConsumption [" << m_source->GetNode()->GetId() << "] @" << Simulator::Now().GetSeconds());
+
+  if (m_flying) {
+    NS_LOG_DEBUG ("UavDeviceEnergyModel::HoverConsumption problema flying == " << m_flying << " [" << m_source->GetNode()->GetId() << "] @" << Simulator::Now().GetSeconds());
+    return;
+  }
 
   // do not update if simulation has finished
   if (Simulator::IsFinished())
