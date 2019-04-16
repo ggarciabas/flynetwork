@@ -54,21 +54,21 @@ int main (int argc, char *argv[])
 	cmd.AddValue ("Custo", "Metrica de análise do DA de Posicionamento", custo);
 	cmd.Parse (argc, argv);
 
-	LogComponentEnable("UavNetwork", LOG_DEBUG);
-	LogComponentEnable("ServerApplication", LOG_DEBUG);
+	// LogComponentEnable("UavNetwork", LOG_DEBUG);
+	// LogComponentEnable("ServerApplication", LOG_DEBUG);
 	// LogComponentEnable("LocationModel", LOG_DEBUG);
 	// LogComponentEnable("UavApplication", LOG_FUNCTION);
-	LogComponentEnable("UavApplication", LOG_DEBUG);
+	// LogComponentEnable("UavApplication", LOG_DEBUG);
 	// LogComponentEnable("SmartphoneApplication", LOG_DEBUG);
 	// LogComponentEnable("WifiPhyStateHelper", LOG_FUNCTION);
 	// LogComponentEnable("WifiPhy", LOG_FUNCTION);
-	LogComponentEnable ("WifiPhyStateHelper", LOG_DEBUG);
-	LogComponentEnable ("WifiRadioEnergyModel", LOG_DEBUG);
+	// LogComponentEnable ("WifiPhyStateHelper", LOG_DEBUG);
+	// LogComponentEnable ("WifiRadioEnergyModel", LOG_DEBUG);
 
 
 	// LogComponentEnable("DhcpClient", LOG_FUNCTION);
 	// LogComponentEnable("ClientDeviceEnergyModelHelper", LOG_FUNCTION);
-	LogComponentEnable("ClientDeviceEnergyModel", LOG_DEBUG);
+	// LogComponentEnable("ClientDeviceEnergyModel", LOG_DEBUG);
 	// LogComponentEnable("ClientModel", LOG_FUNCTION);
 	// LogComponentEnable("ClientModelContainer", LOG_FUNCTION);
 	// LogComponentEnable("LocationModelContainer", LOG_FUNCTION);
@@ -79,10 +79,10 @@ int main (int argc, char *argv[])
 	// LogComponentEnable("UavApplicationContainer", LOG_FUNCTION);
 	// LogComponentEnable("UavApplication", LOG_FUNCTION);
 	// LogComponentEnable("UavDeviceEnergyModelHelper", LOG_FUNCTION);
-	LogComponentEnable("UavDeviceEnergyModel", LOG_DEBUG);
+	// LogComponentEnable("UavDeviceEnergyModel", LOG_DEBUG);
 	// LogComponentEnable("UavEnergySourceHelper", LOG_FUNCTION);
-	LogComponentEnable("UavEnergySource", LOG_DEBUG);
-	LogComponentEnable("UavMobilityModel", LOG_DEBUG);
+	// LogComponentEnable("UavEnergySource", LOG_DEBUG);
+	// LogComponentEnable("UavMobilityModel", LOG_DEBUG);
 	// LogComponentEnable("UavModelContainer", LOG_FUNCTION);
 	// LogComponentEnable("UavModel", LOG_DEBUG);
 	// LogComponentEnable("UavNetwork", LOG_FUNCTION);
