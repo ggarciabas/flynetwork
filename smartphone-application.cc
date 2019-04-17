@@ -148,10 +148,9 @@ void SmartphoneApplication::StartApplication(void)
   {
     staticRouting->RemoveRoute (i); // removendo rotas padrão do static
   }
-  #ifdef TCP
+  #ifdef TCP_CLI
     m_socketUav = Socket::CreateSocket(GetNode(), TcpSocketFactory::GetTypeId());
-  #endif
-  #ifdef UDP
+  #elif UDP
     m_socketUav = Socket::CreateSocket(GetNode(), UdpSocketFactory::GetTypeId());
   #endif
   m_running = true;

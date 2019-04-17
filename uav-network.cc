@@ -388,10 +388,9 @@ void UavNetwork::ConfigureServer()
 
   ObjectFactory packVideo;
   packVideo.SetTypeId ("ns3::PacketSink");
-  #ifdef TCP
+  #ifdef TCP_CLI
     packVideo.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
-  #endif
-  #ifdef UDP
+  #elif UDP
     packVideo.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
   #endif
   packVideo.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), 5070))); // OPS: utilizam Ipv4Address::GetAny ()
@@ -402,10 +401,9 @@ void UavNetwork::ConfigureServer()
 
   ObjectFactory packWww;
   packWww.SetTypeId ("ns3::PacketSink");
-  #ifdef TCP
+  #ifdef TCP_CLI
     packWww.Set ("Protocol", StringValue ("ns3::SocketFactory"));
-  #endif
-  #ifdef UDP
+  #elif UDP
     packWww.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
   #endif
   packWww.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), 8080))); // OPS: utilizam Ipv4Address::GetAny ()
@@ -643,10 +641,9 @@ void UavNetwork::ConfigureUav(int total)
 
     ObjectFactory packFacInfra;
     packFacInfra.SetTypeId ("ns3::PacketSink");
-    #ifdef TCP
+    #ifdef TCP_CLI
       packFacInfra.Set ("Protocol", StringValue ("ns3::SocketFactory"));
-    #endif
-    #ifdef UDP
+    #elif UDP
       packFacInfra.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
     #endif
     packFacInfra.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), m_cliPort))); // OPS: utilizam Ipv4Address::GetAny ()
@@ -806,10 +803,9 @@ void UavNetwork::ConfigureCli()
     // configure PacketSink
     ObjectFactory packFac;
     packFac.SetTypeId ("ns3::PacketSink");
-    #ifdef TCP
+    #ifdef TCP_CLI
       packFac.Set ("Protocol", StringValue ("ns3::SocketFactory"));
-    #endif
-    #ifdef UDP
+    #elif UDP
       packFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
     #endif
     packFac.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), m_cliPort))); // OPS: utilizam Ipv4Address::GetAny ()
@@ -907,10 +903,9 @@ void UavNetwork::ConfigureApplication ()
     } else if (app_code < 2) { // VIDEO
         smart->SetApp ("VIDEO");
         onoffFac.SetTypeId ("ns3::OnOffApplication");
-        #ifdef TCP
+        #ifdef TCP_CLI
           onoffFac.Set ("Protocol", StringValue ("ns3::SocketFactory"));
-        #endif
-        #ifdef UDP
+        #elif UDP
           onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
         #endif
         onoffFac.Set ("PacketSize", UintegerValue (429));
@@ -928,10 +923,9 @@ void UavNetwork::ConfigureApplication ()
     } else if (app_code < 3) { // WWW
         smart->SetApp ("WWW");
         onoffFac.SetTypeId ("ns3::OnOffApplication");
-        #ifdef TCP
+        #ifdef TCP_CLI
           onoffFac.Set ("Protocol", StringValue ("ns3::SocketFactory"));
-        #endif
-        #ifdef UDP
+        #elif UDP
           onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
         #endif
         onoffFac.Set ("PacketSize", UintegerValue (429));
