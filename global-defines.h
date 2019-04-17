@@ -2,9 +2,9 @@
     #define ETAPA 300 
 #endif
 
-#ifndef TCP
-    #define TCP 
-#endif
+// #ifndef TCP
+//     #define TCP 
+// #endif
 
 #ifndef TCP_CLI
     #define TCP_CLI 
