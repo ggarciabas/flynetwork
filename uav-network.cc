@@ -390,7 +390,7 @@ void UavNetwork::ConfigureServer()
   packVideo.SetTypeId ("ns3::PacketSink");
   #ifdef TCP_CLI
     packVideo.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
-  #elif UDP
+  #else
     packVideo.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
   #endif
   packVideo.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), 5070))); // OPS: utilizam Ipv4Address::GetAny ()
@@ -403,7 +403,7 @@ void UavNetwork::ConfigureServer()
   packWww.SetTypeId ("ns3::PacketSink");
   #ifdef TCP_CLI
     packWww.Set ("Protocol", StringValue ("ns3::SocketFactory"));
-  #elif UDP
+  #else
     packWww.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
   #endif
   packWww.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), 8080))); // OPS: utilizam Ipv4Address::GetAny ()
@@ -643,7 +643,7 @@ void UavNetwork::ConfigureUav(int total)
     packFacInfra.SetTypeId ("ns3::PacketSink");
     #ifdef TCP_CLI
       packFacInfra.Set ("Protocol", StringValue ("ns3::SocketFactory"));
-    #elif UDP
+    #else
       packFacInfra.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
     #endif
     packFacInfra.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), m_cliPort))); // OPS: utilizam Ipv4Address::GetAny ()
@@ -805,7 +805,7 @@ void UavNetwork::ConfigureCli()
     packFac.SetTypeId ("ns3::PacketSink");
     #ifdef TCP_CLI
       packFac.Set ("Protocol", StringValue ("ns3::SocketFactory"));
-    #elif UDP
+    #else
       packFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
     #endif
     packFac.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), m_cliPort))); // OPS: utilizam Ipv4Address::GetAny ()
@@ -905,7 +905,7 @@ void UavNetwork::ConfigureApplication ()
         onoffFac.SetTypeId ("ns3::OnOffApplication");
         #ifdef TCP_CLI
           onoffFac.Set ("Protocol", StringValue ("ns3::SocketFactory"));
-        #elif UDP
+        #else
           onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
         #endif
         onoffFac.Set ("PacketSize", UintegerValue (429));
@@ -925,7 +925,7 @@ void UavNetwork::ConfigureApplication ()
         onoffFac.SetTypeId ("ns3::OnOffApplication");
         #ifdef TCP_CLI
           onoffFac.Set ("Protocol", StringValue ("ns3::SocketFactory"));
-        #elif UDP
+        #else
           onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
         #endif
         onoffFac.Set ("PacketSize", UintegerValue (429));

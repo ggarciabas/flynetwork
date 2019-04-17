@@ -150,7 +150,7 @@ void SmartphoneApplication::StartApplication(void)
   }
   #ifdef TCP_CLI
     m_socketUav = Socket::CreateSocket(GetNode(), TcpSocketFactory::GetTypeId());
-  #elif UDP
+  #else
     m_socketUav = Socket::CreateSocket(GetNode(), UdpSocketFactory::GetTypeId());
   #endif
   m_running = true;

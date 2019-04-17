@@ -143,7 +143,7 @@ void UavApplication::StartApplication(void)
   NS_LOG_DEBUG("UavApplication::StartApplication [" << m_id << "]");
   #ifdef TCP_CLI
     m_socketClient = Socket::CreateSocket (GetNode(), TcpSocketFactory::GetTypeId ());
-  #elif UDP
+  #else
     m_socketClient = Socket::CreateSocket (GetNode(), TcpSocketFactory::GetTypeId ());
   #endif
 
