@@ -17,6 +17,7 @@
  *
  * Authors: Giovanna Garcia <ggarciabas@gmail.com>
  */
+#include "global-defines.h"
 #include "server-application.h"
 
 #include "ns3/simulator.h"
@@ -146,7 +147,13 @@ void ServerApplication::AddNewUav(uint32_t id, Ipv4Address addrAdhoc, double tot
 
   ////NS_LOG_DEBUG ("ServerApplication::AddNewUav Criando uav: " << id << " @" << Simulator::Now().GetSeconds());
 
-  Ptr<Socket> socket = Socket::CreateSocket(GetNode(), UdpSocketFactory::GetTypeId());
+  Ptr<Socket> socket;
+  #ifdef TCP
+    socket = Socket::CreateSocket(GetNode(), TcpSocketFactory::GetTypeId());
+  #endif
+  #ifdef UDP
+    socket = Socket::CreateSocket(GetNode(), UdpSocketFactory::GetTypeId());
+  #endif
 
   ObjectFactory obj;
   obj.SetTypeId("ns3::UavModel");
@@ -174,7 +181,13 @@ void ServerApplication::AddSupplyUav(uint32_t id, Ipv4Address addrAdhoc, double 
   Ptr<UavModel> supplied = m_uavContainer.RemoveAt(m_supplyPos);
   ////NS_LOG_DEBUG("Criando supply uav: " << id << " last: " << supplied->GetId());
 
-  Ptr<Socket> socket = Socket::CreateSocket(GetNode(), UdpSocketFactory::GetTypeId());
+  Ptr<Socket> socket;
+  #ifdef TCP
+    socket = Socket::CreateSocket(GetNode(), TcpSocketFactory::GetTypeId());
+  #endif
+  #ifdef UDP
+    socket = Socket::CreateSocket(GetNode(), UdpSocketFactory::GetTypeId());
+  #endif
 
   ObjectFactory obj;
   obj.SetTypeId("ns3::UavModel");
@@ -315,7 +328,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             }
             uav = 0;
       } else if (results.at(0).compare("DATA") == 0) {
-          // NS_LOG_INFO("ServerApplication::TracedCallbackRxApp " << s << " @" << Simulator::Now().GetSeconds());
+          NS_LOG_DEBUG("ServerApplication::TracedCallbackRxApp " << s << " @" << Simulator::Now().GetSeconds());
           Ptr<UavModel> uav = m_uavContainer.FindUavModel(std::stoi(results.at(1), &sz));
           if (uav != NULL)
           {
@@ -382,17 +395,17 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             }
             uav = 0;
           } else {
-            // InetSocketAddress add = InetSocketAddress::ConvertFrom(address);
+            InetSocketAddress add = InetSocketAddress::ConvertFrom(address);
             // std::ostringstream mm;
             // mm << "SERVER\t-1\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tCLIENT";
-            //m_packetTrace(mm.str());
+            // m_packetTrace(mm.str());
             // NS_LOG_DEBUG("SERVER -- CLIENT ::: recebida informacoes de aplicacao do cliente no endereco " << add.GetIpv4());
-            // std::ostringstream os;
-            // os << "./scratch/flynetwork/data/output/" << m_pathData << "/client_data.txt";
-            // std::ofstream file;
-            // file.open(os.str(), std::ofstream::out | std::ofstream::app);
-            // file << Simulator::Now().GetSeconds() << " RECEBIDO" << std::endl; // RECEBIDO pelo servidor
-            // file.close();
+            std::ostringstream os;
+            os << "./scratch/flynetwork/data/output/" << m_pathData << "/client_data.txt";
+            std::ofstream file;
+            file.open(os.str(), std::ofstream::out | std::ofstream::app);
+            file << Simulator::Now().GetSeconds() << " RECEBIDO " << add.GetIpv4() << std::endl; // RECEBIDO pelo servidor
+            file.close();
           }
     results.clear();
 }
@@ -585,136 +598,6 @@ void ServerApplication::SendUavPacket(Ptr<UavModel> uav)
   
   // enviando posicionamento!
   uav->GotoReceived(false);
-}
-
-void ServerApplication::runDAPython()
-{
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-
-  std::ofstream cenario, file;
-  std::ostringstream os;
-  os.str("");
-  os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << m_step << "/cenario_in.txt";
-  cenario.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
-  if (cenario.is_open())
-  {
-    cenario << m_environment << "\n";
-    cenario << m_locationContainer.GetN() << std::endl;
-    Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
-    cenario << pos.x << "," << pos.y;
-
-    os.str("");
-    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/"<<m_step<<"/client.txt";
-    file.open(os.str().c_str(), std::ofstream::out);
-    bool first = true;
-    for (ClientModelContainer::Iterator i = m_clientContainer.Begin(); i != m_clientContainer.End(); ++i)
-    {
-      cenario << std::endl
-              << (*i)->GetLogin() << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
-      if (first) {
-        file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1) << "," << (*i)->GetLogin();
-        first = false;
-      } else {
-        file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1) << "," << (*i)->GetLogin();
-      }
-    }
-    for (ClientModelContainer::Iterator i = m_fixedClientContainer.Begin(); i != m_fixedClientContainer.End(); ++i)
-    {
-      cenario << std::endl
-              << (*i)->GetLogin() << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
-      if (first) {
-        file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1) << "," << (*i)->GetLogin();
-        first = false;
-      } else {
-        file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1) << "," << (*i)->GetLogin();;
-      }
-    }
-    file << std::endl;
-    file.close ();
-    cenario.close ();
-    m_clientPosition (os.str ());
-
-    #ifdef COMPARE_COST
-      os.str("");
-      os << "cp ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << m_step << "/client.txt ./scratch/flynetwork/data/output/" << m_pathData << "/compare/" << m_step;
-    #endif
-  }
-
-  m_totalCliGeral = 0;
-
-  os.str ("");
-  os << "python ./scratch/flynetwork/da_python " << m_pathData << " " << m_step << " > ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << m_step << "/python_log.txt";
-  ////NS_LOG_DEBUG (os.str());
-  int status = system(os.str().c_str());
-  if (status < 0)
-  {
-    NS_FATAL_ERROR("SERVER - Erro na execução do algoritmo em Python!");
-  }
-  else
-  {
-    std::ifstream cenario_in;
-    os.str("");
-    os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << m_step << "/cenario_out.txt";
-    cenario_in.open(os.str().c_str(), std::ofstream::in);
-    if (cenario_in.is_open())
-    {
-      double x, y;
-      std::string line;
-      ObjectFactory obj;
-      obj.SetTypeId("ns3::LocationModel");
-      uint32_t id = 0;
-      m_locConsTotal = 0.0;
-      os.str("");
-      os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << m_step << "/location_client.txt";
-      std::ofstream location_cli;
-      location_cli.open(os.str().c_str(), std::ofstream::out);
-      while (getline(cenario_in, line))
-      {
-        sscanf(line.c_str(), "%lf,%lf\n", &x, &y); // new location
-        obj.Set("Id", UintegerValue(id++));
-        Ptr<LocationModel> loc = obj.Create()->GetObject<LocationModel>();
-        loc->SetPosition(x, y);
-        // ler clientes conectados a loc
-        getline(cenario_in, line);
-        std::istringstream iss(line);
-        std::vector<std::string> results(std::istream_iterator<std::string>{iss},
-                                       std::istream_iterator<std::string>());
-        double total =0.0;
-        int t_cli = 0;
-        for (int i = 0; i < int(results.size()); ++i) {
-          Ptr<ClientModel> cli = NULL;
-          if (results.at(i).at(0) == 'f') {
-            cli = m_fixedClientContainer.FindClientModel(results.at(i)); // id
-          } else {
-            cli = m_clientContainer.FindClientModel(results.at(i)); // id
-          }
-          if (cli != NULL) { // caso já exista, atualiza somente posicao se o tempo de atualizacao for maior!
-            total += cli->GetConsumption();
-          } else {
-            NS_FATAL_ERROR ("ServerApplication::runDAPython cliente nao encontrado " << results.at(i));
-          }
-          t_cli++;
-        }
-        loc->SetTotalConsumption (total);
-        loc->SetTotalCli(t_cli);
-        m_totalCliGeral += t_cli;
-        m_locationContainer.Add(loc);
-        NS_LOG_INFO (loc->toString());
-        m_locConsTotal += total; // atualiza total de consumo de todas as localizacoes
-
-        location_cli << loc->GetId() << "," << loc->GetTotalCli() << "," << loc->GetTotalConsumption() << std::endl;
-      }
-      if ( m_locConsTotal == 0) {
-        m_locConsTotal = 1.0; // para nao dar problemas no calculo
-      }
-      location_cli.close();
-      cenario_in.close();
-    }
-    else
-    {
-      NS_FATAL_ERROR("SERVER - $$$$ [NÃO] foi possível abrir para ler informacoes de localização");
-    }
-  }
 }
 
 void ServerApplication::CreateCentralLocation(void)
@@ -1454,10 +1337,10 @@ void ServerApplication::runDA() {
     (*i)->EraseLocation();
     (*i)->SetPci(1/(tMov+tFix*pFix));
     if (first) {
-      file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();;
+      file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
       first = false;
     } else {
-      file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();;
+      file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
     }
   }
   for (ClientModelContainer::Iterator i = m_fixedClientContainer.Begin(); i != m_fixedClientContainer.End(); ++i)
@@ -1465,10 +1348,10 @@ void ServerApplication::runDA() {
     (*i)->EraseLocation();
     (*i)->SetPci(pFix/(tMov+tFix*pFix));
     if (first) {
-      file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();;
+      file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
       first = false;
     } else {
-      file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();;
+      file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
     }
   }
   file << std::endl;
@@ -2098,5 +1981,138 @@ void ServerApplication::GraficoCenarioDaPuro (double temp, int iter, Ptr<Locatio
   // ////NS_LOG_DEBUG (os.str());
   // system(os.str().c_str());
 }
+
+
+void ServerApplication::runDAPython()
+{
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+
+  std::ofstream cenario, file;
+  std::ostringstream os;
+  os.str("");
+  os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << m_step << "/cenario_in.txt";
+  cenario.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
+  if (cenario.is_open())
+  {
+    cenario << m_environment << "\n";
+    cenario << m_locationContainer.GetN() << std::endl;
+    Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
+    cenario << pos.x << "," << pos.y;
+
+    os.str("");
+    os << "./scratch/flynetwork/data/output/"<<m_pathData<<"/etapa/"<<m_step<<"/client.txt";
+    file.open(os.str().c_str(), std::ofstream::out);
+    bool first = true;
+    for (ClientModelContainer::Iterator i = m_clientContainer.Begin(); i != m_clientContainer.End(); ++i)
+    {
+      cenario << std::endl
+              << (*i)->GetLogin() << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
+      if (first) {
+        file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1) << "," << (*i)->GetLogin();
+        first = false;
+      } else {
+        file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1) << "," << (*i)->GetLogin();
+      }
+    }
+    for (ClientModelContainer::Iterator i = m_fixedClientContainer.Begin(); i != m_fixedClientContainer.End(); ++i)
+    {
+      cenario << std::endl
+              << (*i)->GetLogin() << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1);
+      if (first) {
+        file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1) << "," << (*i)->GetLogin();
+        first = false;
+      } else {
+        file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1) << "," << (*i)->GetLogin();;
+      }
+    }
+    file << std::endl;
+    file.close ();
+    cenario.close ();
+    m_clientPosition (os.str ());
+
+    #ifdef COMPARE_COST
+      os.str("");
+      os << "cp ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << m_step << "/client.txt ./scratch/flynetwork/data/output/" << m_pathData << "/compare/" << m_step;
+    #endif
+  }
+
+  m_totalCliGeral = 0;
+
+  os.str ("");
+  os << "python ./scratch/flynetwork/da_python " << m_pathData << " " << m_step << " > ./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << m_step << "/python_log.txt";
+  ////NS_LOG_DEBUG (os.str());
+  int status = system(os.str().c_str());
+  if (status < 0)
+  {
+    NS_FATAL_ERROR("SERVER - Erro na execução do algoritmo em Python!");
+  }
+  else
+  {
+    std::ifstream cenario_in;
+    os.str("");
+    os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << m_step << "/cenario_out.txt";
+    cenario_in.open(os.str().c_str(), std::ofstream::in);
+    if (cenario_in.is_open())
+    {
+      double x, y;
+      std::string line;
+      ObjectFactory obj;
+      obj.SetTypeId("ns3::LocationModel");
+      uint32_t id = 0;
+      m_locConsTotal = 0.0;
+      os.str("");
+      os <<"./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << m_step << "/location_client.txt";
+      std::ofstream location_cli;
+      location_cli.open(os.str().c_str(), std::ofstream::out);
+      while (getline(cenario_in, line))
+      {
+        sscanf(line.c_str(), "%lf,%lf\n", &x, &y); // new location
+        obj.Set("Id", UintegerValue(id++));
+        Ptr<LocationModel> loc = obj.Create()->GetObject<LocationModel>();
+        loc->SetPosition(x, y);
+        // ler clientes conectados a loc
+        getline(cenario_in, line);
+        std::istringstream iss(line);
+        std::vector<std::string> results(std::istream_iterator<std::string>{iss},
+                                       std::istream_iterator<std::string>());
+        double total =0.0;
+        int t_cli = 0;
+        for (int i = 0; i < int(results.size()); ++i) {
+          Ptr<ClientModel> cli = NULL;
+          if (results.at(i).at(0) == 'f') {
+            cli = m_fixedClientContainer.FindClientModel(results.at(i)); // id
+          } else {
+            cli = m_clientContainer.FindClientModel(results.at(i)); // id
+          }
+          if (cli != NULL) { // caso já exista, atualiza somente posicao se o tempo de atualizacao for maior!
+            total += cli->GetConsumption();
+          } else {
+            NS_FATAL_ERROR ("ServerApplication::runDAPython cliente nao encontrado " << results.at(i));
+          }
+          t_cli++;
+        }
+        loc->SetTotalConsumption (total);
+        loc->SetTotalCli(t_cli);
+        m_totalCliGeral += t_cli;
+        m_locationContainer.Add(loc);
+        NS_LOG_INFO (loc->toString());
+        m_locConsTotal += total; // atualiza total de consumo de todas as localizacoes
+
+        location_cli << loc->GetId() << "," << loc->GetTotalCli() << "," << loc->GetTotalConsumption() << std::endl;
+      }
+      if ( m_locConsTotal == 0) {
+        m_locConsTotal = 1.0; // para nao dar problemas no calculo
+      }
+      location_cli.close();
+      cenario_in.close();
+    }
+    else
+    {
+      NS_FATAL_ERROR("SERVER - $$$$ [NÃO] foi possível abrir para ler informacoes de localização");
+    }
+  }
+}
+
+
 
 } // namespace ns3
