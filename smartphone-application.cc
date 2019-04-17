@@ -18,6 +18,7 @@
  * Authors: Giovanna Garcia <ggarciabas@gmail.com>
  */
 
+#include "global-defines.h"
 #include "smartphone-application.h"
 
 #include "ns3/simulator.h"
@@ -147,8 +148,12 @@ void SmartphoneApplication::StartApplication(void)
   {
     staticRouting->RemoveRoute (i); // removendo rotas padrão do static
   }
-
-  m_socketUav = Socket::CreateSocket (GetNode(), TcpSocketFactory::GetTypeId ());
+  #ifdef TCP
+    m_socketUav = Socket::CreateSocket(GetNode(), TcpSocketFactory::GetTypeId());
+  #endif
+  #ifdef UDP
+    m_socketUav = Socket::CreateSocket(GetNode(), UdpSocketFactory::GetTypeId());
+  #endif
   m_running = true;
 }
 

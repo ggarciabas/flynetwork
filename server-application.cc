@@ -17,6 +17,7 @@
  *
  * Authors: Giovanna Garcia <ggarciabas@gmail.com>
  */
+#include "global-defines.h"
 #include "server-application.h"
 
 #include "ns3/simulator.h"
@@ -146,7 +147,13 @@ void ServerApplication::AddNewUav(uint32_t id, Ipv4Address addrAdhoc, double tot
 
   ////NS_LOG_DEBUG ("ServerApplication::AddNewUav Criando uav: " << id << " @" << Simulator::Now().GetSeconds());
 
-  Ptr<Socket> socket = Socket::CreateSocket(GetNode(), TcpSocketFactory::GetTypeId());
+  Ptr<Socket> socket;
+  #ifdef TCP
+    socket = Socket::CreateSocket(GetNode(), TcpSocketFactory::GetTypeId());
+  #endif
+  #ifdef UDP
+    socket = Socket::CreateSocket(GetNode(), UdpSocketFactory::GetTypeId());
+  #endif
 
   ObjectFactory obj;
   obj.SetTypeId("ns3::UavModel");
@@ -174,7 +181,13 @@ void ServerApplication::AddSupplyUav(uint32_t id, Ipv4Address addrAdhoc, double 
   Ptr<UavModel> supplied = m_uavContainer.RemoveAt(m_supplyPos);
   ////NS_LOG_DEBUG("Criando supply uav: " << id << " last: " << supplied->GetId());
 
-  Ptr<Socket> socket = Socket::CreateSocket(GetNode(), TcpSocketFactory::GetTypeId());
+  Ptr<Socket> socket;
+  #ifdef TCP
+    socket = Socket::CreateSocket(GetNode(), TcpSocketFactory::GetTypeId());
+  #endif
+  #ifdef UDP
+    socket = Socket::CreateSocket(GetNode(), UdpSocketFactory::GetTypeId());
+  #endif
 
   ObjectFactory obj;
   obj.SetTypeId("ns3::UavModel");

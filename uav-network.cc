@@ -17,7 +17,7 @@
  *
  * Authors: Giovanna Garcia <ggarciabas@gmail.com>
  */
-
+#include "global-defines.h"
 #include "uav-network.h"
 #include "ns3/simulator.h"
 #include "ns3/log.h"
@@ -365,7 +365,12 @@ void UavNetwork::ConfigureServer()
   // configurando PacketSink
   ObjectFactory packFacAdhoc;
   packFacAdhoc.SetTypeId ("ns3::PacketSink");
-  packFacAdhoc.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+  #ifdef TCP
+    packFacAdhoc.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+  #endif
+  #ifdef UDP
+    packFacAdhoc.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+  #endif
   packFacAdhoc.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), m_serverPort))); // OPS: utilizam Ipv4Address::GetAny ()
   Ptr<Application> appAdhoc = packFacAdhoc.Create<Application> ();
   appAdhoc->SetStartTime(Seconds(10.0));
@@ -383,7 +388,12 @@ void UavNetwork::ConfigureServer()
 
   ObjectFactory packVideo;
   packVideo.SetTypeId ("ns3::PacketSink");
-  packVideo.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+  #ifdef TCP
+    packVideo.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+  #endif
+  #ifdef UDP
+    packVideo.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+  #endif
   packVideo.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), 5070))); // OPS: utilizam Ipv4Address::GetAny ()
   Ptr<Application> appVideo = packVideo.Create<Application> ();
   appVideo->SetStartTime(Seconds(10.0));
@@ -392,7 +402,12 @@ void UavNetwork::ConfigureServer()
 
   ObjectFactory packWww;
   packWww.SetTypeId ("ns3::PacketSink");
-  packWww.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+  #ifdef TCP
+    packWww.Set ("Protocol", StringValue ("ns3::SocketFactory"));
+  #endif
+  #ifdef UDP
+    packWww.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+  #endif
   packWww.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), 8080))); // OPS: utilizam Ipv4Address::GetAny ()
   Ptr<Application> appWww = packWww.Create<Application> ();
   appWww->SetStartTime(Seconds(10.0));
@@ -614,7 +629,12 @@ void UavNetwork::ConfigureUav(int total)
     // configure PacketSink
     ObjectFactory packFac;
     packFac.SetTypeId ("ns3::PacketSink");
-    packFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+    #ifdef TCP
+      packFac.Set ("Protocol", StringValue ("ns3::SocketFactory"));
+    #endif
+    #ifdef UDP
+      packFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+    #endif
     packFac.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), m_serverPort))); // OPS: utilizam Ipv4Address::GetAny ()
     Ptr<Application> app = packFac.Create<Application> ();
     app->SetStartTime(Seconds(0.0));
@@ -623,7 +643,12 @@ void UavNetwork::ConfigureUav(int total)
 
     ObjectFactory packFacInfra;
     packFacInfra.SetTypeId ("ns3::PacketSink");
-    packFacInfra.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+    #ifdef TCP
+      packFacInfra.Set ("Protocol", StringValue ("ns3::SocketFactory"));
+    #endif
+    #ifdef UDP
+      packFacInfra.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+    #endif
     packFacInfra.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), m_cliPort))); // OPS: utilizam Ipv4Address::GetAny ()
     Ptr<Application> appInfra = packFacInfra.Create<Application> ();
     appInfra->SetStartTime(Seconds(0.0));
@@ -781,7 +806,12 @@ void UavNetwork::ConfigureCli()
     // configure PacketSink
     ObjectFactory packFac;
     packFac.SetTypeId ("ns3::PacketSink");
-    packFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+    #ifdef TCP
+      packFac.Set ("Protocol", StringValue ("ns3::SocketFactory"));
+    #endif
+    #ifdef UDP
+      packFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+    #endif
     packFac.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), m_cliPort))); // OPS: utilizam Ipv4Address::GetAny ()
     Ptr<Application> app = packFac.Create<Application> ();
     app->SetStartTime(Seconds(0.0));
@@ -877,7 +907,12 @@ void UavNetwork::ConfigureApplication ()
     } else if (app_code < 2) { // VIDEO
         smart->SetApp ("VIDEO");
         onoffFac.SetTypeId ("ns3::OnOffApplication");
-        onoffFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+        #ifdef TCP
+          onoffFac.Set ("Protocol", StringValue ("ns3::SocketFactory"));
+        #endif
+        #ifdef UDP
+          onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+        #endif
         onoffFac.Set ("PacketSize", UintegerValue (429));
         onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
         onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0]"));
@@ -893,7 +928,12 @@ void UavNetwork::ConfigureApplication ()
     } else if (app_code < 3) { // WWW
         smart->SetApp ("WWW");
         onoffFac.SetTypeId ("ns3::OnOffApplication");
-        onoffFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+        #ifdef TCP
+          onoffFac.Set ("Protocol", StringValue ("ns3::SocketFactory"));
+        #endif
+        #ifdef UDP
+          onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+        #endif
         onoffFac.Set ("PacketSize", UintegerValue (429));
         onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
         onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0.04]"));

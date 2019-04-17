@@ -17,7 +17,7 @@
  *
  * Authors: Giovanna Garcia <ggarciabas@gmail.com>
  */
-
+#include "global-defines.h"
 #include "uav-application.h"
 #include "ns3/internet-apps-module.h"
 #include "ns3/simulator.h"
@@ -141,9 +141,18 @@ void UavApplication::StartApplication(void)
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG("UavApplication::StartApplication [" << m_id << "]");
-  m_socketClient = Socket::CreateSocket (GetNode(), TcpSocketFactory::GetTypeId ());
-  // criando socket para enviar informacoes ao servidor
-  m_sendSck = Socket::CreateSocket(m_node, TcpSocketFactory::GetTypeId());
+  #ifdef TCP
+    m_socketClient = Socket::CreateSocket (GetNode(), TcpSocketFactory::GetTypeId ());
+    // criando socket para enviar informacoes ao servidor
+    m_sendSck = Socket::CreateSocket(m_node, TcpSocketFactory::GetTypeId());
+  #endif
+
+  #ifdef UDP
+    m_socketClient = Socket::CreateSocket (GetNode(), UdpSocketFactory::GetTypeId ());
+    // criando socket para enviar informacoes ao servidor
+    m_sendSck = Socket::CreateSocket(m_node, UdpSocketFactory::GetTypeId());
+  #endif
+
   if (m_sendSck->Connect(InetSocketAddress(m_peer, m_serverPort))) {
     NS_FATAL_ERROR ("UAV - $$ [NÃO] conseguiu conectar com Servidor!");
   }

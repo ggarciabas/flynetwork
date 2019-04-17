@@ -15,7 +15,7 @@
  *
  * Authors: Giovanna Garcia <ggarciabas@gmail.com>
  */
-#define ETAPA 300 // segundos
+#include "global-defines.h"
 
 #include "uav-network.h"
 
