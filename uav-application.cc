@@ -309,7 +309,22 @@ void UavApplication::SendPacketDepletion(void)
     if (m_uavDevice->IsFlying()) // caso o uav estiver voando, se faz necessario enviar solicitacao para o novo UAV ir direto para a posicao destino
       m << "DEPLETION " << m_id << " " << m_goto.at(0) << " " << m_goto.at(1) << " " << pos.z << " " << '\0';
     else // caso contrário, necessario enviar solicitacao para a posicao atual do UAV
-      m << "DEPLETION " << m_id << " " << pos.x << " " << pos.y << " " << pos.z << " " << '\0';    
+      m << "DEPLETION " << m_id << " " << pos.x << " " << pos.y << " " << pos.z << " " << '\0';
+
+    int count = 0;
+    for(std::map<Ipv4Address, Ptr<ClientModel> >::iterator i = m_mapClient.begin(); i != m_mapClient.end(); i++)
+    {
+      if ((i->second)->GetLogin().compare("NOPOSITION") != 0) { // cliente com posicionamento atualizado!
+        count++;
+      }
+    }
+    std::ostringstream os;
+    os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_depletion/depletion_log.txt";
+    std::ofstream file;
+    file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    file << Simulator::Now().GetSeconds() << "," << m_id << "," << count << std::endl; // TIME, UAV_ID, TOTAL_CLIENTES
+    file.close();
+
     uint16_t packetSize = m.str().length() + 1;
     Ptr<Packet> packet = Create<Packet>((uint8_t *)m.str().c_str(), packetSize);
     if (m_sendSck && m_sendSck->Send(packet) == packetSize)
@@ -363,12 +378,31 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
         // atualizar central
         m_central[0] = std::stod(results.at(4), &sz); // x
         m_central[1] = std::stod(results.at(5), &sz); // y
-        // verificar se já não está na posicao
         vector<double> pa, pn;
         pn.push_back(std::stod(results.at(1), &sz));
         pn.push_back(std::stod(results.at(2), &sz));
         pa.push_back(GetNode()->GetObject<MobilityModel>()->GetPosition().x);
         pa.push_back(GetNode()->GetObject<MobilityModel>()->GetPosition().y);
+        
+        /// Validando para graficos de bateria, identificar a quantidade de bateria 'jogada fora' quando o UAV é solicitado de volta a central.
+        if (pn.at(0) == m_central.at(0) && pn.at(1) == m_central.at(1))
+        { // validando se a direção solicitada é a central
+          int count = 0;
+          for(std::map<Ipv4Address, Ptr<ClientModel> >::iterator i = m_mapClient.begin(); i != m_mapClient.end(); i++)
+          {
+            if ((i->second)->GetLogin().compare("NOPOSITION") != 0) { // cliente com posicionamento atualizado!
+              count++;
+            }
+          }
+          std::ostringstream os;
+          os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_stop/stop_log.txt"; // uavs que foram retirados da rede
+          std::ofstream file;
+          file.open(os.str(), std::ofstream::out | std::ofstream::app);
+          file << Simulator::Now().GetSeconds() << "," << m_id << "," << count << "," << m_uavDevice->GetEnergySource()->GetRemainingEnergy() << "," << m_uavDevice->GetEnergySource()->GetInitialEnergy() << std::endl; // TIME, UAV_ID, TOTAL_CLIENTES, ATUAL_BATERIA, FULL_BATERIA
+          file.close();
+        }
+
+        // verificar se já não está na posicao        
         if (CalculateDistance(m_goto, pn) != 0) { // verificar se já nao receberu um pacote com este comando de posicionamento
           NS_LOG_DEBUG("UAV [" << m_id << "] recebeu novo posicionamento @" << Simulator::Now().GetSeconds());
           m_goto[0] = std::stod(results.at(1), &sz); // atualizando goto
