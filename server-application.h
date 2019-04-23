@@ -129,6 +129,9 @@ private:
     return dbm-30;
   }
 
+  void Permute (std::vector<int> uav_loc, int start, int end, int N);
+  std::vector<int> Exhaustive (std::vector<std::vector<long double> > custo, int N);
+
   UavModelContainer   m_uavContainer;
   UavModelContainer   m_uavGoToCentral; // UAVs enviados para central
   LocationModelContainer m_locationContainer;
@@ -160,6 +163,7 @@ private:
 
   int m_supplyPos;
   int m_totalCliGeral;
+  double m_global_val;
 };
 
 } // namespace ns3

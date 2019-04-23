@@ -29,6 +29,9 @@
 #include <fstream>
 #include <string>
 
+#include <algorithm>
+#include <random>
+
 #define ETAPA 300
 
 #define COMPARE_COST
@@ -812,8 +815,19 @@ void ServerApplication::runAgendamento(void)
     file_l.close();
   #endif
 
-  // Inicializando
-  std::vector<int> s_final (DaPositioning(custo_x, m_uavContainer.GetN()));
+  // dsitribuindo UAVs
+  std::vector<int> s_final; // cada posicao representa um UAV e o valor contido a localização que este deve ir!
+  if (m_custo < 5) // somente executo o DA para os custos 1 à 4!
+    s_final = DaPositioning(custo_x, m_uavContainer.GetN());
+  else if (m_custo > 5) // para os custos maior que 5 será executada a busca exaustiva
+    s_final = Exhaustive(custo_x, m_uavContainer.GetN()); // lembrando que custo_x já tem calculado o valor do custo correspondente
+  else  { // executa aleatoriamente a escolha caso seja custo = 5
+    for (int i = 0; i<(int)m_locationContainer.GetN(); ++i) {
+      s_final.push_back(i);
+    } 
+    auto rng = std::default_random_engine {};
+    std::shuffle(std::begin(s_final), std::end(s_final), rng);
+  }
 
   NS_LOG_DEBUG("SERVER - Finalizada estrutura do DA para agendamento @" << Simulator::Now().GetSeconds());
 
@@ -825,9 +839,9 @@ void ServerApplication::runAgendamento(void)
   for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
        u_i != m_uavContainer.End(); ++u_i, ++i)
   {
-    id = s_final[i];
+    id = s_final[i]; // id da localizacao que deve ir!
     f_mij.push_back(vector<long double>((int)m_locationContainer.GetN(), 0)); // inicia com zeros
-    f_mij[i][id] = 1.0;
+    f_mij[i][id] = 1.0; // gravando matriz da solucao final
 
     if (custo_x[i][id] == 1.0) { // UAv nao tem bateria suficiente para ir ate a localizacao
       // solicitando novo UAV para a posicao
@@ -887,6 +901,65 @@ void ServerApplication::runAgendamento(void)
   m_printUavEnergy(m_step); // esperando a solucao final, UAVs podem ser trocados
 
   NS_LOG_DEBUG ("-- Finalizado posicionamento dos UAVs @" << Simulator::Now().GetSeconds());
+}
+
+void 
+ServerApplication::Permute (std::vector<int> uav_loc, int start, int end, int N) {
+  // std::cout << "[" << start << "," << end << "] ";
+  if (start == end) {
+    double val = 0.0;
+    for (int i = 0; i<N; ++i) { // percorre os UAVs
+      // std::cout << uav_loc[i] << " ";
+      // val = val + g_b_ij[uav_loc[i]][i];
+      val = val + g_b_ij[i][uav_loc[i]]; // acumula o custo total da solução em uav_loc
+    }
+    // std::cout << std::endl;
+    if (val < m_global_val) { // avalia se é menor!
+      // std::cout << "New value: " << val << std::endl;
+      m_global_val = val;
+      for (int i = 0; i<N; ++i) { // copiando
+        min_conf[uav_loc[i]] = i; // salvando uav/loc para nao ser necessario converter!
+      }
+    }
+  } else {
+    for (int i = start; i <= end; ++i) {
+      int aux = uav_loc[i];
+      uav_loc[i] = uav_loc[start];
+      uav_loc[start] = aux;
+      Permute (uav_loc, start+1, end, N);
+      // backtrack
+      aux = uav_loc[i];
+      uav_loc[i] = uav_loc[start];
+      uav_loc[start] = aux;
+    }
+  }
+}
+
+std::vector<int> 
+ServerApplication::Exhaustive (std::vector<std::vector<long double> > custo, int N) {
+  m_global_val = 1000.0;
+  min_conf.clear();
+  for (int i = 0; i<N; ++i) { // i - UAVs, j - localizacoes
+    g_b_ij.push_back(std::vector<long double>());
+    for(int j = 0; j < N; j++)
+    {      
+      g_b_ij[i].push_back(custo[i][j]);
+    }
+  }
+  
+  std::vector<int> uav_loc;
+  for (int i = 0; i<N; ++i) {
+    uav_loc.push_back(i);
+    min_conf.push_back(i);
+  }  
+
+  Permute(uav_loc, 0, N-1, N);
+
+  for (int i = 0; i<N; ++i) {
+    g_b_ij[i].clear();
+  }
+  g_b_ij.clear();
+  return min_conf;
 }
 
 std::vector<int> ServerApplication::DaPositioning (std::vector<std::vector<long double> > b_ij, unsigned N) {
@@ -1112,15 +1185,19 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
     // sobre os custo ver: https://github.com/ggarciabas/Calculo-de-Posicionamento
     switch (m_custo) {
       case 1:
+      case 6: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/flynetwork/issues/45)
         custo = (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot; // media do custo
         break;
       case 2:
+      case 7: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/flynetwork/issues/45
         custo = 1.0/P_te;
         break;
       case 3:
+      case 8: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/flynetwork/issues/45
         custo = (1.0/P_te + (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot) / 2.0;
         break;
       case 4: // custo 2 -> com hover
+      case 9: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/flynetwork/issues/45
         double ce_te = loc->GetTotalConsumption()*m_scheduleServer + uav->GetHoverCost()*m_scheduleServer ; // custo para o TE inteiro, considerando locs e hover
         P_te = b_ui_res/ce_te;
         custo = 1.0/P_te;
