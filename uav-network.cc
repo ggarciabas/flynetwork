@@ -852,7 +852,6 @@ void UavNetwork::ConfigureCli()
 
     // configurando trace Packetsink
     app->TraceConnectWithoutContext ("Rx", MakeCallback (&SmartphoneApplication::TracedCallbackRxApp, smart));
-    // appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
 
     // aggregate to the node
     (*i)->AddApplication(smart);
@@ -898,6 +897,7 @@ void UavNetwork::ConfigureApplication ()
         appOnOff = onoffFac.Create<Application> ();
         appOnOff->SetStartTime(Seconds(1));
         appOnOff->SetStopTime(Seconds(222)); // considerando 111 minutos mensal, 3.7 diario - http://www.teleco.com.br/comentario/com631.asp
+        appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
         (*i)->AddApplication (appOnOff);
         cliLogin << ss.str() << " VOICE" << std::endl;
     } else if (app_code < 2) { // VIDEO
@@ -918,6 +918,7 @@ void UavNetwork::ConfigureApplication ()
         appOnOff = onoffFac.Create<Application> ();
         appOnOff->SetStartTime(Seconds(1.0));
         appOnOff->SetStopTime(Seconds(5*60)); // 5 minutos, sem referencias
+        appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
         (*i)->AddApplication (appOnOff);
         cliLogin << ss.str() << " VIDEO" << std::endl;
     } else if (app_code < 3) { // WWW
@@ -938,6 +939,7 @@ void UavNetwork::ConfigureApplication ()
         appOnOff = onoffFac.Create<Application> ();
         appOnOff->SetStartTime(Seconds(1.0));
         appOnOff->SetStopTime(Seconds(5*60)); // 5 minutoss sem referencia
+        appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
         (*i)->AddApplication (appOnOff);
         cliLogin << ss.str() << " WWW" << std::endl;
     } else if (app_code >= 3 && app_code <= 5) { // NOTHING

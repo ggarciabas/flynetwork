@@ -56,7 +56,7 @@ def scenario (time, main_path, teste):
     plt.plot(central[0],central[1], 'g*', markersize=7.0, label="central")
 
     first = True
-    app_color = {"VOICE":"darksalmon", "VIDEO":"blueviolet", "WWW":"skyblue", "NOTHING":"yellow"}
+    app_color = {"VOICE":"darksalmon", "VIDEO":"blueviolet", "WWW":"skyblue", "NOTHING":"yellow", "NONE":"black"}
     apps = {}
     for i in range(0, len(cli_), 4): # x y login app
         if teste:
