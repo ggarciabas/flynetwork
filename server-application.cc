@@ -1179,6 +1179,7 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
   long double b_ui_res = b_ui_atu*0.98 - ce_ui_la_lj - ce_ui_lj_lc; // bateria residual
   long double ce_te_lj = loc->GetTotalConsumption() * m_scheduleServer;
   long double P_te = b_ui_res/ce_te_lj;
+  double ce_te;
 
   if (b_ui_res > 0) {
     // sobre os custo ver: https://github.com/ggarciabas/Calculo-de-Posicionamento
@@ -1197,9 +1198,12 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
         break;
       case 4: // custo 2 -> com hover
       case 9: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/flynetwork/issues/45
-        double ce_te = loc->GetTotalConsumption()*m_scheduleServer + uav->GetHoverCost()*m_scheduleServer ; // custo para o TE inteiro, considerando locs e hover
+        ce_te = loc->GetTotalConsumption()*m_scheduleServer + uav->GetHoverCost()*m_scheduleServer ; // custo para o TE inteiro, considerando locs e hover
         P_te = b_ui_res/ce_te;
         custo = 1.0/P_te;
+        break;
+      case 5: // aleatorio
+        custo = 0; // quanto menor melhor, só pro aleatorio
         break;
     }
   } else {
