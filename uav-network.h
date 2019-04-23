@@ -134,6 +134,7 @@ private:
   WifiHelper m_wifiHelper;
   uint32_t m_protocol;
   uint32_t m_custo;
+  uint32_t m_seed;
   std::string m_protocolName;
   Ipv4ListRoutingHelper m_list;
   Ipv4InterfaceContainer m_serverAddress;
@@ -151,7 +152,7 @@ private:
   Ipv4AddressHelper m_addressHelper;
 
   Ptr<ServerApplication> m_serverApp;
-  std::ostringstream m_ssgnuPalcos;
+  // std::ostringstream m_ssgnuPalcos;
   // AnimationInterface*         m_animation;
   // Ptr<OutputStreamWrapper> m_routintable;
   // Ptr<OutputStreamWrapper> m_routintableUav;
