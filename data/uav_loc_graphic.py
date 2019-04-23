@@ -54,7 +54,7 @@ def uav_loc (time, main_path, teste, raio_cli, raio_uav):
 
     # https://matplotlib.org/api/markers_api.html points
     first = True
-    app_color = {"VOICE":"darksalmon", "VIDEO":"blueviolet", "WWW":"skyblue", "NOTHING":"yellow"}
+    app_color = {"VOICE":"darksalmon", "VIDEO":"blueviolet", "WWW":"skyblue", "NOTHING":"yellow", "NONE":"black"}
     apps = {}
     for i in range(0, len(cli_), 4): # x y login app
         if cli_[i+2][0] == "f":

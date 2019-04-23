@@ -30,19 +30,21 @@ teste = True
 if sys.argv[1] == "False":
     teste = False
 scenario = sys.argv[2]
-main_path = "./output/"+scenario+"/"
+seed = sys.argv[3]
+main_path = "./output/"+scenario+"/"+seed+"/"
 
 for custo_name in glob.glob(main_path+'custo_*/'):
     custo = os.path.dirname(custo_name).split('/')[-1]
     if teste:
         print "Custo: "+custo
     list_folder = []
-    if len(sys.argv) == 4: # folder number
-        list_folder.append(int(sys.argv[3]))
+    if len(sys.argv) == 5: # folder number
+        list_folder.append(int(sys.argv[4]))
     else:
         for folder_name in glob.glob(main_path+custo+'/etapa/*/'):
             list_folder.append(int(os.path.dirname(folder_name).split('/')[-1]))
     if teste:
+        print 'list folder'
         print (list_folder)
     list_folder = np.array(list_folder)
     list_folder.sort()
@@ -70,8 +72,14 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         print activated
     t_ini = -1
     all_uav = []
-    # Bij
+    
+    if teste:
+        print "Iniciando ------"
     for etapa in list_folder:
+        if teste:
+            print main_path
+            print custo
+            print etapa
         da_loc.da_loc (custo, etapa, main_path, teste, -2) # somente a ultima iteracao
         if teste:
             print etapa

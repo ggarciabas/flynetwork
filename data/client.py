@@ -25,7 +25,7 @@ def scenario (time, main_path, teste):
     ax = fig.add_subplot(111)
 
     first = True
-    app_color = {"VOICE":"darksalmon", "VIDEO":"blueviolet", "WWW":"skyblue", "NOTHING":"yellow"}
+    app_color = {"VOICE":"darksalmon", "VIDEO":"blueviolet", "WWW":"skyblue", "NOTHING":"yellow", "NONE":"black"}
     apps = {}
     for i in range(0, len(cli_), 4): # x y login app
         if cli_[i+2] == "fixed":
