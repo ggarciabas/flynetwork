@@ -642,7 +642,7 @@ void UavNetwork::ConfigureUav(int total)
     ObjectFactory packFacInfra;
     packFacInfra.SetTypeId ("ns3::PacketSink");
     #ifdef TCP_CLI
-      packFacInfra.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+      packFacInfra.Set ("Protocol", StringValue ("ns3::SocketFactory"));
     #else
       packFacInfra.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
     #endif
@@ -904,7 +904,7 @@ void UavNetwork::ConfigureApplication ()
         smart->SetApp ("VIDEO");
         onoffFac.SetTypeId ("ns3::OnOffApplication");
         #ifdef TCP_CLI
-          onoffFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+          onoffFac.Set ("Protocol", StringValue ("ns3::SocketFactory"));
         #else
           onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
         #endif
@@ -924,7 +924,7 @@ void UavNetwork::ConfigureApplication ()
         smart->SetApp ("WWW");
         onoffFac.SetTypeId ("ns3::OnOffApplication");
         #ifdef TCP_CLI
-          onoffFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+          onoffFac.Set ("Protocol", StringValue ("ns3::SocketFactory"));
         #else
           onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
         #endif

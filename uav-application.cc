@@ -144,7 +144,7 @@ void UavApplication::StartApplication(void)
   #ifdef TCP_CLI
     m_socketClient = Socket::CreateSocket (GetNode(), TcpSocketFactory::GetTypeId ());
   #else
-    m_socketClient = Socket::CreateSocket (GetNode(), TcpSocketFactory::GetTypeId ());
+    m_socketClient = Socket::CreateSocket (GetNode(), UdpSocketFactory::GetTypeId ());
   #endif
 
   #ifdef UDP
