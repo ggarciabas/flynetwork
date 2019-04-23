@@ -910,15 +910,14 @@ ServerApplication::Permute (std::vector<int> uav_loc, int start, int end, int N)
     double val = 0.0;
     for (int i = 0; i<N; ++i) { // percorre os UAVs
       // std::cout << uav_loc[i] << " ";
-      // val = val + g_b_ij[uav_loc[i]][i];
-      val = val + g_b_ij[i][uav_loc[i]]; // acumula o custo total da solução em uav_loc
+      val = val + g_custo[i][uav_loc[i]]; // acumula o custo total da solução em uav_loc
     }
     // std::cout << std::endl;
     if (val < m_global_val) { // avalia se é menor!
       // std::cout << "New value: " << val << std::endl;
       m_global_val = val;
       for (int i = 0; i<N; ++i) { // copiando
-        min_conf[uav_loc[i]] = i; // salvando uav/loc para nao ser necessario converter!
+        m_minconf[uav_loc[i]] = i; // salvando uav/loc para nao ser necessario converter!
       }
     }
   } else {
@@ -938,28 +937,28 @@ ServerApplication::Permute (std::vector<int> uav_loc, int start, int end, int N)
 std::vector<int> 
 ServerApplication::Exhaustive (std::vector<std::vector<long double> > custo, int N) {
   m_global_val = 1000.0;
-  min_conf.clear();
+  m_minconf.clear();
   for (int i = 0; i<N; ++i) { // i - UAVs, j - localizacoes
-    g_b_ij.push_back(std::vector<long double>());
+    g_custo.push_back(std::vector<long double>());
     for(int j = 0; j < N; j++)
     {      
-      g_b_ij[i].push_back(custo[i][j]);
+      g_custo[i].push_back(custo[i][j]);
     }
   }
   
   std::vector<int> uav_loc;
   for (int i = 0; i<N; ++i) {
     uav_loc.push_back(i);
-    min_conf.push_back(i);
+    m_minconf.push_back(i);
   }  
 
   Permute(uav_loc, 0, N-1, N);
 
   for (int i = 0; i<N; ++i) {
-    g_b_ij[i].clear();
+    g_custo[i].clear();
   }
-  g_b_ij.clear();
-  return min_conf;
+  g_custo.clear();
+  return m_minconf;
 }
 
 std::vector<int> ServerApplication::DaPositioning (std::vector<std::vector<long double> > b_ij, unsigned N) {

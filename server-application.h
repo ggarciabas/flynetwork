@@ -164,6 +164,8 @@ private:
   int m_supplyPos;
   int m_totalCliGeral;
   double m_global_val;
+  std::vector<std::vector<long double> > g_custo;
+  std::vector<int> m_minconf;
 };
 
 } // namespace ns3
