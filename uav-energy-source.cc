@@ -237,9 +237,9 @@ UavEnergySource::UpdateEnergySource (void) // chamado pelo device wifi-radio-ene
       os.str("");
       os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_remaining_energy/uav_remaining_energy_" << m_node->GetId() << ".txt";
       m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-      m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << "," << m_lowBatteryTh << ",client" << std::endl;
+      m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << "," << m_lowBatteryThUav << ",client" << std::endl;
       m_file.close();
-    // }
+    }
   } 
 }
 
