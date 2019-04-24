@@ -76,7 +76,7 @@ UavApplication::GetTypeId(void)
                                         MakeUintegerChecker<uint16_t>())
                           .AddAttribute("ClientPort",
                                         "Communication port number",
-                                        UintegerValue(8080),
+                                        UintegerValue(9090),
                                         MakeUintegerAccessor(&UavApplication::m_cliPort),
                                         MakeUintegerChecker<uint16_t>())
                           .AddAttribute("AdhocAddress", "The address of the adhoc interface node",
