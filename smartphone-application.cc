@@ -20,6 +20,7 @@
 
 #include "global-defines.h"
 #include "smartphone-application.h"
+#include "my-onoff-application.h"
 
 #include "ns3/simulator.h"
 #include "ns3/log.h"
@@ -61,7 +62,7 @@ SmartphoneApplication::GetTypeId(void)
                                         MakeStringChecker())
                           .AddAttribute("Port",
                                         "Communication port number",
-                                        UintegerValue(8080),
+                                        UintegerValue(9090),
                                         MakeUintegerAccessor(&SmartphoneApplication::m_port),
                                         MakeUintegerChecker<uint16_t>())
                           .AddAttribute("IdDhcp",
@@ -79,10 +80,6 @@ SmartphoneApplication::GetTypeId(void)
                                         DoubleValue(0.5),
                                         MakeDoubleAccessor(&SmartphoneApplication::m_start),
                                         MakeDoubleChecker<double>())
-                          .AddAttribute("RemoteAPP", "The address of the application server",
-                                        Ipv4AddressValue(),
-                                        MakeIpv4AddressAccessor(&SmartphoneApplication::m_appPeer),
-                                        MakeIpv4AddressChecker())
                           .AddAttribute ("PacketSink", "The sink pointer",
                                         PointerValue(),
                                         MakePointerAccessor(&SmartphoneApplication::m_sink),
@@ -115,6 +112,7 @@ SmartphoneApplication::SmartphoneApplication()
   m_running = false;
   m_connected = false;
   m_stopSendingB = true;
+  m_uavPeer = Ipv4Address(); // Para nao ocorrer conflito com a comparacao no newlease
 }
 
 SmartphoneApplication::~SmartphoneApplication()
@@ -243,6 +241,8 @@ SmartphoneApplication::CourseChange(Ptr<const MobilityModel> mobility)
   if (distance >= m_changePosition && m_connected)
   {
     m_lastPosition = actual;
+    Simulator::Remove(m_sendEventUav);
+    m_sendEventUav = Simulator::ScheduleNow(&SmartphoneApplication::SendPacketUav, this);
   }
 }
 
@@ -291,27 +291,28 @@ SmartphoneApplication::TracedCallbackTxApp (Ptr<const Packet> packet, const Addr
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - SERVER ");
   std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/" << m_pathData << "/client_data.txt";
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/client/" << m_ip << ".txt";
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  file << Simulator::Now().GetSeconds() << " ENVIADO " << m_app << " " << m_login << std::endl; // ENVIADO por um cliente
+  file << Simulator::Now().GetSeconds() << " ENVIADO " << m_appOnoff << " " << packet->GetSize () << " " << m_login << std::endl; // ENVIADO por um cliente
   file.close();
 }
 
 void SmartphoneApplication::TracedCallbackExpiryLease (const Ipv4Address& ip)
 {
-  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );  
+  m_ip = Ipv4Address();
   #ifdef DHCP
     std::ostringstream os;
-    os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/client_" << m_id << ".txt";
+    os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/client_lease_" << m_id << ".txt";
     std::ofstream file;
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
-    file << Simulator::Now().GetSeconds() << " " << ip << std::endl;
+    file << Simulator::Now().GetSeconds() << " EXPIRYLEASE " << ip << std::endl;
     file.close();
     os.str("");
     os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/all_expirylease.txt";
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
-    file << Simulator::Now().GetSeconds() << " EXPIRYLEASE "<< ip << std::endl;
+    file << Simulator::Now().GetSeconds() << " " << m_id << " "<< ip << " " << m_uavPeer << std::endl
     file.close();
   #endif
   NS_LOG_DEBUG ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " [[ perdeu IP ]]");
@@ -320,10 +321,16 @@ void SmartphoneApplication::TracedCallbackExpiryLease (const Ipv4Address& ip)
 void SmartphoneApplication::TracedCallbackNewLease (const Ipv4Address& ip)
 {
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
-  m_uavPeer = DynamicCast<DhcpClient>(GetNode()->GetApplication(m_idDHCP))->GetDhcpServer();
+  m_ip = ip;
+  if (m_connected && !DynamicCast<DhcpClient>(GetNode()->GetApplication(m_idDHCP))->GetDhcpServer().IsEqual(m_uavPeer)) { // caso o servidor tenha sido alterado
+    // criar uma aplicação onoff com base na aplicação que o usuario esta configurado m_app
+    m_onoff->SetStopTime(Simulator::Now()); // na roxima avaliacao do onoff será finalizada a aplicacao!
+    m_uavPeer = DynamicCast<DhcpClient>(GetNode()->GetApplication(m_idDHCP))->GetDhcpServer();
+    ConfigureApplication(m_uavPeer); // cria nova aplicacao para envio ao novo servidor!
+  }  
   #ifdef DHCP
     std::ostringstream os;
-    os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/client_" << m_id << ".txt";
+    os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/client_lease_" << m_id << ".txt";
     std::ofstream file;
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
     file << Simulator::Now().GetSeconds() << " NEWLEASE " << ip << " " << m_uavPeer << std::endl;
@@ -334,7 +341,7 @@ void SmartphoneApplication::TracedCallbackNewLease (const Ipv4Address& ip)
     file << Simulator::Now().GetSeconds() << " " << m_id << " "<< ip << " " << m_uavPeer << std::endl;
     file.close();
   #endif
-  NS_LOG_DEBUG ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " novo IP " << ip << " do servidor " << m_uavPeer);
+  NS_LOG_DEBUG ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " novo IP " << ip << " do servidor " << m_uavPeer);  
 }
 
 void
@@ -373,9 +380,9 @@ SmartphoneApplication::TracedCallbackAssocLogger (Mac48Address mac)
     file.close();
 
     os.str("");
-    os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/all_assoc.txt";
+    os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/all_soc.txt";
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
-    file << Simulator::Now().GetSeconds() << " " << m_id << " " << mac << std::endl;
+    file << Simulator::Now().GetSeconds() << " ASSOC " << m_id << " " << mac << std::endl;
     file.close();
   #endif
   m_connected = true;
@@ -394,9 +401,9 @@ SmartphoneApplication::TracedCallbackDeAssocLogger (Mac48Address mac)
     file.close();
 
     os.str("");
-    os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/all_deassoc.txt";
+    os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/all_soc.txt";
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
-    file << Simulator::Now().GetSeconds() << " " << m_id << " " << mac << std::endl;
+    file << Simulator::Now().GetSeconds() << " DEASSOC " << m_id << " " << mac << std::endl;
     file.close();
   #endif
   m_connected = false;
@@ -424,6 +431,85 @@ void SmartphoneApplication::SetApp (std::string a)
 std::string SmartphoneApplication::GetApp () {
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   return m_app;
+}
+
+void SmartphotApplication::SetNode(Ptr<Node> node) 
+{
+  m_node = node;
+}
+
+void SmartphoneApplication::ConfigureApplication (const Ipv4Address& ip)
+{
+  std::ofstream cliLogin;
+  std::ostringstream ss;
+  ss.str("");
+  ss << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << m_id << ".txt";
+  cliLogin.open(ss.str().c_str());
+  cliLogin << Simulator::Now().GetSeconds() << " CONFIGURE " << m_login;
+  // configure OnOff application para server    
+  int port = 0;
+  ObjectFactory onoffFac;
+  m_onoff = 0;
+  m_appOnoff = m_app; // atualizando a aplicacao que esta sendo configurado o onoff!
+  if (m_app.compare ("VOICE") != 0) { // VOICE
+      onoffFac.SetTypeId ("ns3::MyOnOffApplication");
+      onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+      onoffFac.Set ("PacketSize", UintegerValue (50));
+      onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
+      onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0]"));
+      // P.S.: offTime + DataRate/PacketSize = next packet time
+      onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.024Mbps")));
+      port = 5060;
+      onoffFac.Set ("Remote", AddressValue (InetSocketAddress (ip, port)));
+      appOnOff = onoffFac.Create<Application> ();
+      appOnOff->SetStartTime(Seconds(1));
+      appOnOff->SetStopTime(Seconds(ETAPA)); // considerando 111 minutos mensal, 3.7 diario - http://www.teleco.com.br/comentario/com631.asp
+      appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, this));
+      m_node->AddApplication (appOnOff);
+      cliLogin << " VOICE" << std::endl;
+  } else if (m_app.compare ("VIDEO") != 0) { // VIDEO
+      onoffFac.SetTypeId ("ns3::MyOnOffApplication");
+      #ifdef TCP_CLI
+        onoffFac.Set ("Protocol", StringValue ("ns3::SocketFactory"));
+      #else
+        onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+      #endif
+      onoffFac.Set ("PacketSize", UintegerValue (429));
+      onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
+      onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0]"));
+      // P.S.: offTime + DataRate/PacketSize = next packet time
+      onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.128Mbps")));
+      port = 5070;
+      onoffFac.Set ("Remote", AddressValue (InetSocketAddress (ip, port)));
+      appOnOff = onoffFac.Create<Application> ();
+      appOnOff->SetStartTime(Seconds(1.0));
+      appOnOff->SetStopTime(Seconds(ETAPA)); 
+      appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, this));
+      m_node->AddApplication (appOnOff);
+      cliLogin << " VIDEO" << std::endl;
+  } else if (m_app.compare ("WWW") != 0) { // WWW
+      onoffFac.SetTypeId ("ns3::MyOnOffApplication");
+      #ifdef TCP_CLI
+        onoffFac.Set ("Protocol", StringValue ("ns3::SocketFactory"));
+      #else
+        onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+      #endif
+      onoffFac.Set ("PacketSize", UintegerValue (429));
+      onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
+      onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0.04]"));
+      // P.S.: offTime + DataRate/PacketSize = next packet time
+      onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.128Mbps")));
+      port = 8080;
+      onoffFac.Set ("Remote", AddressValue (InetSocketAddress (ip, port)));
+      appOnOff = onoffFac.Create<Application> ();
+      appOnOff->SetStartTime(Seconds(1.0));
+      appOnOff->SetStopTime(Seconds(ETAPA));
+      appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, this));
+      m_node->AddApplication (appOnOff);
+      cliLogin << " WWW" << std::endl;
+  } else if (m_app.compare ("NOTHING") != 0) { // NOTHING
+      cliLogin << " NOTHING" << std::endl;
+  } else NS_FATAL_ERROR ("UavNetwork .. application error");
 }
 
 } // namespace ns3

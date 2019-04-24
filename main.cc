@@ -54,8 +54,8 @@ int main (int argc, char *argv[])
 	cmd.AddValue ("Custo", "Metrica de análise do DA de Posicionamento", custo);
 	cmd.AddValue ("Seed", "Seed", seed);
 	cmd.Parse (argc, argv);
-
-	// LogComponentEnable("UavNetwork", LOG_DEBUG);
+	
+	LogComponentEnable("MyOnOffApplication", LOG_DEBUG);
 	// LogComponentEnable("ServerApplication", LOG_DEBUG);
 	// LogComponentEnable("LocationModel", LOG_DEBUG);
 	// LogComponentEnable("UavApplication", LOG_FUNCTION);

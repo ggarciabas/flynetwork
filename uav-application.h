@@ -71,6 +71,7 @@ public:
 
   void TracedCallbackRxApp (Ptr<const Packet> packet, const Address & address);
   void TracedCallbackRxAppInfra (Ptr<const Packet> packet, const Address & address);
+  void TracedCallbackRxOnOff (Ptr<const Packet> packet, const Address & address);
   // void TurnOffWifiPhy ();
   // void SetTurnOffWifiPhyCallback(OffWifiPhyCallback adhoc, OffWifiPhyCallback infra);
 

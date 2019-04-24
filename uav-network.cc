@@ -106,7 +106,7 @@ UavNetwork::GetTypeId(void)
                                         MakeUintegerChecker<uint16_t>())
                           .AddAttribute("ClientPort",
                                         "Communication port number of client",
-                                        UintegerValue(8080),
+                                        UintegerValue(9090),
                                         MakeUintegerAccessor(&UavNetwork::m_cliPort),
                                         MakeUintegerChecker<uint16_t>())
                           .AddAttribute("LocationUpdateCli",
@@ -377,41 +377,6 @@ void UavNetwork::ConfigureServer()
   appAdhoc->SetStopTime(Seconds(m_simulationTime));
   m_serverNode.Get(0)->AddApplication (appAdhoc);
 
-  ObjectFactory packVoice;
-  packVoice.SetTypeId ("ns3::PacketSink");
-  packVoice.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
-  packVoice.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), 5060))); // OPS: utilizam Ipv4Address::GetAny ()
-  Ptr<Application> appVoice = packVoice.Create<Application> ();
-  appVoice->SetStartTime(Seconds(10.0));
-  appVoice->SetStopTime(Seconds(m_simulationTime));
-  m_serverNode.Get(0)->AddApplication (appVoice);
-
-  ObjectFactory packVideo;
-  packVideo.SetTypeId ("ns3::PacketSink");
-  #ifdef TCP_CLI
-    packVideo.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
-  #else
-    packVideo.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
-  #endif
-  packVideo.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), 5070))); // OPS: utilizam Ipv4Address::GetAny ()
-  Ptr<Application> appVideo = packVideo.Create<Application> ();
-  appVideo->SetStartTime(Seconds(10.0));
-  appVideo->SetStopTime(Seconds(m_simulationTime));
-  m_serverNode.Get(0)->AddApplication (appVideo);
-
-  ObjectFactory packWww;
-  packWww.SetTypeId ("ns3::PacketSink");
-  #ifdef TCP_CLI
-    packWww.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
-  #else
-    packWww.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
-  #endif
-  packWww.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), 8080))); // OPS: utilizam Ipv4Address::GetAny ()
-  Ptr<Application> appWww = packWww.Create<Application> ();
-  appWww->SetStartTime(Seconds(10.0));
-  appWww->SetStopTime(Seconds(m_simulationTime));
-  m_serverNode.Get(0)->AddApplication (appWww);
-
   // create server app
   ObjectFactory obj;
   obj.SetTypeId("ns3::ServerApplication");
@@ -439,9 +404,6 @@ void UavNetwork::ConfigureServer()
 
   // trace do PacketSink RX
   appAdhoc->TraceConnectWithoutContext ("Rx", MakeCallback (&ServerApplication::TracedCallbackRxApp, m_serverApp));
-  appVoice->TraceConnectWithoutContext ("Rx", MakeCallback (&ServerApplication::TracedCallbackRxApp, m_serverApp));
-  appVideo->TraceConnectWithoutContext ("Rx", MakeCallback (&ServerApplication::TracedCallbackRxApp, m_serverApp));
-  appWww->TraceConnectWithoutContext ("Rx", MakeCallback (&ServerApplication::TracedCallbackRxApp, m_serverApp));
 
   // aggregate to node
   m_serverNode.Get(0)->AddApplication(m_serverApp);
@@ -640,7 +602,7 @@ void UavNetwork::ConfigureUav(int total)
     ObjectFactory packFacInfra;
     packFacInfra.SetTypeId ("ns3::PacketSink");
     #ifdef TCP_CLI
-      packFacInfra.Set ("Protocol", StringValue ("ns3::SocketFactory"));
+      packFacInfra.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
     #else
       packFacInfra.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
     #endif
@@ -649,6 +611,41 @@ void UavNetwork::ConfigureUav(int total)
     appInfra->SetStartTime(Seconds(0.0));
     appInfra->SetStopTime(Seconds(m_simulationTime));
     (*i)->AddApplication (appInfra);
+
+    ObjectFactory packVoice;
+    packVoice.SetTypeId ("ns3::PacketSink");
+    packVoice.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+    packVoice.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), 5060))); // OPS: utilizam Ipv4Address::GetAny ()
+    Ptr<Application> appVoice = packVoice.Create<Application> ();
+    appVoice->SetStartTime(Seconds(0.0));
+    appVoice->SetStopTime(Seconds(m_simulationTime));
+    (*i)->AddApplication (appVoice);
+
+    ObjectFactory packVideo;
+    packVideo.SetTypeId ("ns3::PacketSink");
+    #ifdef TCP_CLI
+      packVideo.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+    #else
+      packVideo.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+    #endif
+    packVideo.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), 5070))); // OPS: utilizam Ipv4Address::GetAny ()
+    Ptr<Application> appVideo = packVideo.Create<Application> ();
+    appVideo->SetStartTime(Seconds(0.0));
+    appVideo->SetStopTime(Seconds(m_simulationTime));
+    (*i)->AddApplication (appVideo);
+
+    ObjectFactory packWww;
+    packWww.SetTypeId ("ns3::PacketSink");
+    #ifdef TCP_CLI
+      packWww.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+    #else
+      packWww.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+    #endif
+    packWww.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), 8080))); // OPS: utilizam Ipv4Address::GetAny ()
+    Ptr<Application> appWww = packWww.Create<Application> ();
+    appWww->SetStartTime(Seconds(0.0));
+    appWww->SetStopTime(Seconds(m_simulationTime));
+    (*i)->AddApplication (appWww);   
 
     ObjectFactory obj; // create UavApplication
     obj.SetTypeId("ns3::UavApplication");
@@ -677,6 +674,10 @@ void UavNetwork::ConfigureUav(int total)
     // trace do PacketSink RX
     app->TraceConnectWithoutContext ("Rx", MakeCallback (&UavApplication::TracedCallbackRxApp, uavApp));
     appInfra->TraceConnectWithoutContext ("Rx", MakeCallback (&UavApplication::TracedCallbackRxAppInfra, uavApp));
+
+    appVoice->TraceConnectWithoutContext ("Rx", MakeCallback (&UavApplication::TracedCallbackRxOnOff, uavApp));
+    appVideo->TraceConnectWithoutContext ("Rx", MakeCallback (&UavApplication::TracedCallbackRxOnOff, uavApp));
+    appWww->TraceConnectWithoutContext ("Rx", MakeCallback (&UavApplication::TracedCallbackRxOnOff, uavApp));
 
     // aggregate to the node
     (*i)->AddApplication(uavApp);
@@ -768,11 +769,11 @@ void UavNetwork::ConfigureCli()
         Ptr<PositionAllocator> positionAlloc = CreateObjectWithAttributes<RandomDiscPositionAllocator>
                             ("X", DoubleValue (x),
                               "Y", DoubleValue (y),
-                            "Rho", StringValue("ns3::ConstantRandomVariable[Constant=8.0]"));
+                            "Rho", StringValue("ns3::ConstantRandomVariable[Constant=20.0]"));
         mobilityCLI.SetPositionAllocator(positionAlloc);
         mobilityCLI.SetMobilityModel("ns3::RandomWalk2dMobilityModel",
                                      "Bounds", RectangleValue(Rectangle(m_xmin, m_xmax, m_ymin, m_ymax)),
-                                      "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=10.0]")); // xmin, xmax, ymin, ymax
+                                      "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=5.0]")); // xmin, xmax, ymin, ymax
         mobilityCLI.Install(nodes);
         m_clientNode.Add(nodes);
       }
@@ -800,7 +801,7 @@ void UavNetwork::ConfigureCli()
 
     // configure PacketSink
     ObjectFactory packFac;
-    packFac.SetTypeId ("ns3::PacketSink");
+    packFac.SetTypeId ("ns3::PacketSink"); // para receber informacoes do UAV
     #ifdef TCP_CLI
       packFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
     #else
@@ -853,103 +854,46 @@ void UavNetwork::ConfigureCli()
 
     // aggregate to the node
     (*i)->AddApplication(smart);
-
+    smart->SetNode((*i));
   }
-
 }
 
 void UavNetwork::ConfigureApplication ()
-{
+{ // escolhe a aplicacao que o usuario ira criar quando em conexao!!
   Ptr<UniformRandomVariable> app_rand = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
   app_rand->SetAttribute ("Min", DoubleValue (0));
-  app_rand->SetAttribute ("Max", DoubleValue (6)); // MODIFICADO
-
+  app_rand->SetAttribute ("Max", DoubleValue (4)); // MODIFICADO
+  
+  int c = 0;
   std::ofstream cliLogin;
   std::ostringstream ss;
-  ss << "./scratch/flynetwork/data/output/" << m_pathData << "/client_login.txt";
-  cliLogin.open(ss.str().c_str());
-  int c = 0;
   for (NodeContainer::Iterator i = m_clientNode.Begin(); i != m_clientNode.End(); ++i, ++c)
   {
     ss.str("");
-    ss << "login-" << (*i)->GetId();
+    ss << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << (*i)->GetId() << ".txt";
+    cliLogin.open(ss.str().c_str());
+    cliLogin << Simulator::Now().GetSeconds() << " SET login-" << (*i)->GetId();
 
-    Ptr<SmartphoneApplication> smart = m_appSmart.at(c);
-
-    // configure OnOff application para server
     int app_code = app_rand->GetValue();
-    int port = 0;
-    ObjectFactory onoffFac;
-    Ptr<Application> appOnOff = 0;
+    Ptr<SmartphoneApplication> smart = m_appSmart.at(c);
     if (app_code < 1) { // VOICE
         smart->SetApp ("VOICE");
-        onoffFac.SetTypeId ("ns3::OnOffApplication");
-        onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
-        onoffFac.Set ("PacketSize", UintegerValue (50));
-        onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
-        onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0]"));
-        // P.S.: offTime + DataRate/PacketSize = next packet time
-        onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.024Mbps")));
-        port = 5060;
-        onoffFac.Set ("Remote", AddressValue (InetSocketAddress (m_serverAddress.GetAddress(0), port)));
-        appOnOff = onoffFac.Create<Application> ();
-        appOnOff->SetStartTime(Seconds(1));
-        appOnOff->SetStopTime(Seconds(222)); // considerando 111 minutos mensal, 3.7 diario - http://www.teleco.com.br/comentario/com631.asp
-        appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
-        (*i)->AddApplication (appOnOff);
-        cliLogin << ss.str() << " VOICE" << std::endl;
+        cliLogin << " VOICE\n";
     } else if (app_code < 2) { // VIDEO
         smart->SetApp ("VIDEO");
-        onoffFac.SetTypeId ("ns3::OnOffApplication");
-        #ifdef TCP_CLI
-          onoffFac.Set ("Protocol", StringValue ("ns3::SocketFactory"));
-        #else
-          onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
-        #endif
-        onoffFac.Set ("PacketSize", UintegerValue (429));
-        onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
-        onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0]"));
-        // P.S.: offTime + DataRate/PacketSize = next packet time
-        onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.128Mbps")));
-        port = 5070;
-        onoffFac.Set ("Remote", AddressValue (InetSocketAddress (m_serverAddress.GetAddress(0), port)));
-        appOnOff = onoffFac.Create<Application> ();
-        appOnOff->SetStartTime(Seconds(1.0));
-        appOnOff->SetStopTime(Seconds(5*60)); // 5 minutos, sem referencias
-        appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
-        (*i)->AddApplication (appOnOff);
-        cliLogin << ss.str() << " VIDEO" << std::endl;
+        cliLogin << " VIDEO\n";
     } else if (app_code < 3) { // WWW
-        smart->SetApp ("WWW");
-        onoffFac.SetTypeId ("ns3::OnOffApplication");
-        #ifdef TCP_CLI
-          onoffFac.Set ("Protocol", StringValue ("ns3::SocketFactory"));
-        #else
-          onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
-        #endif
-        onoffFac.Set ("PacketSize", UintegerValue (429));
-        onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
-        onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0.04]"));
-        // P.S.: offTime + DataRate/PacketSize = next packet time
-        onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.128Mbps")));
-        port = 8080;
-        onoffFac.Set ("Remote", AddressValue (InetSocketAddress (m_serverAddress.GetAddress(0), port)));
-        appOnOff = onoffFac.Create<Application> ();
-        appOnOff->SetStartTime(Seconds(1.0));
-        appOnOff->SetStopTime(Seconds(5*60)); // 5 minutoss sem referencia
-        appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
-        (*i)->AddApplication (appOnOff);
-        cliLogin << ss.str() << " WWW" << std::endl;
-    } else if (app_code >= 3 && app_code <= 5) { // NOTHING
+        smart->SetApp ("WWW");        
+        cliLogin << " WWW\n";
+    } else if (app_code >= 3 && app_code <= 4) { // NOTHING
         smart->SetApp ("NOTHING");
-        cliLogin << ss.str() << " NOTHING" << std::endl;
-    } else NS_FATAL_ERROR ("UavNetwork .. application error");
+        cliLogin << " NOTHING\n";
+    }    
+    cliLogin.close();
+    smart = 0;
   }
-  cliLogin.close();
-
   m_newApp = Simulator::Schedule(Seconds(5*60), &UavNetwork::ConfigureApplication, this);
 }
-
 
 void UavNetwork::ConfigurePalcos() // TODO: poderia ser otimizada a leitura do arquivo colocando esta estrutura na configuração do cliente, mas isso tbm poderia confundir! Pensar!
 {

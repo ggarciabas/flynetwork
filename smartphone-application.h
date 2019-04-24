@@ -54,6 +54,8 @@ public:
   void SetLogin(std::string);
   std::string GetLogin();
 
+  void SetNode (Ptr<Node> node);
+
   void CourseChange(Ptr<const MobilityModel> mobility);
 
   void TracedCallbackRxApp (Ptr<const Packet> packet, const Address & address);
@@ -80,13 +82,14 @@ private:
   void DoDispose();
 
   void StopSendingPosition ();
+  void ConfigureApplication (const Ipv4Address& ip);
 
   uint32_t m_id;
   uint16_t m_port;
   uint32_t m_idDHCP;
   bool m_connected;//
   double m_start;
-  Ipv4Address m_appPeer; // endereco do servidor de aplicacao
+  Ipv4Address m_ip; // endereco atual do nó
   Ipv4Address m_uavPeer;
   DataRate m_dataRate;
   Ptr<Socket> m_socketUav;
@@ -96,11 +99,15 @@ private:
   bool m_running;
   std::string m_login;
   std::string m_app;
+  std::string m_appOnoff;
   double m_changePosition; // máximo de movimentação para notificar o servidor
   Vector m_lastPosition;   // posicao inicial para notificacao ao servidor
   TracedCallback<std::string> m_packetTrace;
   Ipv4StaticRoutingHelper m_routingHelper;
   std::string m_pathData;
+
+  Ptr<Node> m_node;
+  Ptr<Application> m_onoff;
 
   Ptr<PacketSink> m_sink;
   Ptr<OnOffApplication> m_serverApp; // application sent to server

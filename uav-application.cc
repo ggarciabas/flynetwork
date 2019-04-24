@@ -478,6 +478,20 @@ UavApplication::ReplyServer ()
 }
 
 void
+UavApplication::TracedCallbackRxOnOff (Ptr<const Packet> packet, const Address & address)
+{
+  NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds()  << packet << address);
+  Ipv4Address ip = InetSocketAddress::ConvertFrom(address).GetIpv4();
+
+  std::ostringstream os;
+  os << "./scratch/flynetwork/data/output/" << m_pathData << "/client/" << ip << ".txt";
+  std::ofstream file;
+  file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  file << Simulator::Now().GetSeconds() << " RECEBIDO " << packet->GetSize () << std::endl;
+  file.close();
+}
+
+void
 UavApplication::TracedCallbackRxAppInfra (Ptr<const Packet> packet, const Address & address)
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds()  << packet << address);
