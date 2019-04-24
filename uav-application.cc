@@ -134,7 +134,7 @@ void UavApplication::Start(double stoptime) {
   m_goto[0] = 0.0; // reiniciando posicionamento goto
   m_goto[1] = 0.0;
   // threshold do uav necessario calcular somente uma vez
-  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold());
+  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold()+m_meanConsumption*2);
 }
 
 void UavApplication::StartApplication(void)
@@ -210,7 +210,7 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   }
 
   // threshold do uav necessario calcular somente uma vez
-  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold());
+  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold()+m_meanConsumption);
 
   // ligar wifi quando chegar ao posicionamento correto
   // m_wifiDevice->HandleEnergyOn();
@@ -322,7 +322,7 @@ void UavApplication::SendPacketDepletion(void)
     os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_depletion/depletion_log.txt";
     std::ofstream file;
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
-    file << Simulator::Now().GetSeconds() << "," << m_id << "," << count << std::endl; // TIME, UAV_ID, TOTAL_CLIENTES
+    file << Simulator::Now().GetSeconds() << " " << m_id << " " << count << " " m_uavDevice->GetEnergySource()->GetRemainingEnergy() << " " << m_uavDevice->GetEnergySource()->GetInitialEnergy() << " " << m_uavDevice->GetEnergySource()->GetWifiAcum() << " " << m_uavDevice->GetEnergySource()->GetMoveAcum() << " " << m_uavDevice->GetEnergySource()->GetHoverAcum() << std::endl; // TIME, UAV_ID, TOTAL_CLIENTES, remainingenergy, initialbattery, wifiacum, moveacum, hoveracum
     file.close();
 
     uint16_t packetSize = m.str().length() + 1;
@@ -398,7 +398,8 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
           os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_stop/stop_log.txt"; // uavs que foram retirados da rede
           std::ofstream file;
           file.open(os.str(), std::ofstream::out | std::ofstream::app);
-          file << Simulator::Now().GetSeconds() << "," << m_id << "," << count << "," << m_uavDevice->GetEnergySource()->GetRemainingEnergy() << "," << m_uavDevice->GetEnergySource()->GetInitialEnergy() << std::endl; // TIME, UAV_ID, TOTAL_CLIENTES, ATUAL_BATERIA, FULL_BATERIA
+          file << Simulator::Now().GetSeconds() << " " << m_id << " " << count << " " << m_uavDevice->GetEnergySource()->GetRemainingEnergy() << " " << m_uavDevice->GetEnergySource()->GetInitialEnergy() << " " m_uavDevice->GetEnergySource()->GetWifiAcum() << " " << m_uavDevice->GetEnergySource()->GetMoveAcum() << " " << m_uavDevice->GetEnergySource()->GetHoverAcum() << std::endl; // TIME, UAV_ID, TOTAL_CLIENTES, ATUAL_BATERIA, FULL_BATERIA, wifiacum, moveacum, hoveracum
+
           file.close();
         }
 
@@ -482,6 +483,12 @@ UavApplication::TracedCallbackRxOnOff (Ptr<const Packet> packet, const Address &
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds()  << packet << address);
   Ipv4Address ip = InetSocketAddress::ConvertFrom(address).GetIpv4();
+
+  // TODO armazenar consumo do cliente de acordo com o uso e passar esta informacao para o servidor, para q o calculo do custo seja mais realistico com o consumo dos clientes
+  // std::map<Ipv4Address, Ptr<ClientModel> >::iterator it = m_mapClient.find(ip);
+  // if (it != m_mapClient.end()) {
+
+  // }
 
   std::ostringstream os;
   os << "./scratch/flynetwork/data/output/" << m_pathData << "/client/" << ip << ".txt";
@@ -607,7 +614,6 @@ void UavApplication::SendCliData ()
     Simulator::Remove(m_sendCliDataEvent);
     std::ostringstream msg;
     msg << "DATA " << m_id << " " << m_uavDevice->GetEnergySource()->GetRemainingEnergy();
-    // msg << "CONSUMPTION " << m_id << " " << m_uavDevice->GetEnergySource()->GetRemainingEnergy() << " " << m_meanConsumption;
     for(std::map<Ipv4Address, Ptr<ClientModel> >::iterator i = m_mapClient.begin(); i != m_mapClient.end(); i++)
     {
       if ((i->second)->GetLogin().compare("NOPOSITION") != 0) { // cliente com posicionamento atualizado
