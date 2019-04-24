@@ -489,6 +489,8 @@ UavApplication::TracedCallbackRxOnOff (Ptr<const Packet> packet, const Address &
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds()  << packet << address);
   Ipv4Address ip = InetSocketAddress::ConvertFrom(address).GetIpv4();
 
+  NS_LOG_DEBUG (Simulator:Now().GetSeconds() << " RECEBIDO APP CLIENTE " << ip);
+
   // TODO armazenar consumo do cliente de acordo com o uso e passar esta informacao para o servidor, para q o calculo do custo seja mais realistico com o consumo dos clientes
   // std::map<Ipv4Address, Ptr<ClientModel> >::iterator it = m_mapClient.find(ip);
   // if (it != m_mapClient.end()) {
