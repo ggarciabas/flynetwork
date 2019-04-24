@@ -180,14 +180,14 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
       msg << "CLIENT " << pos.x << " " << pos.y << " " << m_login << " MSG" << '\0';
       uint16_t packetSize = msg.str().length() + 1;
       Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
-      NS_LOG_DEBUG("SmartphoneApplication::SendPacketUa @" << Simulator::Now().GetSeconds() <<  " " << m_id << " conectado enviando pacote.");
+      // NS_LOG_DEBUG("SmartphoneApplication::SendPacketUaV @" << Simulator::Now().GetSeconds() <<  " " << m_id << " conectado enviando pacote.");
       if (m_socketUav && m_socketUav->Send(packet, 0) == packetSize)
       {
         msg.str("");
         msg << "CLIENT\t" << m_id << "\tSENT\t" << Simulator::Now().GetSeconds() << "\tUAV";
         m_packetTrace(msg.str());
         NS_LOG_INFO ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - UAV");
-        NS_LOG_DEBUG("SmartphoneApplication::SendPacketUa @" << Simulator::Now().GetSeconds() <<  " " << m_id << " enviado.");
+        NS_LOG_DEBUG("SmartphoneApplication::SendPacketUav @" << Simulator::Now().GetSeconds() <<  " " << m_id << " " << m_ip << " enviado.");
 
         #ifdef PACKET
           std::ostringstream os;
@@ -200,7 +200,7 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
       }
       else
       {
-        NS_LOG_DEBUG("SmartphoneApplication::SendPacketUa @" << Simulator::Now().GetSeconds() <<  " " << m_id << " erro ao enviar.");
+        NS_LOG_DEBUG("SmartphoneApplication::SendPacketUav @" << Simulator::Now().GetSeconds() <<  " " << m_id << " " << m_ip << " erro ao enviar.");
         NS_LOG_ERROR("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - UAV NAO");
         #ifdef PACKET
           std::ostringstream os;
@@ -217,7 +217,7 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
       }
       NS_LOG_INFO("SmartphoneApplication::SendPacketUav " << packet->GetReferenceCount());
     } else {
-      NS_LOG_DEBUG("SmartphoneApplication::SendPacketUav @" << Simulator::Now().GetSeconds() << " " << m_id << " erro ao conectar com o servidor.");
+      NS_LOG_DEBUG("SmartphoneApplication::SendPacketUav @" << Simulator::Now().GetSeconds() << " " << m_id << " " << m_ip << " erro ao conectar com o servidor.");
       NS_LOG_INFO ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " erro ao conectar socket com servidor " << m_uavPeer);
       #ifdef PACKET
         std::ostringstream os;
