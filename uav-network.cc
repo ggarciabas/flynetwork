@@ -702,11 +702,6 @@ void UavNetwork::ConfigureUav(int total)
     // energy start
     DynamicCast<UavEnergySource>(sources.Get(c))->Start();
 
-    // routing local callback
-    Ptr<Ipv4> ipv4 = (*i)->GetObject<Ipv4> ();
-    Ptr<Ipv4RoutingProtocol> routing = ipv4->GetRoutingProtocol();
-    routing->TraceConnectWithoutContext("LocalDeliverCallback", MakeCallback(&UavApplication::LocalDeliverCallback, uavApp));
-
     // Configure DHCP
     // The router must have a fixed IP.
     poolAddr.str(""); minAddr.str(""); maxAddr.str(""); serverAddr.str("");
