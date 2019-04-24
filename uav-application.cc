@@ -398,7 +398,12 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
           os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_stop/stop_log.txt"; // uavs que foram retirados da rede
           std::ofstream file;
           file.open(os.str(), std::ofstream::out | std::ofstream::app);
-          file << Simulator::Now().GetSeconds() << " " << m_id << " " << count << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRemainingEnergy() << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetInitialEnergy() << " " DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetWifiAcum() << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetMoveAcum() << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetHoverAcum() << std::endl; // TIME, UAV_ID, TOTAL_CLIENTES, ATUAL_BATERIA, FULL_BATERIA, wifiacum, moveacum, hoveracum
+          file << Simulator::Now().GetSeconds() << " " << m_id << " " << count 
+          << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRemainingEnergy() 
+          << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetInitialEnergy() 
+          << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetWifiAcum() 
+          << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetMoveAcum() 
+          << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetHoverAcum() << std::endl; // TIME, UAV_ID, TOTAL_CLIENTES, ATUAL_BATERIA, FULL_BATERIA, wifiacum, moveacum, hoveracum
 
           file.close();
         }
