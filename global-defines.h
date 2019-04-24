@@ -14,9 +14,9 @@
 //     #define TCP 
 // #endif
 
-#ifndef TCP_CLI
-    #define TCP_CLI 
-#endif
+// #ifndef TCP_CLI
+//     #define TCP_CLI 
+// #endif
 
 #ifndef UDP
     #define UDP 
