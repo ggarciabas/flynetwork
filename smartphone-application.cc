@@ -345,26 +345,26 @@ void SmartphoneApplication::TracedCallbackNewLease (const Ipv4Address& ip)
   NS_LOG_DEBUG ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " novo IP " << ip << " do servidor " << m_uavPeer);  
 }
 
-void
-SmartphoneApplication::PhyOkTrace (std::string context, Ptr<const Packet> packet, double snr, WifiMode mode, enum WifiPreamble preamble)
-{
-  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
-  NS_LOG_INFO("CLIENT - PHYOK mode=" << mode << " snr=" << snr << " " << *packet);
-}
+// void
+// SmartphoneApplication::PhyOkTrace (std::string context, Ptr<const Packet> packet, double snr, WifiMode mode, enum WifiPreamble preamble)
+// {
+//   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
+//   NS_LOG_INFO("CLIENT - PHYOK mode=" << mode << " snr=" << snr << " " << *packet);
+// }
 
-void
-SmartphoneApplication::PhyRxErrorTrace (std::string context, Ptr<const Packet> packet, double snr)
-{
-  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
-  NS_LOG_INFO("CLIENT - PHYRXERROR snr=" << snr << " " << *packet);
-}
+// void
+// SmartphoneApplication::PhyRxErrorTrace (std::string context, Ptr<const Packet> packet, double snr)
+// {
+//   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
+//   NS_LOG_INFO("CLIENT - PHYRXERROR snr=" << snr << " " << *packet);
+// }
 
-void
-SmartphoneApplication::PhyTxTrace (std::string context, Ptr<const Packet> packet, WifiMode mode, WifiPreamble preamble, uint8_t txPower)
-{
-  NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
-  NS_LOG_INFO("CLIENT - PHYTX mode=" << mode << " " << *packet);
-}
+// void
+// SmartphoneApplication::PhyTxTrace (std::string context, Ptr<const Packet> packet, WifiMode mode, WifiPreamble preamble, uint8_t txPower)
+// {
+//   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
+//   NS_LOG_INFO("CLIENT - PHYTX mode=" << mode << " " << *packet);
+// }
 
 void
 SmartphoneApplication::TracedCallbackAssocLogger (Mac48Address mac)

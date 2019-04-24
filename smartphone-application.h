@@ -64,9 +64,9 @@ public:
   void TracedCallbackAssocLogger (Mac48Address mac);
   void TracedCallbackDeAssocLogger (Mac48Address mac);
 
-  void PhyTxTrace (std::string context, Ptr<const Packet> packet, WifiMode mode, WifiPreamble preamble, uint8_t txPower);
-  void PhyRxErrorTrace (std::string context, Ptr<const Packet> packet, double snr);
-  void PhyRxOkTrace (std::string context, Ptr<const Packet> packet, double snr, WifiMode mode, enum WifiPreamble preamble);
+  // void PhyTxTrace (std::string context, Ptr<const Packet> packet, WifiMode mode, WifiPreamble preamble, uint8_t txPower);
+  // void PhyRxErrorTrace (std::string context, Ptr<const Packet> packet, double snr);
+  // void PhyRxOkTrace (std::string context, Ptr<const Packet> packet, double snr, WifiMode mode, enum WifiPreamble preamble);
 
   void TracedCallbackNewLease (const Ipv4Address& ip);
   void TracedCallbackExpiryLease (const Ipv4Address& ip);
