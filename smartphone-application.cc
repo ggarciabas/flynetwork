@@ -510,7 +510,8 @@ void SmartphoneApplication::ConfigureApplication (const Ipv4Address& ip)
       cliLogin << " WWW" << std::endl;
   } else if (m_app.compare ("NOTHING") != 0) { // NOTHING
       cliLogin << " NOTHING" << std::endl;
-  } else NS_FATAL_ERROR ("UavNetwork .. application error");
+  } else
+    NS_FATAL_ERROR ("UavNetwork .. application error");
 }
 
 } // namespace ns3
