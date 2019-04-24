@@ -240,7 +240,7 @@ SmartphoneApplication::CourseChange(Ptr<const MobilityModel> mobility)
   Vector actual = mobility->GetPosition();
   double distance = std::sqrt(std::pow(m_lastPosition.x - actual.x, 2) + std::pow(m_lastPosition.y - actual.y, 2));
 
-  if (distance >= m_changePosition && m_connected)
+  if (distance >= m_changePosition*2 && m_connected)
   {
     m_lastPosition = actual;
     Simulator::Remove(m_sendEventUav);
