@@ -312,7 +312,7 @@ void SmartphoneApplication::TracedCallbackExpiryLease (const Ipv4Address& ip)
     os.str("");
     os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/all_expirylease.txt";
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
-    file << Simulator::Now().GetSeconds() << " " << m_id << " "<< ip << " " << m_uavPeer << std::endl
+    file << Simulator::Now().GetSeconds() << " " << m_id << " "<< ip << " " << m_uavPeer << std::endl;
     file.close();
   #endif
   NS_LOG_DEBUG ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " [[ perdeu IP ]]");
@@ -322,7 +322,8 @@ void SmartphoneApplication::TracedCallbackNewLease (const Ipv4Address& ip)
 {
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   m_ip = ip;
-  if (m_connected && !DynamicCast<DhcpClient>(GetNode()->GetApplication(m_idDHCP))->GetDhcpServer().IsEqual(m_uavPeer)) { // caso o servidor tenha sido alterado
+  if (m_connected && !DynamicCast<DhcpClient>(GetNode()->GetApplication(m_idDHCP))->GetDhcpServer().IsEqual(m_uavPeer))
+  { // caso o servidor tenha sido alterado
     // criar uma aplicação onoff com base na aplicação que o usuario esta configurado m_app
     m_onoff->SetStopTime(Simulator::Now()); // na roxima avaliacao do onoff será finalizada a aplicacao!
     m_uavPeer = DynamicCast<DhcpClient>(GetNode()->GetApplication(m_idDHCP))->GetDhcpServer();
@@ -345,10 +346,10 @@ void SmartphoneApplication::TracedCallbackNewLease (const Ipv4Address& ip)
 }
 
 void
-SmartphoneApplication::PhyRxOkTrace (std::string context, Ptr<const Packet> packet, double snr, WifiMode mode, enum WifiPreamble preamble)
+SmartphoneApplication::PhyOkTrace (std::string context, Ptr<const Packet> packet, double snr, WifiMode mode, enum WifiPreamble preamble)
 {
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
-  NS_LOG_INFO("CLIENT - PHYRXOK mode=" << mode << " snr=" << snr << " " << *packet);
+  NS_LOG_INFO("CLIENT - PHYOK mode=" << mode << " snr=" << snr << " " << *packet);
 }
 
 void
@@ -433,7 +434,7 @@ std::string SmartphoneApplication::GetApp () {
   return m_app;
 }
 
-void SmartphotApplication::SetNode(Ptr<Node> node) 
+void SmartphoneApplication::SetNode(Ptr<Node> node) 
 {
   m_node = node;
 }
@@ -461,11 +462,11 @@ void SmartphoneApplication::ConfigureApplication (const Ipv4Address& ip)
       onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.024Mbps")));
       port = 5060;
       onoffFac.Set ("Remote", AddressValue (InetSocketAddress (ip, port)));
-      appOnOff = onoffFac.Create<Application> ();
-      appOnOff->SetStartTime(Seconds(1));
-      appOnOff->SetStopTime(Seconds(ETAPA)); // considerando 111 minutos mensal, 3.7 diario - http://www.teleco.com.br/comentario/com631.asp
-      appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, this));
-      m_node->AddApplication (appOnOff);
+      m_onoff = onoffFac.Create<Application> ();
+      m_onoff->SetStartTime(Seconds(1));
+      m_onoff->SetStopTime(Seconds(ETAPA)); // considerando 111 minutos mensal, 3.7 diario - http://www.teleco.com.br/comentario/com631.asp
+      m_onoff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, this));
+      m_node->AddApplication (m_onoff);
       cliLogin << " VOICE" << std::endl;
   } else if (m_app.compare ("VIDEO") != 0) { // VIDEO
       onoffFac.SetTypeId ("ns3::MyOnOffApplication");
@@ -481,11 +482,11 @@ void SmartphoneApplication::ConfigureApplication (const Ipv4Address& ip)
       onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.128Mbps")));
       port = 5070;
       onoffFac.Set ("Remote", AddressValue (InetSocketAddress (ip, port)));
-      appOnOff = onoffFac.Create<Application> ();
-      appOnOff->SetStartTime(Seconds(1.0));
-      appOnOff->SetStopTime(Seconds(ETAPA)); 
-      appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, this));
-      m_node->AddApplication (appOnOff);
+      m_onoff = onoffFac.Create<Application> ();
+      m_onoff->SetStartTime(Seconds(1.0));
+      m_onoff->SetStopTime(Seconds(ETAPA)); 
+      m_onoff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, this));
+      m_node->AddApplication (m_onoff);
       cliLogin << " VIDEO" << std::endl;
   } else if (m_app.compare ("WWW") != 0) { // WWW
       onoffFac.SetTypeId ("ns3::MyOnOffApplication");
@@ -501,11 +502,11 @@ void SmartphoneApplication::ConfigureApplication (const Ipv4Address& ip)
       onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.128Mbps")));
       port = 8080;
       onoffFac.Set ("Remote", AddressValue (InetSocketAddress (ip, port)));
-      appOnOff = onoffFac.Create<Application> ();
-      appOnOff->SetStartTime(Seconds(1.0));
-      appOnOff->SetStopTime(Seconds(ETAPA));
-      appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, this));
-      m_node->AddApplication (appOnOff);
+      m_onoff = onoffFac.Create<Application> ();
+      m_onoff->SetStartTime(Seconds(1.0));
+      m_onoff->SetStopTime(Seconds(ETAPA));
+      m_onoff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, this));
+      m_node->AddApplication (m_onoff);
       cliLogin << " WWW" << std::endl;
   } else if (m_app.compare ("NOTHING") != 0) { // NOTHING
       cliLogin << " NOTHING" << std::endl;
