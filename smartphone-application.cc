@@ -173,7 +173,7 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   Simulator::Remove(m_sendEventUav);
 
-  if (m_connected) {
+  if (m_connected && !m_uavPeer.IsEqual(Ipv4Address())) { // caso, tenha um ip valido para o servidor
     if (m_socketUav && !m_socketUav->Connect (InetSocketAddress (m_uavPeer, m_port))) {
       std::ostringstream msg;
       Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();

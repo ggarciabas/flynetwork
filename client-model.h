@@ -56,6 +56,7 @@ public:
 
   double GetConsumption ();
   void SetConsumption (double c);
+  void AddConsumption (double c) { m_consumption += c; }
 
   void SetIp (Ipv4Address ip);
   Ipv4Address GetIp ();
