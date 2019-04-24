@@ -474,7 +474,7 @@ void SmartphoneApplication::ConfigureApplication (const Ipv4Address& ip)
   } else if (m_app.compare ("VIDEO") != 0) { // VIDEO
       onoffFac.SetTypeId ("ns3::MyOnOffApplication");
       #ifdef TCP_CLI
-        onoffFac.Set ("Protocol", StringValue ("ns3::SocketFactory"));
+        onoffFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
       #else
         onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
       #endif
@@ -494,7 +494,7 @@ void SmartphoneApplication::ConfigureApplication (const Ipv4Address& ip)
   } else if (m_app.compare ("WWW") != 0) { // WWW
       onoffFac.SetTypeId ("ns3::MyOnOffApplication");
       #ifdef TCP_CLI
-        onoffFac.Set ("Protocol", StringValue ("ns3::SocketFactory"));
+        onoffFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
       #else
         onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
       #endif
