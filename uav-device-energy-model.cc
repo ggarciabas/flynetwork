@@ -132,7 +132,7 @@ double UavDeviceEnergyModel::CalculateThreshold () {
   NS_ASSERT(distance >= 0);
   double thr = ((m_energyCost * distance) + m_energyUpdateInterval.GetSeconds()*m_hoverCost*2) / m_source->GetInitialEnergy(); // % necessaria para voltar a central de onde está, mais o custo de hover durante o intervalo de atualização tanto para sair quanto quando chegar ao local, para enviar informacao a central de que chegou e que necessita se retirado
   // NS_LOG_DEBUG("UavDeviceEnergyModel::CalculateThreshold distance: " << distance << "m edist: " << (m_energyCost * distance) << "J");
-  return thr;
+  return thr*1.5;
 }
 
 void UavDeviceEnergyModel::HandleEnergyRecharged (void)

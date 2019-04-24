@@ -567,17 +567,21 @@ void UavNetwork::ConfigureUav(int total)
   energyHelper.Set("yCentral", DoubleValue(m_cy));
 
   /* client device energy model*/
-  ClientDeviceEnergyModelHelper cliHelper;
-  DeviceEnergyModelContainer cliEnergyModels = cliHelper.Install(wifi, sources); // install on node, but device is used to set callbacks!
+  #ifdef DEV_CLI
+    ClientDeviceEnergyModelHelper cliHelper;
+    DeviceEnergyModelContainer cliEnergyModels = cliHelper.Install(wifi, sources); // install on node, but device is used to set callbacks!
+  #endif
 
   /* device energy model */
-  // WifiRadioEnergyModelHelper radioEnergyHelper;
-  // configure radio energy model
-  // radioEnergyHelper.Set ("TxCurrentA", DoubleValue (0.0174));
-  // install device model
-  // DeviceEnergyModelContainer deviceModelsWifi = radioEnergyHelper.Install (wifi, sources);
-  // install device model
-  // DeviceEnergyModelContainer deviceModelsAdhoc = radioEnergyHelper.Install (adhoc, sources); // como diferenciar para nao desligar adhoc?! 
+  #ifdef DEV_WIFI
+    WifiRadioEnergyModelHelper radioEnergyHelper;
+    // configure radio energy model
+    radioEnergyHelper.Set ("TxCurrentA", DoubleValue (0.0174));
+    // install device model
+    DeviceEnergyModelContainer deviceModelsWifi = radioEnergyHelper.Install (wifi, sources);
+    // install device model
+    // DeviceEnergyModelContainer deviceModelsAdhoc = radioEnergyHelper.Install (adhoc, sources); // como diferenciar para nao desligar adhoc?! 
+  #endif
 
   // create and configure UAVApp and Sink application
   int c = 0;
@@ -690,11 +694,14 @@ void UavNetwork::ConfigureUav(int total)
 
     // adicionando devices no UAVApp
     uavApp->SetUavDevice(dev);
-    uavApp->SetCliDevice(DynamicCast<ClientDeviceEnergyModel>(cliEnergyModels.Get(c)));
-    // uavApp->SetWifiDevice(DynamicCast<WifiRadioEnergyModel>(deviceModelsWifi.Get(c)));
-
-    // Configure TotalEnergyConsumption
-    // deviceModelsWifi.Get(c)->TraceConnectWithoutContext ("TotalEnergyConsumption", MakeCallback(&UavApplication::TotalEnergyConsumptionTrace,  uavApp));
+    #ifdef DEV_CLI
+      uavApp->SetCliDevice(DynamicCast<ClientDeviceEnergyModel>(cliEnergyModels.Get(c)));
+    #endif
+    #ifdef DEV_WIFI
+      uavApp->SetWifiDevice(DynamicCast<WifiRadioEnergyModel>(deviceModelsWifi.Get(c)));
+      // Configure TotalEnergyConsumption
+      deviceModelsWifi.Get(c)->TraceConnectWithoutContext ("TotalEnergyConsumption", MakeCallback(&UavApplication::TotalEnergyConsumptionTrace,  uavApp));
+    #endif
 
     // Mobility    
     (*i)->GetObject<MobilityModel>()->TraceConnectWithoutContext ("CourseChange", MakeCallback (&UavApplication::CourseChange, uavApp));
