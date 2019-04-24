@@ -113,6 +113,7 @@ SmartphoneApplication::SmartphoneApplication()
   m_connected = false;
   m_stopSendingB = true;
   m_uavPeer = Ipv4Address(); // Para nao ocorrer conflito com a comparacao no newlease
+  m_onoff = 0;
 }
 
 SmartphoneApplication::~SmartphoneApplication()
@@ -325,7 +326,9 @@ void SmartphoneApplication::TracedCallbackNewLease (const Ipv4Address& ip)
   if (m_connected && !DynamicCast<DhcpClient>(GetNode()->GetApplication(m_idDHCP))->GetDhcpServer().IsEqual(m_uavPeer))
   { // caso o servidor tenha sido alterado
     // criar uma aplicação onoff com base na aplicação que o usuario esta configurado m_app
-    m_onoff->SetStopTime(Simulator::Now()); // na roxima avaliacao do onoff será finalizada a aplicacao!
+    if (m_onoff) {
+      m_onoff->SetStopTime(Simulator::Now()); // na roxima avaliacao do onoff será finalizada a aplicacao!
+    }
     m_uavPeer = DynamicCast<DhcpClient>(GetNode()->GetApplication(m_idDHCP))->GetDhcpServer();
     ConfigureApplication(m_uavPeer); // cria nova aplicacao para envio ao novo servidor!
   }  
