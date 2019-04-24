@@ -243,7 +243,12 @@ void UavNetwork::Run()
     exit(-1);
   }
 
-  ss << "/" << m_seed << "/custo_" << m_custo; // adicionando seed
+  #ifdef DEV_WIFI
+    ss << "/wifi/" << m_seed << "/custo_" << m_custo; // adicionando seed
+  #endif
+  #ifdef DEV_CLI
+    ss << "/cli/" << m_seed << "/custo_" << m_custo; // adicionando seed
+  #endif
   m_pathData = ss.str();
   ss.str("");
   ss << "rm -Rf ./scratch/flynetwork/data/output/" << m_pathData;
