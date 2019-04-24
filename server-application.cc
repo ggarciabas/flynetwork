@@ -348,7 +348,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
                   pos.push_back(std::stod (results.at(i+2),&sz)); // x
                   pos.push_back(std::stod (results.at(i+3),&sz)); // y
                   cli->SetPosition(pos.at(0), pos.at(1));
-                  cli->SetConsumption(std::stod (results.at(i+4),&sz)) // consumption
+                  cli->SetConsumption(std::stod (results.at(i+4),&sz)); // consumption
                   pos.clear();
                 }
               } else { // senao cria um novo
