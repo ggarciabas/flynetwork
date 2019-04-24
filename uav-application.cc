@@ -146,7 +146,7 @@ void UavApplication::StartApplication(void)
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG("UavApplication::StartApplication [" << m_id << "]");
   #ifdef TCP_CLI
-    m_socketClient = Socket::CreateSocket (GetNode(), TcpSocketFactory::GetTypeId ());
+    m_socketClient = Socket::CreateSocket (GetNode(), SocketFactory::GetTypeId ());
   #else
     m_socketClient = Socket::CreateSocket (GetNode(), UdpSocketFactory::GetTypeId ());
   #endif
