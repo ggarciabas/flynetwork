@@ -541,9 +541,9 @@ UavApplication::TracedCallbackRxAppInfra (Ptr<const Packet> packet, const Addres
           Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
           if (m_socketClient && m_socketClient->Send(packet, 0) == packetSize)
           {
-            NS_LOG_DEBUG("UavApplication::TracedCallbackRxAppInfra envio pacote para " << ip);
+            NS_LOG_DEBUG("UavApplication::TracedCallbackRxAppInfra envio de confirmacao para  " << ip << " @" << Simulator::Now().GetSeconds());
           } else {
-            NS_LOG_DEBUG("UavApplication::TracedCallbackRxAppInfra erro ao enviar solicitacao de posicionamento ao cliente no endereco " << ip);
+            NS_LOG_DEBUG("UavApplication::TracedCallbackRxAppInfra ERRO resposta para cliente " << ip << " @" << Simulator::Now().GetSeconds());
           }
         }
       } else {
@@ -572,9 +572,9 @@ UavApplication::AskCliPosition()
       Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
       if (m_socketClient && m_socketClient->Send(packet, 0) == packetSize)
       {
-        // NS_LOG_DEBUG("UavApplication::AskCliPosition envio pacote para " << i->first);
+        NS_LOG_DEBUG("UavApplication::AskCliPosition envio pacote para " << i->first << " @" << Simulator::Now().GetSeconds());
       } else {
-        // NS_LOG_DEBUG("UavApplication::AskCliPosition erro ao enviar solicitacao de posicionamento ao cliente no endereco " << i->first);
+        NS_LOG_DEBUG("UavApplication::AskCliPosition erro ao enviar solicitacao de posicionamento ao cliente no endereco " << i->first << " @" << Simulator::Now().GetSeconds());
       }
     }
   }
