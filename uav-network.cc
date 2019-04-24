@@ -885,7 +885,7 @@ void UavNetwork::ConfigureApplication ()
     } else if (app_code < 3) { // WWW
         smart->SetApp ("WWW");        
         cliLogin << " WWW\n";
-    } else if (app_code >= 3 && app_code <= 4) { // NOTHING
+    } else if (app_code >= 3 && app_code <= 4) { // NOTHING
         smart->SetApp ("NOTHING");
         cliLogin << " NOTHING\n";
     }    
