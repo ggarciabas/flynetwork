@@ -606,7 +606,7 @@ void UavNetwork::ConfigureUav(int total)
     ObjectFactory packFacInfra;
     packFacInfra.SetTypeId ("ns3::PacketSink");
     #ifdef TCP_CLI
-      packFacInfra.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+      packFacInfra.Set ("Protocol", StringValue ("ns3::SocketFactory"));
     #else
       packFacInfra.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
     #endif
@@ -810,7 +810,7 @@ void UavNetwork::ConfigureCli()
     ObjectFactory packFac;
     packFac.SetTypeId ("ns3::PacketSink"); // para receber informacoes do UAV
     #ifdef TCP_CLI
-      packFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+      packFac.Set ("Protocol", StringValue ("ns3::SocketFactory"));
     #else
       packFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
     #endif
