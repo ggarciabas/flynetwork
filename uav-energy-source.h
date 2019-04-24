@@ -131,6 +131,7 @@ public:
   double GetWifiAcum () { return m_wifiAcum; }
   double GetMoveAcum () { return m_movAcum; }
   double GetHoverAcum () { return m_hoverAcum; }
+  double GetCliAcum () { return m_cliAcum; }
 
 private:
   /// Defined in ns3::Object

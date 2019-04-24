@@ -134,7 +134,11 @@ void UavApplication::Start(double stoptime) {
   m_goto[0] = 0.0; // reiniciando posicionamento goto
   m_goto[1] = 0.0;
   // threshold do uav necessario calcular somente uma vez
-  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold()+m_meanConsumption*2);
+  #ifdef DEV_WIFI
+    DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold()+m_meanConsumption*2);
+  #else
+    DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold());
+  #endif
 }
 
 void UavApplication::StartApplication(void)
@@ -210,7 +214,11 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   }
 
   // threshold do uav necessario calcular somente uma vez
-  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold()+m_meanConsumption);
+  #ifdef DEV_WIFI
+    DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold()+m_meanConsumption*2);
+  #else
+    DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold());
+  #endif
 
   // ligar wifi quando chegar ao posicionamento correto
   // m_wifiDevice->HandleEnergyOn();
@@ -322,7 +330,13 @@ void UavApplication::SendPacketDepletion(void)
     os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_depletion/depletion_log.txt";
     std::ofstream file;
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
-    file << Simulator::Now().GetSeconds() << " " << m_id << " " << count << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRemainingEnergy() << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetInitialEnergy() << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetWifiAcum() << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetMoveAcum() << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetHoverAcum() << std::endl; // TIME, UAV_ID, TOTAL_CLIENTES, remainingenergy, initialbattery, wifiacum, moveacum, hoveracum
+    file << Simulator::Now().GetSeconds() << " " << m_id << " " << count 
+    << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRemainingEnergy() 
+    << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetInitialEnergy() 
+    << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetWifiAcum() 
+    << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetMoveAcum() 
+    << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetHoverAcum()
+    << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetCliAcum() << std::endl; // TIME, UAV_ID, TOTAL_CLIENTES, remainingenergy, initialbattery, wifiacum, moveacum, hoveracum, cliacum
     file.close();
 
     uint16_t packetSize = m.str().length() + 1;
@@ -403,7 +417,8 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
           << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetInitialEnergy() 
           << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetWifiAcum() 
           << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetMoveAcum() 
-          << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetHoverAcum() << std::endl; // TIME, UAV_ID, TOTAL_CLIENTES, ATUAL_BATERIA, FULL_BATERIA, wifiacum, moveacum, hoveracum
+          << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetHoverAcum()
+          << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetCliAcum() << std::endl; // TIME, UAV_ID, TOTAL_CLIENTES, ATUAL_BATERIA, FULL_BATERIA, wifiacum, moveacum, hoveracum, cliacum
 
           file.close();
         }
