@@ -576,9 +576,7 @@ void UavNetwork::ConfigureUav(int total)
   // configurando pilha de protocolos
   Ipv4InterfaceContainer addContainer(m_addressHelper.Assign(adhoc));
 
-  // install mobility -- and static Routing
-  Ipv4StaticRoutingHelper routingHelper;
-
+  // install mobility
   for (NodeContainer::Iterator i = uav.Begin(); i != uav.End(); ++i)
   {
     ObjectFactory objFacMobUAV;
@@ -703,6 +701,11 @@ void UavNetwork::ConfigureUav(int total)
 
     // energy start
     DynamicCast<UavEnergySource>(sources.Get(c))->Start();
+
+    // routing local callback
+    Ptr<Ipv4> ipv4 = (*i)->GetObject<Ipv4> ();
+    Ptr<Ipv4RoutingProtocol> routing = ipv4->GetRoutingProtocol();
+    routing->TraceConnectWithoutContext("LocalDeliverCallback", MakeCallback(&UavApplication::LocalDeliverCallback, uavApp));
 
     // Configure DHCP
     // The router must have a fixed IP.
