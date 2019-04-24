@@ -699,10 +699,9 @@ void UavNetwork::ConfigureUav(int total)
     #endif
     #ifdef DEV_WIFI
       uavApp->SetWifiDevice(DynamicCast<WifiRadioEnergyModel>(deviceModelsWifi.Get(c)));
+      // Configure TotalEnergyConsumption
+      deviceModelsWifi.Get(c)->TraceConnectWithoutContext ("TotalEnergyConsumption", MakeCallback(&UavApplication::TotalEnergyConsumptionTrace,  uavApp));
     #endif
-
-    // Configure TotalEnergyConsumption
-    deviceModelsWifi.Get(c)->TraceConnectWithoutContext ("TotalEnergyConsumption", MakeCallback(&UavApplication::TotalEnergyConsumptionTrace,  uavApp));
 
     // Mobility    
     (*i)->GetObject<MobilityModel>()->TraceConnectWithoutContext ("CourseChange", MakeCallback (&UavApplication::CourseChange, uavApp));
