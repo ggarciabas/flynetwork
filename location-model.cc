@@ -100,7 +100,7 @@ void LocationModel::SetPosition(double x, double y, double r_max)
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() <<x<<y);
 
-  if (m_changePosition) { // verificar issue: https://github.com/ggarciabas/flynetwork/issues/10
+  if (m_changePosition) { // verificar issue: https://github.com/ggarciabas/client/issues/10
     // procurar no historico se já passou por esta localizacao
     for (std::vector<std::vector<double> >::iterator i = m_historico.begin(); i != m_historico.end(); ++i) {
       if (x*r_max == (*i).at(0) && y*r_max == (*i).at(1)) {
