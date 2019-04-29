@@ -91,6 +91,7 @@ private:
   void ConfigurePalcos();
   void ConfigureServer();
   void ConfigureApplication();
+  void ConfigureApplicationServer ();
 
 private:
 
