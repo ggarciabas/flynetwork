@@ -2,6 +2,10 @@
     #define ETAPA 300 
 #endif
 
+#ifndef COM_SERVER
+    #define COM_SERVER
+#endif
+
 //#ifndef DEV_WIFI
 //    #define DEV_WIFI
 //#endif

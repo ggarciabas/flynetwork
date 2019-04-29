@@ -326,7 +326,13 @@ void UavNetwork::Run()
   NS_LOG_INFO("Configurando Cliente");
   ConfigureCli();
 
-  m_newApp = Simulator::Schedule(Seconds(10), &UavNetwork::ConfigureApplication, this); // configura aplicacoes para os clientes
+  #ifndef COM_SERVER
+    m_newApp = Simulator::Schedule(Seconds(10), &UavNetwork::ConfigureApplication, this);
+  #endif
+
+  #ifdef COM_SERVER
+    m_newApp = Simulator::Schedule(Seconds(10), &UavNetwork::ConfigureApplicationServer, this);
+  #endif
 
   Simulator::Stop(Seconds(m_simulationTime));
   NS_LOG_DEBUG("Iniciando Simulador");
@@ -878,7 +884,7 @@ void UavNetwork::ConfigureApplication ()
   {
     ss.str("");
     ss << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << (*i)->GetId() << ".txt";
-    cliLogin.open(ss.str().c_str());
+    cliLogin.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
     cliLogin << Simulator::Now().GetSeconds() << " SET login-" << (*i)->GetId();
 
     int app_code = app_rand->GetValue();
@@ -899,7 +905,100 @@ void UavNetwork::ConfigureApplication ()
     cliLogin.close();
     smart = 0;
   }
+  
   m_newApp = Simulator::Schedule(Seconds(5*60), &UavNetwork::ConfigureApplication, this);
+}
+
+void UavNetwork::ConfigureApplicationServer ()
+{
+  Ptr<UniformRandomVariable> app_rand = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
+  app_rand->SetAttribute ("Min", DoubleValue (0));
+  app_rand->SetAttribute ("Max", DoubleValue (6)); // MODIFICADO
+
+  std::ofstream cliLogin;
+  std::ostringstream ss;
+  int c = 0;
+  for (NodeContainer::Iterator i = m_clientNode.Begin(); i != m_clientNode.End(); ++i, ++c)
+  {
+    ss.str("");
+    ss << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << (*i)->GetId() << ".txt";
+    cliLogin.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
+    cliLogin << Simulator::Now().GetSeconds() << " CONFIGURE " << m_login;
+
+    Ptr<SmartphoneApplication> smart = m_appSmart.at(c);
+
+    // configure OnOff application para server
+    int app_code = app_rand->GetValue();
+    int port = 0;
+    ObjectFactory onoffFac;
+    Ptr<Application> appOnOff = 0;
+    if (app_code < 1) { // VOICE
+        smart->SetApp ("VOICE");
+        onoffFac.SetTypeId ("ns3::OnOffApplication");
+        onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+        onoffFac.Set ("PacketSize", UintegerValue (50));
+        onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
+        onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0]"));
+        // P.S.: offTime + DataRate/PacketSize = next packet time
+        onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.024Mbps")));
+        port = 5060;
+        onoffFac.Set ("Remote", AddressValue (InetSocketAddress (m_serverAddress.GetAddress(0), port)));
+        appOnOff = onoffFac.Create<Application> ();
+        appOnOff->SetStartTime(Seconds(1));
+        appOnOff->SetStopTime(Seconds(222)); // considerando 111 minutos mensal, 3.7 diario - http://www.teleco.com.br/comentario/com631.asp
+        appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
+        (*i)->AddApplication (appOnOff);
+        cliLogin << " VOICE" << std::endl;
+    } else if (app_code < 2) { // VIDEO
+        smart->SetApp ("VIDEO");
+        onoffFac.SetTypeId ("ns3::OnOffApplication");
+        #ifdef TCP_CLI
+          onoffFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+        #else
+          onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+        #endif
+        onoffFac.Set ("PacketSize", UintegerValue (429));
+        onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
+        onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0]"));
+        // P.S.: offTime + DataRate/PacketSize = next packet time
+        onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.128Mbps")));
+        port = 5070;
+        onoffFac.Set ("Remote", AddressValue (InetSocketAddress (m_serverAddress.GetAddress(0), port)));
+        appOnOff = onoffFac.Create<Application> ();
+        appOnOff->SetStartTime(Seconds(1.0));
+        appOnOff->SetStopTime(Seconds(5*60)); // 5 minutos, sem referencias
+        appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
+        (*i)->AddApplication (appOnOff);
+        cliLogin << " VIDEO" << std::endl;
+    } else if (app_code < 3) { // WWW
+        smart->SetApp ("WWW");
+        onoffFac.SetTypeId ("ns3::OnOffApplication");
+        #ifdef TCP_CLI
+          onoffFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
+        #else
+          onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
+        #endif
+        onoffFac.Set ("PacketSize", UintegerValue (429));
+        onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
+        onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0.04]"));
+        // P.S.: offTime + DataRate/PacketSize = next packet time
+        onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.128Mbps")));
+        port = 8080;
+        onoffFac.Set ("Remote", AddressValue (InetSocketAddress (m_serverAddress.GetAddress(0), port)));
+        appOnOff = onoffFac.Create<Application> ();
+        appOnOff->SetStartTime(Seconds(1.0));
+        appOnOff->SetStopTime(Seconds(5*60)); // 5 minutoss sem referencia
+        appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
+        (*i)->AddApplication (appOnOff);
+        cliLogin << " WWW" << std::endl;
+    } else if (app_code >= 3 && app_code <= 5) { // NOTHING
+        smart->SetApp ("NOTHING");
+        cliLogin << " NOTHING" << std::endl;
+    } else NS_FATAL_ERROR ("UavNetwork .. application error");
+  }
+  cliLogin.close();
+
+  m_newApp = Simulator::Schedule(Seconds(5*60), &UavNetwork::ConfigureApplicationServer, this);
 }
 
 void UavNetwork::ConfigurePalcos() // TODO: poderia ser otimizada a leitura do arquivo colocando esta estrutura na configuração do cliente, mas isso tbm poderia confundir! Pensar!

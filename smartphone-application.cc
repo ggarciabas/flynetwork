@@ -324,15 +324,17 @@ void SmartphoneApplication::TracedCallbackNewLease (const Ipv4Address& ip)
 {
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   m_ip = ip;
-  if (m_connected && !DynamicCast<DhcpClient>(GetNode()->GetApplication(m_idDHCP))->GetDhcpServer().IsEqual(m_uavPeer))
-  { // caso o servidor tenha sido alterado
-    // criar uma aplicação onoff com base na aplicação que o usuario esta configurado m_app
-    if (m_onoff) {
-      m_onoff->SetStopTime(Simulator::Now()); // na roxima avaliacao do onoff será finalizada a aplicacao!
-    }
-    m_uavPeer = DynamicCast<DhcpClient>(GetNode()->GetApplication(m_idDHCP))->GetDhcpServer();
-    ConfigureApplication(m_uavPeer); // cria nova aplicacao para envio ao novo servidor!
-  }  
+  #ifdef COM_SERVER
+    if (m_connected && !DynamicCast<DhcpClient>(GetNode()->GetApplication(m_idDHCP))->GetDhcpServer().IsEqual(m_uavPeer))
+    { // caso o servidor tenha sido alterado
+      // criar uma aplicação onoff com base na aplicação que o usuario esta configurado m_app
+      if (m_onoff) {
+        m_onoff->SetStopTime(Simulator::Now()); // na roxima avaliacao do onoff será finalizada a aplicacao!
+      }
+      m_uavPeer = DynamicCast<DhcpClient>(GetNode()->GetApplication(m_idDHCP))->GetDhcpServer();
+      ConfigureApplication(m_uavPeer); // cria nova aplicacao para envio ao novo servidor!
+    }  
+  #endif
   #ifdef DHCP
     std::ostringstream os;
     os << "./scratch/flynetwork/data/output/" << m_pathData << "/dhcp/client_lease_" << m_id << ".txt";
@@ -449,7 +451,7 @@ void SmartphoneApplication::ConfigureApplication (const Ipv4Address& ip)
   std::ostringstream ss;
   ss.str("");
   ss << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << m_id << ".txt";
-  cliLogin.open(ss.str().c_str());
+  cliLogin.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
   cliLogin << Simulator::Now().GetSeconds() << " CONFIGURE " << m_login;
   // configure OnOff application para server    
   int port = 0;
