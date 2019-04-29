@@ -450,13 +450,8 @@ void SmartphoneApplication::ConfigureApplication (const Ipv4Address& ip)
   std::ofstream cliLogin;
   std::ostringstream ss;
   ss.str("");
-<<<<<<< HEAD
-  ss << "./scratch/wifi/data/output/" << m_pathData << "/client/client_" << m_id << ".txt";
-  cliLogin.open(ss.str().c_str());
-=======
   ss << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << m_id << ".txt";
   cliLogin.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
->>>>>>> 2d9ee3498cb7bccc8ee5153ea713eb36b28f1518
   cliLogin << Simulator::Now().GetSeconds() << " CONFIGURE " << m_login;
   // configure OnOff application para server    
   int port = 0;
