@@ -883,13 +883,8 @@ void UavNetwork::ConfigureApplication ()
   for (NodeContainer::Iterator i = m_clientNode.Begin(); i != m_clientNode.End(); ++i, ++c)
   {
     ss.str("");
-<<<<<<< HEAD
-    ss << "./scratch/wifi/data/output/" << m_pathData << "/client/client_" << (*i)->GetId() << ".txt";
-    cliLogin.open(ss.str().c_str());
-=======
     ss << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << (*i)->GetId() << ".txt";
     cliLogin.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
->>>>>>> 2d9ee3498cb7bccc8ee5153ea713eb36b28f1518
     cliLogin << Simulator::Now().GetSeconds() << " SET login-" << (*i)->GetId();
 
     int app_code = app_rand->GetValue();
@@ -928,7 +923,7 @@ void UavNetwork::ConfigureApplicationServer ()
     ss.str("");
     ss << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << (*i)->GetId() << ".txt";
     cliLogin.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
-    cliLogin << Simulator::Now().GetSeconds() << " CONFIGURE " << m_login;
+    cliLogin << Simulator::Now().GetSeconds() << " CONFIGURE login-" << (*i)->GetId();
 
     Ptr<SmartphoneApplication> smart = m_appSmart.at(c);
 
