@@ -724,6 +724,7 @@ void UavNetwork::ConfigureUav(int total)
     maxAddr << "192.168." << (*i)->GetId() << ".254";
     poolAddr << "192.168." << (*i)->GetId() << ".0";
     DhcpHelper dhcpHelper;
+    // http://www.tcpipguide.com/free/t_DHCPLeaseRenewalandRebindingProcesses-2.htm
     dhcpHelper.SetServerAttribute("RebindTime", TimeValue(Seconds(10)));
     dhcpHelper.SetServerAttribute("RenewTime", TimeValue(Seconds(5)));
     dhcpHelper.SetServerAttribute("LeaseTime", TimeValue(Seconds(ETAPA/2)));
