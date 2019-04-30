@@ -407,7 +407,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
               // m_packetTrace(mm.str());
               // NS_LOG_DEBUG("SERVER -- CLIENT ::: recebida informacoes de aplicacao do cliente no endereco " << add.GetIpv4());
               std::ostringstream os;
-              os << "./scratch/wifi/data/output/" << m_pathData << "/client/" << add << ".txt";
+              os << "./scratch/client/data/output/" << m_pathData << "/client/" << add << ".txt";
               std::ofstream file;
               file.open(os.str(), std::ofstream::out | std::ofstream::app);
               file << Simulator::Now().GetSeconds() << " RECEBIDO " << packet->GetSize () << std::endl;// RECEBIDO pelo servidor
@@ -547,17 +547,17 @@ void ServerApplication::Run ()
   {
     NS_LOG_DEBUG("\tSERVER - Iniciando execução dos DAs @" << Simulator::Now().GetSeconds());
     std::ostringstream ss;
-    ss << "mkdir -p ./scratch/wifi/data/output/"<<m_pathData<<"/etapa/" << m_step << "/mij";
+    ss << "mkdir -p ./scratch/client/data/output/"<<m_pathData<<"/etapa/" << m_step << "/mij";
     system(ss.str().c_str());
     std::ofstream file;
     ss.str("");
-    ss <<"./scratch/wifi/data/output/" << m_pathData << "/etapa_time.txt";
+    ss <<"./scratch/client/data/output/" << m_pathData << "/etapa_time.txt";
     file.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
     file << m_step << "," << int(Simulator::Now().GetSeconds()) << "\n";
     file.close();
     ss.str("");
     #ifdef COMPARE_COST
-      ss << "mkdir -p ./scratch/wifi/data/output/"<<m_pathData<<"/compare/" << m_step;
+      ss << "mkdir -p ./scratch/client/data/output/"<<m_pathData<<"/compare/" << m_step;
       system(ss.str().c_str());
       ss.str("");
     #endif
@@ -619,7 +619,7 @@ void ServerApplication::CreateCentralLocation(void)
   m_locationContainer.Add(loc);
 
   std::ostringstream os;
-  os <<"./scratch/wifi/data/output/" << m_pathData << "/etapa/" << m_step << "/location_client.txt";
+  os <<"./scratch/client/data/output/" << m_pathData << "/etapa/" << m_step << "/location_client.txt";
   std::ofstream location_cli;
   location_cli.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
   location_cli << loc->GetId() << "," << loc->GetTotalCli() << "," << loc->GetTotalConsumption() << std::endl;
@@ -727,28 +727,28 @@ void ServerApplication::runAgendamento(void)
   #ifdef COMPARE_COST
     std::ofstream file_uav, file_ule, file_l, file_c1, file_c2, file_c3, file_c4, file_uce, file_ult;
     os.str("");
-    os << "./scratch/wifi/data/output/" << m_pathData << "/compare/"<<m_step<<"/uav_loc_travel_info.txt";
+    os << "./scratch/client/data/output/" << m_pathData << "/compare/"<<m_step<<"/uav_loc_travel_info.txt";
     file_ult.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
     os.str("");
-    os << "./scratch/wifi/data/output/"<<m_pathData<<"/compare/"<<m_step<<"/uav_loc_energy_info.txt";
+    os << "./scratch/client/data/output/"<<m_pathData<<"/compare/"<<m_step<<"/uav_loc_energy_info.txt";
     file_ule.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
     os.str("");
-    os << "./scratch/wifi/data/output/"<<m_pathData<<"/compare/"<<m_step<<"/uav_central_energy_info.txt";
+    os << "./scratch/client/data/output/"<<m_pathData<<"/compare/"<<m_step<<"/uav_central_energy_info.txt";
     file_uce.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
     os.str("");
-    os << "./scratch/wifi/data/output/"<<m_pathData<<"/compare/"<<m_step<<"/uav_info.txt";
+    os << "./scratch/client/data/output/"<<m_pathData<<"/compare/"<<m_step<<"/uav_info.txt";
     file_uav.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
     os.str("");
-    os << "./scratch/wifi/data/output/"<<m_pathData<<"/compare/"<<m_step<<"/compare_c1.txt";
+    os << "./scratch/client/data/output/"<<m_pathData<<"/compare/"<<m_step<<"/compare_c1.txt";
     file_c1.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
     os.str("");
-    os << "./scratch/wifi/data/output/"<<m_pathData<<"/compare/"<<m_step<<"/compare_c2.txt";
+    os << "./scratch/client/data/output/"<<m_pathData<<"/compare/"<<m_step<<"/compare_c2.txt";
     file_c2.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
     os.str("");
-    os << "./scratch/wifi/data/output/"<<m_pathData<<"/compare/"<<m_step<<"/compare_c3.txt";
+    os << "./scratch/client/data/output/"<<m_pathData<<"/compare/"<<m_step<<"/compare_c3.txt";
     file_c3.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
     os.str("");
-    os << "./scratch/wifi/data/output/"<<m_pathData<<"/compare/"<<m_step<<"/compare_c4.txt";
+    os << "./scratch/client/data/output/"<<m_pathData<<"/compare/"<<m_step<<"/compare_c4.txt";
     file_c4.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
     file_c1 << "compare_c1\n";
     file_c1 << m_uavContainer.GetN() << "\n";
@@ -808,7 +808,7 @@ void ServerApplication::runAgendamento(void)
     file_c4.close();
     file_ult.close();
     os.str("");
-    os << "./scratch/wifi/data/output/"<<m_pathData<<"/compare/"<<m_step<<"/loc_info.txt";
+    os << "./scratch/client/data/output/"<<m_pathData<<"/compare/"<<m_step<<"/loc_info.txt";
     file_l.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
     for (LocationModelContainer::Iterator l_j = m_locationContainer.Begin();
          l_j != m_locationContainer.End(); ++l_j)
@@ -891,11 +891,11 @@ void ServerApplication::runAgendamento(void)
   }
 
   os.str("");
-  os << "./scratch/wifi/data/output/"<<m_pathData<<"/etapa/" << m_step << "/f_mij.txt";
+  os << "./scratch/client/data/output/"<<m_pathData<<"/etapa/" << m_step << "/f_mij.txt";
   PrintMij (f_mij, 0.0, os.str(), uav_ids, loc_ids);
 
   os.str("");
-  os << "./scratch/wifi/data/output/"<<m_pathData<<"/etapa/"<<m_step<<"/uav_loc.txt";
+  os << "./scratch/client/data/output/"<<m_pathData<<"/etapa/"<<m_step<<"/uav_loc.txt";
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
   Vector serv_pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
   file << m_maxx << "," << m_maxy << std::endl << serv_pos.x << "," << serv_pos.y << std::endl << osuav.str() << std::endl << osloc.str() << std::endl;
@@ -1189,19 +1189,19 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
     // sobre os custo ver: https://github.com/ggarciabas/Calculo-de-Posicionamento
     switch (m_custo) {
       case 1:
-      case 6: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/wifi/issues/45)
+      case 6: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/client/issues/45)
         custo = (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot; // media do custo
         break;
       case 2:
-      case 7: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/wifi/issues/45
+      case 7: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/client/issues/45
         custo = 1.0/P_te;
         break;
       case 3:
-      case 8: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/wifi/issues/45
+      case 8: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/client/issues/45
         custo = (1.0/P_te + (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot) / 2.0;
         break;
       case 4: // custo 2 -> com hover
-      case 9: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/wifi/issues/45
+      case 9: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/client/issues/45
         ce_te = loc->GetTotalConsumption()*m_scheduleServer + uav->GetHoverCost()*m_scheduleServer ; // custo para o TE inteiro, considerando locs e hover
         P_te = b_ui_res/ce_te;
         custo = 1.0/P_te;
@@ -1224,9 +1224,9 @@ ServerApplication::PrintBij (vector<vector<long double>> b_ij, int print, bool b
 {
   std::ostringstream os;
   if (before) {
-    os << "./scratch/wifi/data/output/"<<m_pathData<<"/etapa/"<<m_step<<"/bij.txt";
+    os << "./scratch/client/data/output/"<<m_pathData<<"/etapa/"<<m_step<<"/bij.txt";
   } else {
-    os << "./scratch/wifi/data/output/"<<m_pathData<<"/etapa/"<<m_step<<"/bij_final.txt";
+    os << "./scratch/client/data/output/"<<m_pathData<<"/etapa/"<<m_step<<"/bij_final.txt";
   }
   std::ofstream file;
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
@@ -1271,9 +1271,9 @@ ServerApplication::PrintCusto (vector<vector<long double>> custo, int print, boo
 {
   std::ostringstream os;
   if (before) {
-    os << "./scratch/wifi/data/output/"<<m_pathData<<"/etapa/"<<m_step<<"/custo_" << m_custo << ".txt";
+    os << "./scratch/client/data/output/"<<m_pathData<<"/etapa/"<<m_step<<"/custo_" << m_custo << ".txt";
   } else  {
-    os << "./scratch/wifi/data/output/"<<m_pathData<<"/etapa/"<<m_step<<"/custo_" << m_custo << "_final.txt";
+    os << "./scratch/client/data/output/"<<m_pathData<<"/etapa/"<<m_step<<"/custo_" << m_custo << "_final.txt";
   }
   std::ofstream file;
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
@@ -1403,14 +1403,14 @@ void ServerApplication::DoDispose() {
   m_clientContainer.Clear();
 }
 
-// https://github.com/ggarciabas/nsnam_ns3/blob/17c1f9200727381852528ac4798f040128ac842a/scratch/wifi/da_cpp/deterministic-annealing.cc
+// https://github.com/ggarciabas/nsnam_ns3/blob/17c1f9200727381852528ac4798f040128ac842a/scratch/client/da_cpp/deterministic-annealing.cc
 void ServerApplication::runDA() {
   //NS_LOG_DEBUG("ServerApplication::runDA @" << Simulator::Now().GetSeconds());
 
   std::ofstream file;
   std::ostringstream os;
   os.str("");
-  os << "./scratch/wifi/data/output/"<<m_pathData<<"/etapa/"<<m_step<<"/client.txt";
+  os << "./scratch/client/data/output/"<<m_pathData<<"/etapa/"<<m_step<<"/client.txt";
   file.open(os.str().c_str(), std::ofstream::out);
   bool first = true;
   double tMov = m_clientContainer.GetN();
@@ -1473,7 +1473,7 @@ void ServerApplication::runDA() {
   int max_iterB = 5000;
 
   os.str("");
-  os <<"./scratch/wifi/data/output/" << m_pathData << "/etapa/" << m_step << "/da_log.txt";
+  os <<"./scratch/client/data/output/" << m_pathData << "/etapa/" << m_step << "/da_log.txt";
   file.open(os.str().c_str(), std::ofstream::out);
   // //NS_LOG_DEBUG ("\n\t t_min =" << t_min << "\n \t r_max =" << r_max << "\n \t ptUav ="<< ptUav << "\n \t ptCli =" << ptCli << "\n \t fsInterf ="
   //             << fsInterf  << "\n \t dRCli =" << dRCli << "\n \t sinrCliMin =" << sinrCliMin<< "\n \t fcCli ="
@@ -1661,7 +1661,7 @@ void ServerApplication::runDA() {
   m_locConsTotal = 0; // atualiza total de consumo de todas as localizacoes
 
   // os.str("");
-  // os <<"./scratch/wifi/data/output/" << m_pathData << "/etapa/" << m_step << "/location_data_rate.txt";
+  // os <<"./scratch/client/data/output/" << m_pathData << "/etapa/" << m_step << "/location_data_rate.txt";
   // file.open(os.str().c_str(), std::ofstream::out);
   // for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
   //   file << (*lj)->GetId() << "," << (*lj)->GetDataRate() << std::endl;
@@ -1669,7 +1669,7 @@ void ServerApplication::runDA() {
   // file.close();
 
   os.str("");
-  os <<"./scratch/wifi/data/output/" << m_pathData << "/etapa/" << m_step << "/client_data_rate.txt";
+  os <<"./scratch/client/data/output/" << m_pathData << "/etapa/" << m_step << "/client_data_rate.txt";
   file.open(os.str().c_str(), std::ofstream::out);
   for (ClientModelContainer::Iterator ci = m_clientContainer.Begin(); ci != m_clientContainer.End(); ++ci) {
     file << (*ci)->GetLogin() << "," << (*ci)->GetDataRate() << std::endl;
@@ -1709,7 +1709,7 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
   std::ofstream file;
   std::ostringstream os;
   os.str("");
-  os <<"./scratch/wifi/data/output/" << m_pathData << "/etapa/" << m_step << "/da_loc_cpp_" << std::setfill ('0') << std::setw (15) << iter << ".txt";
+  os <<"./scratch/client/data/output/" << m_pathData << "/etapa/" << m_step << "/da_loc_cpp_" << std::setfill ('0') << std::setw (15) << iter << ".txt";
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
   file << iter << std::endl;
   file << uav_cob << std::endl;
@@ -1795,11 +1795,11 @@ void ServerApplication::GraficoCenarioDa (double temp, int iter, Ptr<LocationMod
 
   // os.str ("");
   // // custo, etapa, main_path, teste, iter
-  // os << "python ./scratch/wifi/data/da_loc.py custo_" << m_custo << " " << m_step << " ./scratch/wifi/data/output/" << m_scenarioName << "/ False " << iter;
+  // os << "python ./scratch/client/data/da_loc.py custo_" << m_custo << " " << m_step << " ./scratch/client/data/output/" << m_scenarioName << "/ False " << iter;
   // //NS_LOG_DEBUG (os.str());
   // system(os.str().c_str());
   // os.str ("");
-  // os << "convert -delay 20 -loop 0 ./scratch/wifi/data/output/" << m_pathData << "/etapa/" << m_step << "/*.png" << " ./scratch/wifi/data/output/" << m_pathData << "/etapa/" << m_step << "/da_loc.gif";
+  // os << "convert -delay 20 -loop 0 ./scratch/client/data/output/" << m_pathData << "/etapa/" << m_step << "/*.png" << " ./scratch/client/data/output/" << m_pathData << "/etapa/" << m_step << "/da_loc.gif";
   // ////NS_LOG_DEBUG (os.str());
   // system(os.str().c_str());
 }
@@ -1854,7 +1854,7 @@ void ServerApplication::runDAPuro() {
   std::ofstream file;
   std::ostringstream os;
   os.str("");
-  os << "./scratch/wifi/data/output/"<<m_pathData<<"/etapa/"<<m_step<<"/client.txt";
+  os << "./scratch/client/data/output/"<<m_pathData<<"/etapa/"<<m_step<<"/client.txt";
   file.open(os.str().c_str(), std::ofstream::out);
   bool first = true;
   for (ClientModelContainer::Iterator i = m_clientContainer.Begin(); i != m_clientContainer.End(); ++i)
@@ -2025,7 +2025,7 @@ void ServerApplication::runDAPuro() {
   m_locConsTotal = 0; // atualiza total de consumo de todas as localizacoes
 
   os.str("");
-  os <<"./scratch/wifi/data/output/" << m_pathData << "/etapa/" << m_step << "/location_client.txt";
+  os <<"./scratch/client/data/output/" << m_pathData << "/etapa/" << m_step << "/location_client.txt";
   std::ofstream location_cli;
   location_cli.open(os.str().c_str(), std::ofstream::out);
   for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
@@ -2042,7 +2042,7 @@ void ServerApplication::GraficoCenarioDaPuro (double temp, int iter, Ptr<Locatio
   std::ofstream file;
   std::ostringstream os;
   os.str("");
-  os <<"./scratch/wifi/data/output/" << m_pathData << "/etapa/" << m_step << "/da_loc_puro_" << std::setfill ('0') << std::setw (15) << iter << ".txt";
+  os <<"./scratch/client/data/output/" << m_pathData << "/etapa/" << m_step << "/da_loc_puro_" << std::setfill ('0') << std::setw (15) << iter << ".txt";
   file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
   LocationModelContainer::Iterator lj = m_locationContainer.Begin(); // imprimindo a posicao atual da localizacao
   file << m_maxx << "," << m_maxy << std::endl;
@@ -2057,11 +2057,11 @@ void ServerApplication::GraficoCenarioDaPuro (double temp, int iter, Ptr<Locatio
   file.close();
 
   // os.str ("");
-  // os << "python ./scratch/wifi/data/da_loc_puro.py " << m_pathData << " " << m_step << " " << iter << " " << raio_cob;
+  // os << "python ./scratch/client/data/da_loc_puro.py " << m_pathData << " " << m_step << " " << iter << " " << raio_cob;
   // ////NS_LOG_DEBUG (os.str());
   // system(os.str().c_str());
   // os.str ("");
-  // os << "convert -delay 20 -loop 0 ./scratch/wifi/data/output/" << m_pathData << "/etapa/" << m_step << "/*.png" << " ./scratch/wifi/data/output/" << m_pathData << "/etapa/" << m_step << "/da_loc.gif";
+  // os << "convert -delay 20 -loop 0 ./scratch/client/data/output/" << m_pathData << "/etapa/" << m_step << "/*.png" << " ./scratch/client/data/output/" << m_pathData << "/etapa/" << m_step << "/da_loc.gif";
   // ////NS_LOG_DEBUG (os.str());
   // system(os.str().c_str());
 }
@@ -2074,7 +2074,7 @@ void ServerApplication::runDAPython()
   std::ofstream cenario, file;
   std::ostringstream os;
   os.str("");
-  os <<"./scratch/wifi/data/output/" << m_pathData << "/etapa/" << m_step << "/cenario_in.txt";
+  os <<"./scratch/client/data/output/" << m_pathData << "/etapa/" << m_step << "/cenario_in.txt";
   cenario.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
   if (cenario.is_open())
   {
@@ -2084,7 +2084,7 @@ void ServerApplication::runDAPython()
     cenario << pos.x << "," << pos.y;
 
     os.str("");
-    os << "./scratch/wifi/data/output/"<<m_pathData<<"/etapa/"<<m_step<<"/client.txt";
+    os << "./scratch/client/data/output/"<<m_pathData<<"/etapa/"<<m_step<<"/client.txt";
     file.open(os.str().c_str(), std::ofstream::out);
     bool first = true;
     for (ClientModelContainer::Iterator i = m_clientContainer.Begin(); i != m_clientContainer.End(); ++i)
@@ -2116,14 +2116,14 @@ void ServerApplication::runDAPython()
 
     #ifdef COMPARE_COST
       os.str("");
-      os << "cp ./scratch/wifi/data/output/" << m_pathData << "/etapa/" << m_step << "/client.txt ./scratch/wifi/data/output/" << m_pathData << "/compare/" << m_step;
+      os << "cp ./scratch/client/data/output/" << m_pathData << "/etapa/" << m_step << "/client.txt ./scratch/client/data/output/" << m_pathData << "/compare/" << m_step;
     #endif
   }
 
   m_totalCliGeral = 0;
 
   os.str ("");
-  os << "python ./scratch/wifi/da_python " << m_pathData << " " << m_step << " > ./scratch/wifi/data/output/" << m_pathData << "/etapa/" << m_step << "/python_log.txt";
+  os << "python ./scratch/client/da_python " << m_pathData << " " << m_step << " > ./scratch/client/data/output/" << m_pathData << "/etapa/" << m_step << "/python_log.txt";
   ////NS_LOG_DEBUG (os.str());
   int status = system(os.str().c_str());
   if (status < 0)
@@ -2134,7 +2134,7 @@ void ServerApplication::runDAPython()
   {
     std::ifstream cenario_in;
     os.str("");
-    os <<"./scratch/wifi/data/output/" << m_pathData << "/etapa/" << m_step << "/cenario_out.txt";
+    os <<"./scratch/client/data/output/" << m_pathData << "/etapa/" << m_step << "/cenario_out.txt";
     cenario_in.open(os.str().c_str(), std::ofstream::in);
     if (cenario_in.is_open())
     {
@@ -2145,7 +2145,7 @@ void ServerApplication::runDAPython()
       uint32_t id = 0;
       m_locConsTotal = 0.0;
       os.str("");
-      os <<"./scratch/wifi/data/output/" << m_pathData << "/etapa/" << m_step << "/location_client.txt";
+      os <<"./scratch/client/data/output/" << m_pathData << "/etapa/" << m_step << "/location_client.txt";
       std::ofstream location_cli;
       location_cli.open(os.str().c_str(), std::ofstream::out);
       while (getline(cenario_in, line))

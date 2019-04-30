@@ -17,7 +17,7 @@ for custo_name in glob.glob(main_path+'custo_*/'):
     custo = os.path.dirname(custo_name).split('/')[-1]
     if teste:
         print "Custo: "+custo
-    cli_files = glob.glob(main_path+custo+'/wifi/*')
+    cli_files = glob.glob(main_path+custo+'/client/*')
     data_ENVIADO = []
     data_FALHA = []
     data_NAOCONECTADO = []

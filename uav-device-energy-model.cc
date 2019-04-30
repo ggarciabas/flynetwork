@@ -140,7 +140,7 @@ void UavDeviceEnergyModel::HandleEnergyRecharged (void)
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG("UavDeviceEnergyModel::HandleEnergyRecharged [" << m_source->GetNode()->GetId() << "] @" << Simulator::Now().GetSeconds());
   std::ostringstream os;
-  os << "./scratch/wifi/data/output/" << m_pathData << "/uav_recharged/uav_recharged.txt";
+  os << "./scratch/client/data/output/" << m_pathData << "/uav_recharged/uav_recharged.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << Simulator::Now().GetSeconds() << "," << m_source->GetNode()->GetId() << "," << m_source->GetRemainingEnergy() << std::endl;
   m_file.close();
@@ -176,7 +176,7 @@ void UavDeviceEnergyModel::HandleEnergyDepletion(void)
   // energy to decrease = energy cost * distance from last position to the actual
   double energy = m_energyCost * distance;
   std::ostringstream os;
-  os << "./scratch/wifi/data/output/" << m_pathData << "/uav_depletion/uav_depletion_" << m_source->GetNode()->GetId() << ".txt";
+  os << "./scratch/client/data/output/" << m_pathData << "/uav_depletion/uav_depletion_" << m_source->GetNode()->GetId() << ".txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << Simulator::Now().GetSeconds() << "," << m_source->GetRemainingEnergy() - energy << std::endl;
   m_file.close();
@@ -210,12 +210,12 @@ void UavDeviceEnergyModel::SetEnergySource(Ptr<EnergySource> source)
   m_hoverCost = m_source->GetInitialEnergy() / m_resistTime; // j/s
 
   std::ostringstream os;
-  os << "./scratch/wifi/data/output/" << m_pathData << "/cost_energy.txt";
+  os << "./scratch/client/data/output/" << m_pathData << "/cost_energy.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << m_energyCost << "\n" << m_hoverCost << std::endl;
   m_file.close();
   os.str("");
-  os << "cp ./scratch/wifi/data/output/" << m_pathData << "/cost_energy.txt ./scratch/wifi/data/output/" << m_pathData << "/compare/cost_energy.txt";
+  os << "cp ./scratch/client/data/output/" << m_pathData << "/cost_energy.txt ./scratch/client/data/output/" << m_pathData << "/compare/cost_energy.txt";
   system(os.str().c_str());
 }
 
@@ -265,7 +265,7 @@ void UavDeviceEnergyModel::HoverConsumption(void)
 
   // salvando historico do consumo de bateria
   std::ostringstream os;
-  os << "./scratch/wifi/data/output/" << m_pathData << "/uav_hover/uav_hover_" << m_source->GetNode()->GetId() << ".txt";
+  os << "./scratch/client/data/output/" << m_pathData << "/uav_hover/uav_hover_" << m_source->GetNode()->GetId() << ".txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease / m_source->GetInitialEnergy() << std::endl;
   m_file.close();
@@ -292,7 +292,7 @@ void UavDeviceEnergyModel::CourseChange (Ptr<const MobilityModel> mob) // Chamad
 
   // salvando historico do consumo de bateria por movimentacao
   std::ostringstream os;
-  os << "./scratch/wifi/data/output/" << m_pathData << "/uav_move/uav_move_" << m_source->GetNode()->GetId() << ".txt";
+  os << "./scratch/client/data/output/" << m_pathData << "/uav_move/uav_move_" << m_source->GetNode()->GetId() << ".txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease / m_source->GetInitialEnergy() << std::endl;
   m_file.close();  
