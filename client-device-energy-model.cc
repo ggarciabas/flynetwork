@@ -214,7 +214,7 @@ void ClientDeviceEnergyModel::ClientConsumption ()
   Simulator::Remove(m_cliEvent);
   double energyToDecrease =  UpdateConsumption();
   std::ostringstream os;
-  os << "./scratch/client/data/output/" << m_pathData << "/uav_client_" << m_node->GetId() << ".txt";
+  os << "./scratch/wifi/data/output/" << m_pathData << "/uav_client_" << m_node->GetId() << ".txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease / m_source->GetInitialEnergy() << std::endl;
   m_file.close();
