@@ -191,7 +191,7 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
 
         #ifdef PACKET
           std::ostringstream os;
-          os << "./scratch/wifi/data/output/" << m_pathData << "/wifi/client_" << m_id << "_packet" << ".txt";
+          os << "./scratch/wifi/data/output/" << m_pathData << "/client/client_" << m_id << "_packet" << ".txt";
           std::ofstream file;
           file.open(os.str(), std::ofstream::out | std::ofstream::app);
           file << Simulator::Now().GetSeconds() << " ENVIADO" << std::endl; // ENVIADO
@@ -204,7 +204,7 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
         NS_LOG_ERROR("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - UAV NAO");
         #ifdef PACKET
           std::ostringstream os;
-          os << "./scratch/wifi/data/output/" << m_pathData << "/wifi/client_" << m_id << "_packet" << ".txt";
+          os << "./scratch/wifi/data/output/" << m_pathData << "/client/client_" << m_id << "_packet" << ".txt";
           std::ofstream file;
           file.open(os.str(), std::ofstream::out | std::ofstream::app);
           file << Simulator::Now().GetSeconds() << " FALHA" << std::endl; // FALHA
@@ -221,7 +221,7 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
       NS_LOG_INFO ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " erro ao conectar socket com servidor " << m_uavPeer);
       #ifdef PACKET
         std::ostringstream os;
-        os << "./scratch/wifi/data/output/" << m_pathData << "/wifi/client_" << m_id << "_packet" << ".txt";
+        os << "./scratch/wifi/data/output/" << m_pathData << "/client/client_" << m_id << "_packet" << ".txt";
         std::ofstream file;
         file.open(os.str(), std::ofstream::out | std::ofstream::app);
         file << Simulator::Now().GetSeconds() << " NAO_CONECTADO" << std::endl; // NAO CONECTADO
@@ -293,7 +293,7 @@ SmartphoneApplication::TracedCallbackTxApp (Ptr<const Packet> packet, const Addr
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   // NS_LOG_DEBUG ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - ENVIANDO APP PARA UAV ");
   std::ostringstream os;
-  os << "./scratch/wifi/data/output/" << m_pathData << "/wifi/" << m_ip << ".txt";
+  os << "./scratch/wifi/data/output/" << m_pathData << "/client/" << m_ip << ".txt";
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   file << Simulator::Now().GetSeconds() << " ENVIADO " << m_appOnoff << " " << packet->GetSize () << " " << m_login << std::endl; // ENVIADO por um cliente
@@ -450,7 +450,7 @@ void SmartphoneApplication::ConfigureApplication (const Ipv4Address& ip)
   std::ofstream cliLogin;
   std::ostringstream ss;
   ss.str("");
-  ss << "./scratch/flynetwork/data/output/" << m_pathData << "/wifi/client_" << m_id << ".txt";
+  ss << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << m_id << ".txt";
   cliLogin.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
   cliLogin << Simulator::Now().GetSeconds() << " CONFIGURE " << m_login;
   // configure OnOff application para server    
