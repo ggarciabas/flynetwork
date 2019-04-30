@@ -1196,14 +1196,15 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
         custo = (P_te>0)?1.0/P_te:1.0; // UAV que terá mais bateria para servir a localizacao (conseguira servir por mais tempo)
         break;
       case 3:
-      case 8: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/client/issues/45
-        custo = (1.0/P_te + (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot) / 2.0;
+      case 8: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/wifi/issues/45
+        P_te = b_ui_res/ (ce_te_lj + ce_ui_la_lj + ce_ui_lj_lc);
+        custo = (P_te>0)?1.0/P_te:1.0;
         break;
       case 4: // custo 2 -> com hover
-      case 9: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/client/issues/45
-        ce_te = loc->GetTotalConsumption()*m_scheduleServer + uav->GetHoverCost()*m_scheduleServer ; // custo para o TE inteiro, considerando locs e hover
-        P_te = b_ui_res/ce_te; // considera o gasto para ficar no local
-        custo = (1.0/P_te + (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot) / 2.0;
+      case 9: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/wifi/issues/45
+        ce_hv = uav->GetHoverCost()*m_scheduleServer ; // custo para o TE inteiro, considerando locs e hover
+        P_te = b_ui_res/ (ce_te_lj + ce_ui_la_lj + ce_ui_lj_lc + ce_hv);
+        custo = (P_te>0)?1.0/P_te:1.0;
         break;
       case 5: // aleatorio
         custo = 0; // quanto menor melhor, só pro aleatorio
