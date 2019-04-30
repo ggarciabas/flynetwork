@@ -396,7 +396,7 @@ void UavEnergySource::HandleEnergyDrainedEvent(void)
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_ASSERT(m_onoff);
   NS_LOG_INFO("UavEnergySource:Energy depleted!");
-  // NotifyEnergyDrained(); // notify DeviceEnergyModel objects ??? retirar mesmo? para nao desligar wifi?
+  NotifyEnergyDrained(); // notify DeviceEnergyModel objects ??? retirar mesmo? para nao desligar wifi?
   if (m_cliDev != NULL)
     m_cliDev->HandleEnergyDepletion();
   if (m_uavDev != NULL)

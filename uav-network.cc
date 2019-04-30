@@ -911,9 +911,10 @@ void UavNetwork::ConfigureApplication ()
 
 void UavNetwork::ConfigureApplicationServer ()
 {
+  NS_LOG_FUNCTION (this << " @" << Simulator::Now().GetSeconds());
   Ptr<UniformRandomVariable> app_rand = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
   app_rand->SetAttribute ("Min", DoubleValue (0));
-  app_rand->SetAttribute ("Max", DoubleValue (6)); // MODIFICADO
+  app_rand->SetAttribute ("Max", DoubleValue (4)); // MODIFICADO
 
   std::ofstream cliLogin;
   std::ostringstream ss;
@@ -923,7 +924,7 @@ void UavNetwork::ConfigureApplicationServer ()
     ss.str("");
     ss << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << (*i)->GetId() << ".txt";
     cliLogin.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
-    cliLogin << Simulator::Now().GetSeconds() << " CONFIGURE login-" << (*i)->GetId();
+    cliLogin << Simulator::Now().GetSeconds() << " CONFIGURE SET login-" << (*i)->GetId();
 
     Ptr<SmartphoneApplication> smart = m_appSmart.at(c);
 
@@ -948,6 +949,7 @@ void UavNetwork::ConfigureApplicationServer ()
         appOnOff->SetStopTime(Seconds(222)); // considerando 111 minutos mensal, 3.7 diario - http://www.teleco.com.br/comentario/com631.asp
         appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
         (*i)->AddApplication (appOnOff);
+        NS_LOG_DEBUG ("VOICE login-" <<(*i)->GetId());
         cliLogin << " VOICE" << std::endl;
     } else if (app_code < 2) { // VIDEO
         smart->SetApp ("VIDEO");
@@ -970,6 +972,7 @@ void UavNetwork::ConfigureApplicationServer ()
         appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
         (*i)->AddApplication (appOnOff);
         cliLogin << " VIDEO" << std::endl;
+        NS_LOG_DEBUG ("VIDEO login-" <<(*i)->GetId());
     } else if (app_code < 3) { // WWW
         smart->SetApp ("WWW");
         onoffFac.SetTypeId ("ns3::OnOffApplication");
@@ -991,12 +994,16 @@ void UavNetwork::ConfigureApplicationServer ()
         appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
         (*i)->AddApplication (appOnOff);
         cliLogin << " WWW" << std::endl;
+        NS_LOG_DEBUG ("WWW login-" <<(*i)->GetId());
     } else if (app_code >= 3 && app_code <= 5) { // NOTHING
         smart->SetApp ("NOTHING");
         cliLogin << " NOTHING" << std::endl;
+        NS_LOG_DEBUG ("NOTHING login-" <<(*i)->GetId());
     } else NS_FATAL_ERROR ("UavNetwork .. application error");
+    smart = 0;
+    appOnOff = 0;
+    cliLogin.close();
   }
-  cliLogin.close();
 
   m_newApp = Simulator::Schedule(Seconds(5*60), &UavNetwork::ConfigureApplicationServer, this);
 }
