@@ -726,7 +726,7 @@ void UavNetwork::ConfigureUav(int total)
     DhcpHelper dhcpHelper;
     dhcpHelper.SetServerAttribute("RebindTime", TimeValue(Seconds(10)));
     dhcpHelper.SetServerAttribute("RenewTime", TimeValue(Seconds(5)));
-    dhcpHelper.SetServerAttribute("LeaseTime", TimeValue(Seconds(ETAPA)));
+    dhcpHelper.SetServerAttribute("LeaseTime", TimeValue(Seconds(ETAPA/2)));
     Ipv4InterfaceContainer fixedNodes = dhcpHelper.InstallFixedAddress (wifi.Get (c), Ipv4Address (serverAddr.str().c_str()), Ipv4Mask ("/24"));
     // Not really necessary, IP forwarding is enabled by default in IPv4.
     fixedNodes.Get (0).first->SetAttribute ("IpForward", BooleanValue (true));
