@@ -883,13 +883,8 @@ void UavNetwork::ConfigureApplication ()
   for (NodeContainer::Iterator i = m_clientNode.Begin(); i != m_clientNode.End(); ++i, ++c)
   {
     ss.str("");
-<<<<<<< HEAD
-    ss << "./scratch/client/data/output/" << m_pathData << "/client/client_" << (*i)->GetId() << ".txt";
-    cliLogin.open(ss.str().c_str());
-=======
     ss << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << (*i)->GetId() << ".txt";
     cliLogin.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
->>>>>>> 3ef5483412f802a2222635f66e71cd5042e1cb50
     cliLogin << Simulator::Now().GetSeconds() << " SET login-" << (*i)->GetId();
 
     int app_code = app_rand->GetValue();
