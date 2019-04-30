@@ -214,10 +214,10 @@ UavEnergySource::UpdateEnergySource (void) // chamado pelo device wifi-radio-ene
 
     m_lastUpdateTime = Simulator::Now ();
 
-    if (m_remainingEnergyJ <= 0)
-    {
-      NS_FATAL_ERROR("UavEnergySource::UpdateEnergySource energy bellow ZERO! [" << m_node->GetId() << "] ed: " << remainingEnergy-m_remainingEnergyJ << " re: " << remainingEnergy << "J @" << Simulator::Now().GetSeconds());
-    }
+    // if (m_remainingEnergyJ <= 0)
+    // {
+    //   NS_FATAL_ERROR("UavEnergySource::UpdateEnergySource energy bellow ZERO! [" << m_node->GetId() << "] ed: " << remainingEnergy-m_remainingEnergyJ << " re: " << remainingEnergy << "J @" << Simulator::Now().GetSeconds());
+    // }
 
     if (!m_depleted && m_remainingEnergyJ <= (m_lowBatteryThUav+m_lowBatteryThCli)*2*m_initialEnergyJ)
     {
@@ -252,11 +252,11 @@ UavEnergySource::UpdateEnergySource (void) // chamado pelo device wifi-radio-ene
 void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
 {  
   if (m_onoff) { // calcula somente se estiver ligada
-    if (m_remainingEnergyJ < energyToDecrease)
-    {
-      NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceClient energy bellow ZERO! [" << m_node->GetId() << "] " << m_remainingEnergyJ << "J ____  " << energyToDecrease << "J @" << Simulator::Now().GetSeconds());
-    }
-    else
+    // if (m_remainingEnergyJ < energyToDecrease)
+    // {
+    //   NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceClient energy bellow ZERO! [" << m_node->GetId() << "] " << m_remainingEnergyJ << "J ____  " << energyToDecrease << "J @" << Simulator::Now().GetSeconds());
+    // }
+    // else
     {
       m_remainingEnergyJ -= energyToDecrease;
     }
@@ -295,11 +295,11 @@ void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << energyToDecrease);
   if (m_onoff) { // calcula somente se estiver ligada
-    if (m_remainingEnergyJ < energyToDecrease)
-    {
-      NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceMove energy bellow ZERO! [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << (m_lowBatteryThUav+m_lowBatteryThCli)*2 * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
-    }
-    else
+    // if (m_remainingEnergyJ < energyToDecrease)
+    // {
+    //   NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceMove energy bellow ZERO! [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << (m_lowBatteryThUav+m_lowBatteryThCli)*2 * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
+    // }
+    // else
     {
       m_remainingEnergyJ -= energyToDecrease;
     }
@@ -348,11 +348,11 @@ void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << energyToDecrease);
   if (m_onoff) { // calcula somente se estiver ligada
-    if (m_remainingEnergyJ < energyToDecrease)
-    {
-      NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceHover energy bellow ZERO! [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << (m_lowBatteryThUav+m_lowBatteryThCli)*2 * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
-    }
-    else
+    // if (m_remainingEnergyJ < energyToDecrease)
+    // {
+    //   NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceHover energy bellow ZERO! [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << (m_lowBatteryThUav+m_lowBatteryThCli)*2 * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
+    // }
+    // else
     {
       m_remainingEnergyJ -= energyToDecrease;
     }
@@ -396,7 +396,7 @@ void UavEnergySource::HandleEnergyDrainedEvent(void)
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_ASSERT(m_onoff);
   NS_LOG_INFO("UavEnergySource:Energy depleted!");
-  // NotifyEnergyDrained(); // notify DeviceEnergyModel objects ??? retirar mesmo? para nao desligar wifi?
+  NotifyEnergyDrained(); // notify DeviceEnergyModel objects ??? retirar mesmo? para nao desligar wifi?
   if (m_cliDev != NULL)
     m_cliDev->HandleEnergyDepletion();
   if (m_uavDev != NULL)
@@ -415,7 +415,7 @@ UavEnergySource::CalculateRemainingEnergy (void)
     double energyToDecreaseJ = (totalCurrentA * m_supplyVoltageV * duration.GetNanoSeconds ()) / 1e9;
     if (m_remainingEnergyJ <= energyToDecreaseJ) 
       NS_LOG_DEBUG ("UavEnergySource:CalculateRemainingEnergy rem energy = " << m_remainingEnergyJ << " energytoDecrease " << energyToDecreaseJ << " node " << m_node->GetId());
-    NS_ASSERT (m_remainingEnergyJ >= energyToDecreaseJ);
+    // NS_ASSERT (m_remainingEnergyJ >= energyToDecreaseJ);
     m_remainingEnergyJ -= energyToDecreaseJ;
   }
 }

@@ -55,12 +55,12 @@ int main (int argc, char *argv[])
 	cmd.AddValue ("Seed", "Seed", seed);
 	cmd.Parse (argc, argv);
 	
-	LogComponentEnable("MyOnOffApplication", LOG_DEBUG);
-	LogComponentEnable("ServerApplication", LOG_DEBUG);
+	// LogComponentEnable("MyOnOffApplication", LOG_DEBUG);
+	LogComponentEnable("ServerApplication", LOG_FUNCTION);
 	// LogComponentEnable("LocationModel", LOG_DEBUG);
-	LogComponentEnable("UavApplication", LOG_DEBUG);
+	LogComponentEnable("UavApplication", LOG_FUNCTION);
 	// LogComponentEnable("UavApplication", LOG_DEBUG);
-	LogComponentEnable("SmartphoneApplication", LOG_DEBUG);
+	LogComponentEnable("SmartphoneApplication", LOG_FUNCTION);
 	// LogComponentEnable("WifiPhyStateHelper", LOG_FUNCTION);
 	// LogComponentEnable("WifiPhy", LOG_FUNCTION);
 	// LogComponentEnable ("WifiPhyStateHelper", LOG_DEBUG);
@@ -69,24 +69,24 @@ int main (int argc, char *argv[])
 
 	// LogComponentEnable("DhcpClient", LOG_FUNCTION);
 	// LogComponentEnable("ClientDeviceEnergyModelHelper", LOG_FUNCTION);
-	// LogComponentEnable("ClientDeviceEnergyModel", LOG_DEBUG);
+	// LogComponentEnable("ClientDeviceEnergyModel", LOG_ALL);
 	// LogComponentEnable("ClientModel", LOG_FUNCTION);
 	// LogComponentEnable("ClientModelContainer", LOG_FUNCTION);
 	// LogComponentEnable("LocationModelContainer", LOG_FUNCTION);
 	// LogComponentEnable("LocationModel", LOG_FUNCTION);
 	// LogComponentEnable("ServerApplication", LOG_FUNCTION);
 	// LogComponentEnable("SmartphoneApplication", LOG_FUNCTION);
-	// LogComponentEnable("SmartphoneApplication", LOG_DEBUG);
+	LogComponentEnable("SmartphoneApplication", LOG_FUNCTION);
 	// LogComponentEnable("UavApplicationContainer", LOG_FUNCTION);
 	// LogComponentEnable("UavApplication", LOG_FUNCTION);
 	// LogComponentEnable("UavDeviceEnergyModelHelper", LOG_FUNCTION);
-	// LogComponentEnable("UavDeviceEnergyModel", LOG_DEBUG);
+	// LogComponentEnable("UavDeviceEnergyModel", LOG_FUNCTION);
 	// LogComponentEnable("UavEnergySourceHelper", LOG_FUNCTION);
-	// LogComponentEnable("UavEnergySource", LOG_DEBUG);
+	// LogComponentEnable("UavEnergySource", LOG_FUNCTION);
 	// LogComponentEnable("UavMobilityModel", LOG_DEBUG);
 	// LogComponentEnable("UavModelContainer", LOG_FUNCTION);
 	// LogComponentEnable("UavModel", LOG_DEBUG);
-	// LogComponentEnable("UavNetwork", LOG_FUNCTION);
+	LogComponentEnable("UavNetwork", LOG_FUNCTION);
 	// LogComponentEnable("UavNodeContainer", LOG_FUNCTION);
 
 	// SeedManager::SetSeed(6112018);
