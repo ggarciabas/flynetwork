@@ -21,15 +21,13 @@
 #include "global-defines.h"
 #include "smartphone-application.h"
 #include "my-onoff-application.h"
+#include "global-defines.h"
 
 #include "ns3/simulator.h"
 #include "ns3/log.h"
 #include "ns3/internet-module.h"
 #include "ns3/internet-apps-module.h"
 #include <cmath>
-
-#define PACKET
-#define DHCP
 
 namespace ns3
 {
@@ -191,10 +189,10 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
 
         #ifdef PACKET
           std::ostringstream os;
-          os << "./scratch/client/data/output/" << m_pathData << "/client/client_" << m_id << "_packet" << ".txt";
+          os << "./scratch/client/data/output/" << m_pathData << "/client/" << m_ip << ".txt";
           std::ofstream file;
           file.open(os.str(), std::ofstream::out | std::ofstream::app);
-          file << Simulator::Now().GetSeconds() << " ENVIADO" << std::endl; // ENVIADO
+          file << Simulator::Now().GetSeconds() << " ENVIADO UAV" << std::endl; // ENVIADO
           file.close();
         #endif
       }
@@ -204,10 +202,10 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
         NS_LOG_ERROR("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - UAV NAO");
         #ifdef PACKET
           std::ostringstream os;
-          os << "./scratch/client/data/output/" << m_pathData << "/client/client_" << m_id << "_packet" << ".txt";
+          os << "./scratch/client/data/output/" << m_pathData << "/client/" << m_ip << ".txt";
           std::ofstream file;
           file.open(os.str(), std::ofstream::out | std::ofstream::app);
-          file << Simulator::Now().GetSeconds() << " FALHA" << std::endl; // FALHA
+          file << Simulator::Now().GetSeconds() << " FALHA UAV" << std::endl; // FALHA
           file.close();
         #endif
         if (m_connected) {
@@ -221,10 +219,10 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
       NS_LOG_INFO ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " erro ao conectar socket com servidor " << m_uavPeer);
       #ifdef PACKET
         std::ostringstream os;
-        os << "./scratch/client/data/output/" << m_pathData << "/client/client_" << m_id << "_packet" << ".txt";
+        os << "./scratch/client/data/output/" << m_pathData << "/client/" << m_ip << ".txt";
         std::ofstream file;
         file.open(os.str(), std::ofstream::out | std::ofstream::app);
-        file << Simulator::Now().GetSeconds() << " NAO_CONECTADO" << std::endl; // NAO CONECTADO
+        file << Simulator::Now().GetSeconds() << " NAO_CONECTADO UAV" << std::endl; // NAO CONECTADO
         file.close();
       #endif
       return;

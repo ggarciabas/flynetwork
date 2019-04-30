@@ -29,3 +29,11 @@
 #ifndef UDP
     #define UDP 
 #endif
+
+#ifndef PACKET
+    #define PACKET
+#endif
+
+#ifndef DHCP
+    #define DHCP
+#endif
