@@ -17,7 +17,7 @@ if sys.argv[1] == "False":
 
 scenario = sys.argv[2]
 
-main_path = "./scratch/wifi/data/output/"+scenario+"/"
+main_path = "./scratch/client/data/output/"+scenario+"/"
 if teste :
     main_path = "./output/"+scenario+"/"
 

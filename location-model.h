@@ -133,8 +133,8 @@ private:
   void DoDispose ();
   std::vector<double> m_positionA;
   std::vector<double> m_positionB;
-  std::vector<std::vector<double> > m_historico; // verificar issue: https://github.com/ggarciabas/wifi/issues/10
-  bool m_changePosition; // variavel para permitir trocar de posicao, verificar issue: https://github.com/ggarciabas/wifi/issues/10
+  std::vector<std::vector<double> > m_historico; // verificar issue: https://github.com/ggarciabas/client/issues/10
+  bool m_changePosition; // variavel para permitir trocar de posicao, verificar issue: https://github.com/ggarciabas/client/issues/10
   double m_tempPljci;
   double m_wij;
   double m_punshNeigh; // punicao de conexao com vizinho
