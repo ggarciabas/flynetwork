@@ -548,6 +548,14 @@ UavApplication::TracedCallbackRxAppInfra (Ptr<const Packet> packet, const Addres
         (it->second)->SetLogin(results.at(3));
         (it->second)->SetPosition(pos.at(0), pos.at(1));
         (it->second)->SetUpdatePos (Simulator::Now());
+        #ifdef PACKET
+          std::ostringstream os;
+          os << "./scratch/wifi/data/output/" << m_pathData << "/client/" << ip << ".txt";
+          std::ofstream file;
+          file.open(os.str(), std::ofstream::out | std::ofstream::app);
+          file << Simulator::Now().GetSeconds() << " RECEBIDO UAV" << std::endl; // ENVIADO
+          file.close();
+        #endif
         // repply to client to stop sending position, cliente para de enviar posicionamento apos 10s
         if (m_socketClient && !m_socketClient->Connect (InetSocketAddress (ip, m_cliPort))) {
           std::ostringstream msg;
