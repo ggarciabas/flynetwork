@@ -1176,14 +1176,15 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
 {
   // NS_LOG_DEBUG ("ServerApplication::CalculateCusto > uavId: " << uav->GetId() << " locId: " << loc->GetId());
   long double custo = 1.0;
+  double t_loc = CalculateDistance(uav->GetPosition(), loc->GetPosition()) / 5.0; // time to go to location
   long double b_ui_atu = uav->GetTotalEnergy(); // bateria atual
   long double ce_ui_la_lj = uav->CalculateEnergyCost(CalculateDistance(uav->GetPosition(), loc->GetPosition())); // custo energetico
   long double ce_ui_lj_lc = uav->CalculateEnergyCost(CalculateDistance(loc->GetPosition(), central_pos));
   long double b_ui_tot = uav->GetTotalBattery();
   long double b_ui_res = b_ui_atu*0.98 - ce_ui_la_lj - ce_ui_lj_lc; // bateria residual
-  long double ce_te_lj = loc->GetTotalConsumption() * m_scheduleServer;
+  long double ce_te_lj = loc->GetTotalConsumption() * (m_scheduleServer-t_loc);
   long double P_te = b_ui_res/ce_te_lj;
-  double ce_te;
+  double ce_hv;
 
   if (b_ui_res > 0) {
     switch (m_custo) {
@@ -1202,7 +1203,7 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
         break;
       case 4: // custo 2 -> com hover
       case 9: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/wifi/issues/45
-        ce_hv = uav->GetHoverCost()*m_scheduleServer ; // custo para o TE inteiro, considerando locs e hover
+        ce_hv = uav->GetHoverCost()*(m_scheduleServer-t_loc) ; // custo para o TE inteiro, considerando locs e hover
         P_te = b_ui_res/ (ce_te_lj + ce_ui_la_lj + ce_ui_lj_lc + ce_hv);
         custo = (P_te>0)?1.0/P_te:1.0;
         break;
