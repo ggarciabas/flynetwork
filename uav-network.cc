@@ -152,7 +152,7 @@ UavNetwork::GetTypeId(void)
   return tid;
 }
 
-UavNetwork::UavNetwork() //: m_filePacketServer("./scratch/flynetwork/data/output/packet_trace_server.txt"), m_filePacketUav("./scratch/flynetwork/data/output/packet_trace_uav.txt"), m_filePacketClient("./scratch/flynetwork/data/output/packet_trace_client.txt")
+UavNetwork::UavNetwork() //: m_filePacketServer("./scratch/wifi/data/output/packet_trace_server.txt"), m_filePacketUav("./scratch/wifi/data/output/packet_trace_uav.txt"), m_filePacketClient("./scratch/wifi/data/output/packet_trace_client.txt")
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_iniX = m_iniY = -2000;
@@ -220,7 +220,7 @@ void UavNetwork::Run()
   m_scenarioName = ss.str();
   // ler informacoes do arquivo
   m_PathData = ss.str();
-  ss_ << "./scratch/flynetwork/data/scenarios/" << m_PathData << ".txt";
+  ss_ << "./scratch/wifi/data/scenarios/" << m_PathData << ".txt";
   scenario.open(ss_.str());
   if (scenario.is_open())
   {
@@ -246,64 +246,64 @@ void UavNetwork::Run()
   ss << "/" << m_seed << "/custo_" << m_custo; // adicionando seed
   m_pathData = ss.str();
   ss.str("");
-  ss << "rm -Rf ./scratch/flynetwork/data/output/" << m_pathData;
+  ss << "rm -Rf ./scratch/wifi/data/output/" << m_pathData;
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData;
+  ss << "mkdir -p ./scratch/wifi/data/output/" << m_pathData;
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/course_changed";
+  ss << "mkdir -p ./scratch/wifi/data/output/" << m_pathData << "/course_changed";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_remaining_energy";
+  ss << "mkdir -p ./scratch/wifi/data/output/" << m_pathData << "/uav_remaining_energy";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_hover";
+  ss << "mkdir -p ./scratch/wifi/data/output/" << m_pathData << "/uav_hover";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_move";
+  ss << "mkdir -p ./scratch/wifi/data/output/" << m_pathData << "/uav_move";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_energy_threshold";
+  ss << "mkdir -p ./scratch/wifi/data/output/" << m_pathData << "/uav_energy_threshold";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/etapa";
+  ss << "mkdir -p ./scratch/wifi/data/output/" << m_pathData << "/etapa";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_recharged";
+  ss << "mkdir -p ./scratch/wifi/data/output/" << m_pathData << "/uav_recharged";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_depletion";
+  ss << "mkdir -p ./scratch/wifi/data/output/" << m_pathData << "/uav_depletion";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_client";
+  ss << "mkdir -p ./scratch/wifi/data/output/" << m_pathData << "/uav_client";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_wifi";
+  ss << "mkdir -p ./scratch/wifi/data/output/" << m_pathData << "/uav_wifi";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/uav_stop";
+  ss << "mkdir -p ./scratch/wifi/data/output/" << m_pathData << "/uav_stop";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/python";
+  ss << "mkdir -p ./scratch/wifi/data/output/" << m_pathData << "/python";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/dhcp";
+  ss << "mkdir -p ./scratch/wifi/data/output/" << m_pathData << "/dhcp";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/client";
+  ss << "mkdir -p ./scratch/wifi/data/output/" << m_pathData << "/client";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p ./scratch/flynetwork/data/output/" << m_pathData << "/compare";
+  ss << "mkdir -p ./scratch/wifi/data/output/" << m_pathData << "/compare";
   system(ss.str().c_str());
   // ss.str("");
-  // ss << "./scratch/flynetwork/data/output/"<< m_pathData<<"/packet_trace_server.txt";
+  // ss << "./scratch/wifi/data/output/"<< m_pathData<<"/packet_trace_server.txt";
   // m_filePacketServer = ss.str().c_str();
   // ss.str("");
-  // ss << "./scratch/flynetwork/data/output/"<<m_pathData<<"/packet_trace_uav.txt";
+  // ss << "./scratch/wifi/data/output/"<<m_pathData<<"/packet_trace_uav.txt";
   // m_filePacketUav = ss.str().c_str();
   // ss.str("");
-  // ss << "./scratch/flynetwork/data/output/"<<m_pathData<<"/packet_trace_client.txt";
+  // ss << "./scratch/wifi/data/output/"<<m_pathData<<"/packet_trace_client.txt";
   // m_filePacketClient = ss.str().c_str();
 
   // configure variables
@@ -476,7 +476,7 @@ void UavNetwork::NewUav(int total, int update) // update = 0- normal 1- supply 2
     source = 0;
 
     std::ostringstream os;
-    os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_network_log.txt";
+    os << "./scratch/wifi/data/output/" << m_pathData << "/uav_network_log.txt";
     m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
     m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << "," << update << std::endl;
     m_file.close();
@@ -511,13 +511,13 @@ void UavNetwork::RemoveUav(int id, int step)
   model->SetFirstPosition(v); // manda para perto da central!
 
   std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_network_log.txt";
+  os << "./scratch/wifi/data/output/" << m_pathData << "/uav_network_log.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << ",0" << std::endl;
   m_file.close();
 
   os.str("");
-  os << "./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << step << "/uav_removed_energy.txt";
+  os << "./scratch/wifi/data/output/" << m_pathData << "/etapa/" << step << "/uav_removed_energy.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   Ptr<UavDeviceEnergyModel> dev = uavApp->GetUavDevice();
   m_file << dev->GetEnergySource()->GetRemainingEnergy() / dev->GetEnergySource()->GetInitialEnergy() << std::endl;
@@ -752,7 +752,7 @@ void UavNetwork::ConfigureCli()
 
   std::ostringstream ss;
   std::ifstream scenario;
-  ss << "./scratch/flynetwork/data/scenarios/" << m_PathData << ".txt";
+  ss << "./scratch/wifi/data/scenarios/" << m_PathData << ".txt";
   scenario.open(ss.str());
   // ler informacoes dos arquivos
   if (scenario.is_open())
@@ -911,9 +911,10 @@ void UavNetwork::ConfigureApplication ()
 
 void UavNetwork::ConfigureApplicationServer ()
 {
+  NS_LOG_FUNCTION (this << " @" << Simulator::Now().GetSeconds());
   Ptr<UniformRandomVariable> app_rand = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
   app_rand->SetAttribute ("Min", DoubleValue (0));
-  app_rand->SetAttribute ("Max", DoubleValue (6)); // MODIFICADO
+  app_rand->SetAttribute ("Max", DoubleValue (4)); // MODIFICADO
 
   std::ofstream cliLogin;
   std::ostringstream ss;
@@ -923,7 +924,7 @@ void UavNetwork::ConfigureApplicationServer ()
     ss.str("");
     ss << "./scratch/flynetwork/data/output/" << m_pathData << "/client/client_" << (*i)->GetId() << ".txt";
     cliLogin.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
-    cliLogin << Simulator::Now().GetSeconds() << " CONFIGURE " << m_login;
+    cliLogin << Simulator::Now().GetSeconds() << " CONFIGURE SET login-" << (*i)->GetId();
 
     Ptr<SmartphoneApplication> smart = m_appSmart.at(c);
 
@@ -948,6 +949,7 @@ void UavNetwork::ConfigureApplicationServer ()
         appOnOff->SetStopTime(Seconds(222)); // considerando 111 minutos mensal, 3.7 diario - http://www.teleco.com.br/comentario/com631.asp
         appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
         (*i)->AddApplication (appOnOff);
+        NS_LOG_DEBUG ("VOICE login-" <<(*i)->GetId());
         cliLogin << " VOICE" << std::endl;
     } else if (app_code < 2) { // VIDEO
         smart->SetApp ("VIDEO");
@@ -970,6 +972,7 @@ void UavNetwork::ConfigureApplicationServer ()
         appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
         (*i)->AddApplication (appOnOff);
         cliLogin << " VIDEO" << std::endl;
+        NS_LOG_DEBUG ("VIDEO login-" <<(*i)->GetId());
     } else if (app_code < 3) { // WWW
         smart->SetApp ("WWW");
         onoffFac.SetTypeId ("ns3::OnOffApplication");
@@ -991,12 +994,16 @@ void UavNetwork::ConfigureApplicationServer ()
         appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
         (*i)->AddApplication (appOnOff);
         cliLogin << " WWW" << std::endl;
+        NS_LOG_DEBUG ("WWW login-" <<(*i)->GetId());
     } else if (app_code >= 3 && app_code <= 5) { // NOTHING
         smart->SetApp ("NOTHING");
         cliLogin << " NOTHING" << std::endl;
+        NS_LOG_DEBUG ("NOTHING login-" <<(*i)->GetId());
     } else NS_FATAL_ERROR ("UavNetwork .. application error");
+    smart = 0;
+    appOnOff = 0;
+    cliLogin.close();
   }
-  cliLogin.close();
 
   m_newApp = Simulator::Schedule(Seconds(5*60), &UavNetwork::ConfigureApplicationServer, this);
 }
@@ -1006,7 +1013,7 @@ void UavNetwork::ConfigurePalcos() // TODO: poderia ser otimizada a leitura do a
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   std::ostringstream ss;
   std::ifstream scenario;
-  ss << "./scratch/flynetwork/data/scenarios/" << m_PathData << ".txt";
+  ss << "./scratch/wifi/data/scenarios/" << m_PathData << ".txt";
   string file = ss.str();
   ss.str("");
   scenario.open(file);
@@ -1139,7 +1146,7 @@ void UavNetwork::PrintUavEnergy (int t)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<t);
   std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/" << m_pathData << "/etapa/" << t << "/uav_energy.txt";
+  os << "./scratch/wifi/data/output/" << m_pathData << "/etapa/" << t << "/uav_energy.txt";
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   for (UavApplicationContainer::Iterator it = m_uavAppContainer.Begin(); it != m_uavAppContainer.End(); ++it) {

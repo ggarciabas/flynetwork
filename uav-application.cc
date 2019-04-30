@@ -224,7 +224,7 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   // m_wifiDevice->HandleEnergyOn();
 
   std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/" << m_pathData << "/course_changed/course_changed_" << m_id << ".txt";
+  os << "./scratch/wifi/data/output/" << m_pathData << "/course_changed/course_changed_" << m_id << ".txt";
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << std::endl;
@@ -261,17 +261,17 @@ UavApplication::EnergyRechargedCallback()
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG("---- EnergyRechargedCallback #" << m_id << " @" << Simulator::Now().GetSeconds());
 
-  if (m_depletion) {
-    // reiniciando aplicacao DHCP
-    int app = GetNode()->GetNApplications()-1;
-    Ptr<DhcpServer> dhcp = NULL;
-    do {
-      dhcp = DynamicCast<DhcpServer>(GetNode()->GetApplication(app));
-      --app;
-    } while (dhcp==NULL && app >= 0);
-    NS_ASSERT (dhcp != NULL);
-    dhcp->Resume();
-  }
+  // if (m_depletion) {
+  //   // reiniciando aplicacao DHCP
+  //   int app = GetNode()->GetNApplications()-1;
+  //   Ptr<DhcpServer> dhcp = NULL;
+  //   do {
+  //     dhcp = DynamicCast<DhcpServer>(GetNode()->GetApplication(app));
+  //     --app;
+  //   } while (dhcp==NULL && app >= 0);
+  //   NS_ASSERT (dhcp != NULL);
+  //   dhcp->Resume();
+  // }
 }
 
 void
@@ -292,14 +292,14 @@ UavApplication::EnergyDepletionCallback()
   GetNode()->GetObject<MobilityModel>()->SetPosition(Vector(m_central.at(0), m_central.at(1), 1.0)); // Verficar necessidade de subir em no eixo Z
 
   // pausando aplicacao DHCP
-  int app = GetNode()->GetNApplications()-1;
-  Ptr<DhcpServer> dhcp = NULL;
-  do {
-    dhcp = DynamicCast<DhcpServer>(GetNode()->GetApplication(app));
-    --app;
-  } while (dhcp==NULL && app >= 0);
-  NS_ASSERT (dhcp != NULL);
-  dhcp->Pause();
+  // int app = GetNode()->GetNApplications()-1;
+  // Ptr<DhcpServer> dhcp = NULL;
+  // do {
+  //   dhcp = DynamicCast<DhcpServer>(GetNode()->GetApplication(app));
+  //   --app;
+  // } while (dhcp==NULL && app >= 0);
+  // NS_ASSERT (dhcp != NULL);
+  // dhcp->Pause();
 
 }
 
@@ -327,7 +327,7 @@ void UavApplication::SendPacketDepletion(void)
       }
     }
     std::ostringstream os;
-    os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_depletion/depletion_log.txt";
+    os << "./scratch/wifi/data/output/" << m_pathData << "/uav_depletion/depletion_log.txt";
     std::ofstream file;
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
     file << Simulator::Now().GetSeconds() << " " << m_id << " " << count 
@@ -409,7 +409,7 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
             }
           }
           std::ostringstream os;
-          os << "./scratch/flynetwork/data/output/" << m_pathData << "/uav_stop/stop_log.txt"; // uavs que foram retirados da rede
+          os << "./scratch/wifi/data/output/" << m_pathData << "/uav_stop/stop_log.txt"; // uavs que foram retirados da rede
           std::ofstream file;
           file.open(os.str(), std::ofstream::out | std::ofstream::app);
           file << Simulator::Now().GetSeconds() << " " << m_id << " " << count 
@@ -514,7 +514,7 @@ UavApplication::TracedCallbackRxOnOff (Ptr<const Packet> packet, const Address &
   }
 
   std::ostringstream os;
-  os << "./scratch/flynetwork/data/output/" << m_pathData << "/client/" << ip << ".txt";
+  os << "./scratch/wifi/data/output/" << m_pathData << "/client/" << ip << ".txt";
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   file << Simulator::Now().GetSeconds() << " RECEBIDO " << packet->GetSize () << std::endl;

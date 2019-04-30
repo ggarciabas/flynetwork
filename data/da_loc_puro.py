@@ -12,7 +12,7 @@ import glob
 colors = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
 
 path = sys.argv[1]
-main_path = "./scratch/flynetwork/data/output/"+path
+main_path = "./scratch/wifi/data/output/"+path
 etapa = sys.argv[2]
 iteracao = sys.argv[3]
 rcob = sys.argv[4]
