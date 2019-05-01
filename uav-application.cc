@@ -191,7 +191,7 @@ void UavApplication::Stop()
   double me = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetMoveEnergy();
   double he = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetHoverEnergy();
 
-  NS_ASSERT (we+ce+me+he == (iniE-rem), "Bateria consumida não bateu com o acumulado dos modos!");
+  NS_ASSERT_MSG (we+ce+me+he == (iniE-rem), "Bateria consumida não bateu com o acumulado dos modos!");
 
   // TIME UAV_ID INITIAL_E ACTUAL_E SUM_E_MODE MODE DEPLETION?
   file << Simulator::Now().GetSeconds() << " " << m_id << " " << iniE << " " << rem << " " <<  we << " WIFI " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
