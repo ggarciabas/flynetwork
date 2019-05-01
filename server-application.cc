@@ -576,6 +576,7 @@ void ServerApplication::Run ()
   {
     NS_FATAL_ERROR("SERVER - $$$$ [NÃO] existem clientes identificados no servidor, ignorando execução dos DAs -- Se isso ocorre existe erro no cadastro de clientes fixos (que seriam os palcos)!");
   }
+  std::cout << "m_scheduleServer==" << m_scheduleServer << std::endl;
   m_serverEvent = Simulator::Schedule(Seconds(m_scheduleServer-1.0), &ServerApplication::AskClientData, this);
 }
 
