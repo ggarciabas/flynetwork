@@ -191,7 +191,7 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
 
         #ifdef PACKET_UAV_CLI
           std::ostringstream os;
-          os << global_path << "/data/output/" << m_pathData << "/client/" << m_ip << ".txt";
+          os << global_path << "/" << m_pathData << "/client/" << m_ip << ".txt";
           std::ofstream file;
           file.open(os.str(), std::ofstream::out | std::ofstream::app);
           file << Simulator::Now().GetSeconds() << " ENVIADO UAV" << std::endl; // ENVIADO
@@ -204,7 +204,7 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
         NS_LOG_ERROR("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - UAV NAO");
         #ifdef PACKET_UAV_CLI
           std::ostringstream os;
-          os << global_path << "/data/output/" << m_pathData << "/client/" << m_ip << ".txt";
+          os << global_path << "/" << m_pathData << "/client/" << m_ip << ".txt";
           std::ofstream file;
           file.open(os.str(), std::ofstream::out | std::ofstream::app);
           file << Simulator::Now().GetSeconds() << " FALHA UAV" << std::endl; // FALHA
@@ -221,7 +221,7 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
       NS_LOG_INFO ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " erro ao conectar socket com servidor " << m_uavPeer);
       #ifdef PACKET_UAV_CLI
         std::ostringstream os;
-        os << global_path << "/data/output/" << m_pathData << "/client/" << m_ip << ".txt";
+        os << global_path << "/" << m_pathData << "/client/" << m_ip << ".txt";
         std::ofstream file;
         file.open(os.str(), std::ofstream::out | std::ofstream::app);
         file << Simulator::Now().GetSeconds() << " NAO_CONECTADO UAV" << std::endl; // NAO CONECTADO
@@ -294,7 +294,7 @@ SmartphoneApplication::TracedCallbackTxApp (Ptr<const Packet> packet, const Addr
   // NS_LOG_DEBUG ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - ENVIANDO APP PARA UAV ");
   #ifdef LOG_CLIENT
     std::ostringstream os;
-    os << global_path << "/data/output/" << m_pathData << "/client/" << m_ip << ".txt";
+    os << global_path << "/" << m_pathData << "/client/" << m_ip << ".txt";
     std::ofstream file;
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
     file << Simulator::Now().GetSeconds() << " ENVIADO " << m_appOnoff << " " << packet->GetSize () << " " << m_login << std::endl; // ENVIADO por um cliente
@@ -308,13 +308,13 @@ void SmartphoneApplication::TracedCallbackExpiryLease (const Ipv4Address& ip)
   m_ip = Ipv4Address();
   #ifdef DHCP
     std::ostringstream os;
-    os << global_path << "/data/output/" << m_pathData << "/dhcp/client_lease_" << m_id << ".txt";
+    os << global_path << "/" << m_pathData << "/dhcp/client_lease_" << m_id << ".txt";
     std::ofstream file;
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
     file << Simulator::Now().GetSeconds() << " EXPIRYLEASE " << ip << std::endl;
     file.close();
     os.str("");
-    os << global_path << "/data/output/" << m_pathData << "/dhcp/all_expirylease.txt";
+    os << global_path << "/" << m_pathData << "/dhcp/all_expirylease.txt";
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
     file << Simulator::Now().GetSeconds() << " " << m_id << " "<< ip << " " << m_uavPeer << std::endl;
     file.close();
@@ -339,13 +339,13 @@ void SmartphoneApplication::TracedCallbackNewLease (const Ipv4Address& ip)
   #endif
   #ifdef DHCP
     std::ostringstream os;
-    os << global_path << "/data/output/" << m_pathData << "/dhcp/client_lease_" << m_id << ".txt";
+    os << global_path << "/" << m_pathData << "/dhcp/client_lease_" << m_id << ".txt";
     std::ofstream file;
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
     file << Simulator::Now().GetSeconds() << " NEWLEASE " << ip << " " << m_uavPeer << std::endl;
     file.close();
     os.str("");
-    os << global_path << "/data/output/" << m_pathData << "/dhcp/all_newlease.txt";
+    os << global_path << "/" << m_pathData << "/dhcp/all_newlease.txt";
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
     file << Simulator::Now().GetSeconds() << " " << m_id << " "<< ip << " " << m_uavPeer << std::endl;
     file.close();
@@ -382,14 +382,14 @@ SmartphoneApplication::TracedCallbackAssocLogger (Mac48Address mac)
 
   #ifdef DHCP
     std::ostringstream os;
-    os << global_path << "/data/output/" << m_pathData << "/dhcp/client_" << m_id << ".txt";
+    os << global_path << "/" << m_pathData << "/dhcp/client_" << m_id << ".txt";
     std::ofstream file;
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
     file << Simulator::Now().GetSeconds() << " ASSOC " << mac << std::endl;
     file.close();
 
     os.str("");
-    os << global_path << "/data/output/" << m_pathData << "/dhcp/all_soc.txt";
+    os << global_path << "/" << m_pathData << "/dhcp/all_soc.txt";
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
     file << Simulator::Now().GetSeconds() << " ASSOC " << m_id << " " << mac << std::endl;
     file.close();
@@ -403,14 +403,14 @@ SmartphoneApplication::TracedCallbackDeAssocLogger (Mac48Address mac)
   NS_LOG_FUNCTION(this->m_login << Simulator::Now().GetSeconds() );
   #ifdef DHCP
     std::ostringstream os;
-    os << global_path << "/data/output/" << m_pathData << "/dhcp/client_" << m_id << ".txt";
+    os << global_path << "/" << m_pathData << "/dhcp/client_" << m_id << ".txt";
     std::ofstream file;
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
     file << Simulator::Now().GetSeconds() << " DEASSOC " << mac << std::endl;
     file.close();
 
     os.str("");
-    os << global_path << "/data/output/" << m_pathData << "/dhcp/all_soc.txt";
+    os << global_path << "/" << m_pathData << "/dhcp/all_soc.txt";
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
     file << Simulator::Now().GetSeconds() << " DEASSOC " << m_id << " " << mac << std::endl;
     file.close();
@@ -452,7 +452,7 @@ void SmartphoneApplication::ConfigureApplication (const Ipv4Address& ip)
   std::ofstream cliLogin;
   std::ostringstream ss;
   ss.str("");
-  ss << global_path << "/data/output/" << m_pathData << "/client/client_" << m_id << ".txt";
+  ss << global_path << "/" << m_pathData << "/client/client_" << m_id << ".txt";
   cliLogin.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
   cliLogin << Simulator::Now().GetSeconds() << " CONFIGURE " << m_login;
   // configure OnOff application para server    

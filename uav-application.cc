@@ -225,7 +225,7 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   // m_wifiDevice->HandleEnergyOn();
 
   std::ostringstream os;
-  os << global_path << "/data/output/" << m_pathData << "/course_changed/course_changed_" << m_id << ".txt";
+  os << global_path << "/" << m_pathData << "/course_changed/course_changed_" << m_id << ".txt";
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << std::endl;
@@ -328,7 +328,7 @@ void UavApplication::SendPacketDepletion(void)
       }
     }
     std::ostringstream os;
-    os << global_path << "/data/output/" << m_pathData << "/uav_depletion/depletion_log.txt";
+    os << global_path << "/" << m_pathData << "/uav_depletion/depletion_log.txt";
     std::ofstream file;
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
     file << Simulator::Now().GetSeconds() << " " << m_id << " " << count 
@@ -410,7 +410,7 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
             }
           }
           std::ostringstream os;
-          os << global_path << "/data/output/" << m_pathData << "/uav_stop/stop_log.txt"; // uavs que foram retirados da rede
+          os << global_path << "/" << m_pathData << "/uav_stop/stop_log.txt"; // uavs que foram retirados da rede
           std::ofstream file;
           file.open(os.str(), std::ofstream::out | std::ofstream::app);
           file << Simulator::Now().GetSeconds() << " " << m_id << " " << count 
@@ -516,7 +516,7 @@ UavApplication::TracedCallbackRxOnOff (Ptr<const Packet> packet, const Address &
 
   #ifdef LOG_CLIENT
     std::ostringstream os;
-    os << global_path << "/data/output/" << m_pathData << "/wifi/" << ip << ".txt";
+    os << global_path << "/" << m_pathData << "/wifi/" << ip << ".txt";
     std::ofstream file;
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
     file << Simulator::Now().GetSeconds() << " RECEBIDO " << packet->GetSize () << std::endl;
@@ -553,7 +553,7 @@ UavApplication::TracedCallbackRxAppInfra (Ptr<const Packet> packet, const Addres
         (it->second)->SetUpdatePos (Simulator::Now());
         #ifdef PACKET_UAV_CLI
           std::ostringstream os;
-          os << global_path << "/data/output/" << m_pathData << "/client/" << ip << ".txt";
+          os << global_path << "/" << m_pathData << "/client/" << ip << ".txt";
           std::ofstream file;
           file.open(os.str(), std::ofstream::out | std::ofstream::app);
           file << Simulator::Now().GetSeconds() << " RECEBIDO UAV" << std::endl; // ENVIADO

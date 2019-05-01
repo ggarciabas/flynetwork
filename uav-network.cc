@@ -147,7 +147,7 @@ UavNetwork::GetTypeId(void)
   return tid;
 }
 
-UavNetwork::UavNetwork() //: m_filePacketServer(global_path << "/data/output/packet_trace_server.txt"), m_filePacketUav(global_path << "/data/output/packet_trace_uav.txt"), m_filePacketClient(global_path << "/data/output/packet_trace_client.txt")
+UavNetwork::UavNetwork() //: m_filePacketServer(global_path << "/packet_trace_server.txt"), m_filePacketUav(global_path << "/packet_trace_uav.txt"), m_filePacketClient(global_path << "/packet_trace_client.txt")
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_iniX = m_iniY = -2000;
@@ -241,64 +241,64 @@ void UavNetwork::Run()
   ss << "/" << m_seed << "/custo_" << m_custo; // adicionando seed
   m_pathData = ss.str();
   ss.str("");
-  ss << "rm -Rf " << global_path << "/data/output/" << m_pathData;
+  ss << "rm -Rf " << global_path << "/" << m_pathData;
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p " << global_path << "/data/output/" << m_pathData;
+  ss << "mkdir -p " << global_path << "/" << m_pathData;
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p " << global_path << "/data/output/" << m_pathData << "/course_changed";
+  ss << "mkdir -p " << global_path << "/" << m_pathData << "/course_changed";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p " << global_path << "/data/output/" << m_pathData << "/uav_remaining_energy";
+  ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_remaining_energy";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p " << global_path << "/data/output/" << m_pathData << "/uav_hover";
+  ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_hover";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p " << global_path << "/data/output/" << m_pathData << "/uav_move";
+  ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_move";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p " << global_path << "/data/output/" << m_pathData << "/uav_energy_threshold";
+  ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_energy_threshold";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p " << global_path << "/data/output/" << m_pathData << "/etapa";
+  ss << "mkdir -p " << global_path << "/" << m_pathData << "/etapa";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p " << global_path << "/data/output/" << m_pathData << "/uav_recharged";
+  ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_recharged";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p " << global_path << "/data/output/" << m_pathData << "/uav_depletion";
+  ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_depletion";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p " << global_path << "/data/output/" << m_pathData << "/uav_client";
+  ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_client";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p " << global_path << "/data/output/" << m_pathData << "/uav_wifi";
+  ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_wifi";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p " << global_path << "/data/output/" << m_pathData << "/uav_stop";
+  ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_stop";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p " << global_path << "/data/output/" << m_pathData << "/python";
+  ss << "mkdir -p " << global_path << "/" << m_pathData << "/python";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p " << global_path << "/data/output/" << m_pathData << "/dhcp";
+  ss << "mkdir -p " << global_path << "/" << m_pathData << "/dhcp";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p " << global_path << "/data/output/" << m_pathData << "/client";
+  ss << "mkdir -p " << global_path << "/" << m_pathData << "/client";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p " << global_path << "/data/output/" << m_pathData << "/compare";
+  ss << "mkdir -p " << global_path << "/" << m_pathData << "/compare";
   system(ss.str().c_str());
   // ss.str("");
-  // ss << global_path << "/data/output/"<< m_pathData<<"/packet_trace_server.txt";
+  // ss << global_path << "/"<< m_pathData<<"/packet_trace_server.txt";
   // m_filePacketServer = ss.str().c_str();
   // ss.str("");
-  // ss << global_path << "/data/output/"<<m_pathData<<"/packet_trace_uav.txt";
+  // ss << global_path << "/"<<m_pathData<<"/packet_trace_uav.txt";
   // m_filePacketUav = ss.str().c_str();
   // ss.str("");
-  // ss << global_path << "/data/output/"<<m_pathData<<"/packet_trace_client.txt";
+  // ss << global_path << "/"<<m_pathData<<"/packet_trace_client.txt";
   // m_filePacketClient = ss.str().c_str();
 
   // configure variables
@@ -471,7 +471,7 @@ void UavNetwork::NewUav(int total, int update) // update = 0- normal 1- supply 2
     source = 0;
 
     std::ostringstream os;
-    os << global_path << "/data/output/" << m_pathData << "/uav_network_log.txt";
+    os << global_path << "/" << m_pathData << "/uav_network_log.txt";
     m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
     m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << "," << update << std::endl;
     m_file.close();
@@ -506,13 +506,13 @@ void UavNetwork::RemoveUav(int id, int step)
   model->SetFirstPosition(v); // manda para perto da central!
 
   std::ostringstream os;
-  os << global_path << "/data/output/" << m_pathData << "/uav_network_log.txt";
+  os << global_path << "/" << m_pathData << "/uav_network_log.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << ",0" << std::endl;
   m_file.close();
 
   os.str("");
-  os << global_path << "/data/output/" << m_pathData << "/etapa/" << step << "/uav_removed_energy.txt";
+  os << global_path << "/" << m_pathData << "/etapa/" << step << "/uav_removed_energy.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   Ptr<UavDeviceEnergyModel> dev = uavApp->GetUavDevice();
   m_file << dev->GetEnergySource()->GetRemainingEnergy() / dev->GetEnergySource()->GetInitialEnergy() << std::endl;
@@ -882,7 +882,7 @@ void UavNetwork::ConfigureApplication ()
   for (NodeContainer::Iterator i = m_clientNode.Begin(); i != m_clientNode.End(); ++i, ++c)
   {
     ss.str("");
-    ss << global_path << "/data/output/" << m_pathData << "/wifi/client_" << (*i)->GetId() << ".txt";
+    ss << global_path << "/" << m_pathData << "/wifi/client_" << (*i)->GetId() << ".txt";
     cliLogin.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
     cliLogin << Simulator::Now().GetSeconds() << " SET login-" << (*i)->GetId();
 
@@ -921,7 +921,7 @@ void UavNetwork::ConfigureApplicationServer ()
   for (NodeContainer::Iterator i = m_clientNode.Begin(); i != m_clientNode.End(); ++i, ++c)
   {
     ss.str("");
-    ss << global_path << "/data/output/" << m_pathData << "/wifi/client_" << (*i)->GetId() << ".txt";
+    ss << global_path << "/" << m_pathData << "/wifi/client_" << (*i)->GetId() << ".txt";
     cliLogin.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
     cliLogin << Simulator::Now().GetSeconds() << " CONFIGURE SET login-" << (*i)->GetId();
 
@@ -1145,7 +1145,7 @@ void UavNetwork::PrintUavEnergy (int t)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<t);
   std::ostringstream os;
-  os << global_path << "/data/output/" << m_pathData << "/etapa/" << t << "/uav_energy.txt";
+  os << global_path << "/" << m_pathData << "/etapa/" << t << "/uav_energy.txt";
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   for (UavApplicationContainer::Iterator it = m_uavAppContainer.Begin(); it != m_uavAppContainer.End(); ++it) {
