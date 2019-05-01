@@ -390,6 +390,7 @@ void UavNetwork::ConfigureServer()
   obj.Set("MaxY", DoubleValue(m_ymax));
   obj.Set("PathData", StringValue(m_pathData));
   obj.Set("ScenarioName", StringValue(m_scenarioName));
+  std::cout << "m_scheduleServer=" << m_scheduleServer << std::endl;
   obj.Set("ScheduleServer", DoubleValue(m_scheduleServer));
   obj.Set("Custo", UintegerValue(m_custo));
 
