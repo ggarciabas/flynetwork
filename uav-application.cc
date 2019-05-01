@@ -158,8 +158,8 @@ void UavApplication::StartApplication(void)
   if (m_sendSck->Connect(InetSocketAddress(m_peer, m_serverPort))) {
     NS_FATAL_ERROR ("UAV - $$ [NÃO] conseguiu conectar com Servidor!");
   }
-  NS_LOG_DEBUG ("---->   Programando: " << ETAPA-20);
-  m_askCliPos = Simulator::Schedule(Seconds(ETAPA-20), &UavApplication::AskCliPosition, this);  
+  NS_LOG_DEBUG ("---->   Programando: " << etapa-20);
+  m_askCliPos = Simulator::Schedule(Seconds(etapa-20), &UavApplication::AskCliPosition, this);  
 }
 
 void UavApplication::Stop() 
@@ -605,7 +605,7 @@ UavApplication::AskCliPosition()
     }
   }
   
-  m_askCliPos = Simulator::Schedule(Seconds(ETAPA), &UavApplication::AskCliPosition, this);
+  m_askCliPos = Simulator::Schedule(Seconds(etapa), &UavApplication::AskCliPosition, this);
 }
 
 void 
