@@ -40,7 +40,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <string>
-std::string global_path;
+
 namespace ns3
 {
 

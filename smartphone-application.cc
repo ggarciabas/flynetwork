@@ -29,7 +29,7 @@
 #include "ns3/internet-apps-module.h"
 #include <cmath>
 
-std::string global_path;
+
 
 namespace ns3
 {

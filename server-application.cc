@@ -32,7 +32,7 @@
 #include <algorithm>
 #include <random>
 
-std::string global_path;
+
 
 namespace ns3
 {

@@ -25,7 +25,7 @@
 #include "uav-device-energy-model.h"
 #include "client-device-energy-model.h"
 
-std::string global_path;
+
 
 namespace ns3
 {

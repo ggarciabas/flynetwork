@@ -28,7 +28,7 @@
 
 #include "uav-energy-source.h"
 
-std::string global_path;
+
 
 namespace ns3
 {

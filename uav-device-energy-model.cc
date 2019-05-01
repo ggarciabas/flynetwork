@@ -24,7 +24,7 @@
 #include "ns3/trace-source-accessor.h"
 #include "uav-energy-source.h"
 #include "ns3/log.h"
-std::string global_path;
+
 namespace ns3
 {
 
