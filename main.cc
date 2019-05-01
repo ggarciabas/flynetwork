@@ -38,7 +38,7 @@ using namespace ns3;
 	3- Urban
 	4- Surburban
 */
-
+std::string global_path;
 // https://www.wired.com/story/the-physics-of-why-bigger-drones-can-fly-longer/
 int main (int argc, char *argv[])
 {
@@ -53,6 +53,7 @@ int main (int argc, char *argv[])
 	cmd.AddValue ("ScheduleServer", "Tempo minimo etapa", scheduleServer);
 	cmd.AddValue ("Custo", "Metrica de análise do DA de Posicionamento", custo);
 	cmd.AddValue ("Seed", "Seed", seed);
+	cmd.AddValue ("GlobalPath", "Global Path", global_path);
 	cmd.Parse (argc, argv);
 	
 	// LogComponentEnable("MyOnOffApplication", LOG_DEBUG);
