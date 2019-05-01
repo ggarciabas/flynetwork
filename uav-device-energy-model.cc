@@ -143,7 +143,7 @@ void UavDeviceEnergyModel::HandleEnergyRecharged (void)
   std::ostringstream os;
   os << global_path << "/" << m_pathData << "/uav_recharged/uav_recharged.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  m_file << Simulator::Now().GetSeconds() << "," << m_source->GetNode()->GetId() << "," << m_source->GetRealRemainingEnergy() << std::endl;
+  m_file << Simulator::Now().GetSeconds() << "," << m_source->GetNode()->GetId() << "," << DynamicCast<UavEnergySource>(m_source)->GetRealRemainingEnergy()) << std::endl;
   m_file.close();
 
   m_totalEnergyConsumption = 0.0;
@@ -179,7 +179,7 @@ void UavDeviceEnergyModel::HandleEnergyDepletion(void)
   std::ostringstream os;
   os << global_path << "/" << m_pathData << "/uav_depletion/uav_depletion_" << m_source->GetNode()->GetId() << ".txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  m_file << Simulator::Now().GetSeconds() << "," << m_source->GetRealRemainingEnergy() - energy << std::endl;
+  m_file << Simulator::Now().GetSeconds() << "," << DynamicCast<UavEnergySource>(m_source)->GetRealRemainingEnergy() - energy << std::endl;
   m_file.close();
   NS_LOG_DEBUG("UavDeviceEnergyModel::HandleEnergyDepletion " << m_source->GetNode()->GetId() << " @" << Simulator::Now().GetSeconds());
   if (m_energyDepletionCallback.IsNull())

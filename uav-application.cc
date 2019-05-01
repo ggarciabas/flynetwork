@@ -712,7 +712,7 @@ void UavApplication::SendPacket(void)
   { // para nao ocorrer conflitos com calculo do wifi energy module!
     msg << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRealRemainingEnergy() << '\0';
   } else {
-    msg << m_uavDevice->GetEnergySource()->GetRealRemainingEnergy() << '\0';
+    msg << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRealRemainingEnergy() << '\0';
   }
   uint16_t packetSize = msg.str().length() + 1;
   Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
