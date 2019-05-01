@@ -195,14 +195,11 @@ double
 UavEnergySource::GetRemainingEnergy(void)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  if (m_depleted) {
-    return m_initialEnergyJ; // para não dar problemas com modelo Wifi
-  }
-  return m_remainingEnergyJ;
+  return m_initialEnergyJ; // problemas com wifi 
 }
 
 double
-UavEnergySource::GetDepletionRemainingEnergy()
+UavEnergySource::GetRealRemainingEnergy()
 {
   return m_remainingEnergyJ;
 }

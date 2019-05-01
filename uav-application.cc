@@ -182,9 +182,9 @@ void UavApplication::Stop()
   double rem = 0.;
   double iniE = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetInitialEnergy();
   if (m_depletion) {
-    rem = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetDepletionRemainingEnergy();
+    rem = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRealRemainingEnergy();
   } else {
-    rem = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRemainingEnergy();
+    rem = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRealRemainingEnergy();
   }
   double we = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetWifiEnergy();
   double ce = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetClientEnergy();
@@ -359,7 +359,7 @@ void UavApplication::SendPacketDepletion(void)
     std::ofstream file;
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
     file << Simulator::Now().GetSeconds() << " " << m_id << " " << count 
-    << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetDepletionRemainingEnergy() 
+    << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRealRemainingEnergy() 
     << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetInitialEnergy() 
     << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetWifiAcum() 
     << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetMoveAcum() 
@@ -441,7 +441,7 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
           std::ofstream file;
           file.open(os.str(), std::ofstream::out | std::ofstream::app);
           file << Simulator::Now().GetSeconds() << " " << m_id << " " << count 
-          << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRemainingEnergy() 
+          << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRealRemainingEnergy() 
           << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetInitialEnergy() 
           << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetWifiAcum() 
           << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetMoveAcum() 
@@ -674,7 +674,7 @@ void UavApplication::SendCliData ()
   if (m_running && !m_depletion) {
     Simulator::Remove(m_sendCliDataEvent);
     std::ostringstream msg;
-    msg << "DATA " << m_id << " " << m_uavDevice->GetEnergySource()->GetRemainingEnergy();
+    msg << "DATA " << m_id << " " << m_uavDevice->GetEnergySource()->GetRealRemainingEnergy();
     for(std::map<Ipv4Address, Ptr<ClientModel> >::iterator i = m_mapClient.begin(); i != m_mapClient.end(); i++)
     {
       if ((i->second)->GetLogin().compare("NOPOSITION") != 0) { // cliente com posicionamento atualizado
@@ -710,9 +710,9 @@ void UavApplication::SendPacket(void)
   msg << "UAV " << pos.x << " " << pos.y << " " << pos.z << " " << m_id << " ";
   if (m_depletion)
   { // para nao ocorrer conflitos com calculo do wifi energy module!
-    msg << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetDepletionRemainingEnergy() << '\0';
+    msg << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRealRemainingEnergy() << '\0';
   } else {
-    msg << m_uavDevice->GetEnergySource()->GetRemainingEnergy() << '\0';
+    msg << m_uavDevice->GetEnergySource()->GetRealRemainingEnergy() << '\0';
   }
   uint16_t packetSize = msg.str().length() + 1;
   Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);

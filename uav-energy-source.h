@@ -133,7 +133,7 @@ public:
   double GetHoverAcum () { return m_hoverAcum; }
   double GetCliAcum () { return m_cliAcum; }
 
-  double GetDepletionRemainingEnergy(); // para saber a bateria correta quando estiver em depletion (problemas com calculos do módulo wifi!)
+  double GetRealRemainingEnergy(); // para saber a bateria correta quando (problema com wifiEnergyModule!)
 
   double GetWifiEnergy () {
     return m_wifiEnergy;

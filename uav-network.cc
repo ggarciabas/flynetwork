@@ -481,9 +481,9 @@ void UavNetwork::NewUav(int total, int update) // update = 0- normal 1- supply 2
     Ptr<UavEnergySource> source = DynamicCast<UavEnergySource>(uavApp->GetUavDevice()->GetEnergySource());
     if (update == 1) {
       // envia ao servidor informacoes do UAV substituto
-      m_serverApp->AddSupplyUav(n->GetId(), addr, source->GetRemainingEnergy(), uavApp->GetUavDevice()->GetEnergyCost(), uavApp->GetUavDevice()->GetHoverCost(), source->GetInitialEnergy(), n->GetObject<MobilityModel>());
+      m_serverApp->AddSupplyUav(n->GetId(), addr, source->GetRealRemainingEnergy(), uavApp->GetUavDevice()->GetEnergyCost(), uavApp->GetUavDevice()->GetHoverCost(), source->GetInitialEnergy(), n->GetObject<MobilityModel>());
     } else { // adiciona um novo UAV no servidor
-      m_serverApp->AddNewUav(n->GetId(), addr, source->GetRemainingEnergy(), uavApp->GetUavDevice()->GetEnergyCost(), uavApp->GetUavDevice()->GetHoverCost(), source->GetInitialEnergy(), n->GetObject<MobilityModel>()); // tell the server to create a new model of UAV, used to identify the actual location of those UAV nodes
+      m_serverApp->AddNewUav(n->GetId(), addr, source->GetRealRemainingEnergy(), uavApp->GetUavDevice()->GetEnergyCost(), uavApp->GetUavDevice()->GetHoverCost(), source->GetInitialEnergy(), n->GetObject<MobilityModel>()); // tell the server to create a new model of UAV, used to identify the actual location of those UAV nodes
     }
     source = 0;
 
@@ -532,7 +532,7 @@ void UavNetwork::RemoveUav(int id, int step)
   os << global_path << "/" << m_pathData << "/etapa/" << step << "/uav_removed_energy.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   Ptr<UavDeviceEnergyModel> dev = uavApp->GetUavDevice();
-  m_file << dev->GetEnergySource()->GetRemainingEnergy() / dev->GetEnergySource()->GetInitialEnergy() << std::endl;
+  m_file << dev->GetEnergySource()->GetRealRemainingEnergy() / dev->GetEnergySource()->GetInitialEnergy() << std::endl;
   m_file.close();
 
   n = 0;
@@ -1167,7 +1167,7 @@ void UavNetwork::PrintUavEnergy (int t)
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   for (UavApplicationContainer::Iterator it = m_uavAppContainer.Begin(); it != m_uavAppContainer.End(); ++it) {
     Ptr<UavDeviceEnergyModel> dev = (*it)->GetUavDevice();
-    file << (*it)->GetId()  << "," << dev->GetEnergySource()->GetRemainingEnergy() << "," << dev->GetEnergySource()->GetInitialEnergy() << std::endl;
+    file << (*it)->GetId()  << "," << dev->GetEnergySource()->GetRealRemainingEnergy() << "," << dev->GetEnergySource()->GetInitialEnergy() << std::endl;
   }
   file.close();
 }
