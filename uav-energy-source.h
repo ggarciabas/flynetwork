@@ -135,10 +135,18 @@ public:
 
   double GetDepletionRemainingEnergy(); // para saber a bateria correta quando estiver em depletion (problemas com calculos do módulo wifi!)
 
-  double GetWifiEnergy () { return m_wifiEnergy; }
-  double GetClientEnergy () { return m_clientEnergy; }
-  double GetMoveEnergy () { return m_moveEnergy; }
-  double GetHoverEnergy () { return m_hoverEnergy; }
+  double GetWifiEnergy () {
+    return m_wifiEnergy;
+  }
+  double GetClientEnergy () {
+    return m_clientEnergy;
+    }
+  double GetMoveEnergy () {
+    return m_moveEnergy;
+    }
+  double GetHoverEnergy () {
+    return m_hoverEnergy;
+    }
 
 private:
   /// Defined in ns3::Object
