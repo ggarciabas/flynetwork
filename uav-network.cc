@@ -238,7 +238,7 @@ void UavNetwork::Run()
     exit(-1);
   }
 
-  ss << "/" << m_seed << "/custo_" << m_custo; // adicionando seed
+  ss << "/" << m_seed << "/" << m_protocol << "/custo_" << m_custo; // adicionando seed
   m_pathData = ss.str();
   ss.str("");
   ss << "rm -Rf " << global_path << "/" << m_pathData;
