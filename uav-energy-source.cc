@@ -232,19 +232,23 @@ UavEnergySource::UpdateEnergySource (void) // chamado pelo device wifi-radio-ene
       os << "./scratch/client/data/output/" << m_pathData << "/uav_wifi/uav_wifi_" << m_node->GetId() << ".txt";
       m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
       m_wifiAcum += (remainingEnergy-m_remainingEnergyJ);
-      m_file << Simulator::Now().GetSeconds() << "," << remainingEnergy-m_remainingEnergyJ << std::endl;
+      m_file << Simulator::Now().GetSeconds() << " " << m_remainingEnergyJ << " " << remainingEnergy-m_remainingEnergyJ << " " << m_initialEnergyJ << std::endl;
       m_file.close();
       os.str("");
-      os << "./scratch/client/data/output/" << m_pathData << "/uav_wifi/uav_wifi_acum_" << m_node->GetId() << ".txt";
-      m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-      m_wifiAcum += (remainingEnergy-m_remainingEnergyJ);
-      m_file << Simulator::Now().GetSeconds() << "," << m_wifiAcum/m_initialEnergyJ << std::endl;
-      m_file.close();
-      os.str("");
-      os << "./scratch/client/data/output/" << m_pathData << "/uav_remaining_energy/uav_remaining_energy_" << m_node->GetId() << ".txt";
-      m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-      m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << "," << m_lowBatteryThUav << ",client" << std::endl;
-      m_file.close();
+      #ifdef LOG_ACUM
+        os << "./scratch/client/data/output/" << m_pathData << "/uav_wifi/uav_wifi_acum_" << m_node->GetId() << ".txt";
+        m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+        m_wifiAcum += (remainingEnergy-m_remainingEnergyJ);
+        m_file << Simulator::Now().GetSeconds() << "," << m_wifiAcum/m_initialEnergyJ << std::endl;
+        m_file.close();
+      #endif
+      #ifdef LOG_ENERGY_ALL
+        os.str("");
+        os << "./scratch/client/data/output/" << m_pathData << "/uav_remaining_energy/uav_remaining_energy_" << m_node->GetId() << ".txt";
+        m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+        m_file << Simulator::Now().GetSeconds() << " " << m_remainingEnergyJ << " " << remainingEnergy-m_remainingEnergyJ  << " wifi " << m_initialEnergyJ << " " << (m_lowBatteryThUav+m_lowBatteryThCli)*2 << std::endl;
+        m_file.close();
+      #endif
     }
   } 
 }
@@ -274,19 +278,23 @@ void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
       os << "./scratch/client/data/output/" << m_pathData << "/uav_client/uav_client_" << m_node->GetId() << ".txt";
       m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
       m_cliAcum += energyToDecrease;
-      m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease << std::endl;
+      m_file << Simulator::Now().GetSeconds() << " " << m_remainingEnergyJ << " " << energyToDecrease << " " << m_initialEnergyJ << std::endl;
       m_file.close();
-      os.str("");
-      os << "./scratch/client/data/output/" << m_pathData << "/uav_client/uav_client_acum_" << m_node->GetId() << ".txt";
-      m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-      m_cliAcum += energyToDecrease;
-      m_file << Simulator::Now().GetSeconds() << "," << m_cliAcum / m_initialEnergyJ << std::endl;
-      m_file.close();
-      os.str("");
-      os << "./scratch/client/data/output/" << m_pathData << "/uav_remaining_energy/uav_remaining_energy_" << m_node->GetId() << ".txt";
-      m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-      m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << "," << (m_lowBatteryThUav+m_lowBatteryThCli)*2 << ",client" << std::endl;
-      m_file.close();
+      #ifdef LOG_ACUM
+        os.str("");
+        os << "./scratch/client/data/output/" << m_pathData << "/uav_client/uav_client_acum_" << m_node->GetId() << ".txt";
+        m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+        m_cliAcum += energyToDecrease;
+        m_file << Simulator::Now().GetSeconds() << "," << m_cliAcum / m_initialEnergyJ << std::endl;
+        m_file.close();
+      #endif
+      #ifdef LOG_ENERGY_ALL
+        os.str("");
+        os << "./scratch/client/data/output/" << m_pathData << "/uav_remaining_energy/uav_remaining_energy_" << m_node->GetId() << ".txt";
+        m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+        m_file << Simulator::Now().GetSeconds() << " " << m_remainingEnergyJ << " " << energyToDecrease  << " client " << m_initialEnergyJ << " " << (m_lowBatteryThUav+m_lowBatteryThCli)*2 << std::endl;
+        m_file.close();
+      #endif
     }
   }
 }
@@ -316,19 +324,23 @@ void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
       os << "./scratch/client/data/output/" << m_pathData << "/uav_move/uav_move_" << m_node->GetId() << ".txt";
       m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
       m_movAcum += energyToDecrease;
-      m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease << std::endl;
+      m_file << Simulator::Now().GetSeconds() << " " << m_remainingEnergyJ << " " << energyToDecrease << " " << m_initialEnergyJ << std::endl;
       m_file.close();
-      os.str("");
-      os << "./scratch/client/data/output/" << m_pathData << "/uav_move/uav_move_acum_" << m_node->GetId() << ".txt";
-      m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-      m_movAcum += energyToDecrease;
-      m_file << Simulator::Now().GetSeconds() << "," << m_movAcum / m_initialEnergyJ << std::endl;
-      m_file.close();
-      os.str("");
-      os << "./scratch/client/data/output/" << m_pathData << "/uav_remaining_energy/uav_remaining_energy_" << m_node->GetId() << ".txt";
-      m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-      m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << "," << (m_lowBatteryThUav+m_lowBatteryThCli)*2 << ",move" << std::endl;
-      m_file.close();
+      #ifdef LOG_ACUM
+        os.str("");
+        os << "./scratch/client/data/output/" << m_pathData << "/uav_move/uav_move_acum_" << m_node->GetId() << ".txt";
+        m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+        m_movAcum += energyToDecrease;
+        m_file << Simulator::Now().GetSeconds() << "," << m_movAcum / m_initialEnergyJ << std::endl;
+        m_file.close();
+      #endif
+      #ifdef LOG_ENERGY_ALL 
+        os.str("");
+        os << "./scratch/client/data/output/" << m_pathData << "/uav_remaining_energy/uav_remaining_energy_" << m_node->GetId() << ".txt";
+        m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+        m_file << Simulator::Now().GetSeconds() << " " << m_remainingEnergyJ << " " << energyToDecrease  << " move " << m_initialEnergyJ << " " << (m_lowBatteryThUav+m_lowBatteryThCli)*2 << std::endl;
+        m_file.close();
+      #endif
     }
   }
 }
@@ -370,19 +382,23 @@ void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
       os << "./scratch/client/data/output/" << m_pathData << "/uav_hover/uav_hover_" << m_node->GetId() << ".txt";
       m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
       m_hoverAcum += energyToDecrease;
-      m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease << std::endl;
+      m_file << Simulator::Now().GetSeconds() << " " << m_remainingEnergyJ << " " << energyToDecrease << " " << m_initialEnergyJ << std::endl;
       m_file.close();
       os.str("");
-      os << "./scratch/client/data/output/" << m_pathData << "/uav_hover/uav_hover_acum_" << m_node->GetId() << ".txt";
-      m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-      m_hoverAcum += energyToDecrease;
-      m_file << Simulator::Now().GetSeconds() << "," << m_hoverAcum / m_initialEnergyJ << std::endl;
-      m_file.close();
-      os.str("");
-      os << "./scratch/client/data/output/" << m_pathData << "/uav_remaining_energy/uav_remaining_energy_" << m_node->GetId() << ".txt";
-      m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-      m_file << Simulator::Now().GetSeconds() << "," << m_remainingEnergyJ / m_initialEnergyJ << "," << (m_lowBatteryThUav+m_lowBatteryThCli)*2 << ",hover" << std::endl;
-      m_file.close();
+      #ifdef LOG_ACUM
+        os << "./scratch/client/data/output/" << m_pathData << "/uav_hover/uav_hover_acum_" << m_node->GetId() << ".txt";
+        m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+        m_hoverAcum += energyToDecrease;
+        m_file << Simulator::Now().GetSeconds() << "," << m_hoverAcum / m_initialEnergyJ << std::endl;
+        m_file.close();
+      #endif
+      #ifdef LOG_ENERGY_ALL
+        os.str("");
+        os << "./scratch/client/data/output/" << m_pathData << "/uav_remaining_energy/uav_remaining_energy_" << m_node->GetId() << ".txt";
+        m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+        m_file << Simulator::Now().GetSeconds() << " " << m_remainingEnergyJ << " " << energyToDecrease  << " hover " << m_initialEnergyJ << " " << (m_lowBatteryThUav+m_lowBatteryThCli)*2 << std::endl;
+        m_file.close();
+      #endif
     }
   }
 }

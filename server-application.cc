@@ -130,7 +130,7 @@ ServerApplication::GetTypeId(void)
 ServerApplication::ServerApplication()
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  //std::cout << "ServerApplication::ServerApplication @" << Simulator::Now().GetSeconds() << "\n";
+  std::cout << "ServerApplication::ServerApplication @" << Simulator::Now().GetSeconds() << " Schedule Server [" << m_scheduleServer << "]\n";
   m_step = 0;
 }
 
@@ -406,12 +406,14 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
               // mm << "SERVER\t-1\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tCLIENT";
               // m_packetTrace(mm.str());
               NS_LOG_FUNCTION("SERVER -- CLIENT ::: recebida informacoes de aplicacao do cliente no endereco " << add.GetIpv4());
-              std::ostringstream os;
-              os << "./scratch/client/data/output/" << m_pathData << "/client/" << add.GetIpv4() << ".txt";
-              std::ofstream file;
-              file.open(os.str(), std::ofstream::out | std::ofstream::app);
-              file << Simulator::Now().GetSeconds() << " RECEBIDO " << packet->GetSize () << std::endl;// RECEBIDO pelo servidor
-              file.close();
+              #ifdef LOG_CLIENT
+                std::ostringstream os;
+                os << "./scratch/client/data/output/" << m_pathData << "/client/" << add.GetIpv4() << ".txt";
+                std::ofstream file;
+                file.open(os.str(), std::ofstream::out | std::ofstream::app);
+                file << Simulator::Now().GetSeconds() << " RECEBIDO " << packet->GetSize () << std::endl;// RECEBIDO pelo servidor
+                file.close();
+              #endif
             }
           #endif
     results.clear();

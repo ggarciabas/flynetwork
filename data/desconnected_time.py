@@ -64,7 +64,7 @@ for seed_name in glob.glob(main_path+'*/'):
             if teste:
                 print "Client: " + client + " contime: "+str(conn_time) + " desctime: "+str(desc_time)
 
-            df = pd.DataFrame({"SEED":[seed], "COST":[custo], "CT":[conn_time/s_time*100], "DT":[desc_time/s_time*100], "CLIENT":[client_f]})
+            df = pd.DataFrame({"SEED":[seed], "COST":[custo], "CT":[conn_time/s_time*100], "DT":[desc_time/s_time*100], "TAX":[desc_time/conn_time], "CLIENT":[client_f]})
             df_seed = df_seed.append(df, ignore_index = True)
 
             file.close()   
@@ -86,9 +86,19 @@ for seed_name in glob.glob(main_path+'*/'):
     plt.savefig("./output/"+scenario+"/"+seed+"/desc_time.png")
     plt.close()
 
+    ax = sns.boxplot(x="COST", y="TAX", data=df_seed)
+    plt.xlabel("Custo")
+    plt.ylabel(u"Desc.Time/Con.Time")
+    # plt.show()
+    # plt.title("Comparação tempo de", fontsize=13, fontweight=0, color='black', style='italic')
+    plt.savefig("./output/"+scenario+"/"+seed+"/tax_time.svg")
+    plt.savefig("./output/"+scenario+"/"+seed+"/tax_time.eps")
+    plt.savefig("./output/"+scenario+"/"+seed+"/tax_time.png")
+    plt.close()
+
     ax = sns.boxplot(x="COST", y="CT", data=df_seed)
     plt.xlabel("Custo")
-    plt.ylabel(u"Tempo desconectado (%)")
+    plt.ylabel(u"Tempo conectado (%)")
     # plt.show()
     # plt.title("Comparação tempo de", fontsize=13, fontweight=0, color='black', style='italic')
     plt.savefig("./output/"+scenario+"/"+seed+"/conn_time.svg")
@@ -103,7 +113,7 @@ for seed_name in glob.glob(main_path+'*/'):
 
 df_main = df_main.sort_values(['COST'])
 
-ax = sns.boxplot(x="COST", y="DT", data=df_seed)
+ax = sns.boxplot(x="COST", y="DT", data=df_main)
 plt.xlabel("Custo")
 plt.ylabel(u"Tempo desconectado (%)")
 # plt.show()
@@ -113,9 +123,19 @@ plt.savefig("./output/"+scenario+"/desc_time.eps")
 plt.savefig("./output/"+scenario+"/desc_time.png")
 plt.close()
 
-ax = sns.boxplot(x="COST", y="CT", data=df_seed)
+ax = sns.boxplot(x="COST", y="TAX", data=df_main)
 plt.xlabel("Custo")
-plt.ylabel(u"Tempo desconectado (%)")
+plt.ylabel(u"Desc.Time/Con.Time")
+# plt.show()
+# plt.title("Comparação tempo de", fontsize=13, fontweight=0, color='black', style='italic')
+plt.savefig("./output/"+scenario+"/tax_time.svg")
+plt.savefig("./output/"+scenario+"/tax_time.eps")
+plt.savefig("./output/"+scenario+"/tax_time.png")
+plt.close()
+
+ax = sns.boxplot(x="COST", y="CT", data=df_main)
+plt.xlabel("Custo")
+plt.ylabel(u"Tempo conectado (%)")
 # plt.show()
 # plt.title("Comparação tempo de", fontsize=13, fontweight=0, color='black', style='italic')
 plt.savefig("./output/"+scenario+"/conn_time.svg")

@@ -25,8 +25,6 @@
 #include "uav-device-energy-model.h"
 #include "client-device-energy-model.h"
 
-#define ETAPA 300
-
 namespace ns3
 {
 
@@ -158,6 +156,7 @@ void UavApplication::StartApplication(void)
   if (m_sendSck->Connect(InetSocketAddress(m_peer, m_serverPort))) {
     NS_FATAL_ERROR ("UAV - $$ [NÃO] conseguiu conectar com Servidor!");
   }
+  NS_LOG_DEBUG ("---->   Programando: " << ETAPA-20);
   m_askCliPos = Simulator::Schedule(Seconds(ETAPA-20), &UavApplication::AskCliPosition, this);  
 }
 
@@ -513,12 +512,14 @@ UavApplication::TracedCallbackRxOnOff (Ptr<const Packet> packet, const Address &
     (it->second)->AddConsumption(0.00126928);
   }
 
-  std::ostringstream os;
-  os << "./scratch/client/data/output/" << m_pathData << "/client/" << ip << ".txt";
-  std::ofstream file;
-  file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  file << Simulator::Now().GetSeconds() << " RECEBIDO " << packet->GetSize () << std::endl;
-  file.close();
+  #ifdef LOG_CLIENT
+    std::ostringstream os;
+    os << "./scratch/client/data/output/" << m_pathData << "/wifi/" << ip << ".txt";
+    std::ofstream file;
+    file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    file << Simulator::Now().GetSeconds() << " RECEBIDO " << packet->GetSize () << std::endl;
+    file.close();
+  #endif
 }
 
 void
@@ -548,7 +549,7 @@ UavApplication::TracedCallbackRxAppInfra (Ptr<const Packet> packet, const Addres
         (it->second)->SetLogin(results.at(3));
         (it->second)->SetPosition(pos.at(0), pos.at(1));
         (it->second)->SetUpdatePos (Simulator::Now());
-        #ifdef PACKET
+        #ifdef PACKET_UAV_CLI
           std::ostringstream os;
           os << "./scratch/client/data/output/" << m_pathData << "/client/" << ip << ".txt";
           std::ofstream file;

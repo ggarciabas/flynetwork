@@ -1,5 +1,5 @@
 #ifndef ETAPA
-    #define ETAPA 300 
+    #define ETAPA 150 
 #endif
 
 #ifndef COM_SERVER
@@ -14,10 +14,6 @@
     #define DEV_CLI
 #endif
 
-//#ifndef DEV_CLI
-//    #define DEV_CLI
-//#endif
-
 // #ifndef TCP
 //     #define TCP 
 // #endif
@@ -30,10 +26,26 @@
     #define UDP 
 #endif
 
-#ifndef PACKET
-    #define PACKET
+#ifndef PACKET_UAV_CLI
+    #define PACKET_UAV_CLI
 #endif
 
 #ifndef DHCP
     #define DHCP
 #endif
+
+#ifndef COMPARE_COST
+    #define COMPARE_COST
+#endif
+
+// #ifndef LOG_CLIENT
+//     #define LOG_CLIENT
+// #endif
+
+// #ifndef LOG_ACUM
+//     #define LOG_ACUM
+// #endif
+
+// #ifndef LOG_ENERGY_ALL
+//     #define LOG_ENERGY_ALL
+// #endif

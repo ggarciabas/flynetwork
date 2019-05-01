@@ -41,11 +41,6 @@
 #include <cstdlib>
 #include <string>
 
-#define ETAPA 300
-
-// permite os clientes enviarem aplicacoes para o servidor
-#define APP_CLI
-
 namespace ns3
 {
 
