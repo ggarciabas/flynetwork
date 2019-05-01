@@ -178,12 +178,12 @@ void UavApplication::Stop()
   std::ostringstream os;
   os << global_path << "/" << m_pathData << "/uav_energy/uav_energy_" << m_node->GetId() << ".txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  double rem = 0.0
+  double rem = 0.;
   double iniE = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetInitialEnergy();
   if (m_depletion) {
-    rem = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetDepletionRemainingEnergy() 
+    rem = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetDepletionRemainingEnergy();
   } else {
-    rem = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRemainingEnergy() 
+    rem = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRemainingEnergy();
   }
   double we = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetWifiEnergy();
   double ce = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetClientEnergy();
