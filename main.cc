@@ -43,7 +43,7 @@ double etapa;
 // https://www.wired.com/story/the-physics-of-why-bigger-drones-can-fly-longer/
 int main (int argc, char *argv[])
 {
-	double sim_time=1200.0, cli_pos_update = 5.0, scheduleServer=300;
+	double sim_time=1200.0, cli_pos_update = 5.0;
 	uint32_t scenario = 7, env = 2, protocol = 2, custo=1, seed=9042019;
 	CommandLine cmd;
 	cmd.AddValue ("SimTime", "Simulation time", sim_time);
@@ -51,7 +51,6 @@ int main (int argc, char *argv[])
 	cmd.AddValue ("Scenario", "Scenario", scenario);
 	cmd.AddValue ("Env", "Environment", env);
 	cmd.AddValue ("Protocol", "Routing Protocol", protocol);
-	cmd.AddValue ("ScheduleServer", "Tempo minimo etapa", scheduleServer);
 	cmd.AddValue ("Custo", "Metrica de análise do DA de Posicionamento", custo);
 	cmd.AddValue ("Seed", "Seed", seed);
 	cmd.AddValue ("GlobalPath", "Global Path", global_path);
@@ -104,7 +103,7 @@ int main (int argc, char *argv[])
 	obj.Set("Protocol", UintegerValue(protocol));
 	obj.Set("Custo", UintegerValue(custo));
 	obj.Set("Seed", UintegerValue(seed));
-	obj.Set("ScheduleServer", DoubleValue(scheduleServer));
+	obj.Set("ScheduleServer", DoubleValue(etapa));
 	Ptr<UavNetwork> net = obj.Create()->GetObject<UavNetwork>();
 	net->Run();
 	net->Dispose();
