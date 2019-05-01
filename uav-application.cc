@@ -682,8 +682,8 @@ void UavApplication::SendPacket(void)
   Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
   msg << "UAV " << pos.x << " " << pos.y << " " << pos.z << " " << m_id << " ";
   if (m_depleted)
-  {
-    msg << m_uavDevice->GetEnergySource()->GetDepletionRemainingEnergy() << '\0';
+  { // para nao ocorrer conflitos com calculo do wifi energy module!
+    msg << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetDepletionRemainingEnergy() << '\0';
   } else {
     msg << m_uavDevice->GetEnergySource()->GetRemainingEnergy() << '\0';
   }
