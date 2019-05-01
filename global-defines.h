@@ -59,6 +59,6 @@
 //     #define LOG_ENERGY_ALL
 // #endif
 
-#ifndef LOG_ENERGY
-    #define LOG_ENERGY
-#endif
+// #ifndef LOG_ENERGY
+//     #define LOG_ENERGY
+// #endif

@@ -133,6 +133,21 @@ public:
   double GetHoverAcum () { return m_hoverAcum; }
   double GetCliAcum () { return m_cliAcum; }
 
+  double GetRealRemainingEnergy(); // para saber a bateria correta quando (problema com wifiEnergyModule!)
+
+  double GetWifiEnergy () {
+    return m_wifiEnergy;
+  }
+  double GetClientEnergy () {
+    return m_clientEnergy;
+    }
+  double GetMoveEnergy () {
+    return m_moveEnergy;
+    }
+  double GetHoverEnergy () {
+    return m_hoverEnergy;
+    }
+
 private:
   /// Defined in ns3::Object
   void DoInitialize (void);
@@ -167,6 +182,12 @@ private:
   void UpdateThreshold ();
 
 private:
+
+  double m_wifiEnergy;
+  double m_clientEnergy;
+  double m_moveEnergy;
+  double m_hoverEnergy;
+
   double m_initialEnergyJ;                // initial energy, in Joules
   double m_supplyVoltageV;                // supply voltage, in Volts
   double m_lowBatteryThUav;                 // low battery threshold, as a fraction of the initial energy
