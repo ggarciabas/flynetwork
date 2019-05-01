@@ -14,10 +14,6 @@
 //     #define DEV_CLI
 // #endif
 
-//#ifndef DEV_CLI
-//    #define DEV_CLI
-//#endif
-
 // #ifndef TCP
 //     #define TCP 
 // #endif
@@ -30,8 +26,8 @@
     #define UDP 
 #endif
 
-#ifndef PACKET
-    #define PACKET
+#ifndef PACKET_UAV_CLI
+    #define PACKET_UAV_CLI
 #endif
 
 #ifndef DHCP
@@ -41,3 +37,11 @@
 #ifndef COMPARE_COST
     #define COMPARE_COST
 #endif
+
+// #ifndef LOG_CLIENT
+//     #define LOG_CLIENT
+// #endif
+
+// #ifndef LOG_ACUM
+//     #define LOG_ACUM
+// #endif

@@ -512,12 +512,14 @@ UavApplication::TracedCallbackRxOnOff (Ptr<const Packet> packet, const Address &
     (it->second)->AddConsumption(0.00126928);
   }
 
-  std::ostringstream os;
-  os << "./scratch/wifi/data/output/" << m_pathData << "/wifi/" << ip << ".txt";
-  std::ofstream file;
-  file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  file << Simulator::Now().GetSeconds() << " RECEBIDO " << packet->GetSize () << std::endl;
-  file.close();
+  #ifdef LOG_CLIENT
+    std::ostringstream os;
+    os << "./scratch/wifi/data/output/" << m_pathData << "/wifi/" << ip << ".txt";
+    std::ofstream file;
+    file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    file << Simulator::Now().GetSeconds() << " RECEBIDO " << packet->GetSize () << std::endl;
+    file.close();
+  #endif
 }
 
 void
@@ -547,7 +549,7 @@ UavApplication::TracedCallbackRxAppInfra (Ptr<const Packet> packet, const Addres
         (it->second)->SetLogin(results.at(3));
         (it->second)->SetPosition(pos.at(0), pos.at(1));
         (it->second)->SetUpdatePos (Simulator::Now());
-        #ifdef PACKET
+        #ifdef PACKET_UAV_CLI
           std::ostringstream os;
           os << "./scratch/wifi/data/output/" << m_pathData << "/client/" << ip << ".txt";
           std::ofstream file;

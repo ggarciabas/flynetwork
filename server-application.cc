@@ -406,12 +406,14 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
               // mm << "SERVER\t-1\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tCLIENT";
               // m_packetTrace(mm.str());
               NS_LOG_FUNCTION("SERVER -- CLIENT ::: recebida informacoes de aplicacao do cliente no endereco " << add.GetIpv4());
-              std::ostringstream os;
-              os << "./scratch/wifi/data/output/" << m_pathData << "/client/" << add.GetIpv4() << ".txt";
-              std::ofstream file;
-              file.open(os.str(), std::ofstream::out | std::ofstream::app);
-              file << Simulator::Now().GetSeconds() << " RECEBIDO " << packet->GetSize () << std::endl;// RECEBIDO pelo servidor
-              file.close();
+              #ifdef LOG_CLIENT
+                std::ostringstream os;
+                os << "./scratch/wifi/data/output/" << m_pathData << "/client/" << add.GetIpv4() << ".txt";
+                std::ofstream file;
+                file.open(os.str(), std::ofstream::out | std::ofstream::app);
+                file << Simulator::Now().GetSeconds() << " RECEBIDO " << packet->GetSize () << std::endl;// RECEBIDO pelo servidor
+                file.close();
+              #endif
             }
           #endif
     results.clear();
