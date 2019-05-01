@@ -76,7 +76,7 @@ UavNetwork::GetTypeId(void)
                                         MakeDoubleAccessor(&UavNetwork::m_zValue),
                                         MakeDoubleChecker<double>())
                           .AddAttribute("ScheduleServer", "Time to schedule server method.",
-                                        DoubleValue(etapa),
+                                        DoubleValue(300),
                                         MakeDoubleAccessor(&UavNetwork::m_scheduleServer),
                                         MakeDoubleChecker<double>())
                           .AddAttribute("TxGain",
