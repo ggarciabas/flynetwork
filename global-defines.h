@@ -1,5 +1,5 @@
 
-#include <string.h>
+#include <string>
 
 #ifndef GLOBAL_PATH
     extern std::string global_path;
