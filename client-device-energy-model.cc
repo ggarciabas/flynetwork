@@ -18,6 +18,8 @@
  * Authors: Giovanna Garcia <ggarciabas@gmail.com>
  */
 
+
+#include "global-defines.h"
 #include "client-device-energy-model.h"
 #include "ns3/simulator.h"
 #include "ns3/trace-source-accessor.h"
@@ -25,6 +27,8 @@
 #include "ns3/log.h"
 
 #include "uav-energy-source.h"
+
+
 
 namespace ns3
 {
@@ -214,7 +218,7 @@ void ClientDeviceEnergyModel::ClientConsumption ()
   Simulator::Remove(m_cliEvent);
   double energyToDecrease =  UpdateConsumption();
   std::ostringstream os;
-  os << "./scratch/client/data/output/" << m_pathData << "/uav_client_" << m_node->GetId() << ".txt";
+  os << global_path << "/data/output/" << m_pathData << "/uav_client_" << m_node->GetId() << ".txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease / m_source->GetInitialEnergy() << std::endl;
   m_file.close();

@@ -1,3 +1,11 @@
+
+#include <string>
+
+#ifndef GLOBAL_PATH
+    extern std::string global_path;
+    #define GLOBAL_PATH
+#endif
+
 #ifndef ETAPA
     #define ETAPA 150 
 #endif
