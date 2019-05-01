@@ -32,10 +32,6 @@
 #include <algorithm>
 #include <random>
 
-#define ETAPA 300
-
-#define COMPARE_COST
-
 namespace ns3
 {
 
