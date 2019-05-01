@@ -674,7 +674,7 @@ void UavApplication::SendCliData ()
   if (m_running && !m_depletion) {
     Simulator::Remove(m_sendCliDataEvent);
     std::ostringstream msg;
-    msg << "DATA " << m_id << " " << m_uavDevice->GetEnergySource()->GetRealRemainingEnergy();
+    msg << "DATA " << m_id << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRealRemainingEnergy();
     for(std::map<Ipv4Address, Ptr<ClientModel> >::iterator i = m_mapClient.begin(); i != m_mapClient.end(); i++)
     {
       if ((i->second)->GetLogin().compare("NOPOSITION") != 0) { // cliente com posicionamento atualizado
