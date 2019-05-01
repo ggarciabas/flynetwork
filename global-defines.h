@@ -45,3 +45,7 @@
 // #ifndef LOG_ACUM
 //     #define LOG_ACUM
 // #endif
+
+// #ifndef LOG_ENERGY_ALL
+//     #define LOG_ENERGY_ALL
+// #endif
