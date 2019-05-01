@@ -332,7 +332,7 @@ void UavApplication::SendPacketDepletion(void)
     std::ofstream file;
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
     file << Simulator::Now().GetSeconds() << " " << m_id << " " << count 
-    << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRemainingEnergy() 
+    << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetDepletionRemainingEnergy() 
     << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetInitialEnergy() 
     << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetWifiAcum() 
     << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetMoveAcum() 
@@ -644,7 +644,7 @@ void UavApplication::TracedCallbackNewLease (const Ipv4Address& ip)
 void UavApplication::SendCliData ()
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  if (m_running) {
+  if (m_running && !m_depleted) {
     Simulator::Remove(m_sendCliDataEvent);
     std::ostringstream msg;
     msg << "DATA " << m_id << " " << m_uavDevice->GetEnergySource()->GetRemainingEnergy();
@@ -680,7 +680,13 @@ void UavApplication::SendPacket(void)
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   std::ostringstream msg;
   Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
-  msg << "UAV " << pos.x << " " << pos.y << " " << pos.z << " " << m_id << " " << m_uavDevice->GetEnergySource()->GetRemainingEnergy() << '\0';
+  msg << "UAV " << pos.x << " " << pos.y << " " << pos.z << " " << m_id << " ";
+  if (m_depleted)
+  {
+    msg << m_uavDevice->GetEnergySource()->GetDepletionRemainingEnergy() << '\0';
+  } else {
+    msg << m_uavDevice->GetEnergySource()->GetRemainingEnergy() << '\0';
+  }
   uint16_t packetSize = msg.str().length() + 1;
   Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
   if (m_sendSck->Send(packet) == packetSize)

@@ -133,6 +133,8 @@ public:
   double GetHoverAcum () { return m_hoverAcum; }
   double GetCliAcum () { return m_cliAcum; }
 
+  double GetDepletionRemainingEnergy(); // para saber a bateria correta quando estiver em depletion (problemas com calculos do módulo wifi!)
+
 private:
   /// Defined in ns3::Object
   void DoInitialize (void);
