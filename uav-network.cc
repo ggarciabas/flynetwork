@@ -259,6 +259,9 @@ void UavNetwork::Run()
   ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_move";
   system(ss.str().c_str());
   ss.str("");
+  ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_Energy";
+  system(ss.str().c_str());
+  ss.str("");
   ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_energy_threshold";
   system(ss.str().c_str());
   ss.str("");
@@ -333,6 +336,19 @@ void UavNetwork::Run()
   NS_LOG_DEBUG("Iniciando Simulador");
   Simulator::Run();
   NS_LOG_DEBUG("Finalizando Simulador");
+
+  // parando os UAVs para gerar relatorios
+  for (UavNodeContainer::Iterator i = m_uavNodeActive.Begin(); i != m_uavNodeActive.End(); ++i) {
+    int app = (*i)->GetNApplications()-1;
+    Ptr<UavApplication> uavApp = NULL;
+    do {
+      uavApp = DynamicCast<UavApplication>((*i)->GetApplication(app));
+      --app;
+    } while (uavApp==NULL && app >= 0);
+    NS_ASSERT (uavApp != NULL);
+    uavApp->Stop(); // para gravar informacoes energia !
+  }
+
   Simulator::Destroy();
   NS_LOG_DEBUG("Finalizando Destroy");
 

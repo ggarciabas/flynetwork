@@ -135,6 +135,11 @@ public:
 
   double GetDepletionRemainingEnergy(); // para saber a bateria correta quando estiver em depletion (problemas com calculos do módulo wifi!)
 
+  double GetWifiEnergy () { return m_wifiEnergy; }
+  double GetClientEnergy () { return m_clientEnergy; }
+  double GetMoveEnergy () { return m_moveEnergy; }
+  double GetHoverEnergy () { return m_hoverEnergy; }
+
 private:
   /// Defined in ns3::Object
   void DoInitialize (void);
@@ -169,6 +174,12 @@ private:
   void UpdateThreshold ();
 
 private:
+
+  double m_wifiEnergy;
+  double m_clientEnergy;
+  double m_moveEnergy;
+  double m_hoverEnergy;
+
   double m_initialEnergyJ;                // initial energy, in Joules
   double m_supplyVoltageV;                // supply voltage, in Volts
   double m_lowBatteryThUav;                 // low battery threshold, as a fraction of the initial energy

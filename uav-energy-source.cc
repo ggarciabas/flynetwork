@@ -100,6 +100,7 @@ UavEnergySource::UavEnergySource()
   m_cliAcum = 0.0;
   m_hoverAcum = 0.0;
   m_wifiAcum = 0.0;
+  m_wifiEnergy = m_clientEnergy = m_moveEnergy = m_hoverEnergy = 0.0;
 }
 
 UavEnergySource::~UavEnergySource()
@@ -222,6 +223,8 @@ UavEnergySource::UpdateEnergySource (void) // chamado pelo device wifi-radio-ene
     double remainingEnergy = m_remainingEnergyJ;
     CalculateRemainingEnergy ();
 
+    m_wifiEnergy += remainingEnergy-m_remainingEnergyJ;
+
     m_lastUpdateTime = Simulator::Now ();
 
     // if (m_remainingEnergyJ <= 0)
@@ -277,6 +280,8 @@ void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
       m_remainingEnergyJ -= energyToDecrease;
     }
 
+    m_clientEnergy += energyToDecrease;
+
     if (!m_depleted && m_remainingEnergyJ <= (m_lowBatteryThUav+m_lowBatteryThCli)*2*m_initialEnergyJ)
     {
       NS_LOG_DEBUG("UavEnergySource::UpdateEnergySourceClient DEPLETION [" << m_node->GetId() << "] ed: " << energyToDecrease << "J re: " << m_remainingEnergyJ << "J thr: " << (m_lowBatteryThUav+m_lowBatteryThCli)*2 * m_initialEnergyJ<< "J @" << Simulator::Now().GetSeconds());
@@ -325,6 +330,8 @@ void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
     {
       m_remainingEnergyJ -= energyToDecrease;
     }
+
+    m_moveEnergy += energyToDecrease;
 
     if (!m_depleted && m_remainingEnergyJ <= (m_lowBatteryThUav+m_lowBatteryThCli)*2*m_initialEnergyJ)
     {
@@ -384,6 +391,8 @@ void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
     {
       m_remainingEnergyJ -= energyToDecrease;
     }
+
+    m_hoverEnergy += energyToDecrease;
 
     if (!m_depleted && m_remainingEnergyJ <= (m_lowBatteryThUav+m_lowBatteryThCli)*2*m_initialEnergyJ)
     {
@@ -478,13 +487,14 @@ void UavEnergySource::Start () {
   m_cliAcum = 0.0;
   m_wifiAcum = 0.0;
   m_hoverAcum = 0.0;
+  m_wifiEnergy = m_clientEnergy = m_moveEnergy = m_hoverEnergy = 0.0;
   m_lowBatteryThUav = 0.1;
   m_lowBatteryThCli = 0.1;
   if (m_cliDev != NULL)
     m_cliDev->HandleEnergyRecharged(); // deveria se utilizar o energy source container, porem erro!
   if (m_uavDev != NULL)
     m_uavDev->HandleEnergyRecharged(); // deveria se utilizar o energy source container, porem erro!
-  NotifyEnergyRecharged();  
+  // NotifyEnergyRecharged();  
 }
 
 void UavEnergySource::Stop () {
@@ -495,6 +505,8 @@ void UavEnergySource::Stop () {
     m_cliDev->HandleEnergyOff();
   if (m_uavDev != NULL)
     m_uavDev->HandleEnergyOff(); // deveria se utilizar o energy source container, porem erro!
+
+  m_wifiEnergy = m_clientEnergy = m_moveEnergy = m_hoverEnergy = 0.0;
 
   Simulator::Remove(m_updateThr);
 }
