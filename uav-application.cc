@@ -644,7 +644,7 @@ void UavApplication::TracedCallbackNewLease (const Ipv4Address& ip)
 void UavApplication::SendCliData ()
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  if (m_running && !m_depleted) {
+  if (m_running && !m_depletion) {
     Simulator::Remove(m_sendCliDataEvent);
     std::ostringstream msg;
     msg << "DATA " << m_id << " " << m_uavDevice->GetEnergySource()->GetRemainingEnergy();
@@ -681,7 +681,7 @@ void UavApplication::SendPacket(void)
   std::ostringstream msg;
   Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
   msg << "UAV " << pos.x << " " << pos.y << " " << pos.z << " " << m_id << " ";
-  if (m_depleted)
+  if (m_depletion)
   { // para nao ocorrer conflitos com calculo do wifi energy module!
     msg << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetDepletionRemainingEnergy() << '\0';
   } else {
