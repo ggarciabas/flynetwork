@@ -76,7 +76,7 @@ UavNetwork::GetTypeId(void)
                                         MakeDoubleAccessor(&UavNetwork::m_zValue),
                                         MakeDoubleChecker<double>())
                           .AddAttribute("ScheduleServer", "Time to schedule server method.",
-                                        DoubleValue(ETAPA),
+                                        DoubleValue(etapa),
                                         MakeDoubleAccessor(&UavNetwork::m_scheduleServer),
                                         MakeDoubleChecker<double>())
                           .AddAttribute("TxGain",
@@ -722,7 +722,7 @@ void UavNetwork::ConfigureUav(int total)
     // http://www.tcpipguide.com/free/t_DHCPLeaseRenewalandRebindingProcesses-2.htm
     dhcpHelper.SetServerAttribute("RebindTime", TimeValue(Seconds(10)));
     dhcpHelper.SetServerAttribute("RenewTime", TimeValue(Seconds(5)));
-    dhcpHelper.SetServerAttribute("LeaseTime", TimeValue(Seconds(ETAPA/2)));
+    dhcpHelper.SetServerAttribute("LeaseTime", TimeValue(Seconds(etapa/2)));
     Ipv4InterfaceContainer fixedNodes = dhcpHelper.InstallFixedAddress (wifi.Get (c), Ipv4Address (serverAddr.str().c_str()), Ipv4Mask ("/24"));
     // Not really necessary, IP forwarding is enabled by default in IPv4.
     fixedNodes.Get (0).first->SetAttribute ("IpForward", BooleanValue (true));

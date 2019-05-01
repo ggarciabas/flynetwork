@@ -7,7 +7,8 @@
 #endif
 
 #ifndef ETAPA
-    #define ETAPA 150 
+    extern double etapa;
+    #define ETAPA 
 #endif
 
 #ifndef COM_SERVER

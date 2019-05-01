@@ -53,7 +53,7 @@ ServerApplication::GetTypeId(void)
                                         MakeDataRateAccessor(&ServerApplication::m_dataRate),
                                         MakeDataRateChecker())
                           .AddAttribute("ScheduleServer", "Time to schedule server method.",
-                                        DoubleValue(ETAPA),
+                                        DoubleValue(etapa),
                                         MakeDoubleAccessor(&ServerApplication::m_scheduleServer),
                                         MakeDoubleChecker<double>())
                           .AddAttribute("Rho", "Taxa de reducao da temperatura",

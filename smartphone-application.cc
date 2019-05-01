@@ -472,7 +472,7 @@ void SmartphoneApplication::ConfigureApplication (const Ipv4Address& ip)
       onoffFac.Set ("Remote", AddressValue (InetSocketAddress (ip, port)));
       m_onoff = onoffFac.Create<Application> ();
       m_onoff->SetStartTime(Seconds(1));
-      m_onoff->SetStopTime(Seconds(ETAPA)); // considerando 111 minutos mensal, 3.7 diario - http://www.teleco.com.br/comentario/com631.asp
+      m_onoff->SetStopTime(Seconds(etapa)); // considerando 111 minutos mensal, 3.7 diario - http://www.teleco.com.br/comentario/com631.asp
       m_onoff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, this));
       m_node->AddApplication (m_onoff);
       cliLogin << " VOICE" << std::endl;
@@ -492,7 +492,7 @@ void SmartphoneApplication::ConfigureApplication (const Ipv4Address& ip)
       onoffFac.Set ("Remote", AddressValue (InetSocketAddress (ip, port)));
       m_onoff = onoffFac.Create<Application> ();
       m_onoff->SetStartTime(Seconds(1.0));
-      m_onoff->SetStopTime(Seconds(ETAPA)); 
+      m_onoff->SetStopTime(Seconds(etapa)); 
       m_onoff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, this));
       m_node->AddApplication (m_onoff);
       cliLogin << " VIDEO" << std::endl;
@@ -512,7 +512,7 @@ void SmartphoneApplication::ConfigureApplication (const Ipv4Address& ip)
       onoffFac.Set ("Remote", AddressValue (InetSocketAddress (ip, port)));
       m_onoff = onoffFac.Create<Application> ();
       m_onoff->SetStartTime(Seconds(1.0));
-      m_onoff->SetStopTime(Seconds(ETAPA));
+      m_onoff->SetStopTime(Seconds(etapa));
       m_onoff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, this));
       m_node->AddApplication (m_onoff);
       cliLogin << " WWW" << std::endl;
