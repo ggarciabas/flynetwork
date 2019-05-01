@@ -177,7 +177,8 @@ void UavApplication::Stop()
 
   std::ostringstream os;
   os << global_path << "/" << m_pathData << "/uav_energy/uav_energy_" << m_node->GetId() << ".txt";
-  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  std::ofstream file;
+  file.open(os.str(), std::ofstream::out | std::ofstream::app);
   double rem = 0.;
   double iniE = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetInitialEnergy();
   if (m_depletion) {
@@ -193,11 +194,11 @@ void UavApplication::Stop()
   NS_ASSERT (we+ce+me+he == (iniE-rem), "Bateria consumida não bateu com o acumulado dos modos!");
 
   // TIME UAV_ID INITIAL_E ACTUAL_E SUM_E_MODE MODE DEPLETION?
-  m_file << Simulator::Now().GetSeconds() << " " << m_id << " " << iniE << " " << rem << " " <<  we << " WIFI " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
-  m_file << Simulator::Now().GetSeconds() << " " << m_id << " " << iniE << " " << rem << " " <<  ce << " CLIENT " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
-  m_file << Simulator::Now().GetSeconds() << " " << m_id << " " << iniE << " " << rem << " " <<  me << " MOVE " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
-  m_file << Simulator::Now().GetSeconds() << " " << m_id << " " << iniE << " " << rem << " " <<  he << " HOVER " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
-  m_file.close();
+  file << Simulator::Now().GetSeconds() << " " << m_id << " " << iniE << " " << rem << " " <<  we << " WIFI " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
+  file << Simulator::Now().GetSeconds() << " " << m_id << " " << iniE << " " << rem << " " <<  ce << " CLIENT " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
+  file << Simulator::Now().GetSeconds() << " " << m_id << " " << iniE << " " << rem << " " <<  me << " MOVE " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
+  file << Simulator::Now().GetSeconds() << " " << m_id << " " << iniE << " " << rem << " " <<  he << " HOVER " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
+  file.close();
   
   // para source!
   DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->Stop();  
