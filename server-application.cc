@@ -130,7 +130,7 @@ ServerApplication::GetTypeId(void)
 ServerApplication::ServerApplication()
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  //std::cout << "ServerApplication::ServerApplication @" << Simulator::Now().GetSeconds() << "\n";
+  std::cout << "ServerApplication::ServerApplication @" << Simulator::Now().GetSeconds() << " Schedule Server [" << m_scheduleServer << "]\n";
   m_step = 0;
 }
 

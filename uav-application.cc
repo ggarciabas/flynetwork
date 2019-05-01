@@ -25,8 +25,6 @@
 #include "uav-device-energy-model.h"
 #include "client-device-energy-model.h"
 
-#define ETAPA 300
-
 namespace ns3
 {
 
@@ -158,6 +156,7 @@ void UavApplication::StartApplication(void)
   if (m_sendSck->Connect(InetSocketAddress(m_peer, m_serverPort))) {
     NS_FATAL_ERROR ("UAV - $$ [NÃO] conseguiu conectar com Servidor!");
   }
+  NS_LOG_DEBUG ("---->   Programando: " << ETAPA-20);
   m_askCliPos = Simulator::Schedule(Seconds(ETAPA-20), &UavApplication::AskCliPosition, this);  
 }
 

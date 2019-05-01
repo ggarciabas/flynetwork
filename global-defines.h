@@ -1,5 +1,5 @@
 #ifndef ETAPA
-    #define ETAPA 300 
+    #define ETAPA 150 
 #endif
 
 #ifndef COM_SERVER
@@ -36,4 +36,8 @@
 
 #ifndef DHCP
     #define DHCP
+#endif
+
+#ifndef COMPARE_COST
+    #define COMPARE_COST
 #endif
