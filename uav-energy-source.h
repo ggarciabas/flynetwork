@@ -181,6 +181,8 @@ private:
 
   void UpdateThreshold ();
 
+  void TimeEnergy();
+
 private:
 
   double m_wifiTE; // timing energy calculation
