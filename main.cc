@@ -61,7 +61,7 @@ int main (int argc, char *argv[])
 	cmd.Parse (argc, argv);
 	
 	// LogComponentEnable("MyOnOffApplication", LOG_DEBUG);
-	// LogComponentEnable("ServerApplication", LOG_FUNCTION);
+	LogComponentEnable("ServerApplication", LOG_DEBUG);
 	// LogComponentEnable("LocationModel", LOG_DEBUG);
 	// LogComponentEnable("UavApplication", LOG_FUNCTION);
 	// LogComponentEnable("UavApplication", LOG_DEBUG);
