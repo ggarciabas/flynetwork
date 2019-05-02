@@ -183,6 +183,13 @@ private:
 
 private:
 
+  double m_wifiTE; // timing energy calculation
+  double m_clientTE;
+  double m_moveTE;
+  double m_hoverTE;
+
+  EventId m_timeEnergy;
+
   double m_wifiEnergy;
   double m_clientEnergy;
   double m_moveEnergy;

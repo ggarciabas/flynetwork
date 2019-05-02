@@ -192,11 +192,11 @@ void UavApplication::Stop()
   double he = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetHoverEnergy();  
 
   // TIME UAV_ID INITIAL_E ACTUAL_E SUM_E_MODE WIFI_E CLIENT_E MOVE_E HOVER_E
-  file << Simulator::Now().GetSeconds() << " " << m_id << " " << iniE << " " << rem << " " <<  we << " " << ce << " " << me << " " << he << " " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
+  file << Simulator::Now().GetSeconds() << " " << m_node->GetId() << " " << iniE << " " << rem << " " <<  we << " " << ce << " " << me << " " << he << " " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
   file.close();
 
   if (we+ce+me+he != (iniE-rem))
-    std::cout << "Bateria consumida não bateu com o acumulado dos modos! iniE=" << iniE << " rem=" << rem << " (iniE-rem) = " << (iniE-rem) << " we=" <<  we << " ce=" << ce << " me=" << me << " he=" << he << std::endl;
+    std::cout << "Bateria consumida não bateu com o acumulado dos modos! node=" << m_node->GetId() << " iniE=" << iniE << " rem=" << rem << " (iniE-rem) = " << (iniE-rem) << " we=" <<  we << " ce=" << ce << " me=" << me << " he=" << he << std::endl;
   
   // para source!
   DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->Stop();  

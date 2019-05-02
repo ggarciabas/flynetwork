@@ -101,6 +101,7 @@ UavEnergySource::UavEnergySource()
   m_hoverAcum = 0.0;
   m_wifiAcum = 0.0;
   m_wifiEnergy = m_clientEnergy = m_moveEnergy = m_hoverEnergy = 0.0;
+  m_wifiTE = m_clientTE = m_moveTE = m_hoverTE = 0.0;
 }
 
 UavEnergySource::~UavEnergySource()
@@ -221,6 +222,7 @@ UavEnergySource::UpdateEnergySource (void) // chamado pelo device wifi-radio-ene
     CalculateRemainingEnergy ();
 
     m_wifiEnergy += remainingEnergy-m_remainingEnergyJ;
+    m_hoverTE += remainingEnergy-m_remainingEnergyJ;
 
     m_lastUpdateTime = Simulator::Now ();
 
@@ -278,6 +280,7 @@ void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
     }
 
     m_clientEnergy += energyToDecrease;
+    m_clientTE += energyToDecrease;
 
     if (!m_depleted && m_remainingEnergyJ <= (m_lowBatteryThUav+m_lowBatteryThCli)*2*m_initialEnergyJ)
     {
@@ -329,6 +332,7 @@ void UavEnergySource::UpdateEnergySourceMove (double energyToDecrease)
     }
 
     m_moveEnergy += energyToDecrease;
+    m_moveTE += energyToDecrease;
 
     if (!m_depleted && m_remainingEnergyJ <= (m_lowBatteryThUav+m_lowBatteryThCli)*2*m_initialEnergyJ)
     {
@@ -390,6 +394,7 @@ void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
     }
 
     m_hoverEnergy += energyToDecrease;
+    m_hoverTE += energyToDecrease;
 
     if (!m_depleted && m_remainingEnergyJ <= (m_lowBatteryThUav+m_lowBatteryThCli)*2*m_initialEnergyJ)
     {
@@ -491,7 +496,25 @@ void UavEnergySource::Start () {
     m_cliDev->HandleEnergyRecharged(); // deveria se utilizar o energy source container, porem erro!
   if (m_uavDev != NULL)
     m_uavDev->HandleEnergyRecharged(); // deveria se utilizar o energy source container, porem erro!
-  // NotifyEnergyRecharged();  
+  // NotifyEnergyRecharged();
+
+  m_timeEnergy = Simulator::Schedule (Seconds(10.0), &UavEnergySource::TimeEnergy(), this);
+}
+
+void UavEnergySource::TimeEnergy () {
+  std::ostringstream os;
+  os << global_path << "/" << m_pathData << "/uav_energy/uav_timing_energy_" << m_node->GetId() << ".txt";
+  std::ofstream file;
+  file.open(os.str(), std::ofstream::out | std::ofstream::app);
+
+  file << Simulator::Now().GetSeconds() << " " << m_node->GetId() << " " << m_initialEnergyJ << " " << m_remainingEnergyJ << " " <<  m_wifiTE << " " << m_clientTE << " " << m_moveTE << " " << m_hoverTE << " " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
+  file.close();
+
+  if (m_wifiTE+m_clientTE+m_moveTE+m_hoverTE != (iniE-rem))
+    std::cout << "(TE) Bateria consumida não bateu com o acumulado dos modos! node=" << m_node->GetId() << " iniE=" << iniE << " rem=" << rem << " (iniE-rem) = " << (iniE-rem) << " m_wifiTE=" <<  m_wifiTE << " m_clientTE=" << m_clientTE << " m_moveTE=" << m_moveTE << " m_hoverTE=" << m_hoverTE << std::endl;
+
+  m_wifiTE = m_clientTE = m_moveTE = m_hoverTE = 0.0;
+  m_timeEnergy = Simulator::Schedule (Seconds(10.0), &UavEnergySource::TimeEnergy(), this);
 }
 
 void UavEnergySource::Stop () {
@@ -506,8 +529,7 @@ void UavEnergySource::Stop () {
   m_wifiEnergy = m_clientEnergy = m_moveEnergy = m_hoverEnergy = 0.0;
 
   Simulator::Remove(m_updateThr);
+  Simulator::Remove(m_timeEnergy);
 }
-
-
 
 } // namespace ns3
