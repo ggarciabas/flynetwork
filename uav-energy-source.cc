@@ -195,13 +195,13 @@ double
 UavEnergySource::GetRemainingEnergy(void)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  return m_initialEnergyJ; // problemas com wifi 
+  return m_initialEnergyJ*2; // problemas com wifi 
 }
 
 double
 UavEnergySource::GetRealRemainingEnergy()
 {
-  return m_remainingEnergyJ;
+  return m_remainingEnergyJ; // metodo fake para evitar problemas com wifi
 }
 
 double

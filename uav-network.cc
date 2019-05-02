@@ -259,7 +259,7 @@ void UavNetwork::Run()
   ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_move";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_Energy";
+  ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_energy";
   system(ss.str().c_str());
   ss.str("");
   ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_energy_threshold";

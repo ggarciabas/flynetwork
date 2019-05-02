@@ -189,16 +189,14 @@ void UavApplication::Stop()
   double we = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetWifiEnergy();
   double ce = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetClientEnergy();
   double me = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetMoveEnergy();
-  double he = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetHoverEnergy();
+  double he = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetHoverEnergy();  
 
-  NS_ASSERT_MSG (we+ce+me+he == (iniE-rem), "Bateria consumida não bateu com o acumulado dos modos!");
-
-  // TIME UAV_ID INITIAL_E ACTUAL_E SUM_E_MODE MODE DEPLETION?
-  file << Simulator::Now().GetSeconds() << " " << m_id << " " << iniE << " " << rem << " " <<  we << " WIFI " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
-  file << Simulator::Now().GetSeconds() << " " << m_id << " " << iniE << " " << rem << " " <<  ce << " CLIENT " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
-  file << Simulator::Now().GetSeconds() << " " << m_id << " " << iniE << " " << rem << " " <<  me << " MOVE " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
-  file << Simulator::Now().GetSeconds() << " " << m_id << " " << iniE << " " << rem << " " <<  he << " HOVER " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
+  // TIME UAV_ID INITIAL_E ACTUAL_E SUM_E_MODE WIFI_E CLIENT_E MOVE_E HOVER_E
+  file << Simulator::Now().GetSeconds() << " " << m_id << " " << iniE << " " << rem << " " <<  we << " " << ce << " " << me << " " << he << " " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
   file.close();
+
+  if (we+ce+me+he != (iniE-rem))
+    std::cout << "Bateria consumida não bateu com o acumulado dos modos! iniE=" << iniE << " rem=" << rem << " (iniE-rem) = " << (iniE-rem) << " we=" <<  we << " ce=" << ce << " me=" << me << " he=" << he << std::endl;
   
   // para source!
   DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->Stop();  
