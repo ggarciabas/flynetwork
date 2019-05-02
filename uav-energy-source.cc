@@ -498,7 +498,7 @@ void UavEnergySource::Start () {
     m_uavDev->HandleEnergyRecharged(); // deveria se utilizar o energy source container, porem erro!
   // NotifyEnergyRecharged();
 
-  m_timeEnergy = Simulator::Schedule (Seconds(10.0), &UavEnergySource::TimeEnergy(), this);
+  m_timeEnergy = Simulator::Schedule (Seconds(10.0), &UavEnergySource::TimeEnergy, this);
 }
 
 void UavEnergySource::TimeEnergy () {
@@ -514,7 +514,7 @@ void UavEnergySource::TimeEnergy () {
     std::cout << "(TE) Bateria consumida não bateu com o acumulado dos modos! node=" << m_node->GetId() << " iniE=" << iniE << " m_remainingEnergyJ=" << rem_remainingEnergyJm << " (m_initialEnergyJ-m_remainingEnergyJ) = " << (m_initialEnergyJ-m_remainingEnergyJ) << " m_wifiTE=" <<  m_wifiTE << " m_clientTE=" << m_clientTE << " m_moveTE=" << m_moveTE << " m_hoverTE=" << m_hoverTE << std::endl;
 
   m_wifiTE = m_clientTE = m_moveTE = m_hoverTE = 0.0;
-  m_timeEnergy = Simulator::Schedule (Seconds(10.0), &UavEnergySource::TimeEnergy(), this);
+  m_timeEnergy = Simulator::Schedule (Seconds(10.0), &UavEnergySource::TimeEnergy, this);
 }
 
 void UavEnergySource::Stop () {
