@@ -11,6 +11,11 @@
     #define ETAPA 
 #endif
 
+#ifndef TOTAL_BATTERY
+    extern double total_battery;
+    #define TOTAL_BATTERY
+#endif
+
 #ifndef COM_SERVER
     #define COM_SERVER
 #endif

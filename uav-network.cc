@@ -572,6 +572,7 @@ void UavNetwork::ConfigureUav(int total)
   /** Energy Model **/
   /* energy source */
   UavEnergySourceHelper sourceHelper;
+  sourceHelper.Set("UavEnergySourceInitialEnergy", DoubleValue(total_battery));
   sourceHelper.Set("PathData", StringValue(m_pathData));
   // install source
   EnergySourceContainer sources = sourceHelper.Install(uav);
