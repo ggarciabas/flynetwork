@@ -507,7 +507,7 @@ void UavEnergySource::TimeEnergy () {
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
 
-  file << Simulator::Now().GetSeconds() << " " << m_node->GetId() << " " << m_initialEnergyJ << " " << m_remainingEnergyJ << " " <<  m_wifiTE << " " << m_clientTE << " " << m_moveTE << " " << m_hoverTE << " " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
+  file << Simulator::Now().GetSeconds() << " " << m_node->GetId() << " " << m_initialEnergyJ << " " << m_remainingEnergyJ << " " <<  m_wifiTE << " " << m_clientTE << " " << m_moveTE << " " << m_hoverTE << " " << ((m_depleted)?"TRUE ":"FALSE ") << std::endl;
   file.close();
 
   if (m_wifiTE+m_clientTE+m_moveTE+m_hoverTE != (m_initialEnergyJ-m_remainingEnergyJ))
