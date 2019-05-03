@@ -135,7 +135,7 @@ void UavApplication::Start(double stoptime) {
   m_goto[1] = 0.0;
   // threshold do uav necessario calcular somente uma vez
   #ifdef DEV_WIFI
-    DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold()+m_meanConsumption*2);
+    DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold());
   #else
     DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold());
   #endif
@@ -241,7 +241,7 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
 
   // threshold do uav necessario calcular somente uma vez
   #ifdef DEV_WIFI
-    DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold()+m_meanConsumption*2);
+    DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold()); // removido do depletion os valores do wifi, posi assim que entra, este 'desliga o wifi' [[+m_meanConsumption*2]]
   #else
     DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold());
   #endif
