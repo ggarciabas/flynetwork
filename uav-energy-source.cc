@@ -217,7 +217,7 @@ UavEnergySource::UpdateEnergySource (void) // chamado pelo device wifi-radio-ene
 {
   NS_LOG_FUNCTION (this);
   
-  if (m_onoff && m_depleted) { // calcula somente se estiver ligada    
+  if (m_onoff && !m_depleted) { // calcula somente se estiver ligada    
     double remainingEnergy = m_remainingEnergyJ;
     CalculateRemainingEnergy ();
 
@@ -269,7 +269,7 @@ UavEnergySource::UpdateEnergySource (void) // chamado pelo device wifi-radio-ene
 
 void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
 {  
-  if (m_onoff && m_depleted) { // calcula somente se estiver ligada e fora de depletion
+  if (m_onoff && !m_depleted) { // calcula somente se estiver ligada e fora de depletion
     // if (m_remainingEnergyJ < energyToDecrease)
     // {
     //   NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceClient energy bellow ZERO! [" << m_node->GetId() << "] " << m_remainingEnergyJ << "J ____  " << energyToDecrease << "J @" << Simulator::Now().GetSeconds());
