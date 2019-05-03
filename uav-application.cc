@@ -176,7 +176,7 @@ void UavApplication::Stop()
   m_uavDevice->SetFlying(false);
 
   std::ostringstream os;
-  os << global_path << "/" << m_pathData << "/uav_energy/uav_energy_" << m_node->GetId() << ".txt";
+  os << global_path << "/" << m_pathData << "/uav_energy/uav_energy.txt";
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   double rem = 0.;

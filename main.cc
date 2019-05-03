@@ -40,11 +40,13 @@ using namespace ns3;
 */
 std::string global_path;
 double etapa;
+double total_battery;
 // https://www.wired.com/story/the-physics-of-why-bigger-drones-can-fly-longer/
 int main (int argc, char *argv[])
 {
 	double sim_time=1200.0, cli_pos_update = 5.0;
 	uint32_t scenario = 7, env = 2, protocol = 2, custo=1, seed=9042019;
+	total_battery = 156960;
 	CommandLine cmd;
 	cmd.AddValue ("SimTime", "Simulation time", sim_time);
 	cmd.AddValue ("CliUpdate", "Client update position", cli_pos_update);
@@ -55,10 +57,11 @@ int main (int argc, char *argv[])
 	cmd.AddValue ("Seed", "Seed", seed);
 	cmd.AddValue ("GlobalPath", "Global Path", global_path);
 	cmd.AddValue ("Etapa", "", etapa);
+	cmd.AddValue("TotalBattery", "", total_battery);
 	cmd.Parse (argc, argv);
 	
 	// LogComponentEnable("MyOnOffApplication", LOG_DEBUG);
-	// LogComponentEnable("ServerApplication", LOG_FUNCTION);
+	LogComponentEnable("ServerApplication", LOG_DEBUG);
 	// LogComponentEnable("LocationModel", LOG_DEBUG);
 	// LogComponentEnable("UavApplication", LOG_FUNCTION);
 	// LogComponentEnable("UavApplication", LOG_DEBUG);
