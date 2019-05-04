@@ -14,7 +14,8 @@ if sys.argv[1] == "False":
 scenario = sys.argv[2]
 main_path = "./output/"+scenario+"/"
 
-s_time = 3600 # segundos
+protocol = sys.argv[3] # Protocol
+s_time = float(sys.argv[4]) # segundos
 
 df_main = pd.DataFrame()
 for seed_name in glob.glob(main_path+'*/'):
@@ -22,12 +23,12 @@ for seed_name in glob.glob(main_path+'*/'):
     if teste:
             print "Seed: "+seed
     df_seed = pd.DataFrame()
-    for custo_name in glob.glob(main_path+seed+'/custo_*/'):
+    for custo_name in glob.glob(main_path+seed+'/'+protocol+'/custo_*/'):
         custo = os.path.dirname(custo_name).split('/')[-1]
         if teste:
             print "Custo: "+custo
 
-        for client in glob.glob(main_path+seed+'/'+custo+'/dhcp/client_??.txt'):
+        for client in glob.glob(main_path+seed+'/'+protocol+'/'+custo+'/dhcp/client_??.txt'):
             client_f = os.path.basename(client)
             if teste:
                 print client_f
@@ -81,9 +82,9 @@ for seed_name in glob.glob(main_path+'*/'):
     plt.ylabel(u"Tempo desconectado (%)")
     # plt.show()
     # plt.title("Comparação tempo de", fontsize=13, fontweight=0, color='black', style='italic')
-    plt.savefig("./output/"+scenario+"/"+seed+"/desc_time.svg")
-    plt.savefig("./output/"+scenario+"/"+seed+"/desc_time.eps")
-    plt.savefig("./output/"+scenario+"/"+seed+"/desc_time.png")
+    plt.savefig("./output/"+scenario+"/"+seed+"/desc_time_p"+protocol+".svg")
+    plt.savefig("./output/"+scenario+"/"+seed+"/desc_time_p"+protocol+".eps")
+    plt.savefig("./output/"+scenario+"/"+seed+"/desc_time_p"+protocol+".png")
     plt.close()
 
     ax = sns.boxplot(x="COST", y="TAX", data=df_seed)
@@ -91,9 +92,9 @@ for seed_name in glob.glob(main_path+'*/'):
     plt.ylabel(u"Desc.Time/Con.Time")
     # plt.show()
     # plt.title("Comparação tempo de", fontsize=13, fontweight=0, color='black', style='italic')
-    plt.savefig("./output/"+scenario+"/"+seed+"/tax_time.svg")
-    plt.savefig("./output/"+scenario+"/"+seed+"/tax_time.eps")
-    plt.savefig("./output/"+scenario+"/"+seed+"/tax_time.png")
+    plt.savefig("./output/"+scenario+"/"+seed+"/tax_time_p"+protocol+".svg")
+    plt.savefig("./output/"+scenario+"/"+seed+"/tax_time_p"+protocol+".eps")
+    plt.savefig("./output/"+scenario+"/"+seed+"/tax_time_p"+protocol+".png")
     plt.close()
 
     ax = sns.boxplot(x="COST", y="CT", data=df_seed)
@@ -101,11 +102,11 @@ for seed_name in glob.glob(main_path+'*/'):
     plt.ylabel(u"Tempo conectado (%)")
     # plt.show()
     # plt.title("Comparação tempo de", fontsize=13, fontweight=0, color='black', style='italic')
-    plt.savefig("./output/"+scenario+"/"+seed+"/conn_time.svg")
-    plt.savefig("./output/"+scenario+"/"+seed+"/conn_time.eps")
-    plt.savefig("./output/"+scenario+"/"+seed+"/conn_time.png")
+    plt.savefig("./output/"+scenario+"/"+seed+"/conn_time_p"+protocol+".svg")
+    plt.savefig("./output/"+scenario+"/"+seed+"/conn_time_p"+protocol+".eps")
+    plt.savefig("./output/"+scenario+"/"+seed+"/conn_time_p"+protocol+".png")
     plt.close()
-    df.to_pickle("./output/"+scenario+"/"+seed+"/seed_data.pkl")
+    df_seed.to_pickle("./output/"+scenario+"/"+seed+"/seed_data_p"+protocol+".pkl")
 
     df_main = df_main.append(df_seed, ignore_index = True)
 
@@ -118,9 +119,9 @@ plt.xlabel("Custo")
 plt.ylabel(u"Tempo desconectado (%)")
 # plt.show()
 # plt.title("Comparação tempo de", fontsize=13, fontweight=0, color='black', style='italic')
-plt.savefig("./output/"+scenario+"/desc_time.svg")
-plt.savefig("./output/"+scenario+"/desc_time.eps")
-plt.savefig("./output/"+scenario+"/desc_time.png")
+plt.savefig("./output/"+scenario+"/desc_time_p"+protocol+".svg")
+plt.savefig("./output/"+scenario+"/desc_time_p"+protocol+".eps")
+plt.savefig("./output/"+scenario+"/desc_time_p"+protocol+".png")
 plt.close()
 
 ax = sns.boxplot(x="COST", y="TAX", data=df_main)
@@ -128,9 +129,9 @@ plt.xlabel("Custo")
 plt.ylabel(u"Desc.Time/Con.Time")
 # plt.show()
 # plt.title("Comparação tempo de", fontsize=13, fontweight=0, color='black', style='italic')
-plt.savefig("./output/"+scenario+"/tax_time.svg")
-plt.savefig("./output/"+scenario+"/tax_time.eps")
-plt.savefig("./output/"+scenario+"/tax_time.png")
+plt.savefig("./output/"+scenario+"/tax_time_p"+protocol+".svg")
+plt.savefig("./output/"+scenario+"/tax_time_p"+protocol+".eps")
+plt.savefig("./output/"+scenario+"/tax_time_p"+protocol+".png")
 plt.close()
 
 ax = sns.boxplot(x="COST", y="CT", data=df_main)
@@ -138,8 +139,8 @@ plt.xlabel("Custo")
 plt.ylabel(u"Tempo conectado (%)")
 # plt.show()
 # plt.title("Comparação tempo de", fontsize=13, fontweight=0, color='black', style='italic')
-plt.savefig("./output/"+scenario+"/conn_time.svg")
-plt.savefig("./output/"+scenario+"/conn_time.eps")
-plt.savefig("./output/"+scenario+"/conn_time.png") 
+plt.savefig("./output/"+scenario+"/conn_time_p"+protocol+".svg")
+plt.savefig("./output/"+scenario+"/conn_time_p"+protocol+".eps")
+plt.savefig("./output/"+scenario+"/conn_time_p"+protocol+".png") 
 plt.close() 
-df.to_pickle("./output/"+scenario+"/main_data.pkl")
+df.to_pickle("./output/"+scenario+"/main_data_p"+protocol+".pkl")
