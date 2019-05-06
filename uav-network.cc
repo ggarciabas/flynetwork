@@ -845,7 +845,7 @@ void UavNetwork::ConfigureCli()
 
     DhcpHelper dhcpHelper;
     ApplicationContainer dhcpClients = dhcpHelper.InstallDhcpClient (devices.Get(c));
-    dhcpClients.Start (Seconds (10.0));
+    dhcpClients.Start (Seconds (2*e_ai->GetValue()));
     dhcpClients.Stop (Seconds(m_simulationTime));
     uint32_t id = (*i)->GetNApplications()-1;
 
@@ -864,7 +864,7 @@ void UavNetwork::ConfigureCli()
 
     Ptr<SmartphoneApplication> smart = factory.Create()->GetObject<SmartphoneApplication>();
     m_appSmart.push_back(smart);
-    smart->SetStartTime(Seconds(10.0));
+    smart->SetStartTime(Seconds(2*e_ai->GetValue()));
     smart->SetStopTime(Seconds(m_simulationTime));
 
     // smart->TraceConnectWithoutContext("PacketTrace", MakeCallback(&UavNetwork::PacketClient, this));
@@ -936,6 +936,7 @@ void UavNetwork::ConfigureApplicationServer ()
   std::ofstream cliLogin;
   std::ostringstream ss;
   int c = 0;
+  Ptr<UniformRandomVariable> e_ai = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
   for (NodeContainer::Iterator i = m_clientNode.Begin(); i != m_clientNode.End(); ++i, ++c)
   {
     ss.str("");
@@ -962,7 +963,7 @@ void UavNetwork::ConfigureApplicationServer ()
         port = 5060;
         onoffFac.Set ("Remote", AddressValue (InetSocketAddress (m_serverAddress.GetAddress(0), port)));
         appOnOff = onoffFac.Create<Application> ();
-        appOnOff->SetStartTime(Seconds(1));
+        appOnOff->SetStartTime(Seconds(2*e_ai->GetValue()));
         appOnOff->SetStopTime(Seconds(222)); // considerando 111 minutos mensal, 3.7 diario - http://www.teleco.com.br/comentario/com631.asp
         appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
         (*i)->AddApplication (appOnOff);
@@ -984,7 +985,7 @@ void UavNetwork::ConfigureApplicationServer ()
         port = 5070;
         onoffFac.Set ("Remote", AddressValue (InetSocketAddress (m_serverAddress.GetAddress(0), port)));
         appOnOff = onoffFac.Create<Application> ();
-        appOnOff->SetStartTime(Seconds(1.0));
+        appOnOff->SetStartTime(Seconds(2*e_ai->GetValue()));
         appOnOff->SetStopTime(Seconds(5*60)); // 5 minutos, sem referencias
         appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
         (*i)->AddApplication (appOnOff);
@@ -1006,7 +1007,7 @@ void UavNetwork::ConfigureApplicationServer ()
         port = 8080;
         onoffFac.Set ("Remote", AddressValue (InetSocketAddress (m_serverAddress.GetAddress(0), port)));
         appOnOff = onoffFac.Create<Application> ();
-        appOnOff->SetStartTime(Seconds(1.0));
+        appOnOff->SetStartTime(Seconds(2*e_ai->GetValue()));
         appOnOff->SetStopTime(Seconds(5*60)); // 5 minutoss sem referencia
         appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
         (*i)->AddApplication (appOnOff);
@@ -1022,7 +1023,7 @@ void UavNetwork::ConfigureApplicationServer ()
     cliLogin.close();
   }
 
-  m_newApp = Simulator::Schedule(Seconds(5*60), &UavNetwork::ConfigureApplicationServer, this);
+  m_newApp = Simulator::Schedule(Seconds((5*e_ai->GetValue())*60), &UavNetwork::ConfigureApplicationServer, this);
 }
 
 void UavNetwork::ConfigurePalcos() // TODO: poderia ser otimizada a leitura do arquivo colocando esta estrutura na configuração do cliente, mas isso tbm poderia confundir! Pensar!
