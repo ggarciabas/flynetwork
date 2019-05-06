@@ -144,8 +144,8 @@ def uav_loc (time, main_path, teste, raio_cli, raio_uav):
 
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.23), fancybox=True, shadow=True, ncol=5)
 
-    plt.savefig(main_path+'etapa/'+time+'/uav_loc.svg', bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.savefig(main_path+'etapa/'+time+'/uav_loc.eps', bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.savefig(main_path+'etapa/'+time+'/uav_loc.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+'e'+time+'uavloc.svg', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+'e'+time+'uavloc.eps', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+'e'+time+'uavloc.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
     # plt.savefig('teste.svg')
     plt.close()

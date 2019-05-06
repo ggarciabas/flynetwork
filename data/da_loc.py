@@ -160,9 +160,9 @@ def da_loc (custo, etapa, main_path, teste, it=-1):
 
         lgd = ax0.legend(loc='upper center', bbox_to_anchor=(0.5, 1.23), fancybox=True, shadow=True, ncol=5)
 
-        plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_'+da+'_{:015}'.format(int(iteracao[0]))+'.svg', bbox_extra_artists=(lgd,), bbox_inches='tight')
-        plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_'+da+'_{:015}'.format(int(iteracao[0]))+'.eps', bbox_extra_artists=(lgd,), bbox_inches='tight')
-        plt.savefig(main_path+'/'+str(custo)+'/etapa/'+str(etapa)+'/da_loc_scenario'+da+'_{:015}'.format(int(iteracao[0]))+'.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+        plt.savefig(main_path+'/'+str(custo)+'/e'+str(etapa)+'da.svg', bbox_extra_artists=(lgd,), bbox_inches='tight')
+        plt.savefig(main_path+'/'+str(custo)+'/e'+str(etapa)+'da.eps', bbox_extra_artists=(lgd,), bbox_inches='tight')
+        plt.savefig(main_path+'/'+str(custo)+'/e'+str(etapa)+'da.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
         # plt.savefig('teste.svg')
 
         fig.set_size_inches(16, 6, forward=False)
