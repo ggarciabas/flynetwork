@@ -12,7 +12,7 @@ colors = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
 
 def uav_loc (time, main_path, teste, raio_cli, raio_uav):
     try:
-        f_cen = open(main_path+'/'+'etapa/'+time+'/uav_loc.txt','r')
+        f_cen = open(main_path+'etapa/'+time+'/uav_loc.txt','r')
     except IOError:
         return
     # read LIMITS
@@ -41,7 +41,7 @@ def uav_loc (time, main_path, teste, raio_cli, raio_uav):
     f_cen.close()
     # point_value = range(0,len(value)*2)
 
-    f_cen = open(main_path+'/'+'etapa/'+time+'/client.txt','r')
+    f_cen = open(main_path+'etapa/'+time+'/client.txt','r')
     # read CLIENTS
     line = f_cen.readline().strip()
     cli = [x for x in line.split(',')] # position that server knows
@@ -144,7 +144,8 @@ def uav_loc (time, main_path, teste, raio_cli, raio_uav):
 
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.23), fancybox=True, shadow=True, ncol=5)
 
-    plt.savefig(main_path+'/'+'etapa/'+time+'/uav_loc.svg', bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.savefig(main_path+'/'+'etapa/'+time+'/uav_loc.eps', bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.savefig(main_path+'/'+'etapa/'+time+'/uav_loc.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+'etapa/'+time+'/uav_loc.svg', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+'etapa/'+time+'/uav_loc.eps', bbox_extra_artists=(lgd,), bbox_inches='tight')
+    plt.savefig(main_path+'etapa/'+time+'/uav_loc.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
     # plt.savefig('teste.svg')
+    plt.close()

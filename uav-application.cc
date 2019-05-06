@@ -191,7 +191,7 @@ void UavApplication::Stop()
   double me = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetMoveEnergy();
   double he = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetHoverEnergy();  
 
-  // TIME UAV_ID INITIAL_E ACTUAL_E SUM_E_MODE WIFI_E CLIENT_E MOVE_E HOVER_E
+  // TIME UAV_ID INITIAL_E ACTUAL_E WIFI_E CLIENT_E MOVE_E HOVER_E
   file << Simulator::Now().GetSeconds() << " " << m_node->GetId() << " " << iniE << " " << rem << " " <<  we << " " << ce << " " << me << " " << he << " " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
   file.close();
 

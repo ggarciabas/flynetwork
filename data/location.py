@@ -124,3 +124,4 @@ def scenario (time, main_path, teste):
     plt.savefig(main_path+'etapa/'+time+'/location.eps', bbox_extra_artists=(lgd,), bbox_inches='tight')
     plt.savefig(main_path+'etapa/'+time+'/location.png', bbox_extra_artists=(lgd,), bbox_inches='tight')
     # plt.savefig('teste.svg')
+    plt.close()

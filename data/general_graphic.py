@@ -31,15 +31,16 @@ if sys.argv[1] == "False":
     teste = False
 scenario = sys.argv[2]
 seed = sys.argv[3]
-main_path = "./output/"+scenario+"/"+seed+"/"
+protocol = sys.argv[4]
+main_path = "./output/"+scenario+"/"+seed+"/"+protocol+"/"
 
 for custo_name in glob.glob(main_path+'custo_*/'):
     custo = os.path.dirname(custo_name).split('/')[-1]
     if teste:
         print "Custo: "+custo
     list_folder = []
-    if len(sys.argv) == 5: # folder number
-        list_folder.append(int(sys.argv[4]))
+    if len(sys.argv) == 6: # folder number
+        list_folder.append(int(sys.argv[5]))
     else:
         for folder_name in glob.glob(main_path+custo+'/etapa/*/'):
             list_folder.append(int(os.path.dirname(folder_name).split('/')[-1]))
@@ -84,7 +85,7 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         if teste:
             print etapa
         # (uavs_id, uav_mov) = bij_graphic.bij(custo, str(etapa), main_path, teste)
-        custo_graphic.custo(custo, str(etapa), main_path, teste)
+        # custo_graphic.custo(custo, str(etapa), main_path, teste)
         # if teste:
         #     print uavs_id
         # Battery
@@ -101,11 +102,11 @@ for custo_name in glob.glob(main_path+'custo_*/'):
         # Uav Loc
         uav_loc_graphic.uav_loc (str(etapa), main_path+custo+'/', teste, raio_cli, raio_uav)
         # Mij
-        mij_graphic.mij(str(etapa), main_path+custo+'/', teste)
+        # mij_graphic.mij(str(etapa), main_path+custo+'/', teste)
         # all_uav.extend(uavs_id[:])
 
-    if teste:
-        print all_uav
+    # if teste:
+    #     print all_uav
     # battery_all.battery(main_path+custo+'/', teste, all_uav, 0, t_ini+10, activated, 'all')
     # battery_mov.battery(main_path+custo+'/', teste, [], 0, t_ini+10, activated, 'all')
     # battery_hover.battery(main_path+custo+'/', teste, [], 0, t_ini+10, activated, 'all')
