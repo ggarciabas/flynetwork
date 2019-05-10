@@ -222,6 +222,7 @@ UavEnergySource::UpdateEnergySource (void) // chamado pelo device wifi-radio-ene
     CalculateRemainingEnergy ();
 
     m_wifiEnergy += remainingEnergy-m_remainingEnergyJ;
+    m_wifiTE += remainingEnergy-m_remainingEnergyJ;
     m_hoverTE += remainingEnergy-m_remainingEnergyJ;
 
     m_lastUpdateTime = Simulator::Now ();
@@ -507,7 +508,7 @@ void UavEnergySource::TimeEnergy () {
   os << global_path << "/" << m_pathData << "/uav_energy/uav_timing_energy_" << m_node->GetId() << ".txt";
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
-
+  
   file << Simulator::Now().GetSeconds() << " " << m_node->GetId() << " " << m_initialEnergyJ << " " << m_remainingEnergyJ << " " <<  m_wifiTE << " " << m_clientTE << " " << m_moveTE << " " << m_hoverTE << " " << ((m_depleted)?"TRUE ":"FALSE ") << std::endl;
   file.close();
 

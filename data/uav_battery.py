@@ -36,13 +36,13 @@ for seed_name in glob.glob(main_path+'*/'):
             if teste:
                 print "Custo: "+custo
 
-            # # structure of log file FALHA em algumas simulacoes, o resultado final não está ocorrendo!
-            # # TIME UAV_ID INITIAL_E ACTUAL_E WIFI_E CLIENT_E MOVE_E HOVER_E
-            # # remove duplicated lines on log file
-            # lines_seen = set() # holds lines already seen
-            # for line in open(main_path+seed+'/'+protocol+'/'+custo+'/uav_energy/uav_energy.txt', "r"):
-            #     if line not in lines_seen: # not a duplicate
-            #         lines_seen.add(line)
+            # structure of log file 
+            # TIME UAV_ID INITIAL_E ACTUAL_E WIFI_E CLIENT_E MOVE_E HOVER_E
+            # remove duplicated lines on log file
+            lines_seen = set() # holds lines already seen
+            for line in open(main_path+seed+'/'+protocol+'/'+custo+'/uav_energy/uav_energy.txt', "r"):
+                if line not in lines_seen: # not a duplicate
+                    lines_seen.add(line)
 
             # each line of the list is a UAV is necessary to calculate the proportion between WIFI_E and INITIAL
             df_custo = pd.DataFrame()
@@ -68,9 +68,12 @@ for seed_name in glob.glob(main_path+'*/'):
                 df = pd.DataFrame({"TYPE":["W1", "W2", "H1", "H2", "M1", "M2", "D1", "U1"], "VALUE":[wifiE/(iniE-remE), wifiE/iniE, hoverE/(iniE-remE), hoverE/iniE, moveE/(iniE-remE), moveE/iniE, remE/iniE,(iniE-remE)/iniE], "PROTOCOL": [protocol_str, protocol_str, protocol_str, protocol_str, protocol_str, protocol_str, protocol_str, protocol_str]})
                 df_custo = df_custo.append(df, ignore_index = True)
 
-            ax = sns.boxplot(x="TYPE", y="VALUE", data=df_custo, hue="PROTOCOL")
-            legend = ax.legend()
-            legend.texts[0].set_text('Protocol')
+            # # uav timming
+            # for uav_timing in glob.glob(main_path+seed+'/'+protocol+'/custo_'+custo+'/uav_energy/uav_timing_energy*'):
+            #     # TIME NODE_ID INI_E REM_E WIFI_W CLI_E MOVE_E HOVER_E DEPLETED
+            #     for line in open(uav_timing, "r"):            
+
+            ax = sns.boxplot(x="TYPE", y="VALUE", data=df_custo
             lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=2)
             plt.xlabel("Type")
             plt.ylabel("(0-1)")
@@ -84,14 +87,12 @@ for seed_name in glob.glob(main_path+'*/'):
     if teste:
         print "Final data: "+str(df_seed)
         
-    df_seed = df_seed.sort_values(['COST', "PROTOCOL"])
+    df_seed = df_seed.sort_values(['COST'])
     if teste:
         print "Final sorted data: "+str(df_seed)
 
 
-    ax = sns.boxplot(x="COST", y="U1", data=df_seed, hue="PROTOCOL")
-    legend = ax.legend()
-    legend.texts[0].set_text('Protocol')
+    ax = sns.boxplot(x="COST", y="U1", data=df_seed)
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Custo")
     plt.ylabel(u"$(B_{t}^{u_i}-B_{a}^{u_i}) / B_{t}^{u_i}$")
@@ -102,9 +103,7 @@ for seed_name in glob.glob(main_path+'*/'):
     plt.savefig("./output/"+scenario+"/"+seed+"/u1.png")
     plt.close()
 
-    ax = sns.boxplot(x="COST", y="D1", data=df_seed, hue="PROTOCOL")
-    legend = ax.legend()
-    legend.texts[0].set_text('Protocol')
+    ax = sns.boxplot(x="COST", y="D1", data=df_seed)
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Custo")
     plt.ylabel(u"$B_{a}^{u_i} / B_{t}^{u_i}$")
@@ -115,9 +114,7 @@ for seed_name in glob.glob(main_path+'*/'):
     plt.savefig("./output/"+scenario+"/"+seed+"/d1.png")
     plt.close()
 
-    ax = sns.boxplot(x="COST", y="U1", data=df_seed, showfliers=False, hue="PROTOCOL")
-    legend = ax.legend()
-    legend.texts[0].set_text('Protocol')
+    ax = sns.boxplot(x="COST", y="U1", data=df_seed, showfliers=False)
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Custo")
     plt.ylabel(u"$(B_{t}^{u_i}-B_{a}^{u_i}) / B_{t}^{u_i}$")
@@ -128,9 +125,7 @@ for seed_name in glob.glob(main_path+'*/'):
     plt.savefig("./output/"+scenario+"/"+seed+"/u1_nout.png")
     plt.close()
 
-    ax = sns.boxplot(x="COST", y="D1", data=df_seed, showfliers=False, hue="PROTOCOL")
-    legend = ax.legend()
-    legend.texts[0].set_text('Protocol')
+    ax = sns.boxplot(x="COST", y="D1", data=df_seed, showfliers=False)
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Custo")
     plt.ylabel(u"$B_{a}^{u_i} / B_{t}^{u_i}$")
@@ -141,9 +136,7 @@ for seed_name in glob.glob(main_path+'*/'):
     plt.savefig("./output/"+scenario+"/"+seed+"/d1_nout.png")
     plt.close()
 
-    ax = sns.boxplot(x="COST", y="W1", data=df_seed, hue="PROTOCOL")
-    legend = ax.legend()
-    legend.texts[0].set_text('Protocol')
+    ax = sns.boxplot(x="COST", y="W1", data=df_seed)
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Custo")
     plt.ylabel(u"$ECw_{u_i} / (B_{t}^{u_i}-B_{a}^{u_i})$")
@@ -154,9 +147,7 @@ for seed_name in glob.glob(main_path+'*/'):
     plt.savefig("./output/"+scenario+"/"+seed+"/w1.png")
     plt.close()
 
-    ax = sns.boxplot(x="COST", y="W2", data=df_seed, hue="PROTOCOL")
-    legend = ax.legend()
-    legend.texts[0].set_text('Protocol')
+    ax = sns.boxplot(x="COST", y="W2", data=df_seed)
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Custo")
     plt.ylabel(u"$ECw_{u_i} / B_{t}^{u_i}$")
@@ -167,9 +158,7 @@ for seed_name in glob.glob(main_path+'*/'):
     plt.savefig("./output/"+scenario+"/"+seed+"/w2.png")
     plt.close()
 
-    ax = sns.boxplot(x="COST", y="M1", data=df_seed, hue="PROTOCOL")
-    legend = ax.legend()
-    legend.texts[0].set_text('Protocol')
+    ax = sns.boxplot(x="COST", y="M1", data=df_seed)
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Custo")
     plt.ylabel(u"$ECm_{u_i} / (B_{t}^{u_i}-B_{a}^{u_i})$")
@@ -180,9 +169,7 @@ for seed_name in glob.glob(main_path+'*/'):
     plt.savefig("./output/"+scenario+"/"+seed+"/m1.png")
     plt.close()
 
-    ax = sns.boxplot(x="COST", y="M2", data=df_seed, hue="PROTOCOL")
-    legend = ax.legend()
-    legend.texts[0].set_text('Protocol')
+    ax = sns.boxplot(x="COST", y="M2", data=df_seed)
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Custo")
     plt.ylabel(u"$ECm_{u_i} / B_{t}^{u_i}$")
@@ -193,9 +180,7 @@ for seed_name in glob.glob(main_path+'*/'):
     plt.savefig("./output/"+scenario+"/"+seed+"/m2.png")
     plt.close()
 
-    ax = sns.boxplot(x="COST", y="H1", data=df_seed, hue="PROTOCOL")
-    legend = ax.legend()
-    legend.texts[0].set_text('Protocol')
+    ax = sns.boxplot(x="COST", y="H1", data=df_seed)
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Custo")
     plt.ylabel(u"$ECh_{u_i} / (B_{t}^{u_i}-B_{a}^{u_i})$")
@@ -206,9 +191,7 @@ for seed_name in glob.glob(main_path+'*/'):
     plt.savefig("./output/"+scenario+"/"+seed+"/h1.png")
     plt.close()
 
-    ax = sns.boxplot(x="COST", y="H2", data=df_seed, hue="PROTOCOL")
-    legend = ax.legend()
-    legend.texts[0].set_text('Protocol')
+    ax = sns.boxplot(x="COST", y="H2", data=df_seed)
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Custo")
     plt.ylabel(u"$ECh_{u_i} / B_{t}^{u_i}$")
@@ -225,7 +208,7 @@ for seed_name in glob.glob(main_path+'*/'):
     lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=2)
 
 
-df_main = df_main.sort_values(['COST', "PROTOCOL"])
+df_main = df_main.sort_values(['COST'])
 
 ax = sns.boxplot(x="COST", y="U1", data=df_main)
 plt.xlabel("Custo")
@@ -237,8 +220,7 @@ plt.savefig("./output/"+scenario+"/u1.eps")
 plt.savefig("./output/"+scenario+"/u1.png")
 plt.close()
 
-ax = sns.boxplot(x="COST", y="D1", data=df_main, hue="PROTOCOL")
-legend.texts[0].set_text('Protocol')
+ax = sns.boxplot(x="COST", y="D1", data=df_main)
 plt.xlabel("Custo")
 plt.ylabel(u"$B_{a}^{u_i} / B_{t}^{u_i}$")
 # plt.show()
