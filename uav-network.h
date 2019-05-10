@@ -120,6 +120,7 @@ private:
   std::string m_PathData;
   std::string m_pathData;
   std::string m_scenarioName;
+  double m_uavTimingNext;
 
   NodeContainer m_clientNode;
   vector<double> m_palcoPos; // posicao dos palcos para nao dar conflito no arquivo de conferencia

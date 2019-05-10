@@ -148,6 +148,8 @@ public:
     return m_hoverEnergy;
     }
 
+  void TimeEnergy(Time);
+
 private:
   /// Defined in ns3::Object
   void DoInitialize (void);
@@ -179,9 +181,7 @@ private:
    */
   void CalculateRemainingEnergy (void);
 
-  void UpdateThreshold ();
-
-  void TimeEnergy();
+  void UpdateThreshold ();  
 
 private:
 

@@ -89,6 +89,11 @@ UavNetwork::GetTypeId(void)
                                         DoubleValue(300.0),
                                         MakeDoubleAccessor(&UavNetwork::m_simulationTime),
                                         MakeDoubleChecker<double>())
+                          .AddAttribute("UavTimingNext",
+                                        "Uav Timing Next",
+                                        DoubleValue(150.0),
+                                        MakeDoubleAccessor(&UavNetwork::m_uavTimingNext),
+                                        MakeDoubleChecker<double>())
                           .AddAttribute("PropagationLossCli",
                                         "Client propagation loss",
                                         StringValue("ns3::TwoRayGroundPropagationLossModel"),
@@ -732,6 +737,7 @@ void UavNetwork::ConfigureUav(int total)
 
     // energy start
     DynamicCast<UavEnergySource>(sources.Get(c))->Start();
+    Simulator::Schedule (Seconds(m_uavTimingNext), &UavEnergySource::TimeEnergy, DynamicCast<UavEnergySource>(sources.Get(c)), Seconds(m_uavTimingNext));
 
     // Configure DHCP
     // The router must have a fixed IP.
