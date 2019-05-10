@@ -332,11 +332,23 @@ void UavNetwork::Run()
     m_newApp = Simulator::Schedule(Seconds(10), &UavNetwork::ConfigureApplicationServer, this);
   #endif
 
+  Simulator::Schedule(Seconds(m_simulationTime-0.001), &UavNetwork::PrintFinalUavEnergy, this);
   Simulator::Stop(Seconds(m_simulationTime));
   NS_LOG_DEBUG("Iniciando Simulador");
   Simulator::Run();
-  NS_LOG_DEBUG("Finalizando Simulador");
+  NS_LOG_DEBUG("Finalizando Simulador");  
 
+  Simulator::Destroy();
+  NS_LOG_DEBUG("Finalizando Destroy");
+
+  // m_filePacketServer.close(); // fechando arquivo de trace (pacotes)
+  // m_filePacketUav.close();    // fechando arquivo de trace (pacotes)
+  // m_filePacketClient.close(); // fechando arquivo de trace (pacotes)
+
+}
+
+void UavNetwork::PrintFinalUavEnergy ()
+{
   // parando os UAVs para gerar relatorios
   for (UavNodeContainer::Iterator i = m_uavNodeActive.Begin(); i != m_uavNodeActive.End(); ++i) {
     int app = (*i)->GetNApplications()-1;
@@ -348,14 +360,6 @@ void UavNetwork::Run()
     NS_ASSERT (uavApp != NULL);
     uavApp->Stop(); // para gravar informacoes energia !
   }
-
-  Simulator::Destroy();
-  NS_LOG_DEBUG("Finalizando Destroy");
-
-  // m_filePacketServer.close(); // fechando arquivo de trace (pacotes)
-  // m_filePacketUav.close();    // fechando arquivo de trace (pacotes)
-  // m_filePacketClient.close(); // fechando arquivo de trace (pacotes)
-
 }
 
 void UavNetwork::ConfigureServer()

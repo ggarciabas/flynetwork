@@ -73,7 +73,7 @@ for seed_name in glob.glob(main_path+'*/'):
                 if teste:
                     print "Client: " + client + " contime: "+str(conn_time) + " desctime: "+str(desc_time)
 
-                df = pd.DataFrame({"SEED":[seed], "COST":[custo], "CT":[conn_time/s_time*100], "DT":[desc_time/s_time*100], "TAX":[desc_time/conn_time], "CLIENT":[client_f], "PROTOCOL":[protocol_str]})
+                df = pd.DataFrame({"SEED":[seed], "COST":[custo], "CT":[conn_time/s_time*100], "DT":[desc_time/s_time*100], "TAX":[desc_time/conn_time if conn_time > 0 else 1], "CLIENT":[client_f], "PROTOCOL":[protocol_str]})
                 df_seed = df_seed.append(df, ignore_index = True)
 
                 file.close()   
@@ -129,10 +129,7 @@ for seed_name in glob.glob(main_path+'*/'):
 
 df_main = df_main.sort_values(['COST'])
 
-ax = sns.boxplot(x="COST", y="DT", data=df_main, hue="PROTOCOL")
-legend = ax.legend()
-legend.texts[0].set_text('Protocol')
-lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=2)
+ax = sns.boxplot(x="COST", y="DT", data=df_main)
 plt.xlabel("Custo")
 plt.ylabel(u"Tempo desconectado (%)")
 # plt.show()
@@ -142,10 +139,7 @@ plt.savefig("./output/"+scenario+"/desc_time.eps")
 plt.savefig("./output/"+scenario+"/desc_time.png")
 plt.close()
 
-ax = sns.boxplot(x="COST", y="TAX", data=df_main, hue="PROTOCOL")
-legend = ax.legend()
-legend.texts[0].set_text('Protocol')
-lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=2)
+ax = sns.boxplot(x="COST", y="TAX", data=df_main)
 plt.xlabel("Custo")
 plt.ylabel(u"Desc.Time/Con.Time")
 # plt.show()
@@ -155,10 +149,7 @@ plt.savefig("./output/"+scenario+"/tax_time.eps")
 plt.savefig("./output/"+scenario+"/tax_time.png")
 plt.close()
 
-ax = sns.boxplot(x="COST", y="CT", data=df_main, hue="PROTOCOL")
-legend = ax.legend()
-legend.texts[0].set_text('Protocol')
-lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), fancybox=True, shadow=True, ncol=2)
+ax = sns.boxplot(x="COST", y="CT", data=df_main)
 plt.xlabel("Custo")
 plt.ylabel(u"Tempo conectado (%)")
 # plt.show()

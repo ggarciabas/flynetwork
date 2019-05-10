@@ -93,6 +93,8 @@ private:
   void ConfigureApplication();
   void ConfigureApplicationServer ();
 
+  void PrintFinalUavEnergy():
+
 private:
 
   void DoDispose();
