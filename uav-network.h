@@ -84,6 +84,7 @@ public:
 
   void PrintUavEnergy (int i);
 
+  void PrintFinalUavEnergy():
 private:
   void Configure();
   void ConfigureUav(int);
@@ -93,7 +94,6 @@ private:
   void ConfigureApplication();
   void ConfigureApplicationServer ();
 
-  void PrintFinalUavEnergy():
 
 private:
 
