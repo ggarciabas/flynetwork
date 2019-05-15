@@ -288,9 +288,9 @@ void UavNetwork::Run()
   ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_stop";
   system(ss.str().c_str());
   ss.str("");
-  ss << "mkdir -p " << global_path << "/" << m_pathData << "/python";
-  system(ss.str().c_str());
-  ss.str("");
+  // ss << "mkdir -p " << global_path << "/" << m_pathData << "/python";
+  // system(ss.str().c_str());
+  // ss.str("");
   ss << "mkdir -p " << global_path << "/" << m_pathData << "/dhcp";
   system(ss.str().c_str());
   ss.str("");
@@ -737,7 +737,7 @@ void UavNetwork::ConfigureUav(int total)
 
     // energy start
     DynamicCast<UavEnergySource>(sources.Get(c))->Start();
-    Simulator::Schedule (Seconds(m_uavTimingNext), &UavEnergySource::TimeEnergy, DynamicCast<UavEnergySource>(sources.Get(c)), Seconds(m_uavTimingNext));
+    DynamicCast<UavEnergySource>(sources.Get(c))->TimeEnergy(Seconds(m_uavTimingNext));
 
     // Configure DHCP
     // The router must have a fixed IP.

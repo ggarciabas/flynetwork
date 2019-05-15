@@ -191,8 +191,16 @@ void UavApplication::Stop()
   double me = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetMoveEnergy();
   double he = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetHoverEnergy();  
 
-  // TIME UAV_ID INITIAL_E ACTUAL_E WIFI_E CLIENT_E MOVE_E HOVER_E
-  file << Simulator::Now().GetSeconds() << " " << m_node->GetId() << " " << iniE << " " << rem << " " <<  we << " " << ce << " " << me << " " << he << " " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
+  int count = 0;
+  for(std::map<Ipv4Address, Ptr<ClientModel> >::iterator i = m_mapClient.begin(); i != m_mapClient.end(); i++)
+  {
+    if ((i->second)->GetLogin().compare("NOPOSITION") != 0) { // cliente com posicionamento atualizado!
+      count++;
+    }
+  }
+
+  // TIME UAV_ID INITIAL_E ACTUAL_E WIFI_E CLIENT_E MOVE_E HOVER_E TOTAL_CLI
+  file << Simulator::Now().GetSeconds() << " " << m_node->GetId() << " " << iniE << " " << rem << " " <<  we << " " << ce << " " << me << " " << he << " " << count << " " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
   file.close();
 
   if (we+ce+me+he != (iniE-rem))
