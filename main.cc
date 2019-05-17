@@ -41,6 +41,9 @@ using namespace ns3;
 std::string global_path;
 double etapa;
 double total_battery;
+int global_nc;
+double global_ec_persec;
+double global_speed;
 // https://www.wired.com/story/the-physics-of-why-bigger-drones-can-fly-longer/
 int main (int argc, char *argv[])
 {
@@ -59,6 +62,9 @@ int main (int argc, char *argv[])
 	cmd.AddValue ("Etapa", "", etapa);
 	cmd.AddValue("TotalBattery", "", total_battery);
 	cmd.Parse (argc, argv);
+
+	global_ec_persec = total_battery/27*60; // bt /restime
+	global_speed = 5.0; // m/s
 	
 	// LogComponentEnable("MyOnOffApplication", LOG_DEBUG);
 	LogComponentEnable("ServerApplication", LOG_DEBUG);

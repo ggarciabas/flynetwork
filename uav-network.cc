@@ -339,6 +339,14 @@ void UavNetwork::Run()
 
   Simulator::Schedule(Seconds(m_simulationTime-0.001), &UavNetwork::PrintFinalUavEnergy, this);
   Simulator::Stop(Seconds(m_simulationTime));
+
+
+  std::ostringstream os;
+  os << global_path << "/" << m_pathData << "/uav_network_log.txt";
+  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  m_file << etapa << " " << global_speed << " " << global_nc << " " << global_ec_persec << std::endl;
+  m_file.close();
+
   NS_LOG_DEBUG("Iniciando Simulador");
   Simulator::Run();
   NS_LOG_DEBUG("Finalizando Simulador");  
@@ -829,6 +837,8 @@ void UavNetwork::ConfigureCli()
     NS_LOG_ERROR(ss.str().c_str());
     exit(-1);
   }    
+
+  global_nc = m_totalCli;
   
   // aggregate SmartphoneApp on node and configure it!
   Ptr<UniformRandomVariable> e_ai = CreateObject<UniformRandomVariable>(); // Padrão [0,1]

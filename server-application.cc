@@ -1177,15 +1177,14 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
 {
   // NS_LOG_DEBUG ("ServerApplication::CalculateCusto > uavId: " << uav->GetId() << " locId: " << loc->GetId());
   long double custo = 1.0;
-  double t_loc = CalculateDistance(uav->GetPosition(), loc->GetPosition()) / 5.0; // time to go to location
+  double t_loc = CalculateDistance(uav->GetPosition(), loc->GetPosition()) / global_speed; // time to go to location
   long double b_ui_atu = uav->GetTotalEnergy(); // bateria atual
   long double ce_ui_la_lj = uav->CalculateEnergyCost(CalculateDistance(uav->GetPosition(), loc->GetPosition())); // custo energetico
   long double ce_ui_lj_lc = uav->CalculateEnergyCost(CalculateDistance(loc->GetPosition(), central_pos));
-  long double b_ui_tot = uav->GetTotalBattery();
-  long double b_ui_res = b_ui_atu*0.98 - ce_ui_la_lj - ce_ui_lj_lc; // bateria residual
+  long double b_ui_res = b_ui_atu - ce_ui_la_lj - ce_ui_lj_lc; // bateria residual
   long double ce_te_lj = loc->GetTotalConsumption() * (m_scheduleServer-t_loc);
-  long double P_te = b_ui_res/ce_te_lj;
   double ce_hv;
+  double inf = global_nc*etapa*3 + (2*m_rmax/global_speed)*global_ec_persec + etapa*global_ec_persec; // 3 Joules/s wifi
 
   // NS_LOG_DEBUG ("b_ui_atu=" << b_ui_atu << " b_ui_res=" << b_ui_res);
 
@@ -1193,24 +1192,22 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
     switch (m_custo) {
       case 1:
       case 6: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/wifi/issues/45)
-        custo = (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot; // media do custo
+        custo = (ce_ui_la_lj + ce_ui_lj_lc) / inf; // media do custo
         break;
       case 2:
       case 7: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/wifi/issues/45
-        custo = 1.0/P_te; // UAV que terá mais bateria para servir a localizacao (conseguira servir por mais tempo)
+        custo = ce_te_lj/inf; // UAV que terá mais bateria para servir a localizacao (conseguira servir por mais tempo)
         // NS_LOG_DEBUG ("P_te=" << P_te << " custo=" << custo);
         break;
       case 3:
       case 8: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/wifi/issues/45
-        P_te = b_ui_res / (ce_te_lj + ce_ui_la_lj + ce_ui_lj_lc); // quantos TEs consegue suprir?!
-        custo = 1.0/P_te;
+        custo = (ce_te_lj + ce_ui_la_lj + ce_ui_lj_lc) / inf; // quantos TEs consegue suprir?!
         // NS_LOG_DEBUG ("P_te=" << P_te << " custo=" << custo);
         break;
       case 4: // custo 2 -> com hover
       case 9: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/wifi/issues/45
         ce_hv = uav->GetHoverCost()*(m_scheduleServer-t_loc) ; // custo para o TE inteiro, considerando locs e hover
-        P_te = b_ui_res / (ce_te_lj + ce_ui_la_lj + ce_ui_lj_lc + ce_hv);
-        custo = 1.0/P_te;
+        custo = (ce_te_lj + ce_ui_la_lj + ce_ui_lj_lc + ce_hv) / inf;
         // NS_LOG_DEBUG ("ce_hv=" << ce_hv << " P_te=" << P_te << " custo=" << custo);
         break;
       case 5: // aleatorio
@@ -1218,7 +1215,7 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
         break;
     }
   } else {
-    custo = 1.0;
+    custo = inf;
   }
 
   ////NS_LOG_DEBUG ("ServerApplication::CalculateCusto > mcusto: " << m_custo << " custo: " << custo);

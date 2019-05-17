@@ -1,6 +1,10 @@
 
 #include <string>
 
+extern double global_ec_persec;
+extern int global_nc; // totaol de cliente no cenario
+extern double global_speed;
+
 #ifndef GLOBAL_PATH
     extern std::string global_path;
     #define GLOBAL_PATH

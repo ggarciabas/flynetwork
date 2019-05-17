@@ -25,6 +25,8 @@
 #include "ns3/log.h"
 #include <cmath>
 
+#include "global-defines.h"
+
 namespace ns3
 {
 
@@ -40,7 +42,7 @@ UavMobilityModel::GetTypeId(void)
                           .SetGroupName("Flynetwork-Mobility")
                           .AddConstructor<UavMobilityModel>()
                           .AddAttribute("Speed", "The speed (m/s).",
-                                        DoubleValue(5),
+                                        DoubleValue(global_speed),
                                         MakeDoubleAccessor(&UavMobilityModel::SetSpeed,
                                                            &UavMobilityModel::GetSpeed),
                                         MakeDoubleChecker<double>(1, 10000))

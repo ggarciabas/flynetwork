@@ -645,13 +645,6 @@ void
 UavApplication::TracedCallbackExpiryLease (const Ipv4Address& ip)
 {
   NS_LOG_FUNCTION (m_id << ip);
-  // Remover informacoes do mapa ; m_mapClient
-  std::map<Ipv4Address, Ptr<ClientModel> >::iterator it = m_mapClient.find(ip);
-  if (m_mapClient.find(ip) == m_mapClient.end()) {
-    NS_FATAL_ERROR("UavApplication::TracedCallbackExpiryLease IP nao encontrado no container!");
-  }
-  (it->second)->SetLogin("NOPOSITION"); // ignorado ao enviar informacoes para o servidor
-
   if (m_cliDevice != NULL)
     m_cliDevice->RemoveClient();
 }
@@ -666,9 +659,7 @@ void UavApplication::TracedCallbackNewLease (const Ipv4Address& ip)
     obj.SetTypeId("ns3::ClientModel");
     obj.Set("Login", StringValue("NOPOSITION")); // id
     m_mapClient[ip] = obj.Create()->GetObject<ClientModel>();
-  } else {
-    (it->second)->SetLogin("NOPOSITION"); // ignorado ao enviar informacoes para o servidor, esperando atualizar
-  }
+  } 
 
   if (m_cliDevice != NULL)
     m_cliDevice->AddClient();
@@ -681,13 +672,13 @@ void UavApplication::SendCliData ()
     Simulator::Remove(m_sendCliDataEvent);
     std::ostringstream msg;
     msg << "DATA " << m_id << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRealRemainingEnergy();
+    double consump = m_meanConsumption / (double) m_mapClient.size();
     for(std::map<Ipv4Address, Ptr<ClientModel> >::iterator i = m_mapClient.begin(); i != m_mapClient.end(); i++)
     {
       if ((i->second)->GetLogin().compare("NOPOSITION") != 0) { // cliente com posicionamento atualizado
         msg << " " << (i->second)->GetLogin();
         msg << " " << (i->second)->GetUpdatePos().GetSeconds();
-        msg << " " << (i->second)->GetPosition().at(0) << " " << (i->second)->GetPosition().at(1) << " " << (i->second)->GetConsumption();
-        (i->second)->SetConsumption(0.0); // cosiderando consumo por etapa, por isto zerando o valor!
+        msg << " " << (i->second)->GetPosition().at(0) << " " << (i->second)->GetPosition().at(1) << " " << consump;
       }
     }
     
@@ -704,6 +695,9 @@ void UavApplication::SendCliData ()
     }
 
     m_sendCliDataEvent = Simulator::Schedule (Seconds(5.0), &UavApplication::SendCliData, this);
+
+    m_mapClient.clear(); // atualizando para nova etapa
+    m_meanConsumption = 0.0; // atualizando para nova etapa
   }
 }
 
