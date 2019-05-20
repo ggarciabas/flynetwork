@@ -269,9 +269,9 @@ void UavNetwork::Run()
   ss.str("");
   ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_energy_threshold";
   system(ss.str().c_str());
-  ss.str("");
-  ss << "mkdir -p " << global_path << "/" << m_pathData << "/etapa";
-  system(ss.str().c_str());
+  // ss.str("");
+  // ss << "mkdir -p " << global_path << "/" << m_pathData << "/etapa";
+  // system(ss.str().c_str());
   ss.str("");
   ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_recharged";
   system(ss.str().c_str());
@@ -546,10 +546,10 @@ void UavNetwork::RemoveUav(int id, int step)
   m_file.close();
 
   os.str("");
-  os << global_path << "/" << m_pathData << "/etapa/" << step << "/uav_removed_energy.txt";
+  os << global_path << "/" << m_pathData << "//uav_removed_energy.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   Ptr<UavDeviceEnergyModel> dev = uavApp->GetUavDevice();
-  m_file << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetRealRemainingEnergy() / dev->GetEnergySource()->GetInitialEnergy() << std::endl;
+  m_file << Simulator::Now().GetSeconds() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetRealRemainingEnergy() / dev->GetEnergySource()->GetInitialEnergy() << std::endl;
   m_file.close();
 
   n = 0;
@@ -1184,12 +1184,12 @@ void UavNetwork::PrintUavEnergy (int t)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<t);
   std::ostringstream os;
-  os << global_path << "/" << m_pathData << "/etapa/" << t << "/uav_energy.txt";
+  os << global_path << "/" << m_pathData << "/uav_energy.txt";
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   for (UavApplicationContainer::Iterator it = m_uavAppContainer.Begin(); it != m_uavAppContainer.End(); ++it) {
     Ptr<UavDeviceEnergyModel> dev = (*it)->GetUavDevice();
-    file << (*it)->GetId()  << "," << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetRealRemainingEnergy() << "," << dev->GetEnergySource()->GetInitialEnergy() << std::endl;
+    file << Simulator::Now().GetSeconds() << "," << (*it)->GetId()  << "," << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetRealRemainingEnergy() << "," << dev->GetEnergySource()->GetInitialEnergy() << std::endl;
   }
   file.close();
 }

@@ -547,15 +547,15 @@ void ServerApplication::Run ()
   {
     NS_LOG_DEBUG("\tSERVER - Iniciando execução dos DAs @" << Simulator::Now().GetSeconds());
     std::ostringstream ss;
-    ss << "mkdir -p " << global_path << "/"<<m_pathData<<"/etapa/" << m_step << "/mij";
-    system(ss.str().c_str());
-    std::ofstream file;
-    ss.str("");
-    ss <<global_path << "/" << m_pathData << "/etapa_time.txt";
-    file.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
-    file << m_step << "," << int(Simulator::Now().GetSeconds()) << "\n";
-    file.close();
-    ss.str("");
+    // ss << "mkdir -p " << global_path << "/"<<m_pathData<<"/etapa/" << m_step << "/mij";
+    // system(ss.str().c_str());
+    // std::ofstream file;
+    // ss.str("");
+    // ss <<global_path << "/" << m_pathData << "/etapa_time.txt";
+    // file.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
+    // file << m_step << "," << int(Simulator::Now().GetSeconds()) << "\n";
+    // file.close();
+    // ss.str("");
     #ifdef COMPARE_COST
       ss << "mkdir -p " << global_path << "/"<<m_pathData<<"/compare/" << m_step;
       system(ss.str().c_str());
@@ -619,12 +619,12 @@ void ServerApplication::CreateCentralLocation(void)
   loc->SetPosition(pos.x, pos.y);
   m_locationContainer.Add(loc);
 
-  std::ostringstream os;
-  os <<global_path << "/" << m_pathData << "/etapa/" << m_step << "/location_client.txt";
-  std::ofstream location_cli;
-  location_cli.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
-  location_cli << loc->GetId() << "," << loc->GetTotalCli() << "," << loc->GetTotalConsumption() << std::endl;
-  location_cli.close();
+  // std::ostringstream os;
+  // os <<global_path << "/" << m_pathData << "/etapa/" << m_step << "/location_client.txt";
+  // std::ofstream location_cli;
+  // location_cli.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
+  // location_cli << loc->GetId() << "," << loc->GetTotalCli() << "," << loc->GetTotalConsumption() << std::endl;
+  // location_cli.close();
 }
 
 double
@@ -721,9 +721,9 @@ void ServerApplication::runAgendamento(void)
   }
   NS_LOG_DEBUG ("FIM custo ---------------------------- @" << Simulator::Now().GetSeconds());
 
-  PrintCusto (custo_x, m_step, true, uav_ids, loc_ids);
+  // PrintCusto (custo_x, m_step, true, uav_ids, loc_ids);
 
-  std::ostringstream osloc, osuav, os;
+  std::ostringstream os;
 
   #ifdef COMPARE_COST
     std::ofstream file_uav, file_ule, file_l, file_c1, file_c2, file_c3, file_c4, file_uce, file_ult;
@@ -838,7 +838,7 @@ void ServerApplication::runAgendamento(void)
 
   NS_LOG_DEBUG("SERVER - Atualizando posicionamento dos UAVs @" << Simulator::Now().GetSeconds());
   int id, i = 0;
-  std::ofstream file;
+  // std::ofstream file;
   double t = 0.0;
   vector<vector<long double> > f_mij;
   for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
@@ -864,15 +864,15 @@ void ServerApplication::runAgendamento(void)
     // Salvando onde o UAV estava e para onde ele será enviado.
     NS_LOG_DEBUG("SERVER - Salvando onde o UAV estava e para onde ele será enviado");
     std::vector<double> vp = (*u_i)->GetPosition();
-    if (i == 0)
-      osuav << (*u_i)->GetId() << "," << vp.at(0) << "," << vp.at(1); // posicao do UAV
-    else
-      osuav << "," << (*u_i)->GetId() << "," << vp.at(0) << "," << vp.at(1); // posicao do UAV
+    // if (i == 0)
+    //   osuav << (*u_i)->GetId() << "," << vp.at(0) << "," << vp.at(1); // posicao do UAV
+    // else
+    //   osuav << "," << (*u_i)->GetId() << "," << vp.at(0) << "," << vp.at(1); // posicao do UAV
     vp = m_locationContainer.Get(id)->GetPosition();
-    if (i == 0)
-      osloc << id << "," << vp.at(0) << "," << vp.at(1); // posicao da LOC
-    else
-      osloc << "," << id << "," << vp.at(0) << "," << vp.at(1); // posicao da LOC
+    // if (i == 0)
+    //   osloc << id << "," << vp.at(0) << "," << vp.at(1); // posicao da LOC
+    // else
+    //   osloc << "," << id << "," << vp.at(0) << "," << vp.at(1); // posicao da LOC
 
     NS_LOG_DEBUG("SERVER - definindo novo posicionamento @" << Simulator::Now().GetSeconds());
 
@@ -891,18 +891,18 @@ void ServerApplication::runAgendamento(void)
     vp.clear();
   }
 
-  os.str("");
-  os << global_path << "/"<<m_pathData<<"/etapa/" << m_step << "/f_mij.txt";
-  PrintMij (f_mij, 0.0, os.str(), uav_ids, loc_ids);
+  // os.str("");
+  // os << global_path << "/"<<m_pathData<<"/etapa/" << m_step << "/f_mij.txt";
+  // PrintMij (f_mij, 0.0, os.str(), uav_ids, loc_ids);
 
-  os.str("");
-  os << global_path << "/"<<m_pathData<<"/etapa/"<<m_step<<"/uav_loc.txt";
-  file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
-  Vector serv_pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
-  file << m_maxx << "," << m_maxy << std::endl << serv_pos.x << "," << serv_pos.y << std::endl << osuav.str() << std::endl << osloc.str() << std::endl;
-  file.close();
+  // os.str("");
+  // os << global_path << "/"<<m_pathData<<"/etapa/"<<m_step<<"/uav_loc.txt";
+  // file.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
+  // Vector serv_pos = GetNode()->GetObject<MobilityModel>()->GetPosition();
+  // file << m_maxx << "," << m_maxy << std::endl << serv_pos.x << "," << serv_pos.y << std::endl << osuav.str() << std::endl << osloc.str() << std::endl;
+  // file.close();
 
-  PrintCusto (custo_x, m_step, false, uav_ids, loc_ids); // pode ter sido modificado no laco anterior, um UAv pode ter sido suprido
+  // PrintCusto (custo_x, m_step, false, uav_ids, loc_ids); // pode ter sido modificado no laco anterior, um UAv pode ter sido suprido
   m_printUavEnergy(m_step); // esperando a solucao final, UAVs podem ser trocados
 
   NS_LOG_DEBUG ("-- Finalizado posicionamento dos UAVs @" << Simulator::Now().GetSeconds());
@@ -1411,12 +1411,12 @@ void ServerApplication::DoDispose() {
 void ServerApplication::runDA() {
   //NS_LOG_DEBUG("ServerApplication::runDA @" << Simulator::Now().GetSeconds());
 
-  std::ofstream file;
-  std::ostringstream os;
-  os.str("");
-  os << global_path << "/"<<m_pathData<<"/etapa/"<<m_step<<"/client.txt";
-  file.open(os.str().c_str(), std::ofstream::out);
-  bool first = true;
+  // std::ofstream file;
+  // std::ostringstream os;
+  // os.str("");
+  // os << global_path << "/"<<m_pathData<<"/etapa/"<<m_step<<"/client.txt";
+  // file.open(os.str().c_str(), std::ofstream::out);
+  // bool first = true;
   double tMov = m_clientContainer.GetN();
   double tFix = m_fixedClientContainer.GetN();
   double pFix = 2; // peso dos clientes fixos - clientes móveis sempre com peso de 1"
@@ -1424,27 +1424,27 @@ void ServerApplication::runDA() {
   {
     (*i)->EraseLocation();
     (*i)->SetPci(1/(tMov+tFix*pFix));
-    if (first) {
-      file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
-      first = false;
-    } else {
-      file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
-    }
+    // if (first) {
+    //   file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
+    //   first = false;
+    // } else {
+    //   file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
+    // }
   }
   for (ClientModelContainer::Iterator i = m_fixedClientContainer.Begin(); i != m_fixedClientContainer.End(); ++i)
   {
     (*i)->EraseLocation();
     (*i)->SetPci(pFix/(tMov+tFix*pFix));
-    if (first) {
-      file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
-      first = false;
-    } else {
-      file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
-    }
+    // if (first) {
+    //   file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
+    //   first = false;
+    // } else {
+    //   file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
+    // }
   }
-  file << std::endl;
-  file.close ();
-  m_clientPosition (os.str ()); // Adicionando informacoes reais do ambiente
+  // file << std::endl;
+  // file.close ();
+  // m_clientPosition (os.str ()); // Adicionando informacoes reais do ambiente
 
   m_clientDaContainer.Clear();
   m_clientDaContainer.Add(m_fixedClientContainer); // clientes fixos antes pra dar prioridade na capacidade do UAV!
@@ -1476,9 +1476,9 @@ void ServerApplication::runDA() {
   int locId = 0;
   int max_iterB = 5000;
 
-  os.str("");
-  os <<global_path << "/" << m_pathData << "/etapa/" << m_step << "/da_log.txt";
-  file.open(os.str().c_str(), std::ofstream::out);
+  // os.str("");
+  // os <<global_path << "/" << m_pathData << "/etapa/" << m_step << "/da_log.txt";
+  // file.open(os.str().c_str(), std::ofstream::out);
   // //NS_LOG_DEBUG ("\n\t t_min =" << t_min << "\n \t r_max =" << r_max << "\n \t ptUav ="<< ptUav << "\n \t ptCli =" << ptCli << "\n \t fsInterf ="
   //             << fsInterf  << "\n \t dRCli =" << dRCli << "\n \t sinrCliMin =" << sinrCliMin<< "\n \t fcCli ="
   //             << fcCli  << "\n \t comp_onda =" << comp_onda << "\n \t pi =" << pi << "\n \t maxDrUav =" << maxDrUav << "\n \t gain =" << gain
@@ -1506,7 +1506,7 @@ void ServerApplication::runDA() {
   int iter = 0;
   do {// laco A
     iter++;
-    file << "------------------------------> ItA: " << iter  << " temp: " << t << "\n";
+    // file << "------------------------------> ItA: " << iter  << " temp: " << t << "\n";
     int tMovCon = 0;
     int tFixCon = 0;
     bool locConnected = true;
@@ -1555,13 +1555,13 @@ void ServerApplication::runDA() {
               // calcular a SNR e caso seja maior que o mínimo, considerar cliente conectado
               (*lj)->NewClient(dRCli, (*ci)->GetConsumption(), dcilj);
               (*ci)->SetDataRate(sinr_dBm);
-              file << "tFix: " << tFixCon << "\ttMovCon: " << tMovCon << std::endl;
+              // file << "tFix: " << tFixCon << "\ttMovCon: " << tMovCon << std::endl;
             }
           }
         }
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           if (Zci < 1e-90) {
-            file << "--> Zci esta baixo! @" << Simulator::Now().GetSeconds() << "\n";
+            // file << "--> Zci esta baixo! @" << Simulator::Now().GetSeconds() << "\n";
             // t *= 1.2; // aumenta 120%
             t = 0.1;
             percentCli *= 0.7; // reduz 70%
@@ -1599,7 +1599,7 @@ void ServerApplication::runDA() {
         }
       }
 
-      file << "Itb: " << iterB << "\n\tTemp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false") << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n";
+      // file << "Itb: " << iterB << "\n\tTemp: " << t << "\n\ttMovCon: " << tMovCon << "\n\ttFixCon: " << tFixCon << "\n\tLocConnected: " << ((locConnected) ? "true" : "false") << "\n\tCapacidade: " << ((capacidade) ? "true":"false") << "\n";
 
     } while (movimentoB && iterB < max_iterB);
 
@@ -1607,25 +1607,29 @@ void ServerApplication::runDA() {
       if (capacidade) {
         if (tFixCon == tFix) {
           if (tMovCon >= tMov*percentCli) {
-            file << "--> Finalizado - temp=" << t << std::endl;
+            // file << "--> Finalizado - temp=" << t << std::endl;
             // t *= 0.5; // resfria bastante
-            GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
+            // GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
             break;
-          } else {
-            file << "--> " << iter << " @"<< Simulator::Now().GetSeconds() << " clientes móveis nao conectados [" << percentCli << "] !\n";
-          }
-        } else {
-          file << "--> " << iter << " @"<< Simulator::Now().GetSeconds() << " clientes fixos nao conectados! t[" << t << "]\n";
-        }
-      } else {
-        file << "--> " << iter << " @"<< Simulator::Now().GetSeconds() << " capacidade superior!\n";
-      }
-    } else {
-      file << "--> " << iter << " @"<< Simulator::Now().GetSeconds() << " localizações não conecatadas!\n";
-    }
+          } 
+          // else {
+          //   file << "--> " << iter << " @"<< Simulator::Now().GetSeconds() << " clientes móveis nao conectados [" << percentCli << "] !\n";
+          // }
+        } 
+        // else {
+        //   file << "--> " << iter << " @"<< Simulator::Now().GetSeconds() << " clientes fixos nao conectados! t[" << t << "]\n";
+        // }
+      } 
+      // else {
+      //   file << "--> " << iter << " @"<< Simulator::Now().GetSeconds() << " capacidade superior!\n";
+      // }
+    } 
+    // else {
+    //   file << "--> " << iter << " @"<< Simulator::Now().GetSeconds() << " localizações não conecatadas!\n";
+    // }
 
     if (!MovimentoA()) { // } || (tFixCon != tFix && t == 0.1)) {
-      file << "--> Solicitando nova localizacao por não existir movimento em A @" << Simulator::Now().GetSeconds() << std::endl;
+      // file << "--> Solicitando nova localizacao por não existir movimento em A @" << Simulator::Now().GetSeconds() << std::endl;
       // new_uav:
       Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
       nLoc->SetId(locId++);
@@ -1637,7 +1641,7 @@ void ServerApplication::runDA() {
       nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
       FindFather (m_locationContainer.GetN()-1, r_max, uav_cob, lCentral, true);
       t *= 2.0;
-      GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
+      // GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
         (*lj)->IniciarMovimentoA();
         (*lj)->LimparHistorico();
@@ -1646,7 +1650,7 @@ void ServerApplication::runDA() {
       continue;
     }
 
-    GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
+    // GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
     // Reiniciar Movimento A para cada Localizacao
     for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
       (*lj)->IniciarMovimentoA();
@@ -1658,8 +1662,8 @@ void ServerApplication::runDA() {
 
   } while (t > t_min); // laco da temperatura
 
-  file << std::endl;
-  file.close ();
+  // file << std::endl;
+  // file.close ();
 
   m_totalCliGeral = 0;
   m_locConsTotal = 0; // atualiza total de consumo de todas as localizacoes
@@ -1672,13 +1676,13 @@ void ServerApplication::runDA() {
   // }
   // file.close();
 
-  os.str("");
-  os <<global_path << "/" << m_pathData << "/etapa/" << m_step << "/client_data_rate.txt";
-  file.open(os.str().c_str(), std::ofstream::out);
-  for (ClientModelContainer::Iterator ci = m_clientContainer.Begin(); ci != m_clientContainer.End(); ++ci) {
-    file << (*ci)->GetLogin() << "," << (*ci)->GetDataRate() << std::endl;
-  }
-  file.close();
+  // os.str("");
+  // os <<global_path << "/" << m_pathData << "/etapa/" << m_step << "/client_data_rate.txt";
+  // file.open(os.str().c_str(), std::ofstream::out);
+  // for (ClientModelContainer::Iterator ci = m_clientContainer.Begin(); ci != m_clientContainer.End(); ++ci) {
+  //   file << (*ci)->GetLogin() << "," << (*ci)->GetDataRate() << std::endl;
+  // }
+  // file.close();
 
   if ( m_locConsTotal == 0) {
     m_locConsTotal = 1.0; // para nao dar problemas no calculo
@@ -2148,10 +2152,10 @@ void ServerApplication::runDAPython()
       obj.SetTypeId("ns3::LocationModel");
       uint32_t id = 0;
       m_locConsTotal = 0.0;
-      os.str("");
-      os <<global_path << "/" << m_pathData << "/etapa/" << m_step << "/location_client.txt";
-      std::ofstream location_cli;
-      location_cli.open(os.str().c_str(), std::ofstream::out);
+      // os.str("");
+      // os <<global_path << "/" << m_pathData << "/etapa/" << m_step << "/location_client.txt";
+      // std::ofstream location_cli;
+      // location_cli.open(os.str().c_str(), std::ofstream::out);
       while (getline(cenario_in, line))
       {
         sscanf(line.c_str(), "%lf,%lf\n", &x, &y); // new location
@@ -2186,12 +2190,12 @@ void ServerApplication::runDAPython()
         NS_LOG_INFO (loc->toString());
         m_locConsTotal += total; // atualiza total de consumo de todas as localizacoes
 
-        location_cli << loc->GetId() << "," << loc->GetTotalCli() << "," << loc->GetTotalConsumption() << std::endl;
+        // location_cli << loc->GetId() << "," << loc->GetTotalCli() << "," << loc->GetTotalConsumption() << std::endl;
       }
       if ( m_locConsTotal == 0) {
         m_locConsTotal = 1.0; // para nao dar problemas no calculo
       }
-      location_cli.close();
+      // location_cli.close();
       cenario_in.close();
     }
     else
