@@ -265,11 +265,13 @@ void UavDeviceEnergyModel::HoverConsumption(void)
   DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceHover(energyToDecrease);
 
   // salvando historico do consumo de bateria
-  std::ostringstream os;
-  os << global_path << "/" << m_pathData << "/uav_hover/uav_hover_" << m_source->GetNode()->GetId() << ".txt";
-  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease / m_source->GetInitialEnergy() << std::endl;
-  m_file.close();
+  #ifdef HOVER
+    std::ostringstream os;
+    os << global_path << "/" << m_pathData << "/uav_hover/uav_hover_" << m_source->GetNode()->GetId() << ".txt";
+    m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease / m_source->GetInitialEnergy() << std::endl;
+    m_file.close();
+  #endif
 
   m_lastTime = Simulator::Now();
   m_hoverEvent = Simulator::Schedule(m_energyUpdateInterval,
@@ -292,11 +294,13 @@ void UavDeviceEnergyModel::CourseChange (Ptr<const MobilityModel> mob) // Chamad
   DynamicCast<UavEnergySource> (m_source)->UpdateEnergySourceMove(energyToDecrease);
 
   // salvando historico do consumo de bateria por movimentacao
-  std::ostringstream os;
-  os << global_path << "/" << m_pathData << "/uav_move/uav_move_" << m_source->GetNode()->GetId() << ".txt";
-  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease / m_source->GetInitialEnergy() << std::endl;
-  m_file.close();  
+  #ifdef MOVE
+    std::ostringstream os;
+    os << global_path << "/" << m_pathData << "/uav_move/uav_move_" << m_source->GetNode()->GetId() << ".txt";
+    m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease / m_source->GetInitialEnergy() << std::endl;
+    m_file.close();  
+  #endif
 }
 
 void UavDeviceEnergyModel::SetFlying(bool f) {

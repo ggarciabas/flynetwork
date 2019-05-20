@@ -254,15 +254,19 @@ void UavNetwork::Run()
   ss.str("");
   ss << "mkdir -p " << global_path << "/" << m_pathData << "/course_changed";
   system(ss.str().c_str());
-  ss.str("");
-  ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_remaining_energy";
-  system(ss.str().c_str());
-  ss.str("");
-  ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_hover";
-  system(ss.str().c_str());
-  ss.str("");
-  ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_move";
-  system(ss.str().c_str());
+  // ss.str("");
+  // ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_remaining_energy";
+  // system(ss.str().c_str());
+  #ifdef HOVER
+    ss.str("");
+    ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_hover";
+    system(ss.str().c_str());
+  #endif
+  #ifdef MOVE
+    ss.str("");
+    ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_move";
+    system(ss.str().c_str());
+  #endif
   ss.str("");
   ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_energy";
   system(ss.str().c_str());
@@ -281,9 +285,9 @@ void UavNetwork::Run()
   ss.str("");
   ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_client";
   system(ss.str().c_str());
-  ss.str("");
-  ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_wifi";
-  system(ss.str().c_str());
+  // ss.str("");
+  // ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_wifi";
+  // system(ss.str().c_str());
   ss.str("");
   ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_stop";
   system(ss.str().c_str());

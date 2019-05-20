@@ -57,7 +57,7 @@ SmartphoneApplication::GetTypeId(void)
                                         MakeStringChecker())
                           .AddAttribute("App",
                                         "Smartphone application",
-                                        StringValue("NONE"),
+                                        StringValue("NOTHING"),
                                         MakeStringAccessor(&SmartphoneApplication::m_app),
                                         MakeStringChecker())
                           .AddAttribute("Port",
@@ -190,12 +190,14 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
         NS_LOG_DEBUG("SmartphoneApplication::SendPacketUav @" << Simulator::Now().GetSeconds() <<  " " << m_id << " " << m_ip << " enviado.");
 
         #ifdef PACKET_UAV_CLI
-          std::ostringstream os;
-          os << global_path << "/" << m_pathData << "/client/" << m_ip << ".txt";
-          std::ofstream file;
-          file.open(os.str(), std::ofstream::out | std::ofstream::app);
-          file << Simulator::Now().GetSeconds() << " ENVIADO UAV" << std::endl; // ENVIADO
-          file.close();
+          #ifdef LOG_CLIENT
+            std::ostringstream os;
+            os << global_path << "/" << m_pathData << "/client/" << m_ip << ".txt";
+            std::ofstream file;
+            file.open(os.str(), std::ofstream::out | std::ofstream::app);
+            file << Simulator::Now().GetSeconds() << " ENVIADO UAV" << std::endl; // ENVIADO
+            file.close();
+          #endif
         #endif
       }
       else
@@ -203,12 +205,14 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
         NS_LOG_DEBUG("SmartphoneApplication::SendPacketUav @" << Simulator::Now().GetSeconds() <<  " " << m_id << " " << m_ip << " erro ao enviar.");
         NS_LOG_ERROR("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " - UAV NAO");
         #ifdef PACKET_UAV_CLI
-          std::ostringstream os;
-          os << global_path << "/" << m_pathData << "/client/" << m_ip << ".txt";
-          std::ofstream file;
-          file.open(os.str(), std::ofstream::out | std::ofstream::app);
-          file << Simulator::Now().GetSeconds() << " FALHA UAV" << std::endl; // FALHA
-          file.close();
+          #ifdef LOG_CLIENT
+            std::ostringstream os;
+            os << global_path << "/" << m_pathData << "/client/" << m_ip << ".txt";
+            std::ofstream file;
+            file.open(os.str(), std::ofstream::out | std::ofstream::app);
+            file << Simulator::Now().GetSeconds() << " FALHA UAV" << std::endl; // FALHA
+            file.close();
+          #endif
         #endif
         if (m_connected) {
           m_sendEventUav = Simulator::Schedule(Seconds(1.0), &SmartphoneApplication::SendPacketUav, this);
@@ -220,12 +224,14 @@ void SmartphoneApplication::SendPacketUav(void) // envia posicionamento atual pa
       NS_LOG_DEBUG("SmartphoneApplication::SendPacketUav @" << Simulator::Now().GetSeconds() << " " << m_id << " " << m_ip << " erro ao conectar com o servidor.");
       NS_LOG_INFO ("CLIENTE [" << m_id << "] @" << Simulator::Now().GetSeconds() << " erro ao conectar socket com servidor " << m_uavPeer);
       #ifdef PACKET_UAV_CLI
-        std::ostringstream os;
-        os << global_path << "/" << m_pathData << "/client/" << m_ip << ".txt";
-        std::ofstream file;
-        file.open(os.str(), std::ofstream::out | std::ofstream::app);
-        file << Simulator::Now().GetSeconds() << " NAO_CONECTADO UAV" << std::endl; // NAO CONECTADO
-        file.close();
+        #ifdef LOG_CLIENT
+          std::ostringstream os;
+          os << global_path << "/" << m_pathData << "/client/" << m_ip << ".txt";
+          std::ofstream file;
+          file.open(os.str(), std::ofstream::out | std::ofstream::app);
+          file << Simulator::Now().GetSeconds() << " NAO_CONECTADO UAV" << std::endl; // NAO CONECTADO
+          file.close();
+        #endif
       #endif
       return;
     }
@@ -449,18 +455,19 @@ void SmartphoneApplication::SetNode(Ptr<Node> node)
 
 void SmartphoneApplication::ConfigureApplication (const Ipv4Address& ip)
 {
-  std::ofstream cliLogin;
-  std::ostringstream ss;
-  ss.str("");
-  ss << global_path << "/" << m_pathData << "/client/client_" << m_id << ".txt";
-  cliLogin.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
-  cliLogin << Simulator::Now().GetSeconds() << " CONFIGURE " << m_login;
+  // std::ofstream cliLogin;
+  // std::ostringstream ss;
+  // ss.str("");
+  // ss << global_path << "/" << m_pathData << "/client/client_" << m_id << ".txt";
+  // cliLogin.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
+  // cliLogin << Simulator::Now().GetSeconds() << " CONFIGURE " << m_login;
   // configure OnOff application para server    
   int port = 0;
   ObjectFactory onoffFac;
   m_onoff = 0;
   m_appOnoff = m_app; // atualizando a aplicacao que esta sendo configurado o onoff!
-  if (m_app.compare ("VOICE") != 0) { // VOICE
+  std::cout << "Aplicacao: " << m_appOnoff << "\n";
+  if (m_appOnoff.compare ("VOICE") == 0) { // VOICE
       onoffFac.SetTypeId ("ns3::MyOnOffApplication");
       onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
       onoffFac.Set ("PacketSize", UintegerValue (50));
@@ -475,8 +482,8 @@ void SmartphoneApplication::ConfigureApplication (const Ipv4Address& ip)
       m_onoff->SetStopTime(Seconds(etapa)); // considerando 111 minutos mensal, 3.7 diario - http://www.teleco.com.br/comentario/com631.asp
       m_onoff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, this));
       m_node->AddApplication (m_onoff);
-      cliLogin << " VOICE" << std::endl;
-  } else if (m_app.compare ("VIDEO") != 0) { // VIDEO
+      // cliLogin << " VOICE" << std::endl;
+  } else if (m_appOnoff.compare ("VIDEO") == 0) { // VIDEO
       onoffFac.SetTypeId ("ns3::MyOnOffApplication");
       #ifdef TCP_CLI
         onoffFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
@@ -495,8 +502,8 @@ void SmartphoneApplication::ConfigureApplication (const Ipv4Address& ip)
       m_onoff->SetStopTime(Seconds(etapa)); 
       m_onoff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, this));
       m_node->AddApplication (m_onoff);
-      cliLogin << " VIDEO" << std::endl;
-  } else if (m_app.compare ("WWW") != 0) { // WWW
+      // cliLogin << " VIDEO" << std::endl;
+  } else if (m_appOnoff.compare ("WWW") == 0) { // WWW
       onoffFac.SetTypeId ("ns3::MyOnOffApplication");
       #ifdef TCP_CLI
         onoffFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
@@ -515,11 +522,10 @@ void SmartphoneApplication::ConfigureApplication (const Ipv4Address& ip)
       m_onoff->SetStopTime(Seconds(etapa));
       m_onoff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, this));
       m_node->AddApplication (m_onoff);
-      cliLogin << " WWW" << std::endl;
-  } else if (m_app.compare ("NOTHING") != 0) { // NOTHING
-      cliLogin << " NOTHING" << std::endl;
-  } else
-    NS_FATAL_ERROR ("UavNetwork .. application error");
+      // cliLogin << " WWW" << std::endl;
+  } else if (m_appOnoff.compare ("NOTHING") != 0) { 
+      NS_FATAL_ERROR ("UavNetwork .. application error");
+  }
 }
 
 } // namespace ns3
