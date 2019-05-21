@@ -549,13 +549,13 @@ void ServerApplication::Run ()
     std::ostringstream ss;
     // ss << "mkdir -p " << global_path << "/"<<m_pathData<<"/etapa/" << m_step << "/mij";
     // system(ss.str().c_str());
-    // std::ofstream file;
-    // ss.str("");
-    // ss <<global_path << "/" << m_pathData << "/etapa_time.txt";
-    // file.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
-    // file << m_step << "," << int(Simulator::Now().GetSeconds()) << "\n";
-    // file.close();
-    // ss.str("");
+    std::ofstream file;
+    ss.str("");
+    ss <<global_path << "/" << m_pathData << "/etapa_time.txt";
+    file.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
+    file << m_step << "," << int(Simulator::Now().GetSeconds()) << "\n";
+    file.close();
+    ss.str("");
     #ifdef COMPARE_COST
       ss << "mkdir -p " << global_path << "/"<<m_pathData<<"/compare/" << m_step;
       system(ss.str().c_str());
