@@ -148,7 +148,7 @@ public:
     return m_hoverEnergy;
     }
 
-  void TimeEnergy(Time);
+  void TimeEnergy(double);
 
 private:
   /// Defined in ns3::Object

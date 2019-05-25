@@ -273,9 +273,9 @@ void UavNetwork::Run()
   ss.str("");
   ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_energy_threshold";
   system(ss.str().c_str());
-  // ss.str("");
-  // ss << "mkdir -p " << global_path << "/" << m_pathData << "/etapa";
-  // system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p " << global_path << "/" << m_pathData << "/etapa";
+  system(ss.str().c_str());
   ss.str("");
   ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_recharged";
   system(ss.str().c_str());
@@ -749,7 +749,7 @@ void UavNetwork::ConfigureUav(int total)
 
     // energy start
     DynamicCast<UavEnergySource>(sources.Get(c))->Start();
-    DynamicCast<UavEnergySource>(sources.Get(c))->TimeEnergy(Seconds(m_uavTimingNext));
+    DynamicCast<UavEnergySource>(sources.Get(c))->TimeEnergy(m_uavTimingNext);
 
     // Configure DHCP
     // The router must have a fixed IP.

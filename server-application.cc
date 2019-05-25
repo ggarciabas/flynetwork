@@ -547,8 +547,8 @@ void ServerApplication::Run ()
   {
     NS_LOG_DEBUG("\tSERVER - Iniciando execução dos DAs @" << Simulator::Now().GetSeconds());
     std::ostringstream ss;
-    // ss << "mkdir -p " << global_path << "/"<<m_pathData<<"/etapa/" << m_step << "/mij";
-    // system(ss.str().c_str());
+    ss << "mkdir -p " << global_path << "/"<<m_pathData<<"/etapa/" << m_step << "";
+    system(ss.str().c_str());
     std::ofstream file;
     ss.str("");
     ss <<global_path << "/" << m_pathData << "/etapa_time.txt";
@@ -619,12 +619,12 @@ void ServerApplication::CreateCentralLocation(void)
   loc->SetPosition(pos.x, pos.y);
   m_locationContainer.Add(loc);
 
-  // std::ostringstream os;
-  // os <<global_path << "/" << m_pathData << "/etapa/" << m_step << "/location_client.txt";
-  // std::ofstream location_cli;
-  // location_cli.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
-  // location_cli << loc->GetId() << "," << loc->GetTotalCli() << "," << loc->GetTotalConsumption() << std::endl;
-  // location_cli.close();
+  std::ostringstream os;
+  os <<global_path << "/" << m_pathData << "/etapa/" << m_step << "/location_client.txt";
+  std::ofstream location_cli;
+  location_cli.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
+  location_cli << loc->GetId() << "," << loc->GetTotalCli() << "," << loc->GetTotalConsumption() << std::endl;
+  location_cli.close();
 }
 
 double
@@ -891,9 +891,9 @@ void ServerApplication::runAgendamento(void)
     vp.clear();
   }
 
-  // os.str("");
-  // os << global_path << "/"<<m_pathData<<"/etapa/" << m_step << "/f_mij.txt";
-  // PrintMij (f_mij, 0.0, os.str(), uav_ids, loc_ids);
+  os.str("");
+  os << global_path << "/"<<m_pathData<<"/etapa/" << m_step << "/f_mij.txt";
+  PrintMij (f_mij, 0.0, os.str(), uav_ids, loc_ids);
 
   // os.str("");
   // os << global_path << "/"<<m_pathData<<"/etapa/"<<m_step<<"/uav_loc.txt";
@@ -1411,12 +1411,12 @@ void ServerApplication::DoDispose() {
 void ServerApplication::runDA() {
   //NS_LOG_DEBUG("ServerApplication::runDA @" << Simulator::Now().GetSeconds());
 
-  // std::ofstream file;
-  // std::ostringstream os;
-  // os.str("");
-  // os << global_path << "/"<<m_pathData<<"/etapa/"<<m_step<<"/client.txt";
-  // file.open(os.str().c_str(), std::ofstream::out);
-  // bool first = true;
+  std::ofstream file;
+  std::ostringstream os;
+  os.str("");
+  os << global_path << "/"<<m_pathData<<"/etapa/"<<m_step<<"/client.txt";
+  file.open(os.str().c_str(), std::ofstream::out);
+  bool first = true;
   double tMov = m_clientContainer.GetN();
   double tFix = m_fixedClientContainer.GetN();
   double pFix = 2; // peso dos clientes fixos - clientes móveis sempre com peso de 1"
@@ -1424,27 +1424,27 @@ void ServerApplication::runDA() {
   {
     (*i)->EraseLocation();
     (*i)->SetPci(1/(tMov+tFix*pFix));
-    // if (first) {
-    //   file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
-    //   first = false;
-    // } else {
-    //   file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
-    // }
+    if (first) {
+      file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
+      first = false;
+    } else {
+      file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
+    }
   }
   for (ClientModelContainer::Iterator i = m_fixedClientContainer.Begin(); i != m_fixedClientContainer.End(); ++i)
   {
     (*i)->EraseLocation();
     (*i)->SetPci(pFix/(tMov+tFix*pFix));
-    // if (first) {
-    //   file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
-    //   first = false;
-    // } else {
-    //   file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
-    // }
+    if (first) {
+      file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
+      first = false;
+    } else {
+      file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
+    }
   }
-  // file << std::endl;
-  // file.close ();
-  // m_clientPosition (os.str ()); // Adicionando informacoes reais do ambiente
+  file << std::endl;
+  file.close ();
+  m_clientPosition (os.str ()); // Adicionando informacoes reais do ambiente
 
   m_clientDaContainer.Clear();
   m_clientDaContainer.Add(m_fixedClientContainer); // clientes fixos antes pra dar prioridade na capacidade do UAV!
