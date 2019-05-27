@@ -1688,9 +1688,9 @@ void ServerApplication::runDA() {
   os.str("");
   os <<global_path << "/" << m_pathData << "/etapa/" << m_step << "/client_loc.txt";
   file.open(os.str().c_str(), std::ofstream::out);
-  file << lCentral->GetXPosition() << "," << lCentral->GetYPosition() << std::endl;
+  file << lCentral->GetXPosition() << "," << lCentral->GetYPosition();
   for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-    file << (*lj)->GetXPosition() << "," << (*lj)->GetYPosition();
+    file << std::endl << (*lj)->GetXPosition() << "," << (*lj)->GetYPosition();
     for (std::vector<std::string>::iterator id = (*lj)->GetClient().begin(); id != (*lj)->GetClient().end(); ++id) {
       file << "," << m_clientContainer.Get(*id)->GetXPosition() << "," << m_clientContainer.Get(*id)->GetYPosition() << std::endl;
     }
