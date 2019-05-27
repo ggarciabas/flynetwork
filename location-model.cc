@@ -21,6 +21,7 @@
 #include "client-model.h"
 #include "ns3/simulator.h"
 #include "ns3/log.h"
+#include "client-model-container.h"
 
 # include <math.h>
 
@@ -240,14 +241,15 @@ void LocationModel::UpdateDistCli (double d) {
   m_maxDistCli = (d>m_maxDistCli) ? d : m_maxDistCli;
 }
 
-void LocationModel::NewClient (double dataRate, double cons, double dist) {
+void LocationModel::NewClient (double dataRate, double cons, double dist, Ptr<ClientModel> cli) {
   m_wij += dataRate;
   m_totalConsumption += cons;
   m_totaCli++;
   m_maxDistCli = (dist>m_maxDistCli) ? dist : m_maxDistCli;
+  m_cli.push_back(cli->GetLogin());
 }
 
-void LocationModel::RemoveClient (double dataRate, double cons) {
+void LocationModel::RemoveClient (double dataRate, double cons, Ptr<ClientModel> cli) {
   m_wij -= dataRate;
   m_totalConsumption -= cons;
   m_totaCli--;

@@ -17,6 +17,7 @@
  */
 #include "global-defines.h"
 
+#include "client-model-container.h"
 #include "uav-network.h"
 
 using namespace ns3;

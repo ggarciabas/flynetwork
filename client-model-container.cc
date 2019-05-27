@@ -83,6 +83,20 @@ ClientModelContainer::Get(uint32_t i) const
   return m_models[i];
 }
 
+Ptr<ClientModel>
+ClientModelContainer::Get(std::string id) const
+{
+  int c=0;
+  Iterator i;
+  for (i = m_models.begin(); i != m_models.end(); ++i, ++c) {
+    if (std::strcmp((*i)->GetLogin().c_str(), id.c_str()) == 0) {
+      break;
+    }
+  }
+  if (i != m_models.end()) return Get(uint32_t(c)); // nao remover se nao existe!
+  return NULL;
+}
+
 void ClientModelContainer::Add(ClientModelContainer container)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );

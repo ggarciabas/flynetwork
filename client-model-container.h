@@ -29,13 +29,15 @@
 namespace ns3
 {
 
+class ClientModel;
+
 /**
  * \ingroup FlyNetwork
  */
 class ClientModelContainer
 {
 public:
-  typedef std::vector<Ptr<ClientModel>>::const_iterator Iterator;
+  typedef std::vector<Ptr<ClientModel> >::const_iterator Iterator;
 
 public:
   /**
@@ -82,6 +84,7 @@ public:
    * \returns The requested Ptr<ClientModel>.
    */
   Ptr<ClientModel> Get(uint32_t i) const;
+  Ptr<ClientModel> Get(std::string id) const; 
 
   /**
    * \param container Another ClientModelContainer.

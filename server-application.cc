@@ -1524,6 +1524,7 @@ void ServerApplication::runDA() {
         double Zci = 0.0;
         double low_dchilj = 1.5; // maior distancia é 1.0, valores normalizados!
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+          (*lj)->ClearClientString();
           double dcilj = CalculateDistance((*ci)->GetPosition(r_max), (*lj)->GetPosition(r_max));
           double pljci = std::exp ( - ((dcilj + (*lj)->GetWij()/maxDrUav + (((*ci)->IsConnected()) ? 1 : 0))/t) ); // NOVO - Verifica se o cliente possui conexao, caso nao tenha calcula normalmente, senao adiciona 1 para que a probabilidade deste em relacao ao UAv seja insignificante.
           Zci += pljci;
@@ -1548,12 +1549,12 @@ void ServerApplication::runDA() {
                   lCon = 0;
                   continue; // nao faz alteracoes! Desnecessario!
                 }
-                lCon->RemoveClient(dRCli, (*ci)->GetConsumption());
+                lCon->RemoveClient(dRCli, (*ci)->GetConsumption(), (*ci));
               }
               lCon = 0;
               (*ci)->SetLocConnected((*lj));
               // calcular a SNR e caso seja maior que o mínimo, considerar cliente conectado
-              (*lj)->NewClient(dRCli, (*ci)->GetConsumption(), dcilj);
+              (*lj)->NewClient(dRCli, (*ci)->GetConsumption(), dcilj, (*ci));
               (*ci)->SetDataRate(sinr_dBm);
               // file << "tFix: " << tFixCon << "\ttMovCon: " << tMovCon << std::endl;
             }
@@ -1609,7 +1610,7 @@ void ServerApplication::runDA() {
           if (tMovCon >= tMov*percentCli) {
             // file << "--> Finalizado - temp=" << t << std::endl;
             // t *= 0.5; // resfria bastante
-            // GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
+            GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
             break;
           } 
           // else {
@@ -1683,6 +1684,18 @@ void ServerApplication::runDA() {
   //   file << (*ci)->GetLogin() << "," << (*ci)->GetDataRate() << std::endl;
   // }
   // file.close();
+
+  os.str("");
+  os <<global_path << "/" << m_pathData << "/etapa/" << m_step << "/client_loc.txt";
+  file.open(os.str().c_str(), std::ofstream::out);
+  file << lCentral->GetXPosition() << "," << lCentral->GetYPosition() << std::endl;
+  for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
+    file << (*lj)->GetXPosition() << "," << (*lj)->GetYPosition();
+    for (std::vector<std::string>::iterator id = (*lj)->GetClient().begin(); id != (*lj)->GetClient().end(); ++id) {
+      file << "," << m_clientContainer.Get(*id)->GetXPosition() << "," << m_clientContainer.Get(*id)->GetYPosition() << std::endl;
+    }
+  }
+  file.close();
 
   if ( m_locConsTotal == 0) {
     m_locConsTotal = 1.0; // para nao dar problemas no calculo

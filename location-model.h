@@ -94,8 +94,8 @@ public:
   double GetMaxDistClient ();
 
   void InitializeWij (double);
-  void NewClient (double, double, double);
-  void RemoveClient (double, double);
+  void NewClient (double, double, double, Ptr<ClientModel>);
+  void RemoveClient (double, double, Ptr<ClientModel>);
   double GetWij ();
 
   void SetTempPljci (double);
@@ -129,6 +129,9 @@ public:
 
   void UpdatePosition (double mx, double my);
 
+  std::vector<std::string> GetClient () { return m_cli; }
+  void ClearClientString () { m_cli.clear(); }
+
 private:
   void DoDispose ();
   std::vector<double> m_positionA;
@@ -155,6 +158,7 @@ private:
   // double m_plj; // acumulado da parte da equação referente a p(l_j)
 
   std::map<Ptr<ClientModel>, double> m_pljci;
+  std::vector<std::string> m_cli;
   Ptr<LocationModel> m_father;
   LocationModelContainer m_childList;
 };
