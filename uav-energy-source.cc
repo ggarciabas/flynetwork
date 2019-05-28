@@ -276,9 +276,9 @@ void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
     //   NS_FATAL_ERROR("UavEnergySource::UpdateEnergySourceClient energy bellow ZERO! [" << m_node->GetId() << "] " << m_remainingEnergyJ << "J ____  " << energyToDecrease << "J @" << Simulator::Now().GetSeconds());
     // }
     // else
-    {
-      m_remainingEnergyJ -= energyToDecrease;
-    }
+    // {
+    m_remainingEnergyJ -= energyToDecrease;
+    // }
 
     m_clientEnergy += energyToDecrease;
     m_clientTE += energyToDecrease;

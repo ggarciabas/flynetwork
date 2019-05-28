@@ -106,9 +106,9 @@ void ClientDeviceEnergyModel::HandleEnergyRecharged (void)
   m_totalEnergyConsumption = 0;
   m_clientCount = 0;
   this->m_lastUpdateTime = Simulator::Now ();
-  #ifdef COM_SERVER
-    m_cliEvent = Simulator::Schedule(m_energyUpdateInterval, &ClientDeviceEnergyModel::ClientConsumption, this);
-  #endif
+  // #ifdef COM_SERVER
+  m_cliEvent = Simulator::Schedule(m_energyUpdateInterval, &ClientDeviceEnergyModel::ClientConsumption, this);
+  // #endif
 }
 
 void ClientDeviceEnergyModel::HandleEnergyOff(void)
@@ -131,9 +131,9 @@ void ClientDeviceEnergyModel::HandleEnergyDepletion(void)
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   if (!m_energyDepletionCallback.IsNull())  m_energyDepletionCallback();
   m_clientCount = 0;
-  #ifdef COM_SERVER
-    ClientConsumption(); // update battery
-  #endif
+  // #ifdef COM_SERVER
+  ClientConsumption(); // update battery
+  // #endif
   Simulator::Remove(m_cliEvent);
 }
 
@@ -186,18 +186,18 @@ ClientDeviceEnergyModel::GetTotalEnergyConsumption (void) const
 void ClientDeviceEnergyModel::AddClient ()
 {
   // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  #ifdef COM_SERVER
-    ClientConsumption(); // update battery
-  #endif
+  // #ifdef COM_SERVER
+  ClientConsumption(); // update battery
+  // #endif
   m_clientCount++;
 }
 
 void ClientDeviceEnergyModel::RemoveClient()
 {
   // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  #ifdef COM_SERVER
-    ClientConsumption(); // update battery
-  #endif
+  // #ifdef COM_SERVER
+  ClientConsumption(); // update battery
+  // #endif
   m_clientCount--;
 }
 
@@ -222,9 +222,9 @@ void ClientDeviceEnergyModel::ClientConsumption ()
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << Simulator::Now().GetSeconds() << "," << energyToDecrease / m_source->GetInitialEnergy() << std::endl;
   m_file.close();
-  #ifdef COM_SERVER
-    m_cliEvent = Simulator::Schedule(m_energyUpdateInterval, &ClientDeviceEnergyModel::ClientConsumption, this);
-  #endif
+  // #ifdef COM_SERVER
+  m_cliEvent = Simulator::Schedule(m_energyUpdateInterval, &ClientDeviceEnergyModel::ClientConsumption, this);
+  // #endif
 }
 
 void ClientDeviceEnergyModel::DoDispose (void)
@@ -240,9 +240,9 @@ void ClientDeviceEnergyModel::DoInitialize (void)
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   // update last update time stamp
   m_lastUpdateTime = Simulator::Now ();
-  #ifdef COM_SERVER
+  // #ifdef COM_SERVER
     m_cliEvent = Simulator::Schedule(m_energyUpdateInterval, &ClientDeviceEnergyModel::ClientConsumption, this);
-  #endif
+  // #endif
 }
 
 double

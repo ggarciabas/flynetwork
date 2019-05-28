@@ -134,11 +134,7 @@ void UavApplication::Start(double stoptime) {
   m_goto[0] = 0.0; // reiniciando posicionamento goto
   m_goto[1] = 0.0;
   // threshold do uav necessario calcular somente uma vez
-  #ifdef DEV_WIFI
-    DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold());
-  #else
-    DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold());
-  #endif
+  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold());
 }
 
 void UavApplication::StartApplication(void)
@@ -248,11 +244,7 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   }
 
   // threshold do uav necessario calcular somente uma vez
-  #ifdef DEV_WIFI
-    DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold()); // removido do depletion os valores do wifi, posi assim que entra, este 'desliga o wifi' [[+m_meanConsumption*2]]
-  #else
-    DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold());
-  #endif
+  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold()); // removido do depletion os valores do wifi, posi assim que entra, este 'desliga o wifi' [[+m_meanConsumption*2]]
 
   // ligar wifi quando chegar ao posicionamento correto
   // m_wifiDevice->HandleEnergyOn();
@@ -661,7 +653,7 @@ void UavApplication::TracedCallbackNewLease (const Ipv4Address& ip)
     obj.SetTypeId("ns3::ClientModel");
     obj.Set("Login", StringValue("NOPOSITION")); // id
     m_mapClient[ip] = obj.Create()->GetObject<ClientModel>();
-  } 
+  }
 
   if (m_cliDevice != NULL)
     m_cliDevice->AddClient();
