@@ -1459,7 +1459,7 @@ void ServerApplication::runDA() {
   double ptCli = 28; // dBm - potencia de transmissao máxima para o Ap Aironet 1550 series 802.11n 2.4GHz
   double fsInterf = 0.0008; // fator de sobreposicao de espaco 5 (50%)
   double dRCli = 6.5; // Mbps - taxa considerada por usuário
-  double raio_cob = 115.47; // metros - para clientes utilizando equação de antena direcional com esparramento verificar Klaine2018
+  double raio_cob = 50.0; // metros - para clientes utilizando equação de antena direcional com esparramento verificar Klaine2018
   double sinrCliMin = -93; // dBm - tabela de Receive sensitivity para 2.4GHz 802.11n (HT20) MCS 0
   double lambda = 3e8/2.4e9; // metros
   double b = 3.7;
