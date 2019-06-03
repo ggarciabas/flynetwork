@@ -51,7 +51,7 @@ double global_cli_cob;
 int main (int argc, char *argv[])
 {
 	double sim_time=1200.0, cli_pos_update = 5.0;
-	uint32_t scenario = 7, env = 2, protocol = 2, custo=1, seed=9042019;
+	uint32_t scenario = 7, env = 2, protocol = 1, custo=1, seed=9042019;
 	global_cli_cob = 115.47; // metros - para clientes utilizando equação de antena direcional com esparramento verificar Klaine2018
 	global_uav_cob = 280.5; // metros verificar distancia_sinr.py
 	total_battery = 156960;
