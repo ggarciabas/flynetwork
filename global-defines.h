@@ -4,6 +4,8 @@
 extern double global_ec_persec;
 extern int global_nc; // totaol de cliente no cenario
 extern double global_speed;
+extern double global_uav_cob;
+extern double global_cli_cob;
 
 #ifndef GLOBAL_PATH
     extern std::string global_path;

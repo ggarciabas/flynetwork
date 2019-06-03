@@ -45,11 +45,15 @@ double total_battery;
 int global_nc;
 double global_ec_persec;
 double global_speed;
+double global_uav_cob;
+double global_cli_cob;
 // https://www.wired.com/story/the-physics-of-why-bigger-drones-can-fly-longer/
 int main (int argc, char *argv[])
 {
 	double sim_time=1200.0, cli_pos_update = 5.0;
 	uint32_t scenario = 7, env = 2, protocol = 2, custo=1, seed=9042019;
+	global_cli_cob = 115.47; // metros - para clientes utilizando equação de antena direcional com esparramento verificar Klaine2018
+	global_uav_cob = 280.5; // metros verificar distancia_sinr.py
 	total_battery = 156960;
 	CommandLine cmd;
 	cmd.AddValue ("SimTime", "Simulation time", sim_time);
@@ -61,6 +65,8 @@ int main (int argc, char *argv[])
 	cmd.AddValue ("Seed", "Seed", seed);
 	cmd.AddValue ("GlobalPath", "Global Path", global_path);
 	cmd.AddValue ("Etapa", "", etapa);
+	cmd.AddValue ("UavCob", "", global_uav_cob);
+	cmd.AddValue ("CliCob", "", global_cli_cob);
 	cmd.AddValue("TotalBattery", "", total_battery);
 	cmd.Parse (argc, argv);
 

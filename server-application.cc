@@ -1455,11 +1455,11 @@ void ServerApplication::runDA() {
   double r_max = std::sqrt(std::pow(m_maxx, 2) + std::pow(m_maxy, 2));
   // 1550 series https://www.cisco.com/c/en/us/products/collateral/wireless/aironet-1550-series/data_sheet_c78-641373.html
   // 1570 series https://www.cisco.com/c/en/us/products/wireless/aironet-1570-series/datasheet-listing.html
-  double uav_cob = 280.5; // metros verificar distancia_sinr.py
+  double uav_cob = global_uav_cob; 
   double ptCli = 28; // dBm - potencia de transmissao máxima para o Ap Aironet 1550 series 802.11n 2.4GHz
   double fsInterf = 0.0008; // fator de sobreposicao de espaco 5 (50%)
   double dRCli = 6.5; // Mbps - taxa considerada por usuário
-  double raio_cob = 50.0; // metros - para clientes utilizando equação de antena direcional com esparramento verificar Klaine2018
+  double raio_cob = global_cli_cob; 
   double sinrCliMin = -93; // dBm - tabela de Receive sensitivity para 2.4GHz 802.11n (HT20) MCS 0
   double lambda = 3e8/2.4e9; // metros
   double b = 3.7;
