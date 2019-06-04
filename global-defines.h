@@ -22,6 +22,26 @@ extern double global_cli_cob;
     #define TOTAL_BATTERY
 #endif
 
+#ifndef UDP
+    #define UDP 
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // #ifndef COM_SERVER
 //     #define COM_SERVER
 // #endif
@@ -42,9 +62,7 @@ extern double global_cli_cob;
 //   #define TCP_CLI 
 //#endif
 
-#ifndef UDP
-    #define UDP 
-#endif
+
 
 #ifndef PACKET_UAV_CLI
     #define PACKET_UAV_CLI

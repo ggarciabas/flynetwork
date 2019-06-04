@@ -32,10 +32,6 @@
 #include "ns3/energy-module.h"
 #include "uav-energy-source.h"
 #include "uav-device-energy-model.h"
-#include "client-device-energy-model.h"
-
-#include "client-model-container.h"
-#include "client-model.h"
 
 using namespace std;
 
@@ -65,34 +61,16 @@ public:
   void EnergyDepletionCallback();
   void EnergyRechargedCallback();
 
-  void Reset();
-
   void CourseChange (Ptr<const MobilityModel>);
 
   void TracedCallbackRxApp (Ptr<const Packet> packet, const Address & address);
-  void TracedCallbackRxAppInfra (Ptr<const Packet> packet, const Address & address);
-  void TracedCallbackRxOnOff (Ptr<const Packet> packet, const Address & address);
-  // void TurnOffWifiPhy ();
-  // void SetTurnOffWifiPhyCallback(OffWifiPhyCallback adhoc, OffWifiPhyCallback infra);
-
-  void TotalEnergyConsumptionTrace (double oldV, double newV);
-  void TracedCallbackNewLease (const Ipv4Address& ip);
-  void TracedCallbackExpiryLease (const Ipv4Address& ip);
 
   void Start(double);
   void Stop();
 
-  void SetWifiDevice (Ptr<WifiRadioEnergyModel> dev);
-  Ptr<WifiRadioEnergyModel> GetWifiDevice() {
-    return m_wifiDevice;
-  }
   void SetUavDevice (Ptr<UavDeviceEnergyModel> dev);
   Ptr<UavDeviceEnergyModel> GetUavDevice () {
     return m_uavDevice;
-  }
-  void SetCliDevice (Ptr<ClientDeviceEnergyModel> dev);
-  Ptr<ClientDeviceEnergyModel> GetCliDevice () {
-    return m_cliDevice;
   }
 
 private:
@@ -108,43 +86,30 @@ private:
   void SendPacket(void);
   void SendCliData ();
   void SendPacketDepletion(void);
-  void AskCliPosition();
 
   uint32_t m_id;
   uint16_t m_serverPort;
-  uint16_t m_cliPort;
   std::vector<double> m_goto;
   std::vector<double> m_central;
-  double m_meanConsumption; // consumo medio do UAV
   Ipv4Address m_addressAdhoc;
   double m_updateTime;
-  double m_cliUpdateTime;
   Ipv4Address m_peer;
   DataRate m_dataRate;
   Ptr<Socket> m_sendSck; // sending socket
-  Ptr<Socket> m_socketClient;
   EventId m_sendEvent; 
   EventId m_sendCliDataEvent;
   EventId m_packetDepletion;
-  EventId m_askCliPos;
   bool m_running;
   TracedCallback<std::string> m_packetTrace;
-  Callback<void> m_setOffWifiPhyInfra; // turn off wifiphy
-  Callback<void> m_setOffWifiPhyAdhoc; // turn off wifiphy
-  Ptr<WifiRadioEnergyModel> m_wifiDevice;
   Ptr<UavDeviceEnergyModel> m_uavDevice;
-  Ptr<ClientDeviceEnergyModel> m_cliDevice;
 
   bool m_depletion;// para identificar estado de emergencia
 
-  std::map<Ipv4Address, Ptr<ClientModel> > m_mapClient;
+  // std::map<Ipv4Address, Ptr<ClientModel> > m_mapClient;
 
-  Ptr<WifiRadioEnergyModel> m_wifiRadioEnergyModel;
   Ptr<UavEnergySource> m_uavEnergySource;
 
   std::string m_pathData;
-
-  int m_totalLeased;
 
 };
 

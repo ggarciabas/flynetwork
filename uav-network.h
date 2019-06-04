@@ -43,8 +43,6 @@
 namespace ns3
 {
 
-  class SmartphoneApplication;
-
 /**
  * UavNetwork
  *
@@ -69,19 +67,6 @@ public:
   typedef void (*NewUavTrace)(int total, int update);
   typedef void (*ClientPositionTrace)(string name);
 
-
-  /**
-   * TracedCallback signature.
-   */
-  typedef void (*PacketTraceServer)(std::string msg);
-  typedef void (*PacketTraceUav)(std::string msg);
-  typedef void (*PacketTraceClient)(std::string msg);
-  typedef void (*PrintTraceUavEnergy)(int i);
-
-  void PacketUav(std::string);
-  void PacketServer(std::string);
-  void PacketClient(std::string);
-
   void PrintUavEnergy (int i);
 
   void PrintFinalUavEnergy();
@@ -91,8 +76,6 @@ private:
   void ConfigureCli();
   void ConfigurePalcos();
   void ConfigureServer();
-  void ConfigureApplication();
-  void ConfigureApplicationServer ();
 
 
 private:
@@ -128,14 +111,9 @@ private:
   UavNodeContainer m_uavNode;
   NodeContainer m_serverNode;
   YansWifiChannelHelper m_channelHelper;
-  YansWifiChannelHelper m_channelHelperCli;
   YansWifiPhyHelper m_phyHelper;
-  YansWifiPhyHelper m_phyHelperCli;
   WifiMacHelper m_macAdHocHelper;
-  WifiMacHelper m_macWifiHelper;
-  WifiMacHelper m_macWifiHelperCli;
   WifiHelper m_adhocHelper;
-  WifiHelper m_wifiHelper;
   uint32_t m_protocol;
   uint32_t m_custo;
   uint32_t m_seed;
@@ -150,21 +128,10 @@ private:
 
   // AthstatsHelper m_athstats;
 
-  std::string m_propagationLossCli;
-
-  Ipv4AddressHelper m_addressHelperCli; // modificar estratégia de conexão do cliente para com os UAVs
   Ipv4AddressHelper m_addressHelper;
 
   Ptr<ServerApplication> m_serverApp;
-  // std::ostringstream m_ssgnuPalcos;
-  // AnimationInterface*         m_animation;
-  // Ptr<OutputStreamWrapper> m_routintable;
-  // Ptr<OutputStreamWrapper> m_routintableUav;
-  // Ptr<OutputStreamWrapper> m_routintableUser;
   Ipv4StaticRoutingHelper m_ipv4RoutingHelper;
-  std::ofstream m_filePacketServer;
-  std::ofstream m_filePacketUav;
-  std::ofstream m_filePacketClient;
   InternetStackHelper m_stack;
 
   UavApplicationContainer   m_uavAppContainer;

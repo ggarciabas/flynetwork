@@ -28,41 +28,6 @@ namespace ns3
 
 NS_LOG_COMPONENT_DEFINE("UavNodeContainer");
 
-// TypeId
-// UavNodeContainer::GetTypeId(void)
-// {
-//   static TypeId tid = TypeId("ns3::UavNodeContainer")
-//                           .SetParent<Object>()
-//                           .SetGroupName("Flynetwork-Energy")
-//                           .AddConstructor<UavNodeContainer>();
-//   return tid;
-// }
-//
-// UavNodeContainer::UavNodeContainer() {
-//   NodeContainer();
-// }
-//
-// UavNodeContainer::UavNodeContainer(Ptr<Node> model) {
-//   NodeContainer (model);
-// }
-//
-// UavNodeContainer::UavNodeContainer(std::string modelName) {
-//   NodeContainer(modelName);
-// }
-//
-// UavNodeContainer::UavNodeContainer(const NodeContainer &a,const NodeContainer &b)
-// {
-//   NodeContainer(a, b);
-// }
-//
-// UavNodeContainer::UavNodeContainer(const UavNodeContainer &a,const UavNodeContainer &b) {
-//   NodeContainer(DynamicCast<NodeContainer>(a), DynamicCast<NodeContainer>(b));
-// }
-//
-// UavNodeContainer::~UavNodeContainer() {
-//   ~NodeContainer();
-// }
-
 void UavNodeContainer::Clear() {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG ("UavNodeContainer::Clear");

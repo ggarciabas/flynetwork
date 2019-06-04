@@ -131,16 +131,12 @@ public:
   double GetWifiAcum () { return m_wifiAcum; }
   double GetMoveAcum () { return m_movAcum; }
   double GetHoverAcum () { return m_hoverAcum; }
-  double GetCliAcum () { return m_cliAcum; }
 
   double GetRealRemainingEnergy(); // para saber a bateria correta quando (problema com wifiEnergyModule!)
 
   double GetWifiEnergy () {
     return m_wifiEnergy;
   }
-  double GetClientEnergy () {
-    return m_clientEnergy;
-    }
   double GetMoveEnergy () {
     return m_moveEnergy;
     }
@@ -186,21 +182,18 @@ private:
 private:
 
   double m_wifiTE; // timing energy calculation
-  double m_clientTE;
   double m_moveTE;
   double m_hoverTE;
 
   EventId m_timeEnergy;
 
   double m_wifiEnergy;
-  double m_clientEnergy;
   double m_moveEnergy;
   double m_hoverEnergy;
 
   double m_initialEnergyJ;                // initial energy, in Joules
   double m_supplyVoltageV;                // supply voltage, in Volts
   double m_lowBatteryThUav;                 // low battery threshold, as a fraction of the initial energy
-  double m_lowBatteryThCli;
   double m_highBatteryTh;                // high battery threshold, as a fraction of the initial energy
   bool m_depleted;                       // set to true when the remaining energy goes below the low threshold,
                                          // set to false again when the remaining energy exceeds the high threshold
@@ -224,8 +217,6 @@ private:
 
   Ptr<DeviceEnergyModel> m_uavDev;
   Ptr<UavDeviceEnergyModel> m_uavDevModel;
-  Ptr<DeviceEnergyModel> m_cliDev;
-  Ptr<ClientDeviceEnergyModel> m_cliDevModel;
 
 };
 

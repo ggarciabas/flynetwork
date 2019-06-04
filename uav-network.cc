@@ -33,9 +33,6 @@
 #include "uav-device-energy-model-helper.h"
 #include "client-device-energy-model-helper.h"
 #include "uav-model.h"
-#include "smartphone-application.h"
-// #include "dhcp-helper-uav.h"
-// #include "dhcp-server-uav.h"
 
 #include <fstream>
 #include <cstdlib>
@@ -333,13 +330,6 @@ void UavNetwork::Run()
   NS_LOG_INFO("Configurando Cliente");
   ConfigureCli();
 
-  #ifndef COM_SERVER
-    m_newApp = Simulator::Schedule(Seconds(10), &UavNetwork::ConfigureApplication, this);
-  #endif
-
-  #ifdef COM_SERVER
-    m_newApp = Simulator::Schedule(Seconds(10), &UavNetwork::ConfigureApplicationServer, this);
-  #endif
 
   Simulator::Schedule(Seconds(m_simulationTime-0.001), &UavNetwork::PrintFinalUavEnergy, this);
   Simulator::Stop(Seconds(m_simulationTime));
@@ -398,8 +388,6 @@ void UavNetwork::ConfigureServer()
   serverMobility->SetPosition(Vector(m_cx, m_cy, m_zValue));
   m_serverNode.Get(0)->AggregateObject(serverMobility);
 
-  std::cout << "Server Address: " << m_serverAddress.GetAddress(0) << std::endl;
-
   // configurando PacketSink
   ObjectFactory packFacAdhoc;
   packFacAdhoc.SetTypeId ("ns3::PacketSink");
@@ -422,12 +410,10 @@ void UavNetwork::ConfigureServer()
   obj.Set("Environment", UintegerValue(m_environment));
   obj.Set("Ipv4Address", Ipv4AddressValue(m_serverAddress.GetAddress(0)));
   obj.Set("ServerPort", UintegerValue(m_serverPort));
-  obj.Set("ClientPort", UintegerValue(m_cliPort));
   obj.Set("MaxX", DoubleValue(m_xmax));
   obj.Set("MaxY", DoubleValue(m_ymax));
   obj.Set("PathData", StringValue(m_pathData));
   obj.Set("ScenarioName", StringValue(m_scenarioName));
-  std::cout << "m_scheduleServer=" << m_scheduleServer << std::endl;
   obj.Set("ScheduleServer", DoubleValue(m_scheduleServer));
   obj.Set("Custo", UintegerValue(m_custo));
 
@@ -438,7 +424,6 @@ void UavNetwork::ConfigureServer()
   m_serverApp->TraceConnectWithoutContext("NewUav", MakeCallback(&UavNetwork::NewUav, this));// adicionando callback para criar UAVs
   m_serverApp->TraceConnectWithoutContext("PrintUavEnergy", MakeCallback(&UavNetwork::PrintUavEnergy, this));
   m_serverApp->TraceConnectWithoutContext("RemoveUav", MakeCallback(&UavNetwork::RemoveUav, this));
-  // m_serverApp->TraceConnectWithoutContext("PacketTrace", MakeCallback(&UavNetwork::PacketServer, this));
   m_serverApp->TraceConnectWithoutContext("ClientPositionTrace", MakeCallback(&UavNetwork::ClientPosition, this));
 
   // trace do PacketSink RX
@@ -536,7 +521,7 @@ void UavNetwork::RemoveUav(int id, int step)
     --app;
   } while (uavApp==NULL && app >= 0);
   NS_ASSERT (uavApp != NULL);
-  uavApp->Stop();
+  uavApp->Stop(); // aqui já limpa o container de clientes
 
   // modificando posicionamento para fora do cenario
   Vector v (m_iniX, m_iniY,0);
@@ -569,8 +554,6 @@ void UavNetwork::ConfigureUav(int total)
   // configura comunicação adhoc
   NetDeviceContainer adhoc = m_adhocHelper.Install(m_phyHelper, m_macAdHocHelper, uav);
 
-  // configura comunicação wifi
-  NetDeviceContainer wifi = m_wifiHelper.Install(m_phyHelperCli, m_macWifiHelper, uav);
   // configurando internet
   m_stack.Install(uav);
 
@@ -606,23 +589,6 @@ void UavNetwork::ConfigureUav(int total)
   energyHelper.Set("xCentral", DoubleValue(m_cx)); // utilizado para calcular o threshold dinamicamente
   energyHelper.Set("yCentral", DoubleValue(m_cy));
 
-  /* client device energy model*/
-  #ifdef DEV_CLI
-    ClientDeviceEnergyModelHelper cliHelper;
-    DeviceEnergyModelContainer cliEnergyModels = cliHelper.Install(wifi, sources); // install on node, but device is used to set callbacks!
-  #endif
-
-  /* device energy model */
-  #ifdef DEV_WIFI
-    WifiRadioEnergyModelHelper radioEnergyHelper;
-    // configure radio energy model
-    radioEnergyHelper.Set ("TxCurrentA", DoubleValue (0.0174));
-    // install device model
-    DeviceEnergyModelContainer deviceModelsWifi = radioEnergyHelper.Install (wifi, sources);
-    // install device model
-    // DeviceEnergyModelContainer deviceModelsAdhoc = radioEnergyHelper.Install (adhoc, sources); // como diferenciar para nao desligar adhoc?! 
-  #endif
-
   // create and configure UAVApp and Sink application
   int c = 0;
   std::ostringstream oss, poolAddr, minAddr, maxAddr, serverAddr;
@@ -643,54 +609,6 @@ void UavNetwork::ConfigureUav(int total)
     app->SetStopTime(Seconds(m_simulationTime));
     (*i)->AddApplication (app);
 
-    ObjectFactory packFacInfra;
-    packFacInfra.SetTypeId ("ns3::PacketSink");
-    #ifdef TCP_CLI
-      packFacInfra.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
-    #else
-      packFacInfra.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
-    #endif
-    packFacInfra.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), m_cliPort))); // OPS: utilizam Ipv4Address::GetAny ()
-    Ptr<Application> appInfra = packFacInfra.Create<Application> ();
-    appInfra->SetStartTime(Seconds(0.0));
-    appInfra->SetStopTime(Seconds(m_simulationTime));
-    (*i)->AddApplication (appInfra);
-
-    ObjectFactory packVoice;
-    packVoice.SetTypeId ("ns3::PacketSink");
-    packVoice.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
-    packVoice.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), 5060))); // OPS: utilizam Ipv4Address::GetAny ()
-    Ptr<Application> appVoice = packVoice.Create<Application> ();
-    appVoice->SetStartTime(Seconds(0.0));
-    appVoice->SetStopTime(Seconds(m_simulationTime));
-    (*i)->AddApplication (appVoice);
-
-    ObjectFactory packVideo;
-    packVideo.SetTypeId ("ns3::PacketSink");
-    #ifdef TCP_CLI
-      packVideo.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
-    #else
-      packVideo.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
-    #endif
-    packVideo.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), 5070))); // OPS: utilizam Ipv4Address::GetAny ()
-    Ptr<Application> appVideo = packVideo.Create<Application> ();
-    appVideo->SetStartTime(Seconds(0.0));
-    appVideo->SetStopTime(Seconds(m_simulationTime));
-    (*i)->AddApplication (appVideo);
-
-    ObjectFactory packWww;
-    packWww.SetTypeId ("ns3::PacketSink");
-    #ifdef TCP_CLI
-      packWww.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
-    #else
-      packWww.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
-    #endif
-    packWww.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), 8080))); // OPS: utilizam Ipv4Address::GetAny ()
-    Ptr<Application> appWww = packWww.Create<Application> ();
-    appWww->SetStartTime(Seconds(0.0));
-    appWww->SetStopTime(Seconds(m_simulationTime));
-    (*i)->AddApplication (appWww);   
-
     ObjectFactory obj; // create UavApplication
     obj.SetTypeId("ns3::UavApplication");
     obj.Set("Id", UintegerValue((*i)->GetId()));
@@ -700,28 +618,15 @@ void UavNetwork::ConfigureUav(int total)
     obj.Set("DataRate", DataRateValue(DataRate("11Mbps")));
     obj.Set("AdhocAddress", Ipv4AddressValue(addContainer.GetAddress(c)));
     obj.Set("ServerPort", UintegerValue(m_serverPort));
-    obj.Set("ClientPort", UintegerValue(m_cliPort));
     obj.Set("PathData", StringValue(m_pathData));
-
-    std::cout << "Uav #" << (*i)->GetId() << " IP " << addContainer.GetAddress(c) << std::endl;
 
     Ptr<UavApplication> uavApp = obj.Create()->GetObject<UavApplication>();
     uavApp->SetStartTime(Seconds(0.0));
     uavApp->SetStopTime(Seconds(0.01));
 
-    // uavApp->TraceConnectWithoutContext("PacketTrace", MakeCallback(&UavNetwork::PacketUav, this));
     Ptr<WifiNetDevice> wifiDeviceAdhoc = DynamicCast<WifiNetDevice> (adhoc.Get(c));
     Ptr<WifiPhy> wifiPhyAdhoc = wifiDeviceAdhoc->GetPhy ();
-    Ptr<WifiNetDevice> wifiDeviceInfra = DynamicCast<WifiNetDevice> (wifi.Get(c));
-    Ptr<WifiPhy> wifiPhyInfra = wifiDeviceInfra->GetPhy ();
-    // uavApp->SetTurnOffWifiPhyCallback(MakeCallback(&WifiPhy::SetOffMode, wifiPhyAdhoc),MakeCallback(&WifiPhy::SetOffMode, wifiPhyInfra));
-    // trace do PacketSink RX
     app->TraceConnectWithoutContext ("Rx", MakeCallback (&UavApplication::TracedCallbackRxApp, uavApp));
-    appInfra->TraceConnectWithoutContext ("Rx", MakeCallback (&UavApplication::TracedCallbackRxAppInfra, uavApp));
-
-    appVoice->TraceConnectWithoutContext ("Rx", MakeCallback (&UavApplication::TracedCallbackRxOnOff, uavApp));
-    appVideo->TraceConnectWithoutContext ("Rx", MakeCallback (&UavApplication::TracedCallbackRxOnOff, uavApp));
-    appWww->TraceConnectWithoutContext ("Rx", MakeCallback (&UavApplication::TracedCallbackRxOnOff, uavApp));
 
     // aggregate to the node
     (*i)->AddApplication(uavApp);
@@ -734,14 +639,6 @@ void UavNetwork::ConfigureUav(int total)
 
     // adicionando devices no UAVApp
     uavApp->SetUavDevice(dev);
-    #ifdef DEV_CLI
-      uavApp->SetCliDevice(DynamicCast<ClientDeviceEnergyModel>(cliEnergyModels.Get(c)));
-    #endif
-    #ifdef DEV_WIFI
-      uavApp->SetWifiDevice(DynamicCast<WifiRadioEnergyModel>(deviceModelsWifi.Get(c)));
-      // Configure TotalEnergyConsumption
-      deviceModelsWifi.Get(c)->TraceConnectWithoutContext ("TotalEnergyConsumption", MakeCallback(&UavApplication::TotalEnergyConsumptionTrace,  uavApp));
-    #endif
 
     // Mobility    
     (*i)->GetObject<MobilityModel>()->TraceConnectWithoutContext ("CourseChange", MakeCallback (&UavApplication::CourseChange, uavApp));
@@ -751,30 +648,6 @@ void UavNetwork::ConfigureUav(int total)
     DynamicCast<UavEnergySource>(sources.Get(c))->Start();
     DynamicCast<UavEnergySource>(sources.Get(c))->TimeEnergy(m_uavTimingNext);
 
-    // Configure DHCP
-    // The router must have a fixed IP.
-    poolAddr.str(""); minAddr.str(""); maxAddr.str(""); serverAddr.str("");
-    serverAddr << "192.168." << (*i)->GetId() << ".1";
-    minAddr << "192.168." << (*i)->GetId() << ".2";
-    maxAddr << "192.168." << (*i)->GetId() << ".254";
-    poolAddr << "192.168." << (*i)->GetId() << ".0";
-    DhcpHelper dhcpHelper;
-    // http://www.tcpipguide.com/free/t_DHCPLeaseRenewalandRebindingProcesses-2.htm
-    dhcpHelper.SetServerAttribute("RebindTime", TimeValue(Seconds(10)));
-    dhcpHelper.SetServerAttribute("RenewTime", TimeValue(Seconds(5)));
-    dhcpHelper.SetServerAttribute("LeaseTime", TimeValue(Seconds(etapa/2)));
-    Ipv4InterfaceContainer fixedNodes = dhcpHelper.InstallFixedAddress (wifi.Get (c), Ipv4Address (serverAddr.str().c_str()), Ipv4Mask ("/24"));
-    // Not really necessary, IP forwarding is enabled by default in IPv4.
-    fixedNodes.Get (0).first->SetAttribute ("IpForward", BooleanValue (true));
-    // DHCP server
-    ApplicationContainer dhcpServerApp = dhcpHelper.InstallDhcpServer (wifi.Get (c),
-                        Ipv4Address (serverAddr.str().c_str()),
-                        Ipv4Address (poolAddr.str().c_str()), Ipv4Mask ("/24"),
-                        Ipv4Address (minAddr.str().c_str()), Ipv4Address (maxAddr.str().c_str()),
-                        Ipv4Address (serverAddr.str().c_str()));
-    dhcpServerApp.Get(0)->TraceConnectWithoutContext("NewLease", MakeCallback(&UavApplication::TracedCallbackNewLease, uavApp));
-    dhcpServerApp.Get(0)->TraceConnectWithoutContext("ExpireLease", MakeCallback(&UavApplication::TracedCallbackExpiryLease, uavApp));
-    dhcpServerApp.Stop (Seconds(m_simulationTime));
     m_uavAppContainer.Add(uavApp); // armazenando informacoes das aplicacoes dos UAVs para que os clientes possam obter informacoes necessarias para se conectar no UAV mais proximo!
   }  
 
@@ -815,8 +688,9 @@ void UavNetwork::ConfigureCli()
         int t = app_rand->GetValue();
         nodes.Create(t);
         update_total += t;
-        devices.Add(m_wifiHelper.Install(m_phyHelperCli, m_macWifiHelperCli, nodes));
-        stack.Install(nodes);
+        // devices.Add(m_wifiHelper.Install(m_phyHelperCli, m_macWifiHelperCli, nodes));
+        // stack.Install(nodes);
+        // TODO_NEW: verificar se existe algum problema executar simulacoes com nós sem devices!
         MobilityHelper mobilityCLI;
         Ptr<PositionAllocator> positionAlloc = CreateObjectWithAttributes<RandomDiscPositionAllocator>
                             ("X", DoubleValue (x),
@@ -843,211 +717,6 @@ void UavNetwork::ConfigureCli()
   }    
 
   global_nc = m_totalCli;
-  
-  // aggregate SmartphoneApp on node and configure it!
-  Ptr<UniformRandomVariable> e_ai = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
-  int c = 0;
-  std::ostringstream oss;
-  for (NodeContainer::Iterator i = m_clientNode.Begin(); i != m_clientNode.End(); ++i, ++c)
-  {
-    ss.str("");
-    ss << "login-" << (*i)->GetId();
-
-    // configure PacketSink
-    ObjectFactory packFac;
-    packFac.SetTypeId ("ns3::PacketSink"); // para receber informacoes do UAV
-    #ifdef TCP_CLI
-      packFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
-    #else
-      packFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
-    #endif
-    packFac.Set ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), m_cliPort))); // OPS: utilizam Ipv4Address::GetAny ()
-    Ptr<Application> app = packFac.Create<Application> ();
-    app->SetStartTime(Seconds(0.0));
-    app->SetStopTime(Seconds(m_simulationTime));
-    (*i)->AddApplication (app);
-
-    DhcpHelper dhcpHelper;
-    ApplicationContainer dhcpClients = dhcpHelper.InstallDhcpClient (devices.Get(c));
-    dhcpClients.Start (Seconds (2*e_ai->GetValue()));
-    dhcpClients.Stop (Seconds(m_simulationTime));
-    uint32_t id = (*i)->GetNApplications()-1;
-
-    // configurando Smartphone
-    ObjectFactory factory; // create SmartphoneApplication
-    factory.SetTypeId("ns3::SmartphoneApplication");
-    factory.Set("Id", UintegerValue((*i)->GetId()));
-    factory.Set("Login", StringValue(ss.str()));
-    factory.Set("Start", DoubleValue(e_ai->GetValue()));
-    factory.Set("PacketSink", PointerValue(StaticCast<PacketSink> (app)));
-    factory.Set("ChangePosition", DoubleValue(5.0)); // maximo de movimentacao para notificar o servidor
-    factory.Set("DataRate", DataRateValue(DataRate("11Mbps")));
-    factory.Set("Port", UintegerValue(m_cliPort));
-    factory.Set("IdDhcp", UintegerValue(id));
-    factory.Set("PathData", StringValue(m_pathData));
-
-    Ptr<SmartphoneApplication> smart = factory.Create()->GetObject<SmartphoneApplication>();
-    m_appSmart.push_back(smart);
-    smart->SetStartTime(Seconds(2*e_ai->GetValue()));
-    smart->SetStopTime(Seconds(m_simulationTime));
-
-    // smart->TraceConnectWithoutContext("PacketTrace", MakeCallback(&UavNetwork::PacketClient, this));
-
-    (*i)->GetObject<MobilityModel>()->TraceConnectWithoutContext("CourseChange", MakeCallback(&SmartphoneApplication::CourseChange, smart));
-
-    Ptr<WifiNetDevice> d = DynamicCast<WifiNetDevice>(devices.Get(c));
-    StaticCast<StaWifiMac>(d->GetMac())->TraceConnectWithoutContext("Assoc", MakeCallback(&SmartphoneApplication::TracedCallbackAssocLogger, smart));
-    StaticCast<StaWifiMac>(d->GetMac())->TraceConnectWithoutContext("DeAssoc", MakeCallback(&SmartphoneApplication::TracedCallbackDeAssocLogger, smart));
-
-    // DynamicCast<DhcpClient> (dhcpClients.Get (c))->TraceConnectWithoutContext("NewLease", MakeCallback(&SmartphoneApplication::TracedCallbackNewLease, smart));
-    (*i)->GetApplication(id)->TraceConnectWithoutContext("NewLease", MakeCallback(&SmartphoneApplication::TracedCallbackNewLease, smart));
-    (*i)->GetApplication(id)->TraceConnectWithoutContext("ExpireLease", MakeCallback(&SmartphoneApplication::TracedCallbackExpiryLease, smart));
-
-    // configurando trace Packetsink
-    app->TraceConnectWithoutContext ("Rx", MakeCallback (&SmartphoneApplication::TracedCallbackRxApp, smart));
-
-    // aggregate to the node
-    (*i)->AddApplication(smart);
-    smart->SetNode((*i));
-  }
-}
-
-void UavNetwork::ConfigureApplication ()
-{ // escolhe a aplicacao que o usuario ira criar quando em conexao!!
-  Ptr<UniformRandomVariable> app_rand = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
-  app_rand->SetAttribute ("Min", DoubleValue (0));
-  app_rand->SetAttribute ("Max", DoubleValue (4)); // MODIFICADO
-  
-  int c = 0;
-  std::ofstream cliLogin;
-  std::ostringstream ss;
-  for (NodeContainer::Iterator i = m_clientNode.Begin(); i != m_clientNode.End(); ++i, ++c)
-  {
-    ss.str("");
-    ss << global_path << "/" << m_pathData << "/wifi/client_" << (*i)->GetId() << ".txt";
-    cliLogin.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
-    cliLogin << Simulator::Now().GetSeconds() << " SET login-" << (*i)->GetId();
-
-    int app_code = app_rand->GetValue();
-    Ptr<SmartphoneApplication> smart = m_appSmart.at(c);
-    if (app_code < 1) { // VOICE
-        smart->SetApp ("VOICE");
-        cliLogin << " VOICE\n";
-    } else if (app_code < 2) { // VIDEO
-        smart->SetApp ("VIDEO");
-        cliLogin << " VIDEO\n";
-    } else if (app_code < 3) { // WWW
-        smart->SetApp ("WWW");        
-        cliLogin << " WWW\n";
-    } else if (app_code >= 3 && app_code <= 4) { // NOTHING
-        smart->SetApp ("NOTHING");
-        cliLogin << " NOTHING\n";
-    }    
-    cliLogin.close();
-    smart = 0;
-  }
-  
-  m_newApp = Simulator::Schedule(Seconds(5*60), &UavNetwork::ConfigureApplication, this);
-}
-
-void UavNetwork::ConfigureApplicationServer ()
-{
-  NS_LOG_FUNCTION (this << " @" << Simulator::Now().GetSeconds());
-  Ptr<UniformRandomVariable> app_rand = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
-  app_rand->SetAttribute ("Min", DoubleValue (0));
-  app_rand->SetAttribute ("Max", DoubleValue (4)); // MODIFICADO
-
-  std::ofstream cliLogin;
-  std::ostringstream ss;
-  int c = 0;
-  Ptr<UniformRandomVariable> e_ai = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
-  for (NodeContainer::Iterator i = m_clientNode.Begin(); i != m_clientNode.End(); ++i, ++c)
-  {
-    ss.str("");
-    ss << global_path << "/" << m_pathData << "/wifi/client_" << (*i)->GetId() << ".txt";
-    cliLogin.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
-    cliLogin << Simulator::Now().GetSeconds() << " CONFIGURE SET login-" << (*i)->GetId();
-
-    Ptr<SmartphoneApplication> smart = m_appSmart.at(c);
-
-    // configure OnOff application para server
-    int app_code = app_rand->GetValue();
-    int port = 0;
-    ObjectFactory onoffFac;
-    Ptr<Application> appOnOff = 0;
-    if (app_code < 1) { // VOICE
-        smart->SetApp ("VOICE");
-        onoffFac.SetTypeId ("ns3::OnOffApplication");
-        onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
-        onoffFac.Set ("PacketSize", UintegerValue (50));
-        onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
-        onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0]"));
-        // P.S.: offTime + DataRate/PacketSize = next packet time
-        onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.024Mbps")));
-        port = 5060;
-        onoffFac.Set ("Remote", AddressValue (InetSocketAddress (m_serverAddress.GetAddress(0), port)));
-        appOnOff = onoffFac.Create<Application> ();
-        appOnOff->SetStartTime(Seconds(2*e_ai->GetValue()));
-        appOnOff->SetStopTime(Seconds(222)); // considerando 111 minutos mensal, 3.7 diario - http://www.teleco.com.br/comentario/com631.asp
-        appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
-        (*i)->AddApplication (appOnOff);
-        NS_LOG_DEBUG ("VOICE login-" <<(*i)->GetId());
-        cliLogin << " VOICE" << std::endl;
-    } else if (app_code < 2) { // VIDEO
-        smart->SetApp ("VIDEO");
-        onoffFac.SetTypeId ("ns3::OnOffApplication");
-        #ifdef TCP_CLI
-          onoffFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
-        #else
-          onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
-        #endif
-        onoffFac.Set ("PacketSize", UintegerValue (429));
-        onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
-        onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0]"));
-        // P.S.: offTime + DataRate/PacketSize = next packet time
-        onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.128Mbps")));
-        port = 5070;
-        onoffFac.Set ("Remote", AddressValue (InetSocketAddress (m_serverAddress.GetAddress(0), port)));
-        appOnOff = onoffFac.Create<Application> ();
-        appOnOff->SetStartTime(Seconds(2*e_ai->GetValue()));
-        appOnOff->SetStopTime(Seconds(5*60)); // 5 minutos, sem referencias
-        appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
-        (*i)->AddApplication (appOnOff);
-        cliLogin << " VIDEO" << std::endl;
-        NS_LOG_DEBUG ("VIDEO login-" <<(*i)->GetId());
-    } else if (app_code < 3) { // WWW
-        smart->SetApp ("WWW");
-        onoffFac.SetTypeId ("ns3::OnOffApplication");
-        #ifdef TCP_CLI
-          onoffFac.Set ("Protocol", StringValue ("ns3::TcpSocketFactory"));
-        #else
-          onoffFac.Set ("Protocol", StringValue ("ns3::UdpSocketFactory"));
-        #endif
-        onoffFac.Set ("PacketSize", UintegerValue (429));
-        onoffFac.Set ("OnTime", StringValue ("ns3::ConstantRandomVariable[Constant=120]"));
-        onoffFac.Set ("OffTime", StringValue ("ns3::ConstantRandomVariable[Constant=0.04]"));
-        // P.S.: offTime + DataRate/PacketSize = next packet time
-        onoffFac.Set ("DataRate", DataRateValue (DataRate ("0.128Mbps")));
-        port = 8080;
-        onoffFac.Set ("Remote", AddressValue (InetSocketAddress (m_serverAddress.GetAddress(0), port)));
-        appOnOff = onoffFac.Create<Application> ();
-        appOnOff->SetStartTime(Seconds(2*e_ai->GetValue()));
-        appOnOff->SetStopTime(Seconds(5*60)); // 5 minutoss sem referencia
-        appOnOff->TraceConnectWithoutContext ("TxWithAddresses", MakeCallback (&SmartphoneApplication::TracedCallbackTxApp, smart));
-        (*i)->AddApplication (appOnOff);
-        cliLogin << " WWW" << std::endl;
-        NS_LOG_DEBUG ("WWW login-" <<(*i)->GetId());
-    } else if (app_code >= 3 && app_code <= 5) { // NOTHING
-        smart->SetApp ("NOTHING");
-        cliLogin << " NOTHING" << std::endl;
-        NS_LOG_DEBUG ("NOTHING login-" <<(*i)->GetId());
-    } else NS_FATAL_ERROR ("UavNetwork .. application error");
-    smart = 0;
-    appOnOff = 0;
-    cliLogin.close();
-  }
-
-  m_newApp = Simulator::Schedule(Seconds((5*e_ai->GetValue())*60), &UavNetwork::ConfigureApplicationServer, this);
 }
 
 void UavNetwork::ConfigurePalcos() // TODO: poderia ser otimizada a leitura do arquivo colocando esta estrutura na configuração do cliente, mas isso tbm poderia confundir! Pensar!
@@ -1167,21 +836,6 @@ void UavNetwork::Configure()
   // 16/01/2019 DataSheet: https://www.cisco.com/c/en/us/products/collateral/wireless/aironet-1550-series/data_sheet_c78-641373.pdf
   // Relacao MCS e SINR: https://www.cisco.com/c/en/us/td/docs/wireless/technology/mesh/8-0/design/guide/mesh80.pdf
   // If we consider only 802.11n rates, then Table 13: Requirements for LinkSNR with AP1552 for 2.4 and 5 GHz, on page 48 shows LinkSNR requirements with AP1552 for 2.4 and 5 GHz.
-  // Wifi
-  m_phyHelperCli = YansWifiPhyHelper::Default();
-  m_channelHelperCli = YansWifiChannelHelper::Default();
-  m_phyHelperCli.SetChannel(m_channelHelperCli.Create());
-  m_wifiHelper.SetStandard(WIFI_PHY_STANDARD_80211n_2_4GHZ); // https://en.wikipedia.org/wiki/IEEE_802.11n-2009
-  m_wifiHelper.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", StringValue ("HtMcs0"),
-                                          "ControlMode", StringValue ("HtMcs0"));
-  m_macWifiHelperCli.SetType("ns3::StaWifiMac",
-                             "Ssid", SsidValue(Ssid("flynetwork")),
-                             "ActiveProbing", BooleanValue(false)); // configuração de scanning passivo
-
-  m_macWifiHelper.SetType("ns3::ApWifiMac",
-                          "Ssid", SsidValue(Ssid("flynetwork")));
-
-  m_addressHelperCli.SetBase("192.168.1.0", "255.255.255.0"); // wifi address
 }
 
 void UavNetwork::PrintUavEnergy (int t)

@@ -36,21 +36,6 @@ namespace ns3
 class UavNodeContainer : public NodeContainer
 {
   public:
-    // TypeId GetTypeId(void);
-    // UavNodeContainer();
-    //
-    // UavNodeContainer(Ptr<UavModel> model);
-    //
-    // UavNodeContainer(std::string modelName);
-    //
-    // UavNodeContainer(const NodeContainer &a,
-    //                   const NodeContainer &b);
-    //
-    // UavNodeContainer(const UavNodeContainer &a,
-    //                   const UavNodeContainer &b);
-    //
-    // ~UavNodeContainer();
-
     void Clear();
     Ptr<Node> RemoveAt (uint32_t pos);
     Ptr<Node> RemoveId (uint32_t id);

@@ -1476,13 +1476,6 @@ void ServerApplication::runDA() {
   int locId = 0;
   int max_iterB = 5000;
 
-  // os.str("");
-  // os <<global_path << "/" << m_pathData << "/etapa/" << m_step << "/da_log.txt";
-  // file.open(os.str().c_str(), std::ofstream::out);
-  // //NS_LOG_DEBUG ("\n\t t_min =" << t_min << "\n \t r_max =" << r_max << "\n \t ptUav ="<< ptUav << "\n \t ptCli =" << ptCli << "\n \t fsInterf ="
-  //             << fsInterf  << "\n \t dRCli =" << dRCli << "\n \t sinrCliMin =" << sinrCliMin<< "\n \t fcCli ="
-  //             << fcCli  << "\n \t comp_onda =" << comp_onda << "\n \t pi =" << pi << "\n \t maxDrUav =" << maxDrUav << "\n \t gain =" << gain
-  //               << "\n \t N_W =" << N_W << "\n \t t =" << t <<  "\n \t locId =" << locId << "\n \t max_iterB =" << max_iterB << "\n\tplRefCli_dB: " << plRefCli_dB << "uav_cob: " << uav_cob);
 
   ObjectFactory lObj;
   lObj.SetTypeId("ns3::LocationModel");
