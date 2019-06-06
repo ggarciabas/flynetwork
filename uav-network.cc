@@ -690,7 +690,7 @@ void UavNetwork::ConfigureCli()
                                      "Bounds", RectangleValue(Rectangle(m_xmin, m_xmax, m_ymin, m_ymax)),
                                       "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=5.0]")); // xmin, xmax, ymin, ymax
         mobilityCLI.Install(nodes);
-        m_clientNode.Add(nodes);
+        m_clientNode.Add(nodes);      
       }
     }
     scenario.close();
@@ -705,7 +705,24 @@ void UavNetwork::ConfigureCli()
     exit(-1);
   }    
 
+  for (NodeContainer::Iterator it = m_clientNode.Begin(); it != m_clientNode.End(); ++it) 
+  {
+    m_uavCon.push_back(-1);
+    m_cliEvent.push_back(0);
+  }
+
   global_nc = m_totalCli;
+}
+
+void UavNetwork::ClientBehaviour (int posCli) {
+  // desligar evento anteior
+  Simulator::Remove (m_cliEvent.at(posCli));
+  // gerar nova app
+
+  // atualizar evento para o novo app
+
+  // criar evento para reprogramar o cliente (rechamar esta funcao no tempo final)
+
 }
 
 void UavNetwork::ConfigurePalcos() // TODO: poderia ser otimizada a leitura do arquivo colocando esta estrutura na configuração do cliente, mas isso tbm poderia confundir! Pensar!
@@ -755,6 +772,11 @@ void UavNetwork::ConfigurePalcos() // TODO: poderia ser otimizada a leitura do a
 void UavNetwork::Configure()
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+
+  // configurando estrutura de geracao de aplicacoes para clientes
+  m_randApp->SetAttribute ("Min", DoubleValue (0));
+  m_randApp->SetAttribute ("Max", DoubleValue (5)); // 0- voice 1- video 2- www 3->5 nothing
+
   std::ostringstream ss;
   // Routing
   AodvHelper aodv;

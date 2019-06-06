@@ -77,6 +77,7 @@ private:
   void ConfigurePalcos();
   void ConfigureServer();
 
+  void ClientBehaviour (int posCli);
 
 private:
 
@@ -105,6 +106,10 @@ private:
   double m_uavTimingNext;
 
   NodeContainer m_clientNode;
+  vector<uint32_t> m_uavCon; // uav que o cliente está conectado
+  vector<EventId> m_cliEvent; // eventos programados para os clientes
+  Ptr<UniformRandomVariable> m_randApp;
+
   vector<double> m_palcoPos; // posicao dos palcos para nao dar conflito no arquivo de conferencia
   UavNodeContainer m_uavNodeActive;
   UavNodeContainer m_uavNode;
