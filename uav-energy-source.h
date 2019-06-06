@@ -32,13 +32,11 @@
 #include "ns3/energy-module.h"
 #include <cmath>
 
-#include "client-device-energy-model.h"
 #include "uav-device-energy-model.h"
 
 namespace ns3
 {
 
-  class ClientDeviceEnergyModel;
   class UavDeviceEnergyModel;
 
 /**
@@ -112,13 +110,11 @@ public:
    * This function sets the interval between each energy update.
    */
   void SetEnergyUpdateInterval (Time interval);
-  void SetUpdateThresholdInterval (Time interval);
 
   /**
    * \returns The interval between each energy update.
    */
   Time GetEnergyUpdateInterval (void) const;
-  Time GetUpdateThresholdInterval (void) const;
 
   void SetBasicEnergyLowBatteryThresholdUav (double thr);
 
@@ -177,8 +173,6 @@ private:
    */
   void CalculateRemainingEnergy (void);
 
-  void UpdateThreshold ();  
-
 private:
 
   double m_wifiTE; // timing energy calculation
@@ -199,10 +193,8 @@ private:
                                          // set to false again when the remaining energy exceeds the high threshold
   TracedValue<double> m_remainingEnergyJ; // remaining energy, in mAs
   EventId m_energyUpdateEvent;           // energy update event
-  EventId m_updateThr;
   Vector m_lastPosition;                 // last position of the node
   Time m_lastUpdateTime;                  // last update time
-  Time m_updateThrTime;
   Time m_energyUpdateInterval;           // energy update interval
   std::ofstream m_file;
 

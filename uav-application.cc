@@ -330,8 +330,7 @@ void UavApplication::SendPacketDepletion(void)
     << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetInitialEnergy() 
     << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetWifiAcum() 
     << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetMoveAcum() 
-    << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetHoverAcum()
-    << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetCliAcum() << std::endl; // TIME, UAV_ID, TOTAL_CLIENTES, remainingenergy, initialbattery, wifiacum, moveacum, hoveracum, cliacum
+    << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetHoverAcum() << std::endl; // TIME, UAV_ID, TOTAL_CLIENTES, remainingenergy, initialbattery, wifiacum, moveacum, hoveracum, cliacum
     file.close();
 
     uint16_t packetSize = m.str().length() + 1;
@@ -413,8 +412,7 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
           << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetInitialEnergy() 
           << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetWifiAcum() 
           << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetMoveAcum() 
-          << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetHoverAcum()
-          << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetCliAcum() << std::endl; // TIME, UAV_ID, TOTAL_CLIENTES, ATUAL_BATERIA, FULL_BATERIA, wifiacum, moveacum, hoveracum, cliacum
+          << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetHoverAcum() << std::endl; // TIME, UAV_ID, TOTAL_CLIENTES, ATUAL_BATERIA, FULL_BATERIA, wifiacum, moveacum, hoveracum, cliacum
 
           file.close();
         }

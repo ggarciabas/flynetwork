@@ -31,7 +31,6 @@
 
 #include "uav-energy-source-helper.h"
 #include "uav-device-energy-model-helper.h"
-#include "client-device-energy-model-helper.h"
 #include "uav-model.h"
 
 #include <fstream>
@@ -91,11 +90,6 @@ UavNetwork::GetTypeId(void)
                                         DoubleValue(150.0),
                                         MakeDoubleAccessor(&UavNetwork::m_uavTimingNext),
                                         MakeDoubleChecker<double>())
-                          .AddAttribute("PropagationLossCli",
-                                        "Client propagation loss",
-                                        StringValue("ns3::TwoRayGroundPropagationLossModel"),
-                                        MakeStringAccessor(&UavNetwork::m_propagationLossCli),
-                                        MakeStringChecker())
                           .AddAttribute("ServerPort",
                                         "Communication port number of server",
                                         UintegerValue(8082),
@@ -106,11 +100,6 @@ UavNetwork::GetTypeId(void)
                                         UintegerValue(9090),
                                         MakeUintegerAccessor(&UavNetwork::m_cliPort),
                                         MakeUintegerChecker<uint16_t>())
-                          .AddAttribute("LocationUpdateCli",
-                                        "Time to update the location of the client on the server.",
-                                        DoubleValue(3.0),
-                                        MakeDoubleAccessor(&UavNetwork::m_updateTimeCli),
-                                        MakeDoubleChecker<double>())
                           .AddAttribute("SpeedUav",
                                         "Speed of the UAV node.",
                                         DoubleValue(5.0),
@@ -873,15 +862,8 @@ void UavNetwork::ClientPosition (string name)
   }
   for (NodeContainer::Iterator i = m_clientNode.Begin(); i != m_clientNode.End(); ++i)
   {
-    int app = (*i)->GetNApplications()-1;
-    Ptr<SmartphoneApplication> smart = NULL;
-    do {
-      smart = DynamicCast<SmartphoneApplication>((*i)->GetApplication(app));
-      --app;
-    } while (smart==NULL && app >= 0);
-    NS_ASSERT (smart != NULL);
     Vector current = (*i)->GetObject<MobilityModel>()->GetPosition();
-    file << "," << current.x << "," << current.y << "," << smart->GetLogin() << "," << smart->GetApp();
+    file << "," << current.x << "," << current.y;
   }
   file.close();
 }

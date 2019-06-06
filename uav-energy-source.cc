@@ -60,22 +60,11 @@ UavEnergySource::GetTypeId(void)
                                         DoubleValue(0.1), // as a fraction of the initial energy
                                         MakeDoubleAccessor(&UavEnergySource::m_lowBatteryThUav),
                                         MakeDoubleChecker<double>())
-                          .AddAttribute ("BasicEnergyLowBatteryThresholdCli",
-                                        "Low battery threshold client device for basic energy source.",
-                                        DoubleValue(0.1), // as a fraction of the initial energy
-                                        MakeDoubleAccessor(&UavEnergySource::m_lowBatteryThCli),
-                                        MakeDoubleChecker<double>())
                         .AddAttribute ("PeriodicEnergyUpdateInterval",
                                        "Time between two consecutive periodic energy updates.",
                                        TimeValue (Seconds (1.2)),
                                        MakeTimeAccessor (&UavEnergySource::SetEnergyUpdateInterval,
                                                          &UavEnergySource::GetEnergyUpdateInterval),
-                                       MakeTimeChecker ())
-                        .AddAttribute ("UpdateThresholdInterval",
-                                       "Time between two consecutive periodic threshold updates.",
-                                       TimeValue (Seconds (0.5)),
-                                       MakeTimeAccessor (&UavEnergySource::SetUpdateThresholdInterval,
-                                                         &UavEnergySource::GetUpdateThresholdInterval),
                                        MakeTimeChecker ())
                          .AddAttribute("PathData",
                                        "Name of scenario",
@@ -131,21 +120,6 @@ UavEnergySource::SetEnergyUpdateInterval (Time interval)
 }
 
 void
-UavEnergySource::SetUpdateThresholdInterval (Time interval)
-{
-  NS_LOG_FUNCTION (this << interval);
-  m_updateThrTime = interval;
-}
-
-void 
-UavEnergySource::UpdateThreshold ()
-{
-  NS_LOG_FUNCTION (this);
-  m_lowBatteryThCli = m_cliDevModel->CalculateThreshold(m_uavDevModel->GetTimeToCentral());
-  m_updateThr = Simulator::Schedule(m_updateThrTime, &UavEnergySource::UpdateThreshold, this);
-}
-
-void
 UavEnergySource::SetBasicEnergyLowBatteryThresholdUav (double thr)
 {
   NS_LOG_FUNCTION (this << thr);
@@ -158,13 +132,6 @@ UavEnergySource::GetEnergyUpdateInterval (void) const
 {
   NS_LOG_FUNCTION (this);
   return m_energyUpdateInterval;
-}
-
-Time
-UavEnergySource::GetUpdateThresholdInterval (void) const
-{
-  NS_LOG_FUNCTION (this);
-  return m_updateThrTime;
 }
 
 double
@@ -303,12 +270,6 @@ void UavEnergySource::SetDeviceEnergyModel (Ptr<DeviceEnergyModel> dev) {
   m_uavDevModel = DynamicCast<UavDeviceEnergyModel>(dev);
 }
 
-void UavEnergySource::SetCliDeviceEnergyModel (Ptr<DeviceEnergyModel> dev) {
-  m_cliDev = dev;
-  m_cliDevModel = DynamicCast<ClientDeviceEnergyModel>(dev);
-  m_updateThr = Simulator::Schedule(m_updateThrTime, &UavEnergySource::UpdateThreshold, this);
-}
-
 void UavEnergySource::UpdateEnergySourceHover (double energyToDecrease)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << energyToDecrease);
@@ -364,8 +325,6 @@ void UavEnergySource::HandleEnergyDrainedEvent(void)
   NS_ASSERT(m_onoff);
   NS_LOG_INFO("UavEnergySource:Energy depleted!");
   // NotifyEnergyDrained(); // notify DeviceEnergyModel objects ??? retirar mesmo? para nao desligar wifi?
-  if (m_cliDev != NULL)
-    m_cliDev->HandleEnergyDepletion();
   if (m_uavDev != NULL)
     m_uavDev->HandleEnergyDepletion(); // deveria se utilizar o energysource container, porem ocorre um erro não analisado
 }
@@ -400,11 +359,8 @@ void UavEnergySource::Start () {
   m_cliAcum = 0.0;
   m_wifiAcum = 0.0;
   m_hoverAcum = 0.0;
-  m_wifiEnergy = m_clientEnergy = m_moveEnergy = m_hoverEnergy = 0.0;
+  m_wifiEnergy = m_moveEnergy = m_hoverEnergy = 0.0;
   m_lowBatteryThUav = 0.1;
-  m_lowBatteryThCli = 0.1;
-  if (m_cliDev != NULL)
-    m_cliDev->HandleEnergyRecharged(); // deveria se utilizar o energy source container, porem erro!
   if (m_uavDev != NULL)
     m_uavDev->HandleEnergyRecharged(); // deveria se utilizar o energy source container, porem erro!
   // NotifyEnergyRecharged();
@@ -416,28 +372,21 @@ void UavEnergySource::TimeEnergy (double next) {
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   
-  file << Simulator::Now().GetSeconds() << " " << m_node->GetId() << " " << m_initialEnergyJ << " " << m_remainingEnergyJ << " " <<  m_wifiTE << " " << m_clientTE << " " << m_moveTE << " " << m_hoverTE << " " << ((m_depleted)?"TRUE ":"FALSE ") << std::endl;
+  file << Simulator::Now().GetSeconds() << " " << m_node->GetId() << " " << m_initialEnergyJ << " " << m_remainingEnergyJ << " " <<  m_wifiTE << " " << m_moveTE << " " << m_hoverTE << " " << ((m_depleted)?"TRUE ":"FALSE ") << std::endl;
   file.close();
 
-  // if (m_wifiTE+m_clientTE+m_moveTE+m_hoverTE != (m_initialEnergyJ-m_remainingEnergyJ))
-  //   std::cout << "(TE) Bateria consumida não bateu com o acumulado dos modos! node=" << m_node->GetId() << " m_initialEnergyJ=" << m_initialEnergyJ << " m_remainingEnergyJ=" << m_remainingEnergyJ << " (m_initialEnergyJ-m_remainingEnergyJ) = " << (m_initialEnergyJ-m_remainingEnergyJ) << " m_wifiTE=" <<  m_wifiTE << " m_clientTE=" << m_clientTE << " m_moveTE=" << m_moveTE << " m_hoverTE=" << m_hoverTE << std::endl;
-
-  m_wifiTE = m_clientTE = m_moveTE = m_hoverTE = 0.0;
+  m_wifiTE = m_moveTE = m_hoverTE = 0.0;
   Simulator::Schedule (Seconds(next), &UavEnergySource::TimeEnergy, this, next);
 }
 
 void UavEnergySource::Stop () {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_onoff = false;
-  // NotifyEnergyOff();
-  if (m_cliDev != NULL)
-    m_cliDev->HandleEnergyOff();
   if (m_uavDev != NULL)
     m_uavDev->HandleEnergyOff(); // deveria se utilizar o energy source container, porem erro!
 
-  m_wifiEnergy = m_clientEnergy = m_moveEnergy = m_hoverEnergy = 0.0;
+  m_wifiEnergy = m_moveEnergy = m_hoverEnergy = 0.0;
 
-  Simulator::Remove(m_updateThr);
   Simulator::Remove(m_timeEnergy);
 }
 

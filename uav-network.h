@@ -86,7 +86,6 @@ private:
   */
 
   double m_simulationTime;
-  double m_updateTimeCli;
   double m_updateTimeUav;
   uint16_t m_serverPort;
   uint16_t m_cliPort;
@@ -124,7 +123,6 @@ private:
   double m_scheduleServer;
 
   EventId m_newApp; // controla as aplicacoes dos usuarios
-  std::vector<Ptr<SmartphoneApplication> > m_appSmart;
 
   // AthstatsHelper m_athstats;
 

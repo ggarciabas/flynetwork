@@ -146,7 +146,7 @@ void ServerApplication::AddNewUav(uint32_t id, Ipv4Address addrAdhoc, double tot
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << id << addrAdhoc << totalEnergy << energyCost << totalBattery << mob);
 
-  ////NS_LOG_DEBUG ("ServerApplication::AddNewUav Criando uav: " << id << " @" << Simulator::Now().GetSeconds());
+  // NS_LOG_DEBUG ("ServerApplication::AddNewUav Criando uav: " << id << " @" << Simulator::Now().GetSeconds());
 
   Ptr<Socket> socket;
   #ifdef TCP
