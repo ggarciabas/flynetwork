@@ -335,6 +335,15 @@ void UavNetwork::Run()
   m_file << etapa << " " << global_speed << " " << global_nc << " " << global_ec_persec << std::endl;
   m_file.close();
 
+  // programando comportamento cliente
+  Ptr<UniformRandomVariable> sTime = CreateObject<UniformRandomVariable>();  
+  sTime->SetAttribute ("Min", DoubleValue (10));
+  sTime->SetAttribute ("Max", DoubleValue (30));
+  for (int i = 0; i < (int)m_clientNode.GetN(); ++i)
+  {
+    Simulator::Schedule(Seconds(sTime->GetValue()), &UavNetwork::ClientBehaviour, this, i);
+  }
+
   NS_LOG_DEBUG("Iniciando Simulador");
   Simulator::Run();
   NS_LOG_DEBUG("Finalizando Simulador");  
@@ -768,7 +777,7 @@ void UavNetwork::ClientConsumption (int posCli)
   }
   // caso tenha encontrado algum UAV, consumir
   if ((int)id != -1) {    
-    m_uavAppContainer.Get(m_nodeUavApp[id])->ClientConsumption(m_clientUpdateCons);
+    m_uavAppContainer.Get(m_nodeUavApp[id])->ClientConsumption(m_clientUpdateCons); // passando tempo que usou o UAV
   } else {
     std::ostringstream ss;
     std::ofstream file;

@@ -174,11 +174,13 @@ UavEnergySource::UpdateEnergySource (void)
   NS_LOG_FUNCTION (this);
 }
 
-void UavEnergySource::UpdateEnergySourceClient (double energyToDecrease)
+void UavEnergySource::UpdateEnergySourceClient (double time)
 {  
   if (m_onoff && !m_depleted) { // calcula somente se estiver ligada e fora de depletion
     // TODO_NEW: considerar calculo que o wifi utiliza: double energyToDecreaseJ = (totalCurrentA * m_supplyVoltageV * duration.GetNanoSeconds ()) / 1e9;
     // utilizar os valores especificos para o wifi
+
+    double energyToDecrease = (time * global_tx_current * m_supplyVoltageV);
 
     m_remainingEnergyJ -= energyToDecrease;
 

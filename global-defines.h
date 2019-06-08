@@ -6,6 +6,7 @@ extern int global_nc; // totaol de cliente no cenario
 extern double global_speed;
 extern double global_uav_cob;
 extern double global_cli_cob;
+extern double global_tx_current; // ampere
 
 #ifndef GLOBAL_PATH
     extern std::string global_path;
