@@ -52,4 +52,16 @@ Ptr<Node> UavNodeContainer::RemoveId (uint32_t id) {
   return RemoveAt(uint32_t(c));
 }
 
+uint32_t UavNodeContainer::CheckId (uint32_t id) {
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<id);
+  uint32_t c=0;
+  Iterator i;
+  for (i = m_nodes.begin(); i != m_nodes.end(); ++i, ++c) {
+    if ((*i)->GetId() == id) {
+      break;
+    }
+  }
+  return c;
+}
+
 }

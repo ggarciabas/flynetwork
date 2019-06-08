@@ -39,6 +39,7 @@ class UavNodeContainer : public NodeContainer
     void Clear();
     Ptr<Node> RemoveAt (uint32_t pos);
     Ptr<Node> RemoveId (uint32_t id);
+    uint32_t CheckId (uint32_t id); // verificar se o UAV está no container
 };
 
 }

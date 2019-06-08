@@ -637,6 +637,7 @@ void UavNetwork::ConfigureUav(int total)
     DynamicCast<UavEnergySource>(sources.Get(c))->Start();
     DynamicCast<UavEnergySource>(sources.Get(c))->TimeEnergy(m_uavTimingNext);
 
+    m_nodeUavApp[(*i)->GetId()] = m_uavAppContainer.GetN(); // pego antes para ficar com a posicao real, sem necessidade de pegar o tamanho e fazer operação de redução de uma unidade
     m_uavAppContainer.Add(uavApp); // armazenando informacoes das aplicacoes dos UAVs para que os clientes possam obter informacoes necessarias para se conectar no UAV mais proximo!
   }  
 
@@ -715,14 +716,60 @@ void UavNetwork::ConfigureCli()
 }
 
 void UavNetwork::ClientBehaviour (int posCli) {
-  // desligar evento anteior
+  // 1- desligar evento anteior
   Simulator::Remove (m_cliEvent.at(posCli));
-  // gerar nova app
+  std::ostringstream ss;
+  std::ofstream file;
+  ss << global_path << "/" << m_pathData << "/client/app_log.txt";
+  file.open(ss.str(), std::ofstream::out | std::ofstream::app);
+  Ptr<UniformRandomVariable> startTime = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
+  // 2- atualizar evento para o novo app 
+  // 3- criar evento para reprogramar o cliente (rechamar esta funcao no tempo final)
+  switch (m_randApp->GetValue()) {
+    case 0: // VOICE // considerando 111 minutos mensal, 3.7 diario - http://www.teleco.com.br/comentario/com631.asp
+      file << Simulator::Now().GetSeconds() << "," << m_clientNode.Get(posCli)->GetId() << ",VOICE" << std::endl;
+      m_cliEvent[posCli] = Simulator::Schedule(Seconds(startTime->GetValue()), UavNetwork::ClientConsumption, this, posCli); // start
+      Simulator::Schedule (Seconds(222), UavNetwork::ClientBehaviour, this, posCli); // stop
+      break;
+    case 1: // VIDEO
+      file << Simulator::Now().GetSeconds() << "," << m_clientNode.Get(posCli)->GetId() << ",VIDEO" << std::endl;
+      m_cliEvent[posCli] = Simulator::Schedule(Seconds(startTime->GetValue()), UavNetwork::ClientConsumption, this, posCli); // start
+      Simulator::Schedule (Seconds(240), UavNetwork::ClientBehaviour, this, posCli); // stop - sem referencia (4 min)
+      break;
+    case 2: // WWW
+      file << Simulator::Now().GetSeconds() << "," << m_clientNode.Get(posCli)->GetId() << ",WWW" << std::endl;
+      m_cliEvent[posCli] = Simulator::Schedule(Seconds(startTime->GetValue()), UavNetwork::ClientConsumption, this, posCli); // start
+      Simulator::Schedule (Seconds(180), UavNetwork::ClientBehaviour, this, posCli); // stop - sem referencia (3 min)
+      break;
+    default: // NONE - qt tempo sem fazer nada?!
+      file << Simulator::Now().GetSeconds() << "," << m_clientNode.Get(posCli)->GetId() << ",NONE" << std::endl;
+      Simulator::Schedule (Seconds(120), UavNetwork::ClientBehaviour, this, posCli); // stop
+  }
+  file.close();  
+}
 
-  // atualizar evento para o novo app
-
-  // criar evento para reprogramar o cliente (rechamar esta funcao no tempo final)
-
+void UavNetwork::ClientConsumption (int posCli)
+{
+  // 1- verificar se o cliente está conectado com algum UAV
+  // 2- verificar se o uav está ativo
+  // 3- verificar se o cliente ainda está dentro da area de cobertura (global_cli_cob) do UAV anterior
+  // 4- verificar se o cliente está na area de cobertura (global_cli_cob) de algum outro UAV, caso nao esteja mais na area de cobertura do anterior
+  // 5- consumir do UAV correto e atualizar o UAV conectado
+  // 6- Reprogramar o método consumir para o tempo de delay configurado via simulação (criar variavel global para isso ou somente passar para esta classe?!)
+  bool flag = true; // procurar novo UAV
+  if (m_uavCon[posCli] != -1) { // conectado com algum UAV já
+    // passo 2    
+    uint32_t pos = m_uavNodeActive.CheckId(m_uavCon[posCli]); // retorna posicao se encontrar o Id
+    if (pos) { // uav ainda ativo
+      // passo 3
+      Ptr<Node> node = m_uavNodeActive.Get(pos);
+      Vector pUav = node->GetObject<MobilityModel>()->GetPosition();
+      if (CalculateDistance(pUav, m_clientNode.Get(posCli)->GetObject<MobilityModel>()->GetPosition()) <= global_cli_cob)
+      {
+        
+      }
+    } // else, uav nao ativo, flag já está correta
+  } // else, cliente nao conectado, flag já está correta
 }
 
 void UavNetwork::ConfigurePalcos() // TODO: poderia ser otimizada a leitura do arquivo colocando esta estrutura na configuração do cliente, mas isso tbm poderia confundir! Pensar!

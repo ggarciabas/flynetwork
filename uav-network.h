@@ -106,7 +106,7 @@ private:
   double m_uavTimingNext;
 
   NodeContainer m_clientNode;
-  vector<uint32_t> m_uavCon; // uav que o cliente está conectado
+  vector<uint32_t> m_uavCon; // id do uav que o cliente está conectado
   vector<EventId> m_cliEvent; // eventos programados para os clientes
   Ptr<UniformRandomVariable> m_randApp;
 
@@ -138,6 +138,7 @@ private:
   InternetStackHelper m_stack;
 
   UavApplicationContainer   m_uavAppContainer;
+  map<uint32_t, uint32_t> m_nodeUavApp; // id, m_uavAppContainer pos
   Ptr< PositionAllocator >    m_positionAlloc; // utilizado para distanciar os UAVs da central
 
   std::ofstream m_file;
