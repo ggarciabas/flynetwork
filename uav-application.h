@@ -73,6 +73,8 @@ public:
     return m_uavDevice;
   }
 
+  void ClientConsumption (double time);
+
 private:
   void DoDispose();
   virtual void StartApplication(void);

@@ -61,6 +61,11 @@ UavNetwork::GetTypeId(void)
                                         DoubleValue(10.0),
                                         MakeDoubleAccessor(&UavNetwork::m_powerLevel),
                                         MakeDoubleChecker<double>())
+                          .AddAttribute("ClientUpdateCons",
+                                        "Tempo para atualziar consumo de energi",
+                                        DoubleValue(1.0),
+                                        MakeDoubleAccessor(&UavNetwork::m_clientUpdateCons),
+                                        MakeDoubleChecker<double>())
                           .AddAttribute("RxGain",
                                         "Receiver gain",
                                         DoubleValue(3.0),
@@ -708,8 +713,7 @@ void UavNetwork::ConfigureCli()
 
   for (NodeContainer::Iterator it = m_clientNode.Begin(); it != m_clientNode.End(); ++it) 
   {
-    m_uavCon.push_back(-1);
-    m_cliEvent.push_back(0);
+    m_cliEvent.push_back(EventId());
   }
 
   global_nc = m_totalCli;
@@ -725,51 +729,56 @@ void UavNetwork::ClientBehaviour (int posCli) {
   Ptr<UniformRandomVariable> startTime = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
   // 2- atualizar evento para o novo app 
   // 3- criar evento para reprogramar o cliente (rechamar esta funcao no tempo final)
-  switch (m_randApp->GetValue()) {
+  switch ((int)m_randApp->GetValue()) {
     case 0: // VOICE // considerando 111 minutos mensal, 3.7 diario - http://www.teleco.com.br/comentario/com631.asp
       file << Simulator::Now().GetSeconds() << "," << m_clientNode.Get(posCli)->GetId() << ",VOICE" << std::endl;
-      m_cliEvent[posCli] = Simulator::Schedule(Seconds(startTime->GetValue()), UavNetwork::ClientConsumption, this, posCli); // start
-      Simulator::Schedule (Seconds(222), UavNetwork::ClientBehaviour, this, posCli); // stop
+      m_cliEvent[posCli] = Simulator::Schedule(Seconds(startTime->GetValue()), &UavNetwork::ClientConsumption, this, posCli); // start
+      Simulator::Schedule (Seconds(222), &UavNetwork::ClientBehaviour, this, posCli); // stop
       break;
     case 1: // VIDEO
       file << Simulator::Now().GetSeconds() << "," << m_clientNode.Get(posCli)->GetId() << ",VIDEO" << std::endl;
-      m_cliEvent[posCli] = Simulator::Schedule(Seconds(startTime->GetValue()), UavNetwork::ClientConsumption, this, posCli); // start
-      Simulator::Schedule (Seconds(240), UavNetwork::ClientBehaviour, this, posCli); // stop - sem referencia (4 min)
+      m_cliEvent[posCli] = Simulator::Schedule(Seconds(startTime->GetValue()), &UavNetwork::ClientConsumption, this, posCli); // start
+      Simulator::Schedule (Seconds(240), &UavNetwork::ClientBehaviour, this, posCli); // stop - sem referencia (4 min)
       break;
     case 2: // WWW
       file << Simulator::Now().GetSeconds() << "," << m_clientNode.Get(posCli)->GetId() << ",WWW" << std::endl;
-      m_cliEvent[posCli] = Simulator::Schedule(Seconds(startTime->GetValue()), UavNetwork::ClientConsumption, this, posCli); // start
-      Simulator::Schedule (Seconds(180), UavNetwork::ClientBehaviour, this, posCli); // stop - sem referencia (3 min)
+      m_cliEvent[posCli] = Simulator::Schedule(Seconds(startTime->GetValue()), &UavNetwork::ClientConsumption, this, posCli); // start
+      Simulator::Schedule (Seconds(180), &UavNetwork::ClientBehaviour, this, posCli); // stop - sem referencia (3 min)
       break;
     default: // NONE - qt tempo sem fazer nada?!
       file << Simulator::Now().GetSeconds() << "," << m_clientNode.Get(posCli)->GetId() << ",NONE" << std::endl;
-      Simulator::Schedule (Seconds(120), UavNetwork::ClientBehaviour, this, posCli); // stop
+      Simulator::Schedule (Seconds(120), &UavNetwork::ClientBehaviour, this, posCli); // stop
   }
   file.close();  
 }
 
 void UavNetwork::ClientConsumption (int posCli)
 {
-  // 1- verificar se o cliente está conectado com algum UAV
-  // 2- verificar se o uav está ativo
-  // 3- verificar se o cliente ainda está dentro da area de cobertura (global_cli_cob) do UAV anterior
-  // 4- verificar se o cliente está na area de cobertura (global_cli_cob) de algum outro UAV, caso nao esteja mais na area de cobertura do anterior
-  // 5- consumir do UAV correto e atualizar o UAV conectado
-  // 6- Reprogramar o método consumir para o tempo de delay configurado via simulação (criar variavel global para isso ou somente passar para esta classe?!)
-  bool flag = true; // procurar novo UAV
-  if (m_uavCon[posCli] != -1) { // conectado com algum UAV já
-    // passo 2    
-    uint32_t pos = m_uavNodeActive.CheckId(m_uavCon[posCli]); // retorna posicao se encontrar o Id
-    if (pos) { // uav ainda ativo
-      // passo 3
-      Ptr<Node> node = m_uavNodeActive.Get(pos);
-      Vector pUav = node->GetObject<MobilityModel>()->GetPosition();
-      if (CalculateDistance(pUav, m_clientNode.Get(posCli)->GetObject<MobilityModel>()->GetPosition()) <= global_cli_cob)
-      {
-        
-      }
-    } // else, uav nao ativo, flag já está correta
-  } // else, cliente nao conectado, flag já está correta
+  // 1-  verificar qual Uav está mais próximo
+  Vector cliVec = m_clientNode.Get(posCli)->GetObject<MobilityModel>()->GetPosition();
+  double min = numeric_limits<double>::max();
+  double dist;
+  uint32_t id = -1;
+  for (UavNodeContainer::Iterator i = m_uavNodeActive.Begin(); i != m_uavNodeActive.End(); ++i){
+    dist = CalculateDistance((*i)->GetObject<MobilityModel>()->GetPosition(), cliVec);
+    if (dist < min && dist <= global_cli_cob) { // TODO: colocar um valor aleatorio para quando chegar em duas opcoes diferenciar com 50% de chance para cada lado? Criar variavel como atributo da classe e distribuido uniformemente
+      min = dist;
+      id = (*i)->GetId();
+    }
+  }
+  // caso tenha encontrado algum UAV, consumir
+  if ((int)id != -1) {    
+    m_uavAppContainer.Get(m_nodeUavApp[id])->ClientConsumption(m_clientUpdateCons);
+  } else {
+    std::ostringstream ss;
+    std::ofstream file;
+    ss << global_path << "/" << m_pathData << "/client/desc_log.txt";
+    file.open(ss.str(), std::ofstream::out | std::ofstream::app);
+    file << Simulator::Now().GetSeconds() << "," << m_clientUpdateCons << "," << posCli << std::endl;
+    file.close();
+  }
+
+  m_cliEvent[posCli] = Simulator::Schedule(Seconds(m_clientUpdateCons), &UavNetwork::ClientConsumption, this, posCli);
 }
 
 void UavNetwork::ConfigurePalcos() // TODO: poderia ser otimizada a leitura do arquivo colocando esta estrutura na configuração do cliente, mas isso tbm poderia confundir! Pensar!

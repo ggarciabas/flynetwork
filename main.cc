@@ -50,7 +50,7 @@ double global_cli_cob;
 // https://www.wired.com/story/the-physics-of-why-bigger-drones-can-fly-longer/
 int main (int argc, char *argv[])
 {
-	double sim_time=1200.0, cli_pos_update = 5.0;
+	double sim_time=1200.0, cli_pos_update = 5.0, clientUpdateCons = 1.0;
 	uint32_t scenario = 7, env = 2, protocol = 1, custo=1, seed=9042019;
 	global_cli_cob = 115.47; // metros - para clientes utilizando equação de antena direcional com esparramento verificar Klaine2018
 	global_uav_cob = 280.5; // metros verificar distancia_sinr.py
@@ -67,6 +67,7 @@ int main (int argc, char *argv[])
 	cmd.AddValue ("Etapa", "", etapa);
 	cmd.AddValue ("UavCob", "", global_uav_cob);
 	cmd.AddValue ("CliCob", "", global_cli_cob);
+	cmd.AddValue ("ClientUpdateCons", "", clientUpdateCons);
 	cmd.AddValue("TotalBattery", "", total_battery);
 	cmd.Parse (argc, argv);
 
@@ -121,6 +122,7 @@ int main (int argc, char *argv[])
 	obj.Set("Seed", UintegerValue(seed));
 	obj.Set("ScheduleServer", DoubleValue(etapa));
 	obj.Set("UavTimingNext", DoubleValue((sim_time-0.5)/10.0));
+	obj.Set("ClientUpdateCons", DoubleValue(clientUpdateCons));
 	Ptr<UavNetwork> net = obj.Create()->GetObject<UavNetwork>();
 	net->Run();
 	net->Dispose();

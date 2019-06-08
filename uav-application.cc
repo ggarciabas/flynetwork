@@ -535,4 +535,9 @@ void UavApplication::DoDispose() {
   m_running = false;
 }
 
+void UavApplication::ClientConsumption (double time) 
+{
+  m_uavEnergySource->UpdateEnergySourceClient(time);
+}
+
 } // namespace ns3
