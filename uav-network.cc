@@ -765,6 +765,7 @@ void UavNetwork::ClientBehaviour (int posCli) {
 
 void UavNetwork::ClientConsumption (int posCli)
 {
+  std::cout << Simulator::Now().GetSeconds() << " cliente " << posCli << std::endl;
   // 1-  verificar qual Uav está mais próximo
   Vector cliVec = m_clientNode.Get(posCli)->GetObject<MobilityModel>()->GetPosition();
   double min = numeric_limits<double>::max();
