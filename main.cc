@@ -116,7 +116,6 @@ int main (int argc, char *argv[])
 	ObjectFactory obj;
 	obj.SetTypeId("ns3::UavNetwork");
 	obj.Set("SimulationTime", DoubleValue(sim_time));
-	obj.Set("LocationUpdateCli", DoubleValue(cli_pos_update));
 	obj.Set("Scenario", UintegerValue(scenario));
 	obj.Set("Environment", UintegerValue(env));
 	obj.Set("Protocol", UintegerValue(protocol));

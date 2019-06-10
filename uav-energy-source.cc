@@ -378,7 +378,7 @@ void UavEnergySource::TimeEnergy (double next) {
   file.close();
 
   m_wifiTE = m_moveTE = m_hoverTE = 0.0;
-  Simulator::Schedule (Seconds(next), &UavEnergySource::TimeEnergy, this, next);
+  m_timeEnergy = Simulator::Schedule (Seconds(next), &UavEnergySource::TimeEnergy, this, next);
 }
 
 void UavEnergySource::Stop () {
