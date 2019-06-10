@@ -143,7 +143,7 @@ UavNetwork::GetTypeId(void)
   return tid;
 }
 
-UavNetwork::UavNetwork() //: m_filePacketServer(global_path << "/packet_trace_server.txt"), m_filePacketUav(global_path << "/packet_trace_uav.txt"), m_filePacketClient(global_path << "/packet_trace_client.txt")
+UavNetwork::UavNetwork() : m_randApp() //: m_filePacketServer(global_path << "/packet_trace_server.txt"), m_filePacketUav(global_path << "/packet_trace_uav.txt"), m_filePacketClient(global_path << "/packet_trace_client.txt")
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_iniX = m_iniY = -2000;
