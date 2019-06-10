@@ -143,10 +143,12 @@ UavNetwork::GetTypeId(void)
   return tid;
 }
 
-UavNetwork::UavNetwork() : m_randApp() //: m_filePacketServer(global_path << "/packet_trace_server.txt"), m_filePacketUav(global_path << "/packet_trace_uav.txt"), m_filePacketClient(global_path << "/packet_trace_client.txt")
+UavNetwork::UavNetwork() //: m_filePacketServer(global_path << "/packet_trace_server.txt"), m_filePacketUav(global_path << "/packet_trace_uav.txt"), m_filePacketClient(global_path << "/packet_trace_client.txt")
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   m_iniX = m_iniY = -2000;
+
+  
 }
 
 void UavNetwork::DoDispose ()
@@ -836,9 +838,10 @@ void UavNetwork::ConfigurePalcos() // TODO: poderia ser otimizada a leitura do a
 
 void UavNetwork::Configure()
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );  
 
   // configurando estrutura de geracao de aplicacoes para clientes
+  m_randApp = CreateObject<UniformRandomVariable> ();
   m_randApp->SetAttribute ("Min", DoubleValue (0));
   m_randApp->SetAttribute ("Max", DoubleValue (5)); // 0- voice 1- video 2- www 3->5 nothing
 
