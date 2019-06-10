@@ -72,10 +72,6 @@ UavApplication::GetTypeId(void)
                                         Ipv4AddressValue(),
                                         MakeIpv4AddressAccessor(&UavApplication::m_addressAdhoc),
                                         MakeIpv4AddressChecker())
-                          .AddAttribute ("UavEnergySource", "Uav Energy Source",
-                                        PointerValue(),
-                                        MakePointerAccessor(&UavApplication::m_uavEnergySource),
-                                        MakePointerChecker<UavEnergySource>())
                           .AddTraceSource("PacketTrace",
                                           "Packet trace",
                                           MakeTraceSourceAccessor(&UavApplication::m_packetTrace),
@@ -537,7 +533,7 @@ void UavApplication::DoDispose() {
 
 void UavApplication::ClientConsumption (double time) 
 {
-  m_uavEnergySource->UpdateEnergySourceClient(time);
+  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->UpdateEnergySourceClient(time);
 }
 
 } // namespace ns3

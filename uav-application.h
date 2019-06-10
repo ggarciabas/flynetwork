@@ -109,8 +109,6 @@ private:
 
   // std::map<Ipv4Address, Ptr<ClientModel> > m_mapClient;
 
-  Ptr<UavEnergySource> m_uavEnergySource;
-
   std::string m_pathData;
 
 };
