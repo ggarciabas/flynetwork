@@ -173,6 +173,8 @@ private:
    */
   void CalculateRemainingEnergy (void);
 
+  void HandleAskUav();
+
 private:
 
   double m_wifiTE; // timing energy calculation
@@ -199,11 +201,12 @@ private:
   std::ofstream m_file;
 
   bool m_onoff;
+  bool m_highThr;
 
   double m_hoverAcum;
   double m_movAcum;
-  double m_cliAcum;
   double m_wifiAcum;
+  double m_wifiMean;
 
   std::string m_pathData;
 

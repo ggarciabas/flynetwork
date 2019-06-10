@@ -106,6 +106,7 @@ public:
    */
   void SetEnergyDepletionCallback(EnergyCallback callback);
   void SetEnergyRechargedCallback(EnergyCallback callback);
+  void SetEnergyAskUavCallback(EnergyCallback callback);
 
   /**
    * \brief Handles energy depletion.
@@ -119,6 +120,8 @@ public:
   virtual void HandleEnergyOff (void);
 
   virtual void HandleEnergyOn (void);
+
+  void HandleAskUav();
 
   double CalculateThreshold ();
 
@@ -186,6 +189,7 @@ private:
    */
   EnergyCallback m_energyDepletionCallback;
   EnergyCallback m_energyRechargedCallback;
+  EnergyCallback m_energyAskUavCallback;
 };
 
 } // namespace ns3

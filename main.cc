@@ -51,15 +51,15 @@ double global_tx_current;
 // https://www.wired.com/story/the-physics-of-why-bigger-drones-can-fly-longer/
 int main (int argc, char *argv[])
 {
-	double sim_time=1200.0, cli_pos_update = 5.0, clientUpdateCons = 1.0;
+	double sim_time=1200.0, global_cli_pos_update = 5.0, clientUpdateCons = 1.0;
 	uint32_t scenario = 7, env = 2, protocol = 1, custo=1, seed=9042019;
 	global_cli_cob = 115.47; // metros - para clientes utilizando equação de antena direcional com esparramento verificar Klaine2018
 	global_uav_cob = 280.5; // metros verificar distancia_sinr.py
-	global_tx_current = 0.380; // ampere, valor padrao classe modulo wifi (antigo 0.0174)
+	global_tx_current = 0.0174; // ampere, valor padrao classe modulo wifi (antigo 0.0174)
 	total_battery = 156960;
 	CommandLine cmd;
 	cmd.AddValue ("SimTime", "Simulation time", sim_time);
-	cmd.AddValue ("CliUpdate", "Client update position", cli_pos_update);
+	cmd.AddValue ("CliUpdate", "Client update position", global_cli_pos_update);
 	cmd.AddValue ("Scenario", "Scenario", scenario);
 	cmd.AddValue ("Env", "Environment", env);
 	cmd.AddValue ("Protocol", "Routing Protocol", protocol);
@@ -79,8 +79,8 @@ int main (int argc, char *argv[])
 	// LogComponentEnable("MyOnOffApplication", LOG_DEBUG);
 	// LogComponentEnable("ServerApplication", LOG_DEBUG);
 	// LogComponentEnable("LocationModel", LOG_DEBUG);
-	// LogComponentEnable("UavApplication", LOG_FUNCTION);
-	// LogComponentEnable("UavApplication", LOG_DEBUG);
+	LogComponentEnable("UavApplication", LOG_FUNCTION);
+	LogComponentEnable("UavApplication", LOG_DEBUG);
 	// LogComponentEnable("SmartphoneApplication", LOG_FUNCTION);
 	// LogComponentEnable("WifiPhyStateHelper", LOG_FUNCTION);
 	// LogComponentEnable("WifiPhy", LOG_FUNCTION);
@@ -101,9 +101,9 @@ int main (int argc, char *argv[])
 	// LogComponentEnable("UavApplicationContainer", LOG_FUNCTION);
 	// LogComponentEnable("UavApplication", LOG_FUNCTION);
 	// LogComponentEnable("UavDeviceEnergyModelHelper", LOG_FUNCTION);
-	// LogComponentEnable("UavDeviceEnergyModel", LOG_FUNCTION);
+	LogComponentEnable("UavDeviceEnergyModel", LOG_DEBUG);
 	// LogComponentEnable("UavEnergySourceHelper", LOG_FUNCTION);
-	// LogComponentEnable("UavEnergySource", LOG_FUNCTION);
+	LogComponentEnable("UavEnergySource", LOG_DEBUG);
 	// LogComponentEnable("UavMobilityModel", LOG_DEBUG);
 	// LogComponentEnable("UavModelContainer", LOG_FUNCTION);
 	// LogComponentEnable("UavModel", LOG_DEBUG);

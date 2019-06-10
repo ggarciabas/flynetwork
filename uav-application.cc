@@ -142,7 +142,7 @@ void UavApplication::Stop()
 
   // Para o hover
   m_uavDevice->StopHover();
-  m_uavDevice->SetFlying(false);
+  m_uavDevice->SetFlying(true);
 
   std::ostringstream os;
   os << global_path << "/" << m_pathData << "/uav_energy/uav_energy.txt";
@@ -158,6 +158,7 @@ void UavApplication::Stop()
   // TODO_NEW: lembrar de armazenar o consumo total dos clientes para log
   double me = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetMoveEnergy();
   double he = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetHoverEnergy();  
+  double we = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetWifiEnergy();  
 
   int count = 0;
   // TODO_NEW: caclular o total de cliente pelo tamanho do container de clientes e limpar o container!
@@ -169,7 +170,7 @@ void UavApplication::Stop()
   // }
 
   // TIME UAV_ID INITIAL_E ACTUAL_E WIFI_E CLIENT_E MOVE_E HOVER_E TOTAL_CLI
-  file << Simulator::Now().GetSeconds() << " " << m_node->GetId() << " " << iniE << " " << rem << " " << me << " " << he << " " << count << " " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
+  file << Simulator::Now().GetSeconds() << " " << m_node->GetId() << " " << iniE << " " << rem << " " << we << " " << me << " " << he << " " << count << " " << ((m_depletion)?"TRUE ":"FALSE ") << std::endl;
   file.close();
 
   // para source!
@@ -183,7 +184,7 @@ void UavApplication::StopApplication()
   Simulator::Remove(m_stopEvent);
   Simulator::Remove(m_sendEvent);
   Simulator::Remove(m_sendCliDataEvent);
-  Simulator::Remove(m_packetDepletion);
+  Simulator::Remove(m_packetAskUav);
   if (m_sendSck)
   {
     m_sendSck->ShutdownRecv();
@@ -278,12 +279,10 @@ UavApplication::EnergyRechargedCallback()
 void
 UavApplication::EnergyDepletionCallback() // TODO_NEW: criar um aviso de carga para o servidor já providenciar um novo UAV
 {
+  Simulator::Remove(m_programDepletion);
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG("---->>> EnergyDepletionCallback [" << m_id << "] going to " << m_central.at(0) << "," << m_central.at(1) << " @" << Simulator::Now().GetSeconds());
-  m_depletion = true;
-
-  // avisar central e mudar posição para central!
-  m_packetDepletion = Simulator::ScheduleNow(&UavApplication::SendPacketDepletion, this);
+  m_depletion = true;  
   
   // Ir para central
   if (!m_uavDevice->IsFlying()) { // caso nao esteja voando
@@ -292,36 +291,32 @@ UavApplication::EnergyDepletionCallback() // TODO_NEW: criar um aviso de carga p
   }
   GetNode()->GetObject<MobilityModel>()->SetPosition(Vector(m_central.at(0), m_central.at(1), 1.0)); // Verficar necessidade de subir em no eixo Z
 }
-
+void UavApplication::EnergyAskUavCallback()
+{
+  // avisar central e mudar posição para central!
+  m_packetAskUav = Simulator::ScheduleNow(&UavApplication::SendPacketNewUav, this);
+}
 /*
   Pacote para envio de informacao de onde o UAV estava afim de se repor aquela localizacao, o UAV será redirecionado para a central pois este só tem bateria para voltar!
 */
-void UavApplication::SendPacketDepletion(void)
+void UavApplication::SendPacketNewUav(void)
 {
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
-  m_packetDepletion.Cancel();
+  m_packetAskUav.Cancel();
 
   if (m_running) {
     std::ostringstream m;
     Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition();    
     if (m_uavDevice->IsFlying()) // caso o uav estiver voando, se faz necessario enviar solicitacao para o novo UAV ir direto para a posicao destino
-      m << "DEPLETION " << m_id << " " << m_goto.at(0) << " " << m_goto.at(1) << " " << pos.z << " " << '\0';
+      m << "NEWUAV " << m_id << " " << m_goto.at(0) << " " << m_goto.at(1) << " " << pos.z << " " << '\0';
     else // caso contrário, necessario enviar solicitacao para a posicao atual do UAV
-      m << "DEPLETION " << m_id << " " << pos.x << " " << pos.y << " " << pos.z << " " << '\0';
+      m << "NEWUAV " << m_id << " " << pos.x << " " << pos.y << " " << pos.z << " " << '\0';
 
-    int count = 0;
-    // TODO_NEW: utilizar o ttamnho do container de clientes!
-    // for(std::map<Ipv4Address, Ptr<ClientModel> >::iterator i = m_mapClient.begin(); i != m_mapClient.end(); i++)
-    // {
-    //   if ((i->second)->GetLogin().compare("NOPOSITION") != 0) { // cliente com posicionamento atualizado!
-    //     count++;
-    //   }
-    // }
     std::ostringstream os;
-    os << global_path << "/" << m_pathData << "/uav_depletion/depletion_log.txt";
+    os << global_path << "/" << m_pathData << "/uav_depletion/newuav_log.txt";
     std::ofstream file;
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
-    file << Simulator::Now().GetSeconds() << " " << m_id << " " << count 
+    file << Simulator::Now().GetSeconds() << " " << m_id
     << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRealRemainingEnergy() 
     << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetInitialEnergy() 
     << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetWifiAcum() 
@@ -341,14 +336,14 @@ void UavApplication::SendPacketDepletion(void)
     else
     {
       NS_LOG_ERROR("UAV [" << m_id << "] @" << Simulator::Now().GetSeconds() << " [NÃO] SENT DEPLETION");
-      m_packetDepletion = Simulator::Schedule(Seconds(0.01), &UavApplication::SendPacketDepletion, this);
+      m_packetAskUav = Simulator::Schedule(Seconds(0.01), &UavApplication::SendPacketNewUav, this);
       return;
     }
   } else {
     NS_LOG_DEBUG("Uav not running " << this->m_id);
   }
   
-  m_packetDepletion = Simulator::Schedule(Seconds(0.05), &UavApplication::SendPacketDepletion, this);
+  m_packetAskUav = Simulator::Schedule(Seconds(0.05), &UavApplication::SendPacketNewUav, this);
 }
 
 void
@@ -438,13 +433,15 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
             // m_wifiDevice->HandleEnergyOn();
           }
         }
-      } else if (results.at(0).compare("DEPLETIONOK") == 0)
+      } else if (results.at(0).compare("NEWUAVOK") == 0)
         {
-          m_packetDepletion.Cancel();
+          m_packetAskUav.Cancel();
           std::ostringstream mm;
           mm << "UAV\t" << m_id << "\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tDEPLETIONOK";
           //m_packetTrace(mm.str());
-          NS_LOG_DEBUG(mm.str() << " @" << Simulator::Now().GetSeconds());          
+          NS_LOG_DEBUG(mm.str() << " @" << Simulator::Now().GetSeconds());   
+          // programando para este UAV retornar a central no tempo necessario para o novo UAV chegar
+          m_programDepletion = Simulator::Schedule(Seconds(m_uavDevice->GetTimeToCentral()), &UavApplication::EnergyDepletionCallback, this);       
         } else if (results.at(0).compare("SERVERDATA") == 0)
           {
             if (m_depletion) return; // estado de emergencia

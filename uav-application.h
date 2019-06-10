@@ -60,6 +60,7 @@ public:
 
   void EnergyDepletionCallback();
   void EnergyRechargedCallback();
+  void EnergyAskUavCallback();
 
   void CourseChange (Ptr<const MobilityModel>);
 
@@ -87,7 +88,7 @@ private:
   // void ScheduleTx(void);
   void SendPacket(void);
   void SendCliData ();
-  void SendPacketDepletion(void);
+  void SendPacketNewUav(void);
 
   uint32_t m_id;
   uint16_t m_serverPort;
@@ -100,10 +101,12 @@ private:
   Ptr<Socket> m_sendSck; // sending socket
   EventId m_sendEvent; 
   EventId m_sendCliDataEvent;
-  EventId m_packetDepletion;
+  EventId m_packetAskUav;
   bool m_running;
   TracedCallback<std::string> m_packetTrace;
   Ptr<UavDeviceEnergyModel> m_uavDevice;
+
+  EventId m_programDepletion; // utilizado para programar o depletion de acordo com o tempo para o UAV novo chegar até a posicao onde o UAV que solicitou está.
 
   bool m_depletion;// para identificar estado de emergencia
 

@@ -66,7 +66,7 @@ public:
 
   void AddNewFixedClient(string login, double x, double y);
 
-  void ReplyDepletion(Ptr<UavModel> uav);
+  void ReplyNewUav(Ptr<UavModel> uav);
 
 private:
   void DoDispose();

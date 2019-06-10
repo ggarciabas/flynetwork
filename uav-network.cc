@@ -236,7 +236,7 @@ void UavNetwork::Run()
     exit(-1);
   }
 
-  ss << "/" << m_seed << "/" << m_protocol << "/custo_" << m_custo; // adicionando seed
+  ss << "/" << m_seed << "/custo_" << m_custo; // adicionando seed
   m_pathData = ss.str();
   ss.str("");
   ss << "rm -Rf " << global_path << "/" << m_pathData;
@@ -426,7 +426,7 @@ void UavNetwork::ConfigureServer()
   m_serverApp->SetStartTime(Seconds(0.0));
   m_serverApp->SetStopTime(Seconds(m_simulationTime));
 
-  m_serverApp->TraceConnectWithoutContext("NewUav", MakeCallback(&UavNetwork::NewUav, this));// adicionando callback para criar UAVs
+  m_serverApp->TraceConnectWithoutContext("NewUav", MakeCallback(&UavNetwork::NewUav, this)); // adicionando callback para criar UAVs
   m_serverApp->TraceConnectWithoutContext("PrintUavEnergy", MakeCallback(&UavNetwork::PrintUavEnergy, this));
   m_serverApp->TraceConnectWithoutContext("RemoveUav", MakeCallback(&UavNetwork::RemoveUav, this));
   m_serverApp->TraceConnectWithoutContext("ClientPositionTrace", MakeCallback(&UavNetwork::ClientPosition, this));
@@ -641,7 +641,8 @@ void UavNetwork::ConfigureUav(int total)
     energyHelper.SetEnergyRechargedCallback(MakeCallback (&UavApplication::EnergyRechargedCallback, uavApp));
     DeviceEnergyModelContainer uavEnergyModels = energyHelper.Install((*i), sources.Get(c));
     Ptr<UavDeviceEnergyModel> dev = DynamicCast<UavDeviceEnergyModel>(uavEnergyModels.Get(0));
-
+    dev->SetEnergyAskUavCallback(MakeCallback (&UavApplication::EnergyAskUavCallback, uavApp));
+    
     // adicionando devices no UAVApp
     uavApp->SetUavDevice(dev);
 

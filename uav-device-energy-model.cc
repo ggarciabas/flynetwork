@@ -85,7 +85,7 @@ UavDeviceEnergyModel::UavDeviceEnergyModel()
   m_energyCost = 0.0;
   m_totalEnergyConsumption = 0.0;
   m_hoverCost = 0.0;
-  m_flying = false;
+  m_flying = true;
   m_timeToCentral = 0.0;
 }
 
@@ -125,6 +125,17 @@ void UavDeviceEnergyModel::SetEnergyRechargedCallback(EnergyCallback callback)
   m_energyRechargedCallback = callback;
 }
 
+void UavDeviceEnergyModel::SetEnergyAskUavCallback(EnergyCallback callback)
+{
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << &callback);
+  if (callback.IsNull())
+  {
+    NS_LOG_DEBUG("EnergyAskUavCallback:Setting NULL energy Recharged callback!");
+  }
+  m_energyAskUavCallback = callback;
+}
+
+
 double UavDeviceEnergyModel::CalculateThreshold () {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   Vector actual = m_source->GetNode()->GetObject<MobilityModel>()->GetPosition();
@@ -156,6 +167,11 @@ void UavDeviceEnergyModel::HandleEnergyRecharged (void)
 void UavDeviceEnergyModel::HandleEnergyOff (void)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
+}
+
+void UavDeviceEnergyModel::HandleAskUav ()
+{
+  m_energyAskUavCallback();
 }
 
 void UavDeviceEnergyModel::HandleEnergyOn (void)
@@ -311,7 +327,7 @@ void UavDeviceEnergyModel::SetFlying(bool f) {
 void UavDeviceEnergyModel::StopHover()
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
-  NS_ASSERT_MSG (!m_flying, "UavDeviceEnergyModel::StopHover [" << m_source->GetNode()->GetId() << "] @" << Simulator::Now().GetSeconds());
+  NS_ASSERT_MSG (!m_flying, "UavDeviceEnergyModel::StopHover [" << m_source->GetNode()->GetId() << "] @" << Simulator::Now().GetSeconds()); // m_flying corresponde a estar voando e não parado
   NS_LOG_DEBUG("UavDeviceEnergyModel::StopHover [" << m_source->GetNode()->GetId() << "] lasttime: " << m_lastTime.GetSeconds() << " @" << Simulator::Now().GetSeconds());
   Simulator::Remove(m_hoverEvent);
   m_hoverEvent = Simulator::ScheduleNow(&UavDeviceEnergyModel::HoverConsumption, this);

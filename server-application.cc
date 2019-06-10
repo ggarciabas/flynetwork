@@ -369,13 +369,13 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
           {
             NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [DATA] --- fora da rede?! ID " << results.at(1));
           }
-        } else if (results.at(0).compare("DEPLETION") == 0)  {
-           NS_LOG_DEBUG("SERVER - received DEPLETION  from UAV " << results.at(1));
+        } else if (results.at(0).compare("NEWUAV") == 0)  {
+           NS_LOG_DEBUG("SERVER - received NEWUAV  from UAV " << results.at(1));
             Ptr<UavModel> uav = m_uavContainer.FindUavModel(std::stoi(results.at(1), &sz));
             if (uav != NULL) {              
               uav->CancelSendPositionEvent();
-              uav->SetDepletion(true); // somente espera enviar informacao quando chegar na central, ao chegar na central o UAv é sempre desligado
-              ReplyDepletion(uav);
+              // uav->SetDepletion(true); // somente espera enviar informacao quando chegar na central, ao chegar na central o UAv é sempre desligado
+              ReplyNewUav(uav);
               m_uavGoToCentral.Add(uav);
               m_uavContainer.RemoveUav(uav);
               uav = 0;
@@ -393,7 +393,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
               uav->SetSendPositionEvent(Simulator::ScheduleNow(&ServerApplication::SendUavPacket, this, uav));
               uav = 0;              
             } else {
-              NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [DEPLETION] --- fora da rede?! ID " << results.at(1));
+              NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [NEWUAV] --- fora da rede?! ID " << results.at(1));
             }
             uav = 0;
           } 
@@ -432,16 +432,16 @@ void ServerApplication::ReplyAskCliData(Ptr<UavModel> uav)
   }
 }
 
-void ServerApplication::ReplyDepletion(Ptr<UavModel> uav)
+void ServerApplication::ReplyNewUav(Ptr<UavModel> uav)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << uav->GetId());
   std::ostringstream msg;
-  msg << "DEPLETIONOK "<< '\0';
+  msg << "NEWUAVOK "<< '\0';
   uint16_t packetSize = msg.str().length() + 1;
   Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
   if (uav->GetSocket()->Send(packet, 0) == packetSize) {
     msg.str("");
-    msg << "SERVER\tSENT\t@" << Simulator::Now().GetSeconds() << "\tDEPLETIONOK";
+    msg << "SERVER\tSENT\t@" << Simulator::Now().GetSeconds() << "\tNEWUAVOK";
     //m_packetTrace(msg.str());
   }
   NS_LOG_DEBUG (msg.str());
