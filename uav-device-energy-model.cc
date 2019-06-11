@@ -226,14 +226,14 @@ void UavDeviceEnergyModel::SetEnergySource(Ptr<EnergySource> source)
   m_energyCost = m_source->GetInitialEnergy() / (m_resistTime * m_avgVel); // joule/meter
   m_hoverCost = m_source->GetInitialEnergy() / m_resistTime; // j/s
 
-  std::ostringstream os;
-  os << global_path << "/" << m_pathData << "/cost_energy.txt";
-  m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  m_file << m_energyCost << "\n" << m_hoverCost << std::endl;
-  m_file.close();
-  os.str("");
-  os << "cp " << global_path << "/" << m_pathData << "/cost_energy.txt " << global_path << "/" << m_pathData << "/compare/cost_energy.txt";
-  system(os.str().c_str());
+  // std::ostringstream os;
+  // os << global_path << "/" << m_pathData << "/cost_energy.txt";
+  // m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  // m_file << m_energyCost << "\n" << m_hoverCost << std::endl;
+  // m_file.close();
+  // os.str("");
+  // os << "cp " << global_path << "/" << m_pathData << "/cost_energy.txt " << global_path << "/" << m_pathData << "/compare/cost_energy.txt";
+  // system(os.str().c_str());
 }
 
 const Ptr<EnergySource>

@@ -48,20 +48,19 @@ double global_speed;
 double global_uav_cob;
 double global_cli_cob;
 double global_tx_current;
-double global_cli_pos_update;
+double global_cli_cons_update;
 // https://www.wired.com/story/the-physics-of-why-bigger-drones-can-fly-longer/
 int main (int argc, char *argv[])
 {
-	double sim_time=1200.0, clientUpdateCons = 1.0;
+	double sim_time=1200.0;
 	uint32_t scenario = 7, env = 2, protocol = 1, custo=1, seed=9042019;
-	global_cli_pos_update = 5.0;
+	global_cli_cons_update = 1.0;
 	global_cli_cob = 115.47; // metros - para clientes utilizando equação de antena direcional com esparramento verificar Klaine2018
 	global_uav_cob = 280.5; // metros verificar distancia_sinr.py
 	global_tx_current = 0.0174; // ampere, valor padrao classe modulo wifi (antigo 0.0174)
 	total_battery = 156960;
 	CommandLine cmd;
 	cmd.AddValue ("SimTime", "Simulation time", sim_time);
-	cmd.AddValue ("CliUpdate", "Client update position", global_cli_pos_update);
 	cmd.AddValue ("Scenario", "Scenario", scenario);
 	cmd.AddValue ("Env", "Environment", env);
 	cmd.AddValue ("Protocol", "Routing Protocol", protocol);
@@ -71,7 +70,7 @@ int main (int argc, char *argv[])
 	cmd.AddValue ("Etapa", "", etapa);
 	cmd.AddValue ("UavCob", "", global_uav_cob);
 	cmd.AddValue ("CliCob", "", global_cli_cob);
-	cmd.AddValue ("ClientUpdateCons", "", clientUpdateCons);
+	cmd.AddValue ("ClientUpdateCons", "", global_cli_cons_update);
 	cmd.AddValue("TotalBattery", "", total_battery);
 	cmd.Parse (argc, argv);
 
@@ -125,7 +124,7 @@ int main (int argc, char *argv[])
 	obj.Set("Seed", UintegerValue(seed));
 	obj.Set("ScheduleServer", DoubleValue(etapa));
 	obj.Set("UavTimingNext", DoubleValue((sim_time-0.5)/10.0));
-	obj.Set("ClientUpdateCons", DoubleValue(clientUpdateCons));
+	obj.Set("ClientUpdateCons", DoubleValue(global_cli_cons_update));
 	Ptr<UavNetwork> net = obj.Create()->GetObject<UavNetwork>();
 	net->Run();
 	net->Dispose();

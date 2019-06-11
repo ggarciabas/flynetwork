@@ -7,7 +7,7 @@ extern double global_speed;
 extern double global_uav_cob;
 extern double global_cli_cob;
 extern double global_tx_current; // ampere
-extern double global_cli_pos_update;
+extern double global_cli_cons_update;
 
 #ifndef GLOBAL_PATH
     extern std::string global_path;

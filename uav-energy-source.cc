@@ -190,7 +190,7 @@ void UavEnergySource::UpdateEnergySourceClient (double time)
     double energyToDecrease = (time * global_tx_current * m_supplyVoltageV);
 
     m_wifiMean = (energyToDecrease + m_wifiMean) / 2.0;
-    m_highBatteryTh = m_lowBatteryThUav + (((m_wifiMean*0.5*100)/m_initialEnergyJ)/global_cli_pos_update)/* gasto por segundo */*DynamicCast<UavDeviceEnergyModel>(m_uavDev)->GetTimeToCentral();  // 50% do consumo medio considerado para o high multiplicado pelo tempo de deslocamento da central para o ponto do UAV avaliado. No high é enviado um pedido para a central de um novo UAV.
+    m_highBatteryTh = m_lowBatteryThUav + (((m_wifiMean*0.5*100)/m_initialEnergyJ)/global_cli_cons_update)/* gasto por segundo */*DynamicCast<UavDeviceEnergyModel>(m_uavDev)->GetTimeToCentral();  // 50% do consumo medio considerado para o high multiplicado pelo tempo de deslocamento da central para o ponto do UAV avaliado. No high é enviado um pedido para a central de um novo UAV.
 
     m_remainingEnergyJ -= energyToDecrease;
 
