@@ -2,7 +2,7 @@
 #include <string>
 
 extern double global_ec_persec;
-extern int global_nc; // totaol de cliente no cenario
+extern int global_nc; // total de cliente no cenario
 extern double global_speed;
 extern double global_uav_cob;
 extern double global_cli_cob;
@@ -27,21 +27,6 @@ extern double global_cli_cons_update;
 #ifndef UDP
     #define UDP 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // #ifndef COM_SERVER

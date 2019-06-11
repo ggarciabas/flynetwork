@@ -370,18 +370,13 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [DATA] --- fora da rede?! ID " << results.at(1));
           }
         } else if (results.at(0).compare("NEWUAV") == 0)  {
-           NS_LOG_DEBUG("SERVER - received NEWUAV  from UAV " << results.at(1));
+            NS_LOG_DEBUG("SERVER - received NEWUAV  from UAV " << results.at(1));
             Ptr<UavModel> uav = m_uavContainer.FindUavModel(std::stoi(results.at(1), &sz));
             if (uav != NULL) {              
-              uav->CancelSendPositionEvent();
-              // uav->SetDepletion(true); // somente espera enviar informacao quando chegar na central, ao chegar na central o UAv é sempre desligado
               ReplyNewUav(uav);
-              m_uavGoToCentral.Add(uav);
-              m_uavContainer.RemoveUav(uav);
-              uav = 0;
               // solicitar novo UAV para a rede!
               m_newUav(1, 2); // solicita novo UAV
-              // atualizar o posicionamento do Uav na última posicao do vetor, mandando ele para a localização do UAV que esta saindo
+              // atualizar o posicionamento do Uav na última posicao do vetor, mandando ele para a localização do UAV que esta solicitando carga
               uav = m_uavContainer.GetLast();
               std::vector<double> p;
               p.push_back(std::stod (results.at(2),&sz));
@@ -391,11 +386,10 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
               uav->CancelSendPositionEvent();
               uav->NotConfirmed();
               uav->SetSendPositionEvent(Simulator::ScheduleNow(&ServerApplication::SendUavPacket, this, uav));
-              uav = 0;              
+              uav = 0;    
             } else {
               NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [NEWUAV] --- fora da rede?! ID " << results.at(1));
             }
-            uav = 0;
           } 
           #ifdef COM_SERVER
             else {// enviando pro UAV somente
@@ -1343,6 +1337,7 @@ ServerApplication::PrintMij (vector<vector<long double>> m_ij, double temp, std:
 {
   std::ofstream file;
   file.open(nameFile.c_str(), std::ofstream::out | std::ofstream::app);
+  file << Simulator::Now().GetSeconds() << std::endl;
   file << temp << std::endl;
   vector<int>::iterator u_i = uav_ids.begin();
   file << (*u_i);

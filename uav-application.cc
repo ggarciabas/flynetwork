@@ -437,7 +437,7 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
         {
           m_packetAskUav.Cancel();
           std::ostringstream mm;
-          mm << "UAV\t" << m_id << "\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tDEPLETIONOK";
+          mm << "UAV\t" << m_id << "\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tNEWUAVOK";
           //m_packetTrace(mm.str());
           NS_LOG_DEBUG(mm.str() << " @" << Simulator::Now().GetSeconds());   
           // programando para este UAV retornar a central no tempo necessario para o novo UAV chegar
