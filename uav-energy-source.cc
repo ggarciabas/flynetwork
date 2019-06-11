@@ -343,7 +343,6 @@ void UavEnergySource::Stop () {
 
   m_wifiEnergy = m_moveEnergy = m_hoverEnergy = 0.0;
 
-  Simulator::Remove(m_timeEnergy);
 }
 
 } // namespace ns3

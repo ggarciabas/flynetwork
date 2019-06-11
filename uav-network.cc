@@ -438,7 +438,7 @@ void UavNetwork::ConfigureServer()
   m_serverNode.Get(0)->AddApplication(m_serverApp);
 }
 
-void UavNetwork::NewUav(int total, int update) // update = 0- normal 1- supply 2-depletion
+void UavNetwork::NewUav(int total, int update) // update = 0- normal 1- supply 2-depletion 3- newuav (high thr)
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<total<<update);
   NS_LOG_DEBUG ("UavNetwork::NewUav " << total << " " << update << " @" << Simulator::Now().GetSeconds());
@@ -540,10 +540,10 @@ void UavNetwork::RemoveUav(int id, int step)
   m_file.close();
 
   os.str("");
-  os << global_path << "/" << m_pathData << "//uav_removed_energy.txt";
+  os << global_path << "/" << m_pathData << "/uav_removed_energy.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   Ptr<UavDeviceEnergyModel> dev = uavApp->GetUavDevice();
-  m_file << Simulator::Now().GetSeconds() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetRealRemainingEnergy() / dev->GetEnergySource()->GetInitialEnergy() << std::endl;
+  m_file << Simulator::Now().GetSeconds() << " " << id << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetRealRemainingEnergy() / dev->GetEnergySource()->GetInitialEnergy() << std::endl;
   m_file.close();
 
   n = 0;

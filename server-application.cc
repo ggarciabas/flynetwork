@@ -374,8 +374,10 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             Ptr<UavModel> uav = m_uavContainer.FindUavModel(std::stoi(results.at(1), &sz));
             if (uav != NULL) {              
               ReplyNewUav(uav);
+              m_uavGoToCentral.Add(uav);
+              m_uavContainer.RemoveUav(uav);
               // solicitar novo UAV para a rede!
-              m_newUav(1, 2); // solicita novo UAV
+              m_newUav(1, 3); // solicita novo UAV
               // atualizar o posicionamento do Uav na última posicao do vetor, mandando ele para a localização do UAV que esta solicitando carga
               uav = m_uavContainer.GetLast();
               std::vector<double> p;
