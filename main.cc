@@ -81,8 +81,8 @@ int main (int argc, char *argv[])
 	// LogComponentEnable("MyOnOffApplication", LOG_DEBUG);
 	// LogComponentEnable("ServerApplication", LOG_DEBUG);
 	// LogComponentEnable("LocationModel", LOG_DEBUG);
-	LogComponentEnable("UavApplication", LOG_FUNCTION);
-	LogComponentEnable("UavApplication", LOG_DEBUG);
+	// LogComponentEnable("UavApplication", LOG_FUNCTION);
+	// LogComponentEnable("UavApplication", LOG_DEBUG);
 	// LogComponentEnable("SmartphoneApplication", LOG_FUNCTION);
 	// LogComponentEnable("WifiPhyStateHelper", LOG_FUNCTION);
 	// LogComponentEnable("WifiPhy", LOG_FUNCTION);
@@ -103,9 +103,9 @@ int main (int argc, char *argv[])
 	// LogComponentEnable("UavApplicationContainer", LOG_FUNCTION);
 	// LogComponentEnable("UavApplication", LOG_FUNCTION);
 	// LogComponentEnable("UavDeviceEnergyModelHelper", LOG_FUNCTION);
-	LogComponentEnable("UavDeviceEnergyModel", LOG_DEBUG);
+	// LogComponentEnable("UavDeviceEnergyModel", LOG_DEBUG);
 	// LogComponentEnable("UavEnergySourceHelper", LOG_FUNCTION);
-	LogComponentEnable("UavEnergySource", LOG_DEBUG);
+	// LogComponentEnable("UavEnergySource", LOG_DEBUG);
 	// LogComponentEnable("UavMobilityModel", LOG_DEBUG);
 	// LogComponentEnable("UavModelContainer", LOG_FUNCTION);
 	// LogComponentEnable("UavModel", LOG_DEBUG);
