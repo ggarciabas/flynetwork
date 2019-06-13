@@ -692,7 +692,7 @@ void UavNetwork::ConfigureCli()
     getline(scenario, line); // liberando as primeiras informacoes
     int update_total = 0;
     Ptr<UniformRandomVariable> app_rand = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
-    app_rand->SetAttribute ("Min", DoubleValue (1));
+    app_rand->SetAttribute ("Min", DoubleValue (10.0));
     app_rand->SetAttribute ("Max", DoubleValue (m_totalCli));
     while (getline(scenario, line))
     {
@@ -700,10 +700,7 @@ void UavNetwork::ConfigureCli()
       {
         sscanf(line.c_str(), "%lf,%lf\n", &x, &y);
         NS_LOG_INFO(line.c_str());
-        NodeContainer nodes;
         int t = app_rand->GetValue();
-        nodes.Create(t);
-        update_total += t;
         // devices.Add(m_wifiHelper.Install(m_phyHelperCli, m_macWifiHelperCli, nodes));
         // stack.Install(nodes);
         // TODO_NEW: verificar se existe algum problema executar simulacoes com nós sem devices!
@@ -711,13 +708,51 @@ void UavNetwork::ConfigureCli()
         Ptr<PositionAllocator> positionAlloc = CreateObjectWithAttributes<RandomDiscPositionAllocator>
                             ("X", DoubleValue (x),
                               "Y", DoubleValue (y),
-                            "Rho", StringValue("ns3::ConstantRandomVariable[Constant=20.0]"));
+                            "Rho", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=20.0]"));
         mobilityCLI.SetPositionAllocator(positionAlloc);
+        
+        
+        NodeContainer umahora;
+        update_total += int(t/4.0);
+        umahora.Create(int(t/4.0));        
         mobilityCLI.SetMobilityModel("ns3::RandomWalk2dMobilityModel",
                                      "Bounds", RectangleValue(Rectangle(m_xmin, m_xmax, m_ymin, m_ymax)),
+                                      "Time", TimeValue(Seconds(3600)),
+                                      "Mode", EnumValue(RandomWalk2dMobilityModel::MODE_TIME),
+                                      "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=3.0]")); // xmin, xmax, ymin, ymax
+        mobilityCLI.Install(umahora);
+        
+        NodeContainer meiahora;
+        update_total += int(t/4.0);
+        meiahora.Create(int(t/4.0));      
+        mobilityCLI.SetMobilityModel("ns3::RandomWalk2dMobilityModel",
+                                     "Bounds", RectangleValue(Rectangle(m_xmin, m_xmax, m_ymin, m_ymax)),
+                                      "Time", TimeValue(Seconds(1800)),
                                       "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=5.0]")); // xmin, xmax, ymin, ymax
-        mobilityCLI.Install(nodes);
-        m_clientNode.Add(nodes);      
+        mobilityCLI.Install(meiahora);
+
+        NodeContainer dezmin;
+        update_total += int(t/4.0);
+        dezmin.Create(int(t/4.0));       
+        mobilityCLI.SetMobilityModel("ns3::RandomWalk2dMobilityModel",
+                                     "Bounds", RectangleValue(Rectangle(m_xmin, m_xmax, m_ymin, m_ymax)),
+                                      "Time", TimeValue(Seconds(600)),
+                                      "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=5.0]")); // xmin, xmax, ymin, ymax
+        mobilityCLI.Install(dezmin);
+
+        NodeContainer cincomin;
+        update_total += int(t/4.0);
+        cincomin.Create(int(t/4.0));      
+        mobilityCLI.SetMobilityModel("ns3::RandomWalk2dMobilityModel",
+                                     "Bounds", RectangleValue(Rectangle(m_xmin, m_xmax, m_ymin, m_ymax)),
+                                      "Time", TimeValue(Seconds(300)),
+                                      "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=5.0]")); // xmin, xmax, ymin, ymax
+        mobilityCLI.Install(cincomin);
+        
+        m_clientNode.Add(umahora);      
+        m_clientNode.Add(meiahora);    
+        m_clientNode.Add(dezmin);    
+        m_clientNode.Add(cincomin);    
       }
     }
     scenario.close();
