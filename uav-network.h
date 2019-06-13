@@ -129,6 +129,7 @@ private:
   Ipv4InterfaceContainer m_serverAddress;
   double m_iniX, m_iniY; // posicao inicial do UAV para nao interferir nos resultados!
   double m_scheduleServer;
+  map<int, int> m_descTime;
 
   EventId m_newApp; // controla as aplicacoes dos usuarios
 

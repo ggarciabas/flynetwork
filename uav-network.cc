@@ -350,6 +350,15 @@ void UavNetwork::Run()
   Simulator::Run();
   NS_LOG_DEBUG("Finalizando Simulador");  
 
+  std::ofstream file;
+  ss.str("");
+  ss << global_path << "/" << m_pathData << "/client/desc_log.txt";
+  file.open(ss.str(), std::ofstream::out | std::ofstream::app);
+  for (map<int, int>::iterator i = m_descTime.begin(); i != m_descTime.end(); ++i) {    
+    file << Simulator::Now().GetSeconds() << "," << i->second << "," << i->first << std::endl;
+  }
+  file.close();
+
   Simulator::Destroy();
   NS_LOG_DEBUG("Finalizando Destroy");
 
@@ -726,6 +735,7 @@ void UavNetwork::ConfigureCli()
   for (NodeContainer::Iterator it = m_clientNode.Begin(); it != m_clientNode.End(); ++it) 
   {
     m_cliEvent.push_back(EventId());
+    m_descTime[(*it)->GetId()] = 0; // iniciando
   }
 
   global_nc = m_totalCli;
@@ -783,12 +793,7 @@ void UavNetwork::ClientConsumption (int posCli)
   if ((int)id != -1) {    
     m_uavAppContainer.Get(m_nodeUavApp[id])->ClientConsumption(m_clientUpdateCons); // passando tempo que usou o UAV
   } else {
-    std::ostringstream ss;
-    std::ofstream file;
-    ss << global_path << "/" << m_pathData << "/client/desc_log.txt";
-    file.open(ss.str(), std::ofstream::out | std::ofstream::app);
-    file << Simulator::Now().GetSeconds() << "," << m_clientUpdateCons << "," << posCli << std::endl;
-    file.close();
+    m_descTime[m_clientNode.Get(posCli)->GetId()]++;    
   }
 
   m_cliEvent[posCli] = Simulator::Schedule(Seconds(m_clientUpdateCons), &UavNetwork::ClientConsumption, this, posCli);
