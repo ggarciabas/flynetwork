@@ -85,7 +85,7 @@ public:
    */
   virtual void UpdateEnergySource (void);
   virtual void UpdateEnergySourceMove (double);
-  virtual void UpdateEnergySourceClient (double);
+  virtual double UpdateEnergySourceClient (double);
   virtual void UpdateEnergySourceHover (double energyToDecrease);
 
   /**

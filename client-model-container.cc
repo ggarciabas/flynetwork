@@ -121,6 +121,23 @@ void ClientModelContainer::Add(std::string modelName)
   m_models.push_back(model);
 }
 
+
+Ptr<ClientModel>
+ClientModelContainer::FindClientModel(uint32_t id)
+{
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<id);
+  for (Iterator i = m_models.begin(); i != m_models.end(); i++)
+  {
+    if ((*i)->GetId() == id)
+    {
+      NS_LOG_INFO ("ClientModelContainer::FindClientModel @" <<Simulator::Now().GetSeconds() << " encontrado cliente com ID " << id);
+      return (*i);
+    }
+  }
+  NS_LOG_INFO ("ClientModelContainer::FindClientModel @" <<Simulator::Now().GetSeconds() << " NAO id " << id);
+  return NULL;
+}
+
 Ptr<ClientModel>
 ClientModelContainer::FindClientModel(std::string login)
 {

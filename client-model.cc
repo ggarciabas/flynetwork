@@ -41,6 +41,11 @@ ClientModel::GetTypeId(void)
                                         StringValue("none"),
                                         MakeStringAccessor(&ClientModel::m_login),
                                         MakeStringChecker())
+                          .AddAttribute("Id",
+                                        "Client model id",
+                                        UintegerValue(-1),
+                                        MakeUintegerAccessor(&ClientModel::m_id),
+                                        MakeUintegerChecker<uint32_t>())
                           .AddAttribute("Consumption",
                                         "Consumption in joules per second.",
                                         DoubleValue(0.34), // J/s

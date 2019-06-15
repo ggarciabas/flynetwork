@@ -91,8 +91,13 @@ public:
   double GetDataRate ();
   void SetDataRate (double sinr);
 
+  uint32_t GetId () {
+    return m_id;
+  }
+
 private:
   void DoDispose ();
+  uint32_t m_id;
   double m_pci; // probabilidade do cliente
   bool m_connected;
   Ptr<LocationModel> m_locConnected;

@@ -339,7 +339,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             NS_LOG_DEBUG("SERVER - DATA confirmation ::: UAV #" << uav->GetId() << " @" << Simulator::Now().GetSeconds());
             int i = 3; // 3 informacoes antes das informacoes dos clientes! contemplam cada cliente!
             for (; i < int(results.size()-1); i+=5) { // id time_update posx posy consumption
-              Ptr<ClientModel> cli = m_clientContainer.FindClientModel(results.at(i)); // id
+              Ptr<ClientModel> cli = m_clientContainer.FindClientModel(std::stoi(results.at(i))); // id
               if (cli != NULL) { // caso já exista, atualiza somente posicao se o tempo de atualizacao for maior!
                 if (std::stod(results.at(i+1), &sz) > cli->GetUpdatePos().GetSeconds()) { // time - pega ultima posicao atualizada
                   std::vector<double> pos;
@@ -352,13 +352,14 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
               } else { // senao cria um novo
                 ObjectFactory obj;
                 obj.SetTypeId("ns3::ClientModel");
-                obj.Set("Login", StringValue(results.at(i))); // id
+                obj.Set("Id", UintegerValue(std::stoi(results.at(i)))); // id
                 cli = obj.Create()->GetObject<ClientModel>();
                 cli->SetUpdatePos(Seconds(std::stod(results.at(i+1), &sz))); // time
                 std::vector<double> pos;
                 pos.push_back(std::stod (results.at(i+2),&sz)); // x
                 pos.push_back(std::stod (results.at(i+3),&sz)); // y
                 cli->SetPosition(pos.at(0), pos.at(1));
+                cli->SetConsumption(std::stod (results.at(i+4),&sz)); // consumption
                 m_clientContainer.Add(cli);
                 pos.clear();
               }

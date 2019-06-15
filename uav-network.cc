@@ -90,6 +90,11 @@ UavNetwork::GetTypeId(void)
                                         DoubleValue(300.0),
                                         MakeDoubleAccessor(&UavNetwork::m_simulationTime),
                                         MakeDoubleChecker<double>())
+                          .AddAttribute("TotalCli",
+                                        "Total de clientes",
+                                        DoubleValue(0.0),
+                                        MakeDoubleAccessor(&UavNetwork::m_totalCli),
+                                        MakeDoubleChecker<double>())
                           .AddAttribute("UavTimingNext",
                                         "Uav Timing Next",
                                         DoubleValue(150.0),
@@ -176,35 +181,8 @@ void UavNetwork::Run()
   std::ostringstream ss, ss_;
   switch (m_scenario)
   {
-    case 0: // teste
-      ss << "teste";
-      break;
-    case 1:
-      ss << "lollapalooza_30";
-      break;
-    case 2: //Lollapalooza
-      ss << "lollapalooza_50";
-      break;
-    case 3:
-      ss << "lollapalooza_100";
-      break;
-    case 4: //Rock in Rio Lisboa
-      ss << "rockinriolisboa_30";
-      break;
-    case 5: 
-      ss << "rockinriolisboa_50";
-      break;
-    case 6: 
-      ss << "rockinriolisboa_100";
-      break;
-    case 7: // austin_30
-      ss << "austin_30";
-      break;
-    case 8: // austin
-      ss << "austin_50";
-      break;
-    case 9: // austin
-      ss << "austin_100";
+    case 1:  // austin
+      ss << "austin";
       break;
     default:
       NS_LOG_ERROR("Não foi possivel identificar o cenario!");
@@ -218,8 +196,6 @@ void UavNetwork::Run()
   if (scenario.is_open())
   {
     std::string line;
-    getline(scenario, line);
-    sscanf(line.c_str(), "%d\n", &m_totalCli);
     m_xmin = m_ymin = 0;
     getline(scenario, line);
     sscanf(line.c_str(), "%lf,%lf\n", &m_xmax, &m_ymax);
@@ -236,7 +212,7 @@ void UavNetwork::Run()
     exit(-1);
   }
 
-  ss << "/" << global_cli_cob << "m/" << m_seed << "/custo_" << m_custo; // adicionando seed
+  ss << "/" << m_totalCli << "/" << m_seed << "/custo_" << m_custo; // adicionando seed
   m_pathData = ss.str();
   ss.str("");
   ss << "rm -Rf " << global_path << "/" << m_pathData;
@@ -728,6 +704,7 @@ void UavNetwork::ConfigureCli()
         mobilityCLI.SetMobilityModel("ns3::RandomWalk2dMobilityModel",
                                      "Bounds", RectangleValue(Rectangle(m_xmin, m_xmax, m_ymin, m_ymax)),
                                       "Time", TimeValue(Seconds(1800)),
+                                      "Mode", EnumValue(RandomWalk2dMobilityModel::MODE_TIME),
                                       "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=5.0]")); // xmin, xmax, ymin, ymax
         mobilityCLI.Install(meiahora);
 
@@ -737,6 +714,7 @@ void UavNetwork::ConfigureCli()
         mobilityCLI.SetMobilityModel("ns3::RandomWalk2dMobilityModel",
                                      "Bounds", RectangleValue(Rectangle(m_xmin, m_xmax, m_ymin, m_ymax)),
                                       "Time", TimeValue(Seconds(600)),
+                                      "Mode", EnumValue(RandomWalk2dMobilityModel::MODE_TIME),
                                       "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=5.0]")); // xmin, xmax, ymin, ymax
         mobilityCLI.Install(dezmin);
 
@@ -746,6 +724,7 @@ void UavNetwork::ConfigureCli()
         mobilityCLI.SetMobilityModel("ns3::RandomWalk2dMobilityModel",
                                      "Bounds", RectangleValue(Rectangle(m_xmin, m_xmax, m_ymin, m_ymax)),
                                       "Time", TimeValue(Seconds(300)),
+                                      "Mode", EnumValue(RandomWalk2dMobilityModel::MODE_TIME),
                                       "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=5.0]")); // xmin, xmax, ymin, ymax
         mobilityCLI.Install(cincomin);
         
@@ -826,7 +805,7 @@ void UavNetwork::ClientConsumption (int posCli)
   }
   // caso tenha encontrado algum UAV, consumir
   if ((int)id != -1) {    
-    m_uavAppContainer.Get(m_nodeUavApp[id])->ClientConsumption(m_clientUpdateCons); // passando tempo que usou o UAV
+    m_uavAppContainer.Get(m_nodeUavApp[id])->ClientConsumption(m_clientUpdateCons, cliVec.x, cliVec.y, m_clientNode.Get(posCli)->GetId()); // passando tempo que usou o UAV
   } else {
     m_descTime[m_clientNode.Get(posCli)->GetId()]++;    
   }

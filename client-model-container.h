@@ -68,6 +68,7 @@ public:
   Iterator End(void) const;
 
   Ptr<ClientModel> FindClientModel(std::string login);
+  Ptr<ClientModel> FindClientModel(uint32_t id);
   Ptr<ClientModel> FindClientModel(Ipv4Address ip);
 
   /**

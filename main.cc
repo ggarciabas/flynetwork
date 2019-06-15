@@ -53,6 +53,7 @@ double global_cli_cons_update;
 int main (int argc, char *argv[])
 {
 	double sim_time=1200.0;
+	double totalCli = 0;
 	uint32_t scenario = 7, env = 2, protocol = 1, custo=1, seed=9042019;
 	global_cli_cons_update = 1.0;
 	global_cli_cob = 115.47; // metros - para clientes utilizando equação de antena direcional com esparramento verificar Klaine2018
@@ -71,7 +72,8 @@ int main (int argc, char *argv[])
 	cmd.AddValue ("UavCob", "", global_uav_cob);
 	cmd.AddValue ("CliCob", "", global_cli_cob);
 	cmd.AddValue ("ClientUpdateCons", "", global_cli_cons_update);
-	cmd.AddValue("TotalBattery", "", total_battery);
+	cmd.AddValue ("TotalBattery", "", total_battery);
+	cmd.AddValue ("TotalCli", "", totalCli);
 	cmd.Parse (argc, argv);
 
 	global_ec_persec = total_battery/27*60; // bt /restime
@@ -123,6 +125,7 @@ int main (int argc, char *argv[])
 	obj.Set("Custo", UintegerValue(custo));
 	obj.Set("Seed", UintegerValue(seed));
 	obj.Set("ScheduleServer", DoubleValue(etapa));
+	obj.Set("TotalCli", DoubleValue(totalCli));
 	obj.Set("UavTimingNext", DoubleValue((sim_time-0.5)/10.0));
 	obj.Set("ClientUpdateCons", DoubleValue(global_cli_cons_update));
 	Ptr<UavNetwork> net = obj.Create()->GetObject<UavNetwork>();

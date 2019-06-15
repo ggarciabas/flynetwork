@@ -32,6 +32,8 @@
 #include "ns3/energy-module.h"
 #include "uav-energy-source.h"
 #include "uav-device-energy-model.h"
+#include "client-model-container.h"
+#include "client-model.h"
 
 using namespace std;
 
@@ -74,7 +76,7 @@ public:
     return m_uavDevice;
   }
 
-  void ClientConsumption (double time);
+  void ClientConsumption (double time, double px, double py, uint32_t id);
 
 private:
   void DoDispose();
@@ -105,6 +107,8 @@ private:
   bool m_running;
   TracedCallback<std::string> m_packetTrace;
   Ptr<UavDeviceEnergyModel> m_uavDevice;
+
+  ClientModelContainer m_clientContainer;  
 
   EventId m_programDepletion; // utilizado para programar o depletion de acordo com o tempo para o UAV novo chegar até a posicao onde o UAV que solicitou está.
 

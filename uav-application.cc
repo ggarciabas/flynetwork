@@ -201,8 +201,21 @@ void UavApplication::SendCliData ()
     Simulator::Remove(m_sendCliDataEvent);
     std::ostringstream msg;
     msg << "DATA " << m_id << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRealRemainingEnergy();
-    
+    for (ClientModelContainer::Iterator it = m_clientContainer.Begin(); it != m_clientContainer.End(); ++it) {
+      msg << " " << (*it)->GetId();
+      msg << " " << (*it)->GetUpdatePos().GetSeconds();
+      msg << " " << (*it)->GetPosition().at(0) << " " << (*it)->GetPosition().at(1) << " " << (*it)->GetConsumption();
+    }    
     msg << " \0";
+
+    std::ostringstream os;
+    os << global_path << "/" << m_pathData << "/uav_client/uav_" << m_id << ".txt";
+    std::ofstream file;
+    file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    Ptr<const MobilityModel> mob = GetNode()->GetObject<MobilityModel>();
+    file << Simulator::Now().GetSeconds() << " " <<  mob->GetPosition().x << " " << mob->GetPosition().y << " " << msg.str() << std::endl;
+    file.close();
+
     uint16_t packetSize = msg.str().length() + 1;
     Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
     NS_LOG_DEBUG ("UavApplication::SendCliData " << msg.str()<< " @" << Simulator::Now().GetSeconds());
@@ -364,6 +377,7 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
     } else if (results.at(0).compare("DATAOK") == 0) {
         Simulator::Remove(m_sendCliDataEvent);
         NS_LOG_DEBUG("UAV #" << m_id << " recebeu DATAOK");
+        m_clientContainer.Clear(); // limpando container de informacoes de clientes apos enviadas as informacoes para o servidor
       } else if (results.at(0).compare("GOTO") == 0)
       {
         if (m_depletion) return; // nao deixar executar acoes a nao ser voltar para a central em estado de emergencia        
@@ -528,9 +542,24 @@ void UavApplication::DoDispose() {
   m_running = false;
 }
 
-void UavApplication::ClientConsumption (double time) 
+void UavApplication::ClientConsumption (double time, double px, double py, uint32_t id) 
 {
-  DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->UpdateEnergySourceClient(time);
+  double cons = DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->UpdateEnergySourceClient(time);
+  Ptr<ClientModel> cli = m_clientContainer.FindClientModel(id); // id
+  if (cli != NULL) { // update se existir
+    cli->SetUpdatePos(Simulator::Now()); // atualiza tempo
+    cli->SetPosition(px, py); // atualiza pos
+    cli->AddConsumption(cons);
+  } else { // criar novo
+    ObjectFactory obj;
+    obj.SetTypeId("ns3::ClientModel");
+    obj.Set("Id", UintegerValue(id)); // id
+    cli = obj.Create()->GetObject<ClientModel>();
+    cli->SetUpdatePos(Simulator::Now()); // time
+    cli->SetPosition(px, py);
+    cli->AddConsumption(cons);
+    m_clientContainer.Add(cli);
+  }
 }
 
 } // namespace ns3
