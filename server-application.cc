@@ -32,8 +32,6 @@
 #include <algorithm>
 #include <random>
 
-
-
 namespace ns3
 {
 
@@ -1399,7 +1397,7 @@ void ServerApplication::DoDispose() {
 
 // https://github.com/ggarciabas/nsnam_ns3/blob/17c1f9200727381852528ac4798f040128ac842a/scratch/wifi/da_cpp/deterministic-annealing.cc
 void ServerApplication::runDA() {
-  //NS_LOG_DEBUG("ServerApplication::runDA @" << Simulator::Now().GetSeconds());
+  NS_LOG_DEBUG("ServerApplication::runDA @" << Simulator::Now().GetSeconds());
 
   std::ofstream file;
   std::ostringstream os;
@@ -1445,22 +1443,22 @@ void ServerApplication::runDA() {
   // 1550 series https://www.cisco.com/c/en/us/products/collateral/wireless/aironet-1550-series/data_sheet_c78-641373.html
   // 1570 series https://www.cisco.com/c/en/us/products/wireless/aironet-1570-series/datasheet-listing.html
   double uav_cob = global_uav_cob; 
-  double ptCli = 28; // dBm - potencia de transmissao máxima para o Ap Aironet 1550 series 802.11n 2.4GHz
-  double fsInterf = 0.0008; // fator de sobreposicao de espaco 5 (50%)
-  double dRCli = 6.5; // Mbps - taxa considerada por usuário
+  // double ptCli = 28; // dBm - potencia de transmissao máxima para o Ap Aironet 1550 series 802.11n 2.4GHz
+  // double fsInterf = 0.0008; // fator de sobreposicao de espaco 5 (50%)
+  // double dRCli = 6.5; // Mbps - taxa considerada por usuário
   double raio_cob = global_cli_cob; 
-  double sinrCliMin = -93; // dBm - tabela de Receive sensitivity para 2.4GHz 802.11n (HT20) MCS 0
-  double lambda = 3e8/2.4e9; // metros
-  double b = 3.7;
-  double pi = 3.141516; // pi
-  double maxDrUav = 1024; // Mbps -- verificar alguma Ref!!
-  double gain = 4; // dBi - tanto o ganho de recepcao como o de transmissao
-  double N_W = 10e-9*2e7; // dB - N0 = 10e-9 W/Hz -- B = 20MHz - Livro Goldsmith ref para N0
+  // double sinrCliMin = -93; // dBm - tabela de Receive sensitivity para 2.4GHz 802.11n (HT20) MCS 0
+  // double lambda = 3e8/2.4e9; // metros
+  // double b = 3.7;
+  // double pi = 3.141516; // pi
+  // double maxDrUav = 1024; // Mbps -- verificar alguma Ref!!
+  // double gain = 4; // dBi - tanto o ganho de recepcao como o de transmissao
+  // double N_W = 10e-9*2e7; // dB - N0 = 10e-9 W/Hz -- B = 20MHz - Livro Goldsmith ref para N0
   // Fuck explanation dB and log relation: https://www.physicsforums.com/threads/confusion-with-db-equation-10-or-20.641850/#post-4105917
-  double pl_ref = 20*std::log10(4*pi/lambda); // dB - Friis Model
+  // double pl_ref = 20*std::log10(4*pi/lambda); // dB - Friis Model
   // --> https://www.isa.org/standards-publications/isa-publications/intech-magazine/2002/november/db-vs-dbm/
   // Use dB when expressing the ratio between two power values. Use dBm when expressing an absolute value of power.
-  double pr_ref = ptCli + gain + gain - pl_ref; // dBm - potencia do sinal na distancia de referencia
+  // double pr_ref = ptCli + gain + gain - pl_ref; // dBm - potencia do sinal na distancia de referencia
   double t = 0.6;
   int locId = 0;
   int max_iterB = 5000;
@@ -1481,7 +1479,7 @@ void ServerApplication::runDA() {
   loc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
   loc->IniciarMovimentoB();
   loc->SetPunishNeighboor(0.2); // ALTERADO: valor inicial de punicao!
-  loc->InitializeWij (m_clientDaContainer.GetN()*dRCli); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
+  // loc->InitializeWij (m_clientDaContainer.GetN()*dRCli); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
   loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), r_max, uav_cob);
   m_locationContainer.Add(loc);
   double percentCli = 0.8;
@@ -1492,11 +1490,11 @@ void ServerApplication::runDA() {
     int tMovCon = 0;
     int tFixCon = 0;
     bool locConnected = true;
-    bool capacidade = true;
+    // bool capacidade = true;
     bool movimentoB = true;
     int iterB = 0;
     do { // laco B
-      capacidade = locConnected = true;
+      locConnected = true;
       iterB++;
       tMovCon = 0;
       tFixCon = 0;
@@ -1508,22 +1506,22 @@ void ServerApplication::runDA() {
         for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
           (*lj)->ClearClientString();
           double dcilj = CalculateDistance((*ci)->GetPosition(r_max), (*lj)->GetPosition(r_max));
-          double pljci = std::exp ( - ((dcilj + (*lj)->GetWij()/maxDrUav + (((*ci)->IsConnected()) ? 1 : 0))/t) ); // NOVO - Verifica se o cliente possui conexao, caso nao tenha calcula normalmente, senao adiciona 1 para que a probabilidade deste em relacao ao UAv seja insignificante.
+          double pljci = std::exp ( - ((dcilj /*+ (*lj)->GetWij()/maxDrUav*/ + (((*ci)->IsConnected()) ? 1 : 0))/t) ); // NOVO - Verifica se o cliente possui conexao, caso nao tenha calcula normalmente, senao adiciona 1 para que a probabilidade deste em relacao ao UAv seja insignificante.
           Zci += pljci;
           (*lj)->SetTempPljci(pljci);
           if (low_dchilj > dcilj) { // achou UAV mais proximo
             low_dchilj = dcilj;
             // https://bitbucket.org/cpgeimestrado/rascunhocpgei/src/master/conversor.cpp
-            double pl_dB = 10*std::log10(dcilj)*b; // dB - modelo simplificado goldsmith
-            long double pr_W = dBmToWatts(pr_ref - pl_dB); // W
-            long double it_W = fsInterf*pr_W; // w
-            long double sinr_W = pr_W / (it_W + N_W); // W - modelo de goldsmith considera para escalar!!!
-            long double sinr_dBm = WattsToDbm(sinr_W); // dBm
-            if (low_dchilj <= raio_cob/r_max && sinr_dBm >= sinrCliMin) { // esta dentro da area de cobertura maxima da antena e recebe SINR min
+            // double pl_dB = 10*std::log10(dcilj)*b; // dB - modelo simplificado goldsmith
+            // long double pr_W = dBmToWatts(pr_ref - pl_dB); // W
+            // long double it_W = fsInterf*pr_W; // w
+            // long double sinr_W = pr_W / (it_W + N_W); // W - modelo de goldsmith considera para escalar!!!
+            // long double sinr_dBm = WattsToDbm(sinr_W); // dBm
+            if (low_dchilj <= raio_cob/r_max) { // && sinr_dBm >= sinrCliMin) { // esta dentro da area de cobertura maxima da antena e recebe SINR min
               // NS_LOG_DEBUG ("-> CLI " << (*ci)->GetLogin() <<  " com " << (*lj)->GetId() << "\t Distancia: " << dcilj*r_max << "\t SINR: " << sinr_dBm << "dBm");
               Ptr<LocationModel> lCon = (*ci)->GetLocConnected();
               (*ci)->SetConnected(true);
-              (*ci)->SetDataRate(sinr_dBm);
+              (*ci)->SetDataRate(0.0);
               if (lCon) { // caso tenha alguma informacao anterior, desconsidera nos calculos, para isto atualiza o loc
                 lCon->toString();
                 if (lCon->GetId() == (*lj)->GetId()) {
@@ -1531,13 +1529,13 @@ void ServerApplication::runDA() {
                   lCon = 0;
                   continue; // nao faz alteracoes! Desnecessario!
                 }
-                lCon->RemoveClient(dRCli, (*ci)->GetConsumption(), (*ci));
+                lCon->RemoveClient(0.0, (*ci)->GetConsumption(), (*ci));
               }
               lCon = 0;
               (*ci)->SetLocConnected((*lj));
               // calcular a SNR e caso seja maior que o mínimo, considerar cliente conectado
-              (*lj)->NewClient(dRCli, (*ci)->GetConsumption(), dcilj, (*ci));
-              (*ci)->SetDataRate(sinr_dBm);
+              (*lj)->NewClient(0.0, (*ci)->GetConsumption(), dcilj, (*ci));
+              (*ci)->SetDataRate(0.0);
               // file << "tFix: " << tFixCon << "\ttMovCon: " << tMovCon << std::endl;
             }
           }
@@ -1565,7 +1563,7 @@ void ServerApplication::runDA() {
       for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
         (*lj)->UpdatePosition (m_maxx, m_maxy);
         // Avalia a utilizacao de capacidade das localizações
-        capacidade = capacidade && (*lj)->ValidarCapacidade(maxDrUav);
+        // capacidade = capacidade && (*lj)->ValidarCapacidade(maxDrUav);
         (*lj)->ClearChildList();
       }
 
@@ -1587,12 +1585,16 @@ void ServerApplication::runDA() {
     } while (movimentoB && iterB < max_iterB);
 
     if (locConnected) {
-      if (capacidade) {
+      NS_LOG_DEBUG("DARun: localizacoes conectadas\n");
+      // if (capacidade) {
+      //   NS_LOG_DEBUG("DARun: capacidade ok\n");
         if (tFixCon == tFix) {
+          NS_LOG_DEBUG("DARun: clientes fixos conectados\n");
           if (tMovCon >= m_allCli*percentCli) {
+            NS_LOG_DEBUG("DARun: porcentagem de clientes conectados alcancado\n");
             // file << "--> Finalizado - temp=" << t << std::endl;
             // t *= 0.5; // resfria bastante
-            GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
+            GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, 0.0);
             break;
           } 
           // else {
@@ -1602,7 +1604,7 @@ void ServerApplication::runDA() {
         // else {
         //   file << "--> " << iter << " @"<< Simulator::Now().GetSeconds() << " clientes fixos nao conectados! t[" << t << "]\n";
         // }
-      } 
+      // } 
       // else {
       //   file << "--> " << iter << " @"<< Simulator::Now().GetSeconds() << " capacidade superior!\n";
       // }
@@ -1614,6 +1616,7 @@ void ServerApplication::runDA() {
     if (!MovimentoA()) { // } || (tFixCon != tFix && t == 0.1)) {
       // file << "--> Solicitando nova localizacao por não existir movimento em A @" << Simulator::Now().GetSeconds() << std::endl;
       // new_uav:
+      NS_LOG_DEBUG("DARun: nova localização\n");
       Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
       nLoc->SetId(locId++);
       CentroDeMassa(nLoc, lCentral, r_max);
@@ -1621,7 +1624,7 @@ void ServerApplication::runDA() {
       nLoc->IniciarMovimentoB();
       m_locationContainer.Add(nLoc);
       nLoc->SetPunishNeighboor(0.2);
-      nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
+      // nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
       FindFather (m_locationContainer.GetN()-1, r_max, uav_cob, lCentral, true);
       t *= 2.0;
       // GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);

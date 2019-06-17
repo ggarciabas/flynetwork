@@ -202,7 +202,7 @@ void UavApplication::SendCliData ()
     std::ostringstream msg, ss, slog;
     msg << "DATA " << m_id << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRealRemainingEnergy();
 
-    if (m_clientContainer.GetN() > global_ksize) { // somente agrupa se houver mais clientes do que o maximo para análise do DA de Localizacao
+    if (int(m_clientContainer.GetN()) > global_ksize) { // somente agrupa se houver mais clientes do que o maximo para análise do DA de Localizacao
       // -----> filtrar os clientes
       // identify borders
       ClientModelContainer::Iterator it = m_clientContainer.Begin();
@@ -282,19 +282,21 @@ void UavApplication::SendCliData ()
         sumCluXPos.at(min_pos) += (*i)->GetPosition().at(0);
         sumCluYPos.at(min_pos) += (*i)->GetPosition().at(1);
         totCluPos.at(min_pos) += 1.0;
-        slog << pos << " ";
+        slog << min_pos << " ";
       }
       slog << "\n";
 
       // construindo mensagem para o servidor
       pos = 0;
       for (ClientModelContainer::Iterator it = groupedCli.Begin(); it != groupedCli.End(); ++it, ++pos) {
-        msg << " " << (*it)->GetId();
-        msg << " " << (*it)->GetUpdatePos().GetSeconds();
-        // atualiza posicao com média dos clientes
-        (*it)->SetPosition(sumCluXPos.at(pos)/totCluPos.at(pos), sumCluYPos.at(pos)/totCluPos.at(pos));
-        msg << " " << (*it)->GetPosition().at(0) << " " << (*it)->GetPosition().at(1) << " " << (*it)->GetConsumption() << " " << totCluPos.at(pos);
-        slog << (*it)->GetPosition().at(0) << " " << (*it)->GetPosition().at(1) << " " << (*it)->GetConsumption() << " " << totCluPos.at(pos) << "\n";
+        if (totCluPos.at(pos)>0) {
+          msg << " " << (*it)->GetId();
+          msg << " " << (*it)->GetUpdatePos().GetSeconds();
+          // atualiza posicao com média dos clientes
+          (*it)->SetPosition(sumCluXPos.at(pos)/totCluPos.at(pos), sumCluYPos.at(pos)/totCluPos.at(pos));
+          msg << " " << (*it)->GetPosition().at(0) << " " << (*it)->GetPosition().at(1) << " " << (*it)->GetConsumption() << " " << totCluPos.at(pos);
+          slog << pos << " " << (*it)->GetPosition().at(0) << " " << (*it)->GetPosition().at(1) << " " << (*it)->GetConsumption() << " " << totCluPos.at(pos) << "\n";
+        }
       }    
       msg << " \0";
 
