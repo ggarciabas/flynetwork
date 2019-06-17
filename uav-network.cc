@@ -960,13 +960,13 @@ void UavNetwork::ClientPosition (string name)
   for (vector<double>::iterator i = m_palcoPos.begin(); i != m_palcoPos.end();)
   {
     if (i == m_palcoPos.begin()) {
-      file << (*i) << ",";
+      file << (*i) << " ";
       i++;
-      file << (*i) << ",fixed,0";
+      file << (*i);
     } else {
-      file << "," << (*i) << ",";
+      file << " " << (*i) << " ";
       i++;
-      file << (*i) << ",fixed,0";
+      file << (*i);
     }
 
     i++;
@@ -974,7 +974,7 @@ void UavNetwork::ClientPosition (string name)
   for (NodeContainer::Iterator i = m_clientNode.Begin(); i != m_clientNode.End(); ++i)
   {
     Vector current = (*i)->GetObject<MobilityModel>()->GetPosition();
-    file << "," << current.x << "," << current.y;
+    file << " " << current.x << " " << current.y;
   }
   file.close();
 }
