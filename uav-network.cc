@@ -971,10 +971,11 @@ void UavNetwork::ClientPosition (string name)
 
     i++;
   }
+  file << std::endl;
   for (NodeContainer::Iterator i = m_clientNode.Begin(); i != m_clientNode.End(); ++i)
   {
     Vector current = (*i)->GetObject<MobilityModel>()->GetPosition();
-    file << " " << current.x << " " << current.y;
+    file << current.x << " " << current.y << " ";
   }
   file.close();
 }
