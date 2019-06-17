@@ -1412,10 +1412,10 @@ void ServerApplication::runDA() {
     (*i)->EraseLocation();
     (*i)->SetPci(1/(m_allCli+tFix*pFix) * (*i)->GetTotalCli()); // peso baseado no total de clientes na regiao, principalmente quando utilizado cluster
     if (first) {
-      file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
+      file << (*i)->GetPosition().at(0) << " " << (*i)->GetPosition().at(1);
       first = false;
     } else {
-      file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
+      file << " " << (*i)->GetPosition().at(0) << " " << (*i)->GetPosition().at(1);
     }
   }
   for (ClientModelContainer::Iterator i = m_fixedClientContainer.Begin(); i != m_fixedClientContainer.End(); ++i)
@@ -1423,10 +1423,10 @@ void ServerApplication::runDA() {
     (*i)->EraseLocation();
     (*i)->SetPci(pFix/(m_allCli+tFix*pFix));
     if (first) {
-      file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
+      file << (*i)->GetPosition().at(0) << " " << (*i)->GetPosition().at(1);
       first = false;
     } else {
-      file << "," << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
+      file << " " << (*i)->GetPosition().at(0) << " " << (*i)->GetPosition().at(1);
     }
   }
   file << std::endl;
@@ -1594,7 +1594,7 @@ void ServerApplication::runDA() {
             NS_LOG_DEBUG("DARun: porcentagem de clientes conectados alcancado\n");
             // file << "--> Finalizado - temp=" << t << std::endl;
             // t *= 0.5; // resfria bastante
-            GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, 0.0);
+            // GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, 0.0);
             break;
           } 
           // else {
@@ -1654,6 +1654,30 @@ void ServerApplication::runDA() {
   m_totalCliGeral = 0;
   m_locConsTotal = 0; // atualiza total de consumo de todas as localizacoes
 
+  os.str("");
+  os <<global_path << "/" << m_pathData << "/etapa/" << m_step << "/da_solve.txt";
+  file.open(os.str().c_str(), std::ofstream::out);
+  file << raio_cob << std::endl;
+  file << lCentral->GetXPosition() << "," << lCentral->GetYPosition() << std::endl;
+
+  LocationModelContainer::Iterator lj = m_locationContainer.Begin();
+  lj = m_locationContainer.Begin(); // imprimindo a posicao atual da localizacao
+  file << (*lj)->GetXPosition() << "," << (*lj)->GetYPosition();
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    file << "," << (*lj)->GetXPosition() << "," << (*lj)->GetYPosition();
+  }
+  file << "\n";
+
+  lj = m_locationContainer.Begin(); // imprimindo a posicao antiga
+  file << (*lj)->GetXPositionA() << "," << (*lj)->GetYPositionA();
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    file << "," << (*lj)->GetXPositionA() << "," << (*lj)->GetYPositionA();
+  }
+  file << "\n";
+  file.close();
+
   // os.str("");
   // os <<global_path << "/" << m_pathData << "/etapa/" << m_step << "/location_data_rate.txt";
   // file.open(os.str().c_str(), std::ofstream::out);
@@ -1669,18 +1693,6 @@ void ServerApplication::runDA() {
   //   file << (*ci)->GetLogin() << "," << (*ci)->GetDataRate() << std::endl;
   // }
   // file.close();
-
-  os.str("");
-  os <<global_path << "/" << m_pathData << "/etapa/" << m_step << "/client_loc.txt";
-  file.open(os.str().c_str(), std::ofstream::out);
-  file << lCentral->GetXPosition() << "," << lCentral->GetYPosition();
-  for (LocationModelContainer::Iterator lj = m_locationContainer.Begin(); lj != m_locationContainer.End(); ++lj) {
-    file << std::endl << (*lj)->GetXPosition() << "," << (*lj)->GetYPosition();
-    for (std::vector<std::string>::iterator id = (*lj)->GetClient().begin(); id != (*lj)->GetClient().end(); ++id) {
-      file << "," << m_clientContainer.Get(*id)->GetXPosition() << "," << m_clientContainer.Get(*id)->GetYPosition() << std::endl;
-    }
-  }
-  file.close();
 
   if ( m_locConsTotal == 0) {
     m_locConsTotal = 1.0; // para nao dar problemas no calculo
