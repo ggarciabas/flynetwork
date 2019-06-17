@@ -337,32 +337,24 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
             uav->SetClientDataConfirmed(true); // recebeu confirmacao!
             uav->SetTotalEnergy(std::stod(results.at(2), &sz)); // atualiza energia total do UAV
             NS_LOG_DEBUG("SERVER - DATA confirmation ::: UAV #" << uav->GetId() << " @" << Simulator::Now().GetSeconds());
+            m_allCli = 0.0;
             int i = 3; // 3 informacoes antes das informacoes dos clientes! contemplam cada cliente!
-            for (; i < int(results.size()-1); i+=5) { // id time_update posx posy consumption
-              Ptr<ClientModel> cli = m_clientContainer.FindClientModel(std::stoi(results.at(i))); // id
-              if (cli != NULL) { // caso já exista, atualiza somente posicao se o tempo de atualizacao for maior!
-                if (std::stod(results.at(i+1), &sz) > cli->GetUpdatePos().GetSeconds()) { // time - pega ultima posicao atualizada
-                  std::vector<double> pos;
-                  pos.push_back(std::stod (results.at(i+2),&sz)); // x
-                  pos.push_back(std::stod (results.at(i+3),&sz)); // y
-                  cli->SetPosition(pos.at(0), pos.at(1));
-                  cli->SetConsumption(std::stod (results.at(i+4),&sz)); // consumption
-                  pos.clear();
-                }
-              } else { // senao cria um novo
-                ObjectFactory obj;
-                obj.SetTypeId("ns3::ClientModel");
-                obj.Set("Id", UintegerValue(std::stoi(results.at(i)))); // id
-                cli = obj.Create()->GetObject<ClientModel>();
-                cli->SetUpdatePos(Seconds(std::stod(results.at(i+1), &sz))); // time
-                std::vector<double> pos;
-                pos.push_back(std::stod (results.at(i+2),&sz)); // x
-                pos.push_back(std::stod (results.at(i+3),&sz)); // y
-                cli->SetPosition(pos.at(0), pos.at(1));
-                cli->SetConsumption(std::stod (results.at(i+4),&sz)); // consumption
-                m_clientContainer.Add(cli);
-                pos.clear();
-              }
+            Ptr<ClientModel> cli;
+            for (; i < int(results.size()-1); i+=6) { // id time_update posx posy consumption totCli
+              ObjectFactory obj;
+              obj.SetTypeId("ns3::ClientModel");
+              obj.Set("Id", UintegerValue(std::stoi(results.at(i)))); // id
+              cli = obj.Create()->GetObject<ClientModel>();
+              cli->SetUpdatePos(Seconds(std::stod(results.at(i+1), &sz))); // time
+              std::vector<double> pos;
+              pos.push_back(std::stod (results.at(i+2),&sz)); // x
+              pos.push_back(std::stod (results.at(i+3),&sz)); // y
+              cli->SetPosition(pos.at(0), pos.at(1));
+              cli->SetConsumption(std::stod (results.at(i+4),&sz)); // consumption
+              cli->SetTotalCli(std::stod (results.at(i+5),&sz)); // total de clientes que este equivale
+              m_allCli += std::stod (results.at(i+5),&sz);
+              m_clientContainer.Add(cli);
+              pos.clear();
             }
             // repply to UAV
             ReplyAskCliData (uav);
@@ -1415,13 +1407,12 @@ void ServerApplication::runDA() {
   os << global_path << "/"<<m_pathData<<"/etapa/"<<m_step<<"/client.txt";
   file.open(os.str().c_str(), std::ofstream::out);
   bool first = true;
-  double tMov = m_clientContainer.GetN();
   double tFix = m_fixedClientContainer.GetN();
   double pFix = 2; // peso dos clientes fixos - clientes móveis sempre com peso de 1"
   for (ClientModelContainer::Iterator i = m_clientContainer.Begin(); i != m_clientContainer.End(); ++i)
   {
     (*i)->EraseLocation();
-    (*i)->SetPci(1/(tMov+tFix*pFix));
+    (*i)->SetPci(1/(m_allCli+tFix*pFix) * (*i)->GetTotalCli()); // peso baseado no total de clientes na regiao, principalmente quando utilizado cluster
     if (first) {
       file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
       first = false;
@@ -1432,7 +1423,7 @@ void ServerApplication::runDA() {
   for (ClientModelContainer::Iterator i = m_fixedClientContainer.Begin(); i != m_fixedClientContainer.End(); ++i)
   {
     (*i)->EraseLocation();
-    (*i)->SetPci(pFix/(tMov+tFix*pFix));
+    (*i)->SetPci(pFix/(m_allCli+tFix*pFix));
     if (first) {
       file << (*i)->GetPosition().at(0) << "," << (*i)->GetPosition().at(1)  << "," << (*i)->GetLogin();
       first = false;
@@ -1493,7 +1484,7 @@ void ServerApplication::runDA() {
   loc->InitializeWij (m_clientDaContainer.GetN()*dRCli); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
   loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), r_max, uav_cob);
   m_locationContainer.Add(loc);
-  double percentCli = 1.0;
+  double percentCli = 0.8;
   int iter = 0;
   do {// laco A
     iter++;
@@ -1565,7 +1556,7 @@ void ServerApplication::runDA() {
           if ((*ci)->GetLogin().at(0) == 'f') {
             tFixCon++;
           } else {
-            tMovCon++;
+            tMovCon += (*ci)->GetTotalCli(); // considerando o total de clientes na regiao, principalmente quanto utilizado cluster
           }
         }
       }
@@ -1598,7 +1589,7 @@ void ServerApplication::runDA() {
     if (locConnected) {
       if (capacidade) {
         if (tFixCon == tFix) {
-          if (tMovCon >= tMov*percentCli) {
+          if (tMovCon >= m_allCli*percentCli) {
             // file << "--> Finalizado - temp=" << t << std::endl;
             // t *= 0.5; // resfria bastante
             GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, maxDrUav);
@@ -1968,7 +1959,7 @@ void ServerApplication::runDAPuro() {
         }
         if (low_dchilj <= raio_cob) {
           (*ci)->SetConnected(true);
-          tMovCon++;
+          tMovCon+= (*ci)->GetTotalCli();
         } else {
           (*ci)->SetConnected(false);
         }
@@ -2009,7 +2000,7 @@ void ServerApplication::runDAPuro() {
     //std::cout << "]\n";
     // -----------------
 
-    if (tMovCon >= m_clientDaContainer.GetN()*0.8) {
+    if (tMovCon >= m_allCli*0.8) {
       break; // finalizar Da
     }
 

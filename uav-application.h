@@ -92,6 +92,8 @@ private:
   void SendCliData ();
   void SendPacketNewUav(void);
 
+  void SendCliDataMsg(std::string msg);
+
   uint32_t m_id;
   uint16_t m_serverPort;
   std::vector<double> m_goto;
@@ -117,6 +119,7 @@ private:
   // std::map<Ipv4Address, Ptr<ClientModel> > m_mapClient;
 
   std::string m_pathData;
+
 
 };
 

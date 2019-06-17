@@ -95,10 +95,19 @@ public:
     return m_id;
   }
 
+  void SetTotalCli (double tc) {
+    m_totCli = tc;
+  }
+
+  double GetTotalCli () {
+    return m_totCli;
+  }
+
 private:
   void DoDispose ();
   uint32_t m_id;
   double m_pci; // probabilidade do cliente
+  double m_totCli; // pois existem casos que são agrupados clientes para reduzir tempo de execucao do DA
   bool m_connected;
   Ptr<LocationModel> m_locConnected;
   std::string m_login;

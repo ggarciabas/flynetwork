@@ -151,6 +151,7 @@ private:
   double m_maxx, m_maxy;
   double m_rmax;
   double m_locConsTotal; // total de consumo das localizacoes
+  double m_allCli; // utilizado para calcular probabilidade dos clientes, principalmente quando utilizado cluster.
   Ipv4Address m_address;
 
   TracedCallback<int, int> m_newUav;
