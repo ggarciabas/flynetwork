@@ -1642,6 +1642,7 @@ void ServerApplication::runDA() {
   os <<global_path << "/" << m_pathData << "/etapa/" << m_step << "/da_solve.txt";
   file.open(os.str().c_str(), std::ofstream::out);
   file << raio_cob << std::endl;
+  file << m_maxx << "," << m_maxy << std::endl;
   file << lCentral->GetXPosition() << "," << lCentral->GetYPosition() << std::endl;
 
   LocationModelContainer::Iterator lj = m_locationContainer.Begin();
