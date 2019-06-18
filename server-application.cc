@@ -1406,11 +1406,10 @@ void ServerApplication::runDA() {
   file.open(os.str().c_str(), std::ofstream::out);
   bool first = true;
   double tFix = m_fixedClientContainer.GetN();
-  double pFix = 5; // peso dos clientes fixos - clientes móveis sempre com peso de 1"
   for (ClientModelContainer::Iterator i = m_clientContainer.Begin(); i != m_clientContainer.End(); ++i)
   {
     (*i)->EraseLocation();
-    (*i)->SetPci(1/(m_allCli+tFix*pFix) * (*i)->GetTotalCli()); // peso baseado no total de clientes na regiao, principalmente quando utilizado cluster
+    (*i)->SetPci(1/(m_allCli+tFix) * (*i)->GetTotalCli()); // peso baseado no total de clientes na regiao, principalmente quando utilizado cluster
     if (first) {
       file << (*i)->GetPosition().at(0) << " " << (*i)->GetPosition().at(1);
       first = false;
@@ -1423,7 +1422,7 @@ void ServerApplication::runDA() {
   for (ClientModelContainer::Iterator i = m_fixedClientContainer.Begin(); i != m_fixedClientContainer.End(); ++i)
   {
     (*i)->EraseLocation();
-    (*i)->SetPci(pFix/(m_allCli+tFix*pFix));
+    (*i)->SetPci(1);
   }
 
   m_clientDaContainer.Clear();
