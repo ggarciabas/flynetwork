@@ -695,7 +695,7 @@ void UavNetwork::ConfigureCli()
                                      "Bounds", RectangleValue(Rectangle(m_xmin, m_xmax, m_ymin, m_ymax)),
                                       "Time", TimeValue(Seconds(3600)),
                                       "Mode", EnumValue(RandomWalk2dMobilityModel::MODE_TIME),
-                                      "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=3.0]")); // xmin, xmax, ymin, ymax
+                                      "Speed", StringValue("ns3::UniformRandomVariable[Min=0.0|Max=1.5]")); // xmin, xmax, ymin, ymax
         mobilityCLI.Install(umahora);
         
         NodeContainer meiahora;
