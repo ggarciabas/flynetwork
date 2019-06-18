@@ -125,6 +125,10 @@ public:
   double GetXPosition ();
   double GetYPosition ();
 
+  double GetXFirstPosition();
+  double GetYFirstPosition();
+  void CopyFirstPosition();
+
   void LimparHistorico ();
 
   void UpdatePosition (double mx, double my);
@@ -136,6 +140,7 @@ private:
   void DoDispose ();
   std::vector<double> m_positionA;
   std::vector<double> m_positionB;
+  std::vector<double> m_firstP;
   std::vector<std::vector<double> > m_historico; // verificar issue: https://github.com/ggarciabas/wifi/issues/10
   bool m_changePosition; // variavel para permitir trocar de posicao, verificar issue: https://github.com/ggarciabas/wifi/issues/10
   double m_tempPljci;

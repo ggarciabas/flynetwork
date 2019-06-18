@@ -957,6 +957,7 @@ void UavNetwork::ClientPosition (string name)
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<name);
   std::ofstream file;
   file.open(name, std::ofstream::out | std::ofstream::app);
+  file << std::endl;
   for (vector<double>::iterator i = m_palcoPos.begin(); i != m_palcoPos.end();)
   {
     if (i == m_palcoPos.begin()) {

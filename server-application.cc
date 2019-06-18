@@ -1471,6 +1471,7 @@ void ServerApplication::runDA() {
   CentroDeMassa(loc, lCentral, r_max);
   loc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
   loc->IniciarMovimentoB();
+  loc->CopyFirstPosition();
   loc->SetPunishNeighboor(0.2); // ALTERADO: valor inicial de punicao!
   // loc->InitializeWij (m_clientDaContainer.GetN()*dRCli); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
   loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), r_max, uav_cob);
@@ -1606,6 +1607,7 @@ void ServerApplication::runDA() {
       CentroDeMassa(nLoc, lCentral, r_max);
       nLoc->IniciarMovimentoA(); // salvando posicionamento para comparacao de movimento no laco A
       nLoc->IniciarMovimentoB();
+      nLoc->CopyFirstPosition();
       m_locationContainer.Add(nLoc);
       nLoc->SetPunishNeighboor(0.2);
       // nLoc->InitializeWij (0.0); // ninguem esta conectado a nova localizacao
@@ -1655,10 +1657,10 @@ void ServerApplication::runDA() {
   file << "\n";
 
   lj = m_locationContainer.Begin(); // imprimindo a posicao antiga
-  file << (*lj)->GetXPositionA() << "," << (*lj)->GetYPositionA();
+  file << (*lj)->GetXFirstPosition() << "," << (*lj)->GetYFirstPosition();
   lj++;
   for (; lj != m_locationContainer.End(); ++lj) {
-    file << "," << (*lj)->GetXPositionA() << "," << (*lj)->GetYPositionA();
+    file << "," << (*lj)->GetXFirstPosition() << "," << (*lj)->GetYFirstPosition();
   }
   file << "\n";
   file.close();

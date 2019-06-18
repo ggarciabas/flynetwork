@@ -397,6 +397,22 @@ double LocationModel::GetYPositionA () {
   return m_positionA.at(1);
 }
 
+double LocationModel::GetXFirstPosition()
+{
+  return m_firstP.at(0);
+}
+
+double LocationModel::GetYFirstPosition()
+{
+  return m_firstP.at(1);
+}
+
+void LocationModel::CopyFirstPosition() {
+  m_firstP.clear();
+  m_firstP.push_back(m_position.at(0));
+  m_firstP.push_back(m_position.at(1));
+}
+
 double LocationModel::GetChildListSize() {
   return (double)m_childList.GetN();
 }
