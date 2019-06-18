@@ -1475,7 +1475,7 @@ void ServerApplication::runDA() {
   // loc->InitializeWij (m_clientDaContainer.GetN()*dRCli); // considera que todos os clientes estao conectados ao primeiro UAv, isto para nao ter que calcular a distancia na primeira vez, esta validacao será feita a partir da primeira iteracao do laco A
   loc->SetFather(lCentral, CalculateDistance(lCentral->GetPosition(r_max), loc->GetPosition(r_max)), r_max, uav_cob);
   m_locationContainer.Add(loc);
-  double percentCli = 0.8;
+  double percentCli = 1.0;
   int iter = 0;
   do {// laco A
     iter++;
@@ -1538,7 +1538,7 @@ void ServerApplication::runDA() {
             // file << "--> Zci esta baixo! @" << Simulator::Now().GetSeconds() << "\n";
             // t *= 1.2; // aumenta 120%
             t = 0.1;
-            percentCli *= 0.7; // reduz 70%
+            percentCli *= 0.9; 
             break;
           }
           (*lj)->AddPljCi((*ci), Zci, r_max); // finaliza o calculo do pljci na funcao e cadastra no map relacionando o ci
