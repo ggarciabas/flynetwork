@@ -202,7 +202,6 @@ void UavApplication::SendCliData ()
     std::ostringstream msg, ss, slog;
     msg << "DATA " << m_id << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRealRemainingEnergy();
 
-    m_clientContainerLast.Clear();
     m_clientContainerLast.Add(m_clientContainer);
 
     if (int(m_clientContainer.GetN()) > global_ksize) { // somente agrupa se houver mais clientes do que o maximo para análise do DA de Localizacao
@@ -403,7 +402,8 @@ UavApplication::EnergyDepletionCallback() // TODO_NEW: criar um aviso de carga p
   Simulator::Remove(m_programDepletion);
   NS_LOG_FUNCTION(this->m_id << Simulator::Now().GetSeconds() );
   NS_LOG_DEBUG("---->>> EnergyDepletionCallback [" << m_id << "] going to " << m_central.at(0) << "," << m_central.at(1) << " @" << Simulator::Now().GetSeconds());
-  m_depletion = true;  
+  m_depletion = true; 
+  EraseClientContainerLast(); 
   
   // Ir para central
   if (!m_uavDevice->IsFlying()) { // caso nao esteja voando

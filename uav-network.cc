@@ -984,6 +984,7 @@ void UavNetwork::ClientPosition (string name)
     for (ClientModelContainer::Iterator c = cont.Begin(); c != cont.End(); ++c) {
       file << (*c)->GetXPosition() << " " << (*c)->GetYPosition() << " ";
     }
+    (*it)->EraseClientContainerLast();
   }
   file.close();
 }

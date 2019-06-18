@@ -82,6 +82,10 @@ public:
     return m_clientContainerLast;
   }
 
+  void EraseClientContainerLast () {
+    m_clientContainerLast.Clear();
+  }
+
 private:
   void DoDispose();
   virtual void StartApplication(void);
