@@ -202,6 +202,9 @@ void UavApplication::SendCliData ()
     std::ostringstream msg, ss, slog;
     msg << "DATA " << m_id << " " << DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->GetRealRemainingEnergy();
 
+    m_clientContainerLast.Clear();
+    m_clientContainerLast.Add(m_clientContainer);
+
     if (int(m_clientContainer.GetN()) > global_ksize) { // somente agrupa se houver mais clientes do que o maximo para análise do DA de Localizacao
       // -----> filtrar os clientes
       // identify borders

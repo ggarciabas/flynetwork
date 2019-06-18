@@ -978,6 +978,13 @@ void UavNetwork::ClientPosition (string name)
     Vector current = (*i)->GetObject<MobilityModel>()->GetPosition();
     file << current.x << " " << current.y << " ";
   }
+  file << std::endl;
+  for (UavApplicationContainer::Iterator it = m_uavAppContainer.Begin(); it != m_uavAppContainer.End(); ++it) {
+    ClientModelContainer cont = (*it)->GetClientContainerLast();
+    for (ClientModelContainer::Iterator c = cont.Begin(); c != cont.End(); ++c) {
+      file << (*c)->GetXPosition() << " " << (*c)->GetYPosition() << " ";
+    }
+  }
   file.close();
 }
 

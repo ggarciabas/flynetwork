@@ -78,6 +78,10 @@ public:
 
   void ClientConsumption (double time, double px, double py, uint32_t id);
 
+  ClientModelContainer GetClientContainerLast () {
+    return m_clientContainerLast;
+  }
+
 private:
   void DoDispose();
   virtual void StartApplication(void);
@@ -111,6 +115,7 @@ private:
   Ptr<UavDeviceEnergyModel> m_uavDevice;
 
   ClientModelContainer m_clientContainer;  
+  ClientModelContainer m_clientContainerLast; 
 
   EventId m_programDepletion; // utilizado para programar o depletion de acordo com o tempo para o UAV novo chegar até a posicao onde o UAV que solicitou está.
 
