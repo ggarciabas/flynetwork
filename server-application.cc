@@ -1406,7 +1406,7 @@ void ServerApplication::runDA() {
   file.open(os.str().c_str(), std::ofstream::out);
   bool first = true;
   double tFix = m_fixedClientContainer.GetN();
-  double pFix = 2; // peso dos clientes fixos - clientes móveis sempre com peso de 1"
+  double pFix = 5; // peso dos clientes fixos - clientes móveis sempre com peso de 1"
   for (ClientModelContainer::Iterator i = m_clientContainer.Begin(); i != m_clientContainer.End(); ++i)
   {
     (*i)->EraseLocation();
@@ -1418,20 +1418,13 @@ void ServerApplication::runDA() {
       file << " " << (*i)->GetPosition().at(0) << " " << (*i)->GetPosition().at(1);
     }
   }
+  file.close ();
+  m_clientPosition (os.str ()); // Adicionando informacoes reais do ambiente
   for (ClientModelContainer::Iterator i = m_fixedClientContainer.Begin(); i != m_fixedClientContainer.End(); ++i)
   {
     (*i)->EraseLocation();
     (*i)->SetPci(pFix/(m_allCli+tFix*pFix));
-    if (first) {
-      file << (*i)->GetPosition().at(0) << " " << (*i)->GetPosition().at(1);
-      first = false;
-    } else {
-      file << " " << (*i)->GetPosition().at(0) << " " << (*i)->GetPosition().at(1);
-    }
   }
-  file << std::endl;
-  file.close ();
-  m_clientPosition (os.str ()); // Adicionando informacoes reais do ambiente
 
   m_clientDaContainer.Clear();
   m_clientDaContainer.Add(m_fixedClientContainer); // clientes fixos antes pra dar prioridade na capacidade do UAV!
@@ -1586,8 +1579,6 @@ void ServerApplication::runDA() {
 
     if (locConnected) {
       NS_LOG_DEBUG("DARun: localizacoes conectadas\n");
-      // if (capacidade) {
-      //   NS_LOG_DEBUG("DARun: capacidade ok\n");
         if (tFixCon == tFix) {
           NS_LOG_DEBUG("DARun: clientes fixos conectados\n");
           if (tMovCon >= m_allCli*percentCli) {
@@ -1596,22 +1587,15 @@ void ServerApplication::runDA() {
             // t *= 0.5; // resfria bastante
             // GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, 0.0);
             break;
-          } 
-          // else {
-          //   file << "--> " << iter << " @"<< Simulator::Now().GetSeconds() << " clientes móveis nao conectados [" << percentCli << "] !\n";
-          // }
+          } else {
+            NS_LOG_DEBUG("DARun: porcentagem de clientes NAO alcancado\n");
+          }
+        } else {
+          NS_LOG_DEBUG("DARun: clientes fixos NAO conectados\n");
         } 
-        // else {
-        //   file << "--> " << iter << " @"<< Simulator::Now().GetSeconds() << " clientes fixos nao conectados! t[" << t << "]\n";
-        // }
-      // } 
-      // else {
-      //   file << "--> " << iter << " @"<< Simulator::Now().GetSeconds() << " capacidade superior!\n";
-      // }
-    } 
-    // else {
-    //   file << "--> " << iter << " @"<< Simulator::Now().GetSeconds() << " localizações não conecatadas!\n";
-    // }
+    } else {
+      NS_LOG_DEBUG("DARun: localizacoes NAO conectadas\n");
+    }
 
     if (!MovimentoA()) { // } || (tFixCon != tFix && t == 0.1)) {
       // file << "--> Solicitando nova localizacao por não existir movimento em A @" << Simulator::Now().GetSeconds() << std::endl;
