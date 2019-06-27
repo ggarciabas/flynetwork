@@ -686,14 +686,23 @@ void UavNetwork::ConfigureCli()
                               "Y", DoubleValue (y),
                             "Rho", StringValue("ns3::ConstantRandomVariable[Constant=20.0]"));
         mobilityCLI.SetPositionAllocator(positionAlloc);
+        // double xmi, xma, ymi, yma;
+        // xmi = m_max(x, m_xmin);
+        // xma = m_min(x,m_xmax);
+        // ymi = m_max(y,m_ymin);
+        // yma = m_min(y,m_ymax);
+        // std::cout << "[" << xmi << "," << xma << "] -- [" << ymi << "," << yma << "]\n";
+        // mobilityCLI.SetMobilityModel("ns3::RandomWalk2dMobilityModel",
+        //                              "Bounds", RectangleValue(Rectangle(xmi, xma, ymi, yma)),
+        //                               "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=3.0]")); // xmin, xmax, ymin, ymax
         mobilityCLI.SetMobilityModel("ns3::RandomWalk2dMobilityModel",
                                      "Bounds", RectangleValue(Rectangle(m_xmin, m_xmax, m_ymin, m_ymax)),
                                       "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=3.0]")); // xmin, xmax, ymin, ymax
         // mobilityCLI.SetMobilityModel("ns3::SteadyStateRandomWaypointMobilityModel",
-        //                              "MinX", DoubleValue(m_xmin),
-        //                              "MaxX", DoubleValue(m_xmax),
-        //                              "MinY", DoubleValue(m_ymin),
-        //                              "MaxY", DoubleValue(m_ymax),
+        //                              "MinX", DoubleValue(m_max(x, m_xmin)),
+        //                              "MaxX", DoubleValue(m_min(x,m_xmax)),
+        //                              "MinY", DoubleValue(m_max(y,m_ymin)),
+        //                              "MaxY", DoubleValue(m_min(y,m_ymax)),
         //                              "MinSpeed", DoubleValue(0.3),
         //                              "MaxSpeed", DoubleValue(1.0),
         //                              "MinPause", DoubleValue(1),

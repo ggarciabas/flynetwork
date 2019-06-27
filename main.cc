@@ -130,7 +130,7 @@ int main (int argc, char *argv[])
 	obj.Set("Seed", UintegerValue(seed));
 	obj.Set("ScheduleServer", DoubleValue(etapa));
 	obj.Set("TotalCli", DoubleValue(totalCli));
-	obj.Set("UavTimingNext", DoubleValue((sim_time-0.5)/10.0));
+	obj.Set("UavTimingNext", DoubleValue(etapa));
 	obj.Set("ClientUpdateCons", DoubleValue(global_cli_cons_update));
 	Ptr<UavNetwork> net = obj.Create()->GetObject<UavNetwork>();
 	net->Run();
