@@ -982,7 +982,7 @@ void UavNetwork::PrintUavEnergy (int t)
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   for (UavApplicationContainer::Iterator it = m_uavAppContainer.Begin(); it != m_uavAppContainer.End(); ++it) {
     Ptr<UavDeviceEnergyModel> dev = (*it)->GetUavDevice();
-    file << Simulator::Now().GetSeconds() << "," << (*it)->GetId()  << "," << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetRealRemainingEnergy() << "," << dev->GetEnergySource()->GetInitialEnergy() << std::endl;
+    file << Simulator::Now().GetSeconds() << " " << (*it)->GetId()  << " " << dev->GetEnergySource()->GetInitialEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetRealRemainingEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetWifiEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetMoveEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetHoverEnergy() << " " << std::endl;
   }
   file.close();
 }
