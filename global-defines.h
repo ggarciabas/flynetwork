@@ -9,6 +9,7 @@ extern double global_cli_cob;
 extern double global_tx_current; // ampere
 extern double global_cli_cons_update;
 extern int global_ksize;
+extern double seed;
 
 #ifndef GLOBAL_PATH
     extern std::string global_path;

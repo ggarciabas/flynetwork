@@ -49,13 +49,14 @@ double global_uav_cob;
 double global_cli_cob;
 double global_tx_current;
 double global_cli_cons_update;
+double seed;
 int global_ksize;
 // https://www.wired.com/story/the-physics-of-why-bigger-drones-can-fly-longer/
 int main (int argc, char *argv[])
 {
 	double sim_time=1200.0;
 	double totalCli = 0;
-	uint32_t scenario = 7, env = 2, protocol = 1, custo=1, seed=9042019;
+	uint32_t scenario = 7, env = 2, protocol = 1, custo=1;
 	global_ksize = 10;
 	global_cli_cons_update = 1.0;
 	global_cli_cob = 115.47; // metros - para clientes utilizando equação de antena direcional com esparramento verificar Klaine2018

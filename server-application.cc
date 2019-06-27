@@ -550,6 +550,12 @@ void ServerApplication::Run ()
     #endif
     // runDAPython();
     // runDAPuro();
+    ss.str("");
+    ss <<global_path << "/" << m_pathData << "/seed.txt";
+    file.open(ss.str().c_str(), std::ofstream::out | std::ofstream::app);
+    file << int(Simulator::Now().GetSeconds()) << "," << SeedManager::GetSeed() << "\n";
+    file.close();
+    
     runDA();
     NS_LOG_INFO ("ServerApplication::Run liberando client container ");
     m_clientContainer.Clear();
