@@ -489,6 +489,14 @@ void UavNetwork::NewUav(int total, int update) // update = 0- normal 1- supply 2
     m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << "," << update << std::endl;
     m_file.close();
 
+    os.str("");
+    os << global_path << "/" << m_pathData << "/uav_energy.txt";
+    std::ofstream file;
+    file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    Ptr<UavDeviceEnergyModel> dev = uavApp->GetUavDevice();
+    file << Simulator::Now().GetSeconds() << " " << n->GetId()  << " " << dev->GetEnergySource()->GetInitialEnergy() << " 0 0 0 0" << std::endl;
+    file.close();
+
     n = 0;
     NS_LOG_DEBUG (" ------------------------------------- ");
   }
@@ -500,7 +508,7 @@ void UavNetwork::RemoveUav(int id, int step)
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<id);
   NS_LOG_DEBUG ("UavNetwork::RemoveUav [" << id << "]");
   Ptr<Node> n = m_uavNodeActive.RemoveId(id);
-  m_uavNode.Add(n);
+  m_uavNode.Add(n);  
 
   // Stop application
   NS_LOG_DEBUG ("Apps " << n->GetNApplications());
@@ -511,6 +519,13 @@ void UavNetwork::RemoveUav(int id, int step)
     --app;
   } while (uavApp==NULL && app >= 0);
   NS_ASSERT (uavApp != NULL);
+  std::ostringstream os;
+  os << global_path << "/" << m_pathData << "/uav_energy.txt";
+  std::ofstream file;
+  file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  Ptr<UavDeviceEnergyModel> dev = uavApp->GetUavDevice();
+  file << Simulator::Now().GetSeconds() << " " << n->GetId()  << " " << dev->GetEnergySource()->GetInitialEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetRealRemainingEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetWifiEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetMoveEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetHoverEnergy() << " " << std::endl;
+  file.close();
   uavApp->Stop(); // aqui já limpa o container de clientes
 
   // modificando posicionamento para fora do cenario
@@ -518,7 +533,7 @@ void UavNetwork::RemoveUav(int id, int step)
   Ptr<UavMobilityModel> model = n->GetObject<UavMobilityModel>();
   model->SetFirstPosition(v); // manda para perto da central!
 
-  std::ostringstream os;
+  os.str("");
   os << global_path << "/" << m_pathData << "/uav_network_log.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
   m_file << Simulator::Now().GetSeconds() << "," << n->GetId() << ",0" << std::endl;
@@ -527,7 +542,7 @@ void UavNetwork::RemoveUav(int id, int step)
   os.str("");
   os << global_path << "/" << m_pathData << "/uav_removed_energy.txt";
   m_file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  Ptr<UavDeviceEnergyModel> dev = uavApp->GetUavDevice();
+  dev = uavApp->GetUavDevice();
   m_file << Simulator::Now().GetSeconds() << " " << id << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetRealRemainingEnergy() / dev->GetEnergySource()->GetInitialEnergy() << std::endl;
   m_file.close();
 
