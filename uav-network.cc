@@ -684,20 +684,20 @@ void UavNetwork::ConfigureCli()
         Ptr<PositionAllocator> positionAlloc = CreateObjectWithAttributes<RandomDiscPositionAllocator>
                             ("X", DoubleValue (x),
                               "Y", DoubleValue (y),
-                            "Rho", StringValue("ns3::ConstantRandomVariable[Constant=20.0]"));
+                            "Rho", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=20.0]"));
         mobilityCLI.SetPositionAllocator(positionAlloc);
-        // double xmi, xma, ymi, yma;
-        // xmi = m_max(x, m_xmin);
-        // xma = m_min(x,m_xmax);
-        // ymi = m_max(y,m_ymin);
-        // yma = m_min(y,m_ymax);
-        // std::cout << "[" << xmi << "," << xma << "] -- [" << ymi << "," << yma << "]\n";
-        // mobilityCLI.SetMobilityModel("ns3::RandomWalk2dMobilityModel",
-        //                              "Bounds", RectangleValue(Rectangle(xmi, xma, ymi, yma)),
-        //                               "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=3.0]")); // xmin, xmax, ymin, ymax
+        double xmi, xma, ymi, yma;
+        xmi = m_low(x, m_xmin);
+        xma = m_sup(x, m_xmax);
+        ymi = m_low(y, m_ymin);
+        yma = m_sup(y, m_ymax);
+        std::cout << "[" << xmi << "," << xma << "] -- [" << ymi << "," << yma << "]\n";
         mobilityCLI.SetMobilityModel("ns3::RandomWalk2dMobilityModel",
-                                     "Bounds", RectangleValue(Rectangle(m_xmin, m_xmax, m_ymin, m_ymax)),
+                                     "Bounds", RectangleValue(Rectangle(xmi, xma, ymi, yma)),
                                       "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=3.0]")); // xmin, xmax, ymin, ymax
+        // mobilityCLI.SetMobilityModel("ns3::RandomWalk2dMobilityModel",
+        //                              "Bounds", RectangleValue(Rectangle(m_xmin, m_xmax, m_ymin, m_ymax)),
+        //                               "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=3.0]")); // xmin, xmax, ymin, ymax
         // mobilityCLI.SetMobilityModel("ns3::SteadyStateRandomWaypointMobilityModel",
         //                              "MinX", DoubleValue(m_max(x, m_xmin)),
         //                              "MaxX", DoubleValue(m_min(x,m_xmax)),
