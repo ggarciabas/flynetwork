@@ -705,9 +705,28 @@ void UavNetwork::ConfigureCli()
                               "Y", DoubleValue (y),
                             "Rho", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=10.0]"));
         mobilityCLI.SetPositionAllocator(positionAlloc);
+        double xmi, xma, ymi, yma;
+        xmi = m_low(x, m_xmin);
+        xma = m_sup(x, m_xmax);
+        ymi = m_low(y, m_ymin);
+        yma = m_sup(y, m_ymax);
+        std::cout << "[" << xmi << "," << xma << "] -- [" << ymi << "," << yma << "]\n";
         mobilityCLI.SetMobilityModel("ns3::RandomWalk2dMobilityModel",
-                                     "Bounds", RectangleValue(Rectangle(m_xmin, m_xmax, m_ymin, m_ymax)),
-                                      "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=3.0]")); // xmin, xmax, ymin, ymax                                   
+                                     "Bounds", RectangleValue(Rectangle(xmi, xma, ymi, yma)),
+                                      "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=3.0]")); // xmin, xmax, ymin, ymax
+        // mobilityCLI.SetMobilityModel("ns3::RandomWalk2dMobilityModel",
+        //                              "Bounds", RectangleValue(Rectangle(m_xmin, m_xmax, m_ymin, m_ymax)),
+        //                               "Speed", StringValue("ns3::UniformRandomVariable[Min=1.0|Max=3.0]")); // xmin, xmax, ymin, ymax
+        // mobilityCLI.SetMobilityModel("ns3::SteadyStateRandomWaypointMobilityModel",
+        //                              "MinX", DoubleValue(m_max(x, m_xmin)),
+        //                              "MaxX", DoubleValue(m_min(x,m_xmax)),
+        //                              "MinY", DoubleValue(m_max(y,m_ymin)),
+        //                              "MaxY", DoubleValue(m_min(y,m_ymax)),
+        //                              "MinSpeed", DoubleValue(0.3),
+        //                              "MaxSpeed", DoubleValue(1.0),
+        //                              "MinPause", DoubleValue(1),
+        //                              "MaxPause", DoubleValue(3600),
+        //                              "Z", DoubleValue(1.5)); // xmin, xmax, ymin, ymax                                      
         mobilityCLI.Install(nodes);
         m_clientNode.Add(nodes);
       }

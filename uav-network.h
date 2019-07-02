@@ -45,8 +45,8 @@
 namespace ns3
 {
 
-#define m_min(v,v_min) ((v+5.0<v_min)?v_min:v+5.0)
-#define m_max(v,v_max) ((v-5.0>v_max)?v_max:v-5.0)
+#define m_sup(v,v_sup) ((v+50.0>v_sup)?v_sup:v+50.0)
+#define m_low(v,v_low) ((v-50.0<v_low)?v_low:v-50.0)
 
 /**
  * UavNetwork
