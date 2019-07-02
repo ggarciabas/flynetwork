@@ -1184,21 +1184,21 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
   if (b_ui_res > 0) {
     switch (m_custo) {
       case 1:
-      case 6: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/wifi/issues/45)
+      case 6: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45)
         custo = (ce_ui_la_lj + ce_ui_lj_lc) / inf; // media do custo
         break;
       case 2:
-      case 7: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/wifi/issues/45
+      case 7: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45
         custo = ce_te_lj/inf; // UAV que terá mais bateria para servir a localizacao (conseguira servir por mais tempo)
         // NS_LOG_DEBUG ("P_te=" << P_te << " custo=" << custo);
         break;
       case 3:
-      case 8: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/wifi/issues/45
+      case 8: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45
         custo = (ce_te_lj + ce_ui_la_lj + ce_ui_lj_lc) / inf; // quantos TEs consegue suprir?!
         // NS_LOG_DEBUG ("P_te=" << P_te << " custo=" << custo);
         break;
       case 4: // custo 2 -> com hover
-      case 9: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/wifi/issues/45
+      case 9: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45
         ce_hv = uav->GetHoverCost()*(m_scheduleServer-t_loc) ; // custo para o TE inteiro, considerando locs e hover
         custo = (ce_te_lj + ce_ui_la_lj + ce_ui_lj_lc + ce_hv) / inf;
         // NS_LOG_DEBUG ("ce_hv=" << ce_hv << " P_te=" << P_te << " custo=" << custo);
@@ -1401,7 +1401,7 @@ void ServerApplication::DoDispose() {
   m_clientContainer.Clear();
 }
 
-// https://github.com/ggarciabas/nsnam_ns3/blob/17c1f9200727381852528ac4798f040128ac842a/scratch/wifi/da_cpp/deterministic-annealing.cc
+// https://github.com/ggarciabas/nsnam_ns3/blob/17c1f9200727381852528ac4798f040128ac842a/scratch/teste/da_cpp/deterministic-annealing.cc
 void ServerApplication::runDA() {
   NS_LOG_DEBUG("ServerApplication::runDA @" << Simulator::Now().GetSeconds());
 

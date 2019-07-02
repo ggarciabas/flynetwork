@@ -82,18 +82,10 @@ int main (int argc, char *argv[])
 
 	global_ec_persec = total_battery/27*60; // bt /restime
 	global_speed = 5.0; // m/s
-	
-	// LogComponentEnable("MyOnOffApplication", LOG_DEBUG);
-	// LogComponentEnable("ServerApplication", LOG_DEBUG);
-	// LogComponentEnable("LocationModel", LOG_DEBUG);
-	// LogComponentEnable("UavApplication", LOG_FUNCTION);
-	// LogComponentEnable("UavApplication", LOG_DEBUG);
-	// LogComponentEnable("SmartphoneApplication", LOG_FUNCTION);
-	// LogComponentEnable("WifiPhyStateHelper", LOG_FUNCTION);
-	// LogComponentEnable("WifiPhy", LOG_FUNCTION);
-	// LogComponentEnable ("WifiPhyStateHelper", LOG_DEBUG);
-	// LogComponentEnable ("WifiRadioEnergyModel", LOG_DEBUG);
 
+	
+	// LogComponentEnable("ServerApplication", LOG_DEBUG);
+	// LogComponentEnable("UavApplication", LOG_DEBUG);
 
 	// LogComponentEnable("DhcpClient", LOG_FUNCTION);
 	// LogComponentEnable("ClientDeviceEnergyModelHelper", LOG_FUNCTION);

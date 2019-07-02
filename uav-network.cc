@@ -189,12 +189,13 @@ void UavNetwork::Run()
       break;
     default:
       NS_LOG_ERROR("Não foi possivel identificar o cenario!");
+      std::cout << "Não foi possivel identificar o cenario!\n";
       exit(-1);
   }
   m_scenarioName = ss.str();
   // ler informacoes do arquivo
   m_PathData = ss.str();
-  ss_ << "./scratch/wifi/data/scenarios/" << m_PathData << ".txt";
+  ss_ << "./scratch/teste/data/scenarios/" << m_PathData << ".txt";
   scenario.open(ss_.str());
   if (scenario.is_open())
   {
@@ -674,7 +675,7 @@ void UavNetwork::ConfigureCli()
 
   std::ostringstream ss;
   std::ifstream scenario;
-  ss << "./scratch/wifi/data/scenarios/" << m_PathData << ".txt";
+  ss << "./scratch/teste/data/scenarios/" << m_PathData << ".txt";
   scenario.open(ss.str());
   // ler informacoes dos arquivos
   if (scenario.is_open())
@@ -795,7 +796,7 @@ void UavNetwork::ConfigurePalcos() // TODO: poderia ser otimizada a leitura do a
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   std::ostringstream ss;
   std::ifstream scenario;
-  ss << "./scratch/wifi/data/scenarios/" << m_PathData << ".txt";
+  ss << "./scratch/teste/data/scenarios/" << m_PathData << ".txt";
   string file = ss.str();
   ss.str("");
   scenario.open(file);
