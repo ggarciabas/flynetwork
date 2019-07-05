@@ -84,8 +84,8 @@ int main (int argc, char *argv[])
 	global_speed = 5.0; // m/s
 
 	
-	// LogComponentEnable("ServerApplication", LOG_DEBUG);
-	// LogComponentEnable("UavApplication", LOG_DEBUG);
+	LogComponentEnable("ServerApplication", LOG_DEBUG);
+	LogComponentEnable("UavApplication", LOG_DEBUG);
 
 	// LogComponentEnable("DhcpClient", LOG_FUNCTION);
 	// LogComponentEnable("ClientDeviceEnergyModelHelper", LOG_FUNCTION);
