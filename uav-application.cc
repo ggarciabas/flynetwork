@@ -206,39 +206,9 @@ void UavApplication::SendCliData ()
 
     if (int(m_clientContainer.GetN()) > global_ksize) { // somente agrupa se houver mais clientes do que o maximo para análise do DA de Localizacao
       // -----> filtrar os clientes
-      // identify borders
-      ClientModelContainer::Iterator it = m_clientContainer.Begin();
-      double xmin, ymin, xmax, ymax, x, y;
-      xmin = xmax = (*it)->GetPosition().at(0);
-      ymin = ymax = (*it)->GetPosition().at(1);
-      it++;
-      for (; it != m_clientContainer.End(); ++it) {
-        x = (*it)->GetPosition().at(0);
-        y = (*it)->GetPosition().at(1);
-        slog << x << " " << y << " ";
-        if (x > xmax) {
-          xmax = x;
-        } else if (x < xmin) {
-          xmin = x;
-        }
-        if (y > ymax) {
-          ymax = y;
-        } else if (y < ymin) {
-          ymin = y;
-        }
-      }
-      slog << "\n";
-      // define position allocator
-      ObjectFactory posObj;
-      posObj.SetTypeId ("ns3::RandomRectanglePositionAllocator");
-      ss.str("");
-      ss << "ns3::UniformRandomVariable[Min=" << xmin << "|Max=" << xmax << "]";
-      posObj.Set ("X", StringValue (ss.str().c_str()));
-      ss.str("");
-      ss << "ns3::UniformRandomVariable[Min=" << ymin << "|Max=" << ymax << "]";
-      posObj.Set ("Y", StringValue (ss.str().c_str()));
-      Ptr <PositionAllocator> pAlloc = posObj.Create ()->GetObject <PositionAllocator> ();
-
+      Ptr<UniformRandomVariable> cliCode = CreateObject<UniformRandomVariable> ();
+      cliCode->SetAttribute ("Min", DoubleValue (0));
+      cliCode->SetAttribute ("Max", DoubleValue (int(m_clientContainer.GetN())-1));
       // criando grupos
       std::vector<double> sumCluXPos; // para calcular o novo posicionamento do cluster!
       std::vector<double> sumCluYPos; // para calcular o novo posicionamento do cluster!
@@ -251,13 +221,13 @@ void UavApplication::SendCliData ()
         obj.Set("Id", UintegerValue(i)); // id 
         cli = obj.Create()->GetObject<ClientModel>();
         cli->SetUpdatePos(Simulator::Now()); // time
-        Vector v = pAlloc->GetNext();
-        slog << v.x << " " << v.y << " ";
-        cli->SetPosition(v.x, v.y);
+        int pCli = cliCode->GetValue();
+        cli->SetPosition(m_clientContainer.Get(pCli)->GetPosition().at(0), m_clientContainer.Get(pCli)->GetPosition().at(1));
         groupedCli.Add(cli);
         sumCluXPos.push_back(0.0);
         sumCluYPos.push_back(0.0);
         totCluPos.push_back(0.0);
+        cli = 0;
       }
       slog << "\n";
       // encontrar clientes que pertençam ao grupo   
@@ -318,6 +288,12 @@ void UavApplication::SendCliData ()
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
     Ptr<const MobilityModel> mob = GetNode()->GetObject<MobilityModel>();
     file << Simulator::Now().GetSeconds() << " " <<  mob->GetPosition().x << " " << mob->GetPosition().y << "\n" << slog.str();
+    file.close();
+
+    os.str("");
+    os << global_path << "/" << m_pathData << "/uav_client/uav_" << m_id << "_msg.txt";
+    file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    file << Simulator::Now().GetSeconds() << " " <<  mob->GetPosition().x << " " << mob->GetPosition().y << "\n" << msg.str();
     file.close();
 
     this->SendCliDataMsg(msg.str());

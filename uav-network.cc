@@ -686,9 +686,22 @@ void UavNetwork::ConfigureCli()
     getline(scenario, line);
     int update_total = 0;
     std::vector<int> tCliTeste;
-    tCliTeste.push_back(100);
-    tCliTeste.push_back(1000);
+    tCliTeste.push_back(500);
+    tCliTeste.push_back(1300);
+    tCliTeste.push_back(20);
+    tCliTeste.push_back(20);
+    tCliTeste.push_back(20);
+    tCliTeste.push_back(20);
+    tCliTeste.push_back(20);
+    tCliTeste.push_back(20);
+    tCliTeste.push_back(20);
+    tCliTeste.push_back(20);
+    tCliTeste.push_back(20);
+    tCliTeste.push_back(20);
+    tCliTeste.push_back(20);
+    tCliTeste.push_back(20);
     int t = 0;
+    NS_LOG_DEBUG("--------------> Iniciando distribuicao de clientes");
     while (getline(scenario, line))
     {
       if (line.at(0) != '#')
@@ -696,6 +709,7 @@ void UavNetwork::ConfigureCli()
         sscanf(line.c_str(), "%lf,%lf\n", &x, &y);
         NS_LOG_INFO(line.c_str());
         NodeContainer nodes;
+        // std::cout << "ttoal: " << tCliTeste.at(t) << std::endl;
         nodes.Create(tCliTeste.at(t));
         update_total += tCliTeste.at(t);
         t++;
