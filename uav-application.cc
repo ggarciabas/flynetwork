@@ -278,6 +278,7 @@ void UavApplication::SendCliData ()
           if (d < min_dist) {
             min = j;
             min_pos = pos;
+            min_dist = d;
           }
         }
         (*min)->AddConsumption((*i)->GetConsumption()); // atualizando consumo do cluster
