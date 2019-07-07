@@ -214,6 +214,7 @@ void UavApplication::SendCliData ()
       std::vector<double> sumCluYPos; // para calcular o novo posicionamento do cluster!
       std::vector<double> totCluPos; // total de clientes no cluster
       ClientModelContainer groupedCli;
+      slog << " ksize= " << global_ksize << "\n";
       Ptr<ClientModel> cli;
       for (int i = 0; i < global_ksize; ++i) {
         ObjectFactory obj;
@@ -223,23 +224,27 @@ void UavApplication::SendCliData ()
         cli->SetUpdatePos(Simulator::Now()); // time
         int pCli = cliCode->GetValue();
         cli->SetPosition(m_clientContainer.Get(pCli)->GetPosition().at(0), m_clientContainer.Get(pCli)->GetPosition().at(1));
+        slog << pCli << " " << m_clientContainer.Get(pCli)->GetPosition().at(0) << " " << m_clientContainer.Get(pCli)->GetPosition().at(1) << "\n";
         groupedCli.Add(cli);
         sumCluXPos.push_back(0.0);
         sumCluYPos.push_back(0.0);
         totCluPos.push_back(0.0);
-        cli = 0;
       }
-      slog << "\n";
+      slog << "\n---\n" << groupedCli.GetN() << "\n--\n";
       // encontrar clientes que pertençam ao grupo   
       ClientModelContainer::Iterator min, j;
-      double min_dist, d;
+      long double min_dist, d;
       int min_pos, pos;
       for (ClientModelContainer::Iterator i = m_clientContainer.Begin(); i != m_clientContainer.End(); ++i) 
       {
         j = groupedCli.Begin();
         min = j; // cluster mais perto é o primeiro
-        min_pos = 0;
+        min_pos = 0;       
         min_dist = std::sqrt(std::pow((*i)->GetPosition().at(0) - (*min)->GetPosition().at(0), 2) + std::pow((*i)->GetPosition().at(1) - (*min)->GetPosition().at(1), 2));
+        //slog << (*i)->GetPosition().at(0) << " " << (*i)->GetPosition().at(1) << " min " << (*min)->GetPosition().at(0) << " " << (*min)->GetPosition().at(1) << " pos " << min_pos << "\n";
+        /*if ((*i)->GetPosition().at(0) == (*min)->GetPosition().at(0) && (*i)->GetPosition().at(1) == (*min)->GetPosition().at(1)) {
+          slog << (*min)->GetPosition().at(0) << " " << (*min)->GetPosition().at(1) << " menor " << min_pos << " min_dist " << min_dist << "\n";
+        }*/
         j++;
         pos = 1;
         for (; j != groupedCli.End(); ++j, ++pos) 
@@ -248,15 +253,20 @@ void UavApplication::SendCliData ()
           if (d < min_dist) {
             min = j;
             min_pos = pos;
+            min_dist = d;
+            //slog << (*i)->GetPosition().at(0) << " " << (*i)->GetPosition().at(1) << " min " << (*min)->GetPosition().at(0) << " " << (*min)->GetPosition().at(1) << " pos " << min_pos << "\n";
           }
+          /* if ((*i)->GetPosition().at(0) == (*j)->GetPosition().at(0) && (*i)->GetPosition().at(1) == (*j)->GetPosition().at(1)) {
+            slog << (*min)->GetPosition().at(0) << " " << (*min)->GetPosition().at(1) << " menor " << min_pos << " d " << d << " min_dist " << min_dist << "\n";
+          }*/
         }
         (*min)->AddConsumption((*i)->GetConsumption()); // atualizando consumo do cluster
         sumCluXPos.at(min_pos) += (*i)->GetPosition().at(0);
         sumCluYPos.at(min_pos) += (*i)->GetPosition().at(1);
         totCluPos.at(min_pos) += 1.0;
-        slog << min_pos << " ";
+        //slog << min_pos << " (" << (*min)->GetPosition().at(1) << "," << (*min)->GetPosition().at(1) << "," << min_dist << ") <----- \n";
       }
-      slog << "\n";
+      //slog << "\n";
 
       // construindo mensagem para o servidor
       pos = 0;
@@ -267,7 +277,7 @@ void UavApplication::SendCliData ()
           // atualiza posicao com média dos clientes
           (*it)->SetPosition(sumCluXPos.at(pos)/totCluPos.at(pos), sumCluYPos.at(pos)/totCluPos.at(pos));
           msg << " " << (*it)->GetPosition().at(0) << " " << (*it)->GetPosition().at(1) << " " << (*it)->GetConsumption() << " " << totCluPos.at(pos);
-          slog << pos << " " << (*it)->GetPosition().at(0) << " " << (*it)->GetPosition().at(1) << " " << (*it)->GetConsumption() << " " << totCluPos.at(pos) << "\n";
+          //slog << pos << " " << (*it)->GetPosition().at(0) << " " << (*it)->GetPosition().at(1) << " " << (*it)->GetConsumption() << " " << totCluPos.at(pos) << "\n";
         }
       }    
       msg << " \0";
@@ -277,18 +287,18 @@ void UavApplication::SendCliData ()
         msg << " " << (*it)->GetId();
         msg << " " << (*it)->GetUpdatePos().GetSeconds();
         msg << " " << (*it)->GetPosition().at(0) << " " << (*it)->GetPosition().at(1) << " " << (*it)->GetConsumption() << " 1.0";
-        slog << (*it)->GetPosition().at(0) << " " << (*it)->GetPosition().at(1) << " " << (*it)->GetConsumption() << " 1.0\n";
+        //slog << (*it)->GetPosition().at(0) << " " << (*it)->GetPosition().at(1) << " " << (*it)->GetConsumption() << " 1.0\n";
       }    
       msg << " \0";
     }
 
-    std::ostringstream os;
+    /*std::ostringstream os;
     os << global_path << "/" << m_pathData << "/uav_client/uav_" << m_id << ".txt";
     std::ofstream file;
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
     Ptr<const MobilityModel> mob = GetNode()->GetObject<MobilityModel>();
     file << Simulator::Now().GetSeconds() << " " <<  mob->GetPosition().x << " " << mob->GetPosition().y << "\n" << slog.str();
-    file.close();
+    file.close();*/
 
     os.str("");
     os << global_path << "/" << m_pathData << "/uav_client/uav_" << m_id << "_msg.txt";
