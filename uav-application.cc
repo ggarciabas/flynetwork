@@ -302,6 +302,7 @@ void UavApplication::SendCliData ()
 
     std::ostringstream os;
     std::ofstream file;
+    Ptr<const MobilityModel> mob = GetNode()->GetObject<MobilityModel>();
     os << global_path << "/" << m_pathData << "/uav_client/uav_" << m_id << "_msg.txt";
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
     file << Simulator::Now().GetSeconds() << " " <<  mob->GetPosition().x << " " << mob->GetPosition().y << "\n" << msg.str();
