@@ -78,6 +78,7 @@ private:
   void SendCentralPacket(Ptr<UavModel> uav);
   void runDAPython();
   void runDA();
+  void aleatorio();
   void runDAPuro();
   void runAgendamento(void);
   void CreateCentralLocation(void);

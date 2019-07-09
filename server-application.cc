@@ -556,7 +556,11 @@ void ServerApplication::Run ()
     file << int(Simulator::Now().GetSeconds()) << "," << SeedManager::GetSeed() << "," << global_ksize << "\n";
     file.close();
     
-    runDA();
+    if (m_custo == 5) {
+      aleatorio();
+    } else {
+      runDA();
+    }
     NS_LOG_INFO ("ServerApplication::Run liberando client container ");
     m_clientContainer.Clear();
     runAgendamento();
@@ -1399,6 +1403,10 @@ void ServerApplication::DoDispose() {
   m_locationContainer.Clear();
   m_fixedClientContainer.Clear();
   m_clientContainer.Clear();
+}
+
+void ServerApplication::aleatorio() {
+  // area de distribuicao para teste
 }
 
 // https://github.com/ggarciabas/nsnam_ns3/blob/17c1f9200727381852528ac4798f040128ac842a/scratch/teste/da_cpp/deterministic-annealing.cc
