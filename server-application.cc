@@ -1436,12 +1436,12 @@ void ServerApplication::aleatorio() {
   totLoc->SetAttribute ("Max", DoubleValue (m_fixedClientContainer.GetN()*2));
 
   Ptr<UniformRandomVariable> xPos = CreateObject<UniformRandomVariable>();  
-  xPos->SetAttribute ("Min", DoubleValue (0));
-  xPos->SetAttribute ("Max", DoubleValue (m_maxx));
+  xPos->SetAttribute ("Min", DoubleValue (10));
+  xPos->SetAttribute ("Max", DoubleValue (m_maxx-10));
 
   Ptr<UniformRandomVariable> yPos = CreateObject<UniformRandomVariable>();  
-  yPos->SetAttribute ("Min", DoubleValue (0));
-  yPos->SetAttribute ("Max", DoubleValue (m_maxy));
+  yPos->SetAttribute ("Min", DoubleValue (10));
+  yPos->SetAttribute ("Max", DoubleValue (m_maxy-10));
 
   int tLoc = totLoc->GetValue();
   ObjectFactory lObj;
