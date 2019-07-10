@@ -1467,8 +1467,10 @@ void ServerApplication::aleatorio() {
   //                    4- Posiciona nova localizacao em p3 = (1-u)p1 + up2
   //                    5- Chamar função recursiva para (p1, p3)
   //                    6- Chamar função recursiva para (p2, p3)
-  for (LocationModelContainer::Iterator it = m_locationContainer.Begin(); it != m_locationContainer.End(); ++it) {
-    this->aleNewLoc ((*it)->GetXPosition(), (*it)->GetYPosition(), pos.x, pos.y);
+  
+  for (int i = 0; i < tLoc; ++i) {
+    Ptr<LocationModel> l = m_locationContainer.Get(i);
+    this->aleNewLoc (l->GetXPosition(), l->GetYPosition(), pos.x, pos.y);
   }
 
   // salvando
