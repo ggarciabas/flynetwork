@@ -1476,6 +1476,7 @@ void ServerApplication::aleatorio() {
   std::ostringstream os;
   os <<global_path << "/" << m_pathData << "/aleatorio.txt";
   file.open(os.str().c_str(), std::ofstream::out);
+  file << global_uav_cob << std::endl;
   file << m_maxx << "," << m_maxy << std::endl;  
   file << lCentral->GetXPosition() << "," << lCentral->GetYPosition() << std::endl;
 
@@ -1484,6 +1485,13 @@ void ServerApplication::aleatorio() {
   lj++;
   for (; lj != m_locationContainer.End(); ++lj) {
     file << "," << (*lj)->GetXPosition() << "," << (*lj)->GetYPosition();
+  }
+  file << std::endl;
+  ClientModelContainer::Iterator it = m_fixedClientContainer.Begin();
+  file << (*it)->GetXPosition() << "," << (*it)->GetYPosition();
+  it++;
+  for (; it != m_fixedClientContainer.End(); ++it) {
+    file << "," << (*it)->GetXPosition() << "," << (*it)->GetYPosition();
   }
   file.close();
 } 
