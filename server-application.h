@@ -78,6 +78,8 @@ private:
   void SendCentralPacket(Ptr<UavModel> uav);
   void runDAPython();
   void runDA();
+  void aleatorio();
+  void aleNewLoc (double x1, double y1, double x2, double y2);
   void runDAPuro();
   void runAgendamento(void);
   void CreateCentralLocation(void);
@@ -148,6 +150,7 @@ private:
   uint32_t m_step; 
   uint16_t m_cliPort;
   uint32_t m_custo;
+  bool m_aleatorio;
   double m_maxx, m_maxy;
   double m_rmax;
   double m_locConsTotal; // total de consumo das localizacoes

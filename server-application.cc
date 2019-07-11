@@ -128,6 +128,7 @@ ServerApplication::ServerApplication()
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() );
   // std::cout << "ServerApplication::ServerApplication @" << Simulator::Now().GetSeconds() << " Schedule Server [" << m_scheduleServer << "]\n";
   m_step = 0;
+  m_aleatorio = true;
 }
 
 ServerApplication::~ServerApplication()
@@ -556,12 +557,17 @@ void ServerApplication::Run ()
     file << int(Simulator::Now().GetSeconds()) << "," << SeedManager::GetSeed() << "," << global_ksize << "\n";
     file.close();
     
-    runDA();
+    if (m_custo == 5 && m_aleatorio) {
+      aleatorio();
+      m_aleatorio = false; // para executar a distribuicao somente na primeira etapa
+    } else {
+      runDA();
+    }
     NS_LOG_INFO ("ServerApplication::Run liberando client container ");
     m_clientContainer.Clear();
     runAgendamento();
     NS_LOG_INFO ("ServerApplication::Run liberando location container ");
-    m_locationContainer.Clear();
+    if (m_custo != 5) m_locationContainer.Clear(); // somente apaga se nao for o custo 5!! Custo 5 somente faz distribuicao uma vez!
 
     m_step++;
   }
@@ -1184,21 +1190,21 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
   if (b_ui_res > 0) {
     switch (m_custo) {
       case 1:
-      case 6: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/wifi/issues/45)
+      case 6: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45)
         custo = (ce_ui_la_lj + ce_ui_lj_lc) / inf; // media do custo
         break;
       case 2:
-      case 7: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/wifi/issues/45
+      case 7: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45
         custo = ce_te_lj/inf; // UAV que terá mais bateria para servir a localizacao (conseguira servir por mais tempo)
         // NS_LOG_DEBUG ("P_te=" << P_te << " custo=" << custo);
         break;
       case 3:
-      case 8: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/wifi/issues/45
+      case 8: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45
         custo = (ce_te_lj + ce_ui_la_lj + ce_ui_lj_lc) / inf; // quantos TEs consegue suprir?!
         // NS_LOG_DEBUG ("P_te=" << P_te << " custo=" << custo);
         break;
       case 4: // custo 2 -> com hover
-      case 9: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/wifi/issues/45
+      case 9: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45
         ce_hv = uav->GetHoverCost()*(m_scheduleServer-t_loc) ; // custo para o TE inteiro, considerando locs e hover
         custo = (ce_te_lj + ce_ui_la_lj + ce_ui_lj_lc + ce_hv) / inf;
         // NS_LOG_DEBUG ("ce_hv=" << ce_hv << " P_te=" << P_te << " custo=" << custo);
@@ -1401,7 +1407,117 @@ void ServerApplication::DoDispose() {
   m_clientContainer.Clear();
 }
 
-// https://github.com/ggarciabas/nsnam_ns3/blob/17c1f9200727381852528ac4798f040128ac842a/scratch/wifi/da_cpp/deterministic-annealing.cc
+void ServerApplication::aleatorio() {
+  // area de distribuicao para teste  
+  // obtendo região dos palcos para distribuir
+  /*
+  ClientModelContainer::Iterator it = m_fixedClientContainer.Begin();
+  double maxX, maxY, minX, minY;
+  maxX = minX = (*it)->GetXPosition();
+  maxY = minY = (*it)->GetYPosition();
+  it++;
+  for (; it != m_fixedClientContainer.End(); ++it) {
+    if (maxX < (*it)->GetXPosition()) {
+      maxX = (*it)->GetXPosition();
+    } else if (minX > (*it)->GetXPosition()) {
+      minX = (*it)->GetXPosition();
+    }
+    if (maxY < (*it)->GetYPosition()) {
+      maxY = (*it)->GetYPosition();
+    } else if (minY > (*it)->GetYPosition()) {
+      minY = (*it)->GetYPosition();
+    }
+  }
+  */
+
+  // distribuir a quantidade escolhida aleatoriamente
+  Ptr<UniformRandomVariable> totLoc = CreateObject<UniformRandomVariable>();  
+  totLoc->SetAttribute ("Min", DoubleValue (1));
+  totLoc->SetAttribute ("Max", DoubleValue (m_fixedClientContainer.GetN()*2));
+
+  Ptr<UniformRandomVariable> xPos = CreateObject<UniformRandomVariable>();  
+  xPos->SetAttribute ("Min", DoubleValue (10));
+  xPos->SetAttribute ("Max", DoubleValue (m_maxx-10));
+
+  Ptr<UniformRandomVariable> yPos = CreateObject<UniformRandomVariable>();  
+  yPos->SetAttribute ("Min", DoubleValue (10));
+  yPos->SetAttribute ("Max", DoubleValue (m_maxy-10));
+
+  int tLoc = totLoc->GetValue();
+  ObjectFactory lObj;
+  lObj.SetTypeId("ns3::LocationModel");
+  for (int i = 0; i < tLoc; ++i) {
+    Ptr<LocationModel> loc = lObj.Create()->GetObject<LocationModel>();
+    loc->SetId(i);
+    loc->SetPosition(xPos->GetValue(), yPos->GetValue());
+    m_locationContainer.Add(loc);
+  }
+
+  // como validar se tem conexão??
+  Ptr<LocationModel> lCentral = lObj.Create()->GetObject<LocationModel> ();
+  lCentral->SetId(9999);
+  Vector pos = GetNode()->GetObject<MobilityModel>()->GetPosition(); // posicao do servidor
+  lCentral->SetPosition(pos.x, pos.y);
+
+  // 1- Para cada Localizacao distribuída: m_locationContainer
+  // 2- Iniciar distribuição de pontos para conexão
+  // (função recursiva) 1- Informar p1, p2 e R
+  //                    2- Se distancia entre p1 e p2 menor que R, retorna 0 
+  //                    3- Senão, gera valor aleatório entre u=[0,1]
+  //                    4- Posiciona nova localizacao em p3 = (1-u)p1 + up2
+  //                    5- Chamar função recursiva para (p1, p3)
+  //                    6- Chamar função recursiva para (p2, p3)
+  
+  for (int i = 0; i < tLoc; ++i) {
+    Ptr<LocationModel> l = m_locationContainer.Get(i);
+    this->aleNewLoc (l->GetXPosition(), l->GetYPosition(), pos.x, pos.y);
+  }
+
+  // salvando
+  std::ofstream file;
+  std::ostringstream os;
+  os <<global_path << "/" << m_pathData << "/aleatorio.txt";
+  file.open(os.str().c_str(), std::ofstream::out);
+  file << global_uav_cob << std::endl;
+  file << m_maxx << "," << m_maxy << std::endl;  
+  file << lCentral->GetXPosition() << "," << lCentral->GetYPosition() << std::endl;
+
+  LocationModelContainer::Iterator lj = m_locationContainer.Begin();
+  file << (*lj)->GetXPosition() << "," << (*lj)->GetYPosition();
+  lj++;
+  for (; lj != m_locationContainer.End(); ++lj) {
+    file << "," << (*lj)->GetXPosition() << "," << (*lj)->GetYPosition();
+  }
+  file << std::endl;
+  ClientModelContainer::Iterator it = m_fixedClientContainer.Begin();
+  file << (*it)->GetXPosition() << "," << (*it)->GetYPosition();
+  it++;
+  for (; it != m_fixedClientContainer.End(); ++it) {
+    file << "," << (*it)->GetXPosition() << "," << (*it)->GetYPosition();
+  }
+  file.close();
+} 
+
+void ServerApplication::aleNewLoc (double x1, double y1, double x2, double y2)
+{ 
+  if (std::sqrt(std::pow(x1 - x2, 2) + std::pow(y1 - y2, 2)) <= global_uav_cob) 
+  {
+    return;
+  }
+  Ptr<UniformRandomVariable> urv = CreateObject<UniformRandomVariable>();
+  double u = urv->GetValue();
+  std::cout << "U: " << u << "\n";
+  ObjectFactory lObj;
+  lObj.SetTypeId("ns3::LocationModel");
+  Ptr<LocationModel> loc = lObj.Create()->GetObject<LocationModel>();
+  loc->SetId(m_locationContainer.GetN());
+  loc->SetPosition((x1*u)+(x2*(1-u)), (y1*u)+(y2*(1-u)));
+  m_locationContainer.Add(loc);
+  this->aleNewLoc(x1, y1, loc->GetXPosition(), loc->GetYPosition());
+  this->aleNewLoc(x2, y2, loc->GetXPosition(), loc->GetYPosition());
+}
+
+// https://github.com/ggarciabas/nsnam_ns3/blob/17c1f9200727381852528ac4798f040128ac842a/scratch/teste/da_cpp/deterministic-annealing.cc
 void ServerApplication::runDA() {
   NS_LOG_DEBUG("ServerApplication::runDA @" << Simulator::Now().GetSeconds());
 
