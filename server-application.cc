@@ -560,7 +560,7 @@ void ServerApplication::Run ()
     if (m_custo == 5 && m_aleatorio) {
       aleatorio();
       m_aleatorio = false; // para executar a distribuicao somente na primeira etapa
-    } else {
+    } else if (m_custo != 5) {
       runDA();
     }
     NS_LOG_INFO ("ServerApplication::Run liberando client container ");
@@ -2326,3 +2326,4 @@ void ServerApplication::runDAPython()
 
 
 } // namespace ns3
+1679
