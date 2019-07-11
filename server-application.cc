@@ -277,7 +277,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
         }
         else
         {
-          NS_LOG_DEBUG("SERVER - $$$$ [NÃO -- m_uavContainer] foi possivel encontrar o UAV que foi pra central [UAV] ID " << results.at(4));
+          NS_LOG_DEBUG("SERVER - $$$$ [NÃO -- m_uavContainer] foi possivel encontrar o UAV que foi pra central [UAV] ID -- central " << results.at(4));
         }
       }
       uav = 0;      
@@ -300,7 +300,7 @@ ServerApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address 
       }
       else
       {
-        NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [UAV] --- fora da rede?! ID " << results.at(4));
+        NS_LOG_DEBUG("SERVER - $$$$ [NÃO] foi possivel encontrar o UAV [UAV] --- fora da rede?! ID -- network " << results.at(4));
       }
       uav = 0;
     }
@@ -560,15 +560,17 @@ void ServerApplication::Run ()
     if (m_custo == 5 && m_aleatorio) {
       aleatorio();
       m_aleatorio = false; // para executar a distribuicao somente na primeira etapa
+      NS_LOG_INFO ("ServerApplication::Run liberando client container ");
+      m_clientContainer.Clear();
     } else if (m_custo != 5) {
       runDA();
+      NS_LOG_INFO ("ServerApplication::Run liberando client container ");
+      m_clientContainer.Clear();
+      runAgendamento();
+      NS_LOG_INFO ("ServerApplication::Run liberando location container ");
+      m_locationContainer.Clear(); // somente apaga se nao for o custo 5!! Custo 5 somente faz distribuicao uma vez!
     }
-    NS_LOG_INFO ("ServerApplication::Run liberando client container ");
-    m_clientContainer.Clear();
-    runAgendamento();
-    NS_LOG_INFO ("ServerApplication::Run liberando location container ");
-    if (m_custo != 5) m_locationContainer.Clear(); // somente apaga se nao for o custo 5!! Custo 5 somente faz distribuicao uma vez!
-
+    
     m_step++;
   }
   else
@@ -589,6 +591,7 @@ void ServerApplication::SendUavPacket(Ptr<UavModel> uav)
   std::vector<double> pos = uav->GetNewPosition();
   std::ostringstream msg;
   msg << "GOTO " << pos.at(0) << " " << pos.at(1) << " 10.0 " << posCentral.x << " " << posCentral.y << '\0';
+  NS_LOG_DEBUG(msg.str());
   uint16_t packetSize = msg.str().length() + 1;
   Ptr<Packet> packet = Create<Packet>((uint8_t *)msg.str().c_str(), packetSize);
   if (uav->GetSocket()->Send(packet, 0) == packetSize) {
@@ -666,11 +669,11 @@ void ServerApplication::runAgendamento(void)
     }
   }
 
-  for (LocationModelContainer::Iterator l_j = m_locationContainer.Begin();
-       l_j != m_locationContainer.End(); ++l_j)
-  {
-    NS_LOG_INFO("-- " << (*l_j)->toString());
-  }
+  // for (LocationModelContainer::Iterator l_j = m_locationContainer.Begin();
+  //      l_j != m_locationContainer.End(); ++l_j)
+  // {
+  //   NS_LOG_INFO("-- " << (*l_j)->toString());
+  // }
 
   //  - calcular o CUSTO ENERGETICO de atribuição do uav para cada localizacao, criando uma matriz Bij
   NS_LOG_DEBUG("SERVER - Iniciando estrutura do DA para agendamento @" << Simulator::Now().GetSeconds());
@@ -723,115 +726,12 @@ void ServerApplication::runAgendamento(void)
   // PrintCusto (custo_x, m_step, true, uav_ids, loc_ids);
 
   std::ostringstream os;
-
-  #ifdef COMPARE_COST
-    std::ofstream file_uav, file_ule, file_l, file_c1, file_c2, file_c3, file_c4, file_uce, file_ult;
-    os.str("");
-    os << global_path << "/" << m_pathData << "/compare/"<<m_step<<"/uav_loc_travel_info.txt";
-    file_ult.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
-    os.str("");
-    os << global_path << "/"<<m_pathData<<"/compare/"<<m_step<<"/uav_loc_energy_info.txt";
-    file_ule.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
-    os.str("");
-    os << global_path << "/"<<m_pathData<<"/compare/"<<m_step<<"/uav_central_energy_info.txt";
-    file_uce.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
-    os.str("");
-    os << global_path << "/"<<m_pathData<<"/compare/"<<m_step<<"/uav_info.txt";
-    file_uav.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
-    os.str("");
-    os << global_path << "/"<<m_pathData<<"/compare/"<<m_step<<"/compare_c1.txt";
-    file_c1.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
-    os.str("");
-    os << global_path << "/"<<m_pathData<<"/compare/"<<m_step<<"/compare_c2.txt";
-    file_c2.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
-    os.str("");
-    os << global_path << "/"<<m_pathData<<"/compare/"<<m_step<<"/compare_c3.txt";
-    file_c3.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
-    os.str("");
-    os << global_path << "/"<<m_pathData<<"/compare/"<<m_step<<"/compare_c4.txt";
-    file_c4.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
-    file_c1 << "compare_c1\n";
-    file_c1 << m_uavContainer.GetN() << "\n";
-    file_c2 << "compare_c2\n";
-    file_c2 << m_uavContainer.GetN() << "\n";
-    file_c3 << "compare_c3\n";
-    file_c3 << m_uavContainer.GetN() << "\n";
-    file_c4 << "compare_c4\n";
-    file_c4 << m_uavContainer.GetN() << "\n";
-    for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
-       u_i != m_uavContainer.End(); ++u_i, ++count)
-    {
-      std::vector<double> vp = (*u_i)->GetPosition();
-      file_uav << (*u_i)->GetId() << "," << vp.at(0) << "," << vp.at(1) << "," << (*u_i)->GetTotalEnergy() << "," << (*u_i)->GetTotalBattery() << "\n";
-      file_uce << (*u_i)->CalculateEnergyCost(CalculateDistance((*u_i)->GetPosition(), central_pos)) << "\n";
-      for (LocationModelContainer::Iterator l_j = m_locationContainer.Begin();
-         l_j != m_locationContainer.End(); ++l_j)
-      {
-        double t_loc = CalculateDistance((*u_i)->GetPosition(), (*l_j)->GetPosition()) / 5.0; // time to go to location
-        file_ult << t_loc << ","; // 5m/s
-        file_ule << (*u_i)->CalculateEnergyCost(CalculateDistance((*u_i)->GetPosition(), (*l_j)->GetPosition())) << ",";
-        // custo
-        long double b_ui_atu = (*u_i)->GetTotalEnergy(); // bateria atual
-        long double ce_ui_la_lj = (*u_i)->CalculateEnergyCost(CalculateDistance((*u_i)->GetPosition(), (*l_j)->GetPosition())); // custo energetico
-        long double ce_ui_lj_lc = (*u_i)->CalculateEnergyCost(CalculateDistance((*l_j)->GetPosition(), central_pos));
-        long double b_ui_tot = (*u_i)->GetTotalBattery();
-        long double b_ui_res = b_ui_atu*0.98 - ce_ui_la_lj - ce_ui_lj_lc; // bateria residual
-        if (b_ui_res > 0) {
-          file_c1 << (ce_ui_la_lj + ce_ui_lj_lc) / b_ui_tot << ","; 
-          long double ce_te_lj = (*l_j)->GetTotalConsumption() * (m_scheduleServer-t_loc);
-          long double P_te = b_ui_res/ce_te_lj;
-          file_c2 << 1.0/P_te << ","; // invertendo para minimizar
-          P_te = b_ui_res/(ce_te_lj+(ce_ui_la_lj + ce_ui_lj_lc));
-          file_c3 << 1.0/P_te << ",";
-          P_te = b_ui_res/(ce_te_lj+(ce_ui_la_lj + ce_ui_lj_lc + (*u_i)->GetHoverCost()*(m_scheduleServer-t_loc)));
-          file_c4 << 1.0/P_te << ","; // invertendo para minimizar
-        } else {
-          file_c1 << "'1.0,";
-          file_c2 << "'1.0,";
-          file_c3 << "'1.0,";
-          file_c4 << "'1.0,";
-        }
-      }
-      file_ule << "\n";
-      file_c1 << "\n";
-      file_c2 << "\n";
-      file_c3 << "\n";
-      file_c4 << "\n";
-      file_ult << "\n";
-    }
-    file_uce.close();
-    file_ule.close();
-    file_uav.close();
-    file_c1.close();
-    file_c2.close();
-    file_c3.close();
-    file_c4.close();
-    file_ult.close();
-    os.str("");
-    os << global_path << "/"<<m_pathData<<"/compare/"<<m_step<<"/loc_info.txt";
-    file_l.open(os.str().c_str(), std::ofstream::out | std::ofstream::app);
-    for (LocationModelContainer::Iterator l_j = m_locationContainer.Begin();
-         l_j != m_locationContainer.End(); ++l_j)
-    {
-      std::vector<double> vp = (*l_j)->GetPosition();
-      file_l << vp.at(0) << "," << vp.at(1) << "," << (*l_j)->GetTotalConsumption() << "," << (*l_j)->GetTotalCli() << "\n";
-    }
-    file_l.close();
-  #endif
-
   // dsitribuindo UAVs
   std::vector<int> s_final; // cada posicao representa um UAV e o valor contido a localização que este deve ir!
   if (m_custo < 5) // somente executo o DA para os custos 1 à 4!
     s_final = DaPositioning(custo_x, m_uavContainer.GetN());
   else if (m_custo > 5) // para os custos maior que 5 será executada a busca exaustiva
     s_final = Exhaustive(custo_x, m_uavContainer.GetN()); // lembrando que custo_x já tem calculado o valor do custo correspondente
-  else  { // executa aleatoriamente a escolha caso seja custo = 5
-    for (int i = 0; i<(int)m_locationContainer.GetN(); ++i) {
-      s_final.push_back(i);
-    } 
-    auto rng = std::default_random_engine {};
-    std::shuffle(std::begin(s_final), std::end(s_final), rng);
-  }
 
   NS_LOG_DEBUG("SERVER - Finalizada estrutura do DA para agendamento @" << Simulator::Now().GetSeconds());
 
@@ -1496,6 +1396,29 @@ void ServerApplication::aleatorio() {
     file << "," << (*it)->GetXPosition() << "," << (*it)->GetYPosition();
   }
   file.close();
+
+
+  // add uav
+  int diff = m_locationContainer.GetN() - m_uavContainer.GetN();
+  if (diff > 0)
+  { // add new uav
+    NS_LOG_DEBUG("SERVER - Solicitando novos UAVs @" << Simulator::Now().GetSeconds());
+    // chamar callback para criar novos UAVs
+    m_newUav(diff, 0); // chamando callback
+  }
+  int i = 0;
+  double t = 0.0;
+  for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
+       u_i != m_uavContainer.End(); ++u_i, ++i)
+  {
+    NS_LOG_DEBUG("SERVER - definindo novo posicionamento @" << Simulator::Now().GetSeconds());
+
+    (*u_i)->SetNewPosition(m_locationContainer.Get(i)->GetPosition());
+    (*u_i)->NotConfirmed(); // atualiza o valor para identificar se o UAV chegou a posicao correta
+    (*u_i)->CancelSendPositionEvent();
+    (*u_i)->SetSendPositionEvent(Simulator::Schedule(Seconds(t), &ServerApplication::SendUavPacket, this, (*u_i)));
+    t += 0.005;
+  }
 } 
 
 void ServerApplication::aleNewLoc (double x1, double y1, double x2, double y2)
@@ -2322,7 +2245,5 @@ void ServerApplication::runDAPython()
     }
   }
 }
-
-
 
 } // namespace ns3

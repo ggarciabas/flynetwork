@@ -489,6 +489,7 @@ UavApplication::TracedCallbackRxApp (Ptr<const Packet> packet, const Address & a
         m_clientContainer.Clear(); // limpando container de informacoes de clientes apos enviadas as informacoes para o servidor
       } else if (results.at(0).compare("GOTO") == 0)
       {
+        NS_LOG_DEBUG(msg);
         if (m_depletion) return; // nao deixar executar acoes a nao ser voltar para a central em estado de emergencia        
         std::ostringstream mm;
         mm << "UAV\t" << m_id << "\tRECEIVED\t" << Simulator::Now().GetSeconds() << "\tGOTO";
