@@ -497,7 +497,7 @@ void UavNetwork::NewUav(int total, int update) // update = 0- normal 1- supply 2
     std::ofstream file;
     file.open(os.str(), std::ofstream::out | std::ofstream::app);
     Ptr<UavDeviceEnergyModel> dev = uavApp->GetUavDevice();
-    file << Simulator::Now().GetSeconds() << " " << n->GetId()  << " " << dev->GetEnergySource()->GetInitialEnergy() << " 0 0 0 0" << std::endl;
+    file << Simulator::Now().GetSeconds() << " " << n->GetId()  << " " << dev->GetEnergySource()->GetInitialEnergy() << " 0 0 0 0 " << m_uavNodeActive.GetN() << " " << std::endl;
     file.close();
 
     n = 0;
@@ -527,7 +527,7 @@ void UavNetwork::RemoveUav(int id, int step)
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   Ptr<UavDeviceEnergyModel> dev = uavApp->GetUavDevice();
-  file << Simulator::Now().GetSeconds() << " " << n->GetId()  << " " << dev->GetEnergySource()->GetInitialEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetRealRemainingEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetWifiEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetMoveEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetHoverEnergy() << " " << std::endl;
+  file << Simulator::Now().GetSeconds() << " " << n->GetId()  << " " << dev->GetEnergySource()->GetInitialEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetRealRemainingEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetWifiEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetMoveEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetHoverEnergy() << " " << m_uavNodeActive.GetN() << " " << std::endl;
   file.close();
   uavApp->Stop(); // aqui já limpa o container de clientes
 
@@ -683,7 +683,6 @@ void UavNetwork::ConfigureCli()
     std::string line;
     getline(scenario, line);
     getline(scenario, line);
-    getline(scenario, line); // liberando as primeiras informacoes
     int update_total = 0;
     Ptr<UniformRandomVariable> app_rand = CreateObject<UniformRandomVariable>(); // Padrão [0,1]
     app_rand->SetAttribute ("Min", DoubleValue (10.0));
@@ -883,7 +882,6 @@ void UavNetwork::ConfigurePalcos() // TODO: poderia ser otimizada a leitura do a
     std::string line;
     getline(scenario, line);
     getline(scenario, line);
-    getline(scenario, line); // liberando as primeiras informacoes
     while (getline(scenario, line))
     {
       if (line.at(0) != '#')
@@ -1000,7 +998,7 @@ void UavNetwork::PrintUavEnergy (int t)
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
   for (UavApplicationContainer::Iterator it = m_uavAppContainer.Begin(); it != m_uavAppContainer.End(); ++it) {
     Ptr<UavDeviceEnergyModel> dev = (*it)->GetUavDevice();
-    file << Simulator::Now().GetSeconds() << " " << (*it)->GetId()  << " " << dev->GetEnergySource()->GetInitialEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetRealRemainingEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetWifiEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetMoveEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetHoverEnergy() << " " << std::endl;
+    file << Simulator::Now().GetSeconds() << " " << (*it)->GetId()  << " " << dev->GetEnergySource()->GetInitialEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetRealRemainingEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetWifiEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetMoveEnergy() << " " << DynamicCast<UavEnergySource>(dev->GetEnergySource())->GetHoverEnergy() << " " << m_uavNodeActive.GetN() << " " << std::endl;
   }
   file.close();
 }
