@@ -1583,7 +1583,7 @@ void ServerApplication::runDA() {
             // file << "--> Zci esta baixo! @" << Simulator::Now().GetSeconds() << "\n";
             // t *= 1.2; // aumenta 120%
             t = 0.1;
-            percentCli *= 0.9; 
+            percentCli *= 0.99999; 
             break;
           }
           (*lj)->AddPljCi((*ci), Zci, r_max); // finaliza o calculo do pljci na funcao e cadastra no map relacionando o ci
