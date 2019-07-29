@@ -313,13 +313,13 @@ void UavApplication::SendCliData ()
       msg << " \0";
     }
 
-    std::ostringstream os;
-    os << global_path << "/" << m_pathData << "/uav_client/uav_" << m_id << ".txt";
-    std::ofstream file;
-    file.open(os.str(), std::ofstream::out | std::ofstream::app);
-    Ptr<const MobilityModel> mob = GetNode()->GetObject<MobilityModel>();
-    file << Simulator::Now().GetSeconds() << " " <<  mob->GetPosition().x << " " << mob->GetPosition().y << "\n" << slog.str();
-    file.close();
+    // std::ostringstream os;
+    // os << global_path << "/" << m_pathData << "/uav_client/uav_" << m_id << ".txt";
+    // std::ofstream file;
+    // file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    // Ptr<const MobilityModel> mob = GetNode()->GetObject<MobilityModel>();
+    // file << Simulator::Now().GetSeconds() << " " <<  mob->GetPosition().x << " " << mob->GetPosition().y << "\n" << slog.str();
+    // file.close();
 
     this->SendCliDataMsg(msg.str());
   } 
@@ -361,12 +361,12 @@ UavApplication::CourseChange (Ptr<const MobilityModel> mob)
   // TODO_NEW: considerar o consumo dos clientes como threshold superior e somente a quatidade de energia para ir a central para o threshold inferior
   DynamicCast<UavEnergySource>(m_uavDevice->GetEnergySource())->SetBasicEnergyLowBatteryThresholdUav(m_uavDevice->CalculateThreshold()); 
 
-  std::ostringstream os;
-  os << global_path << "/" << m_pathData << "/course_changed/course_changed_" << m_id << ".txt";
-  std::ofstream file;
-  file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << std::endl;
-  file.close();
+  // std::ostringstream os;
+  // os << global_path << "/" << m_pathData << "/course_changed/course_changed_" << m_id << ".txt";
+  // std::ofstream file;
+  // file.open(os.str(), std::ofstream::out | std::ofstream::app);
+  // file << Simulator::Now().GetSeconds() << "," <<  mob->GetPosition().x << "," << mob->GetPosition().y << std::endl;
+  // file.close();
 
   m_uavDevice->SetFlying(false);
   m_uavDevice->StartHover();

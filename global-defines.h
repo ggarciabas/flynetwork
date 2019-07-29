@@ -61,9 +61,9 @@ extern double seed;
     #define DHCP
 #endif
 
-#ifndef COMPARE_COST
-    #define COMPARE_COST
-#endif
+// #ifndef COMPARE_COST
+//     #define COMPARE_COST
+// #endif
 
 // #ifndef LOG_CLIENT
 //     #define LOG_CLIENT

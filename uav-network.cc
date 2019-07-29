@@ -223,9 +223,9 @@ void UavNetwork::Run()
   ss.str("");
   ss << "mkdir -p " << global_path << "/" << m_pathData;
   system(ss.str().c_str());
-  ss.str("");
-  ss << "mkdir -p " << global_path << "/" << m_pathData << "/course_changed";
-  system(ss.str().c_str());
+  // ss.str("");
+  // ss << "mkdir -p " << global_path << "/" << m_pathData << "/course_changed";
+  // system(ss.str().c_str());
   // ss.str("");
   // ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_remaining_energy";
   // system(ss.str().c_str());
@@ -254,9 +254,9 @@ void UavNetwork::Run()
   ss.str("");
   ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_depletion";
   system(ss.str().c_str());
-  ss.str("");
-  ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_client";
-  system(ss.str().c_str());
+  // ss.str("");
+  // ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_client";
+  // system(ss.str().c_str());
   // ss.str("");
   // ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_wifi";
   // system(ss.str().c_str());
