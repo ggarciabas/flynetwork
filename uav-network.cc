@@ -254,9 +254,9 @@ void UavNetwork::Run()
   ss.str("");
   ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_depletion";
   system(ss.str().c_str());
-  // ss.str("");
-  // ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_client";
-  // system(ss.str().c_str());
+  ss.str("");
+  ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_client";
+  system(ss.str().c_str());
   // ss.str("");
   // ss << "mkdir -p " << global_path << "/" << m_pathData << "/uav_wifi";
   // system(ss.str().c_str());

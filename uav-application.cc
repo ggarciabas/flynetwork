@@ -313,13 +313,12 @@ void UavApplication::SendCliData ()
       msg << " \0";
     }
 
-    // std::ostringstream os;
-    // os << global_path << "/" << m_pathData << "/uav_client/uav_" << m_id << ".txt";
-    // std::ofstream file;
-    // file.open(os.str(), std::ofstream::out | std::ofstream::app);
-    // Ptr<const MobilityModel> mob = GetNode()->GetObject<MobilityModel>();
-    // file << Simulator::Now().GetSeconds() << " " <<  mob->GetPosition().x << " " << mob->GetPosition().y << "\n" << slog.str();
-    // file.close();
+    std::ostringstream os;
+    os << global_path << "/" << m_pathData << "/uav_client/uav_" << m_id << ".txt";
+    std::ofstream file;
+    file.open(os.str(), std::ofstream::out | std::ofstream::app);
+    file << Simulator::Now().GetSeconds() << " " << m_clientContainer.GetN() << "\n";
+    file.close();
 
     this->SendCliDataMsg(msg.str());
   } 
