@@ -728,7 +728,7 @@ void ServerApplication::runAgendamento(void)
   std::ostringstream os;
   // dsitribuindo UAVs
   std::vector<int> s_final; // cada posicao representa um UAV e o valor contido a localização que este deve ir!
-  if (m_custo < 5) // somente executo o DA para os custos 1 à 4!
+  if (m_custo < 5 && m_custo == 10) // somente executo o DA para os custos 1 à 4 e 10!
     s_final = DaPositioning(custo_x, m_uavContainer.GetN());
   else if (m_custo > 5) // para os custos maior que 5 será executada a busca exaustiva
     s_final = Exhaustive(custo_x, m_uavContainer.GetN()); // lembrando que custo_x já tem calculado o valor do custo correspondente
