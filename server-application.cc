@@ -1112,6 +1112,10 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
       case 5: // aleatorio
         custo = 0; // quanto menor melhor, só pro aleatorio
         break;
+      case 10: // arrumando c2
+      case 11:
+        custo = ((m_scheduleServer-t_loc)/(b_ui_atu / loc->GetTotalConsumption()/* qt tempo supri a localizacao (S) */) /*qual proporcao da tapa supre?*/) / (m_scheduleServer/1e-10); // normalizando
+        break;
     }
   } else {
     custo = inf;
