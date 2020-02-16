@@ -1086,7 +1086,6 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
   double inf = global_nc*etapa*3 + (2*m_rmax/global_speed)*global_ec_persec + etapa*global_ec_persec; // 3 Joules/s wifi
 
   // NS_LOG_DEBUG ("b_ui_atu=" << b_ui_atu << " b_ui_res=" << b_ui_res);
-
   if (b_ui_res > 0) {
     switch (m_custo) {
       case 1:
@@ -1101,7 +1100,6 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
         if (b_ui_res >= ce_te_lj) {
           custo = 1 - (ce_te_lj/inf_); // UAV que terá mais bateria para servir a localizacao [0,1]
         } 
-
         // NS_LOG_DEBUG ("P_te=" << P_te << " custo=" << custo);
         break;
       // case 3: nao mais utilizado
@@ -1111,7 +1109,6 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
       //   break;
       case 4: // custo 2 -> com hover
       case 9: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45
-        double inf = global_nc*etapa*3 + (2*m_rmax/global_speed)*global_ec_persec + etapa*global_ec_persec; // 3 Joules/s wifi
 
         ce_s = 1.0; // não tem bateria suficiente
         if (b_ui_res >= ce_te_lj) {
@@ -1142,7 +1139,7 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
       //   break;
     }
   } else {
-    custo = 1.0;
+    custo = inf;
   }
 
   ////NS_LOG_DEBUG ("ServerApplication::CalculateCusto > mcusto: " << m_custo << " custo: " << custo);
