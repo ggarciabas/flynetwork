@@ -141,7 +141,7 @@ void UavModelContainer::Clear(void)
 }
 
 Ptr<UavModel> UavModelContainer::RemoveAt (uint32_t pos) {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<pos);
+  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds() <<pos  << " size " << m_models.size());
   Ptr<UavModel> n = m_models[pos];
   m_models.erase(m_models.begin()+pos);
   return n;

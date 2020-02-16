@@ -179,7 +179,7 @@ void ServerApplication::AddSupplyUav(uint32_t id, Ipv4Address addrAdhoc, double 
 {
   NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds()  << id << addrAdhoc << totalEnergy << energyCost << totalBattery << mob << m_supplyPos);
   Ptr<UavModel> supplied = m_uavContainer.RemoveAt(m_supplyPos);
-  ////NS_LOG_DEBUG("Criando supply uav: " << id << " last: " << supplied->GetId());
+  NS_LOG_DEBUG("Criando supply uav: " << id << " last: " << supplied->GetId());
 
   Ptr<Socket> socket;
   #ifdef TCP
@@ -641,7 +641,7 @@ ServerApplication::CalculateDistanceCentral(const std::vector<double> pos) {
 double
 ServerApplication::CalculateDistance(const std::vector<double> pos1, const std::vector<double> pos2)
 {
-  NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds());
+  // NS_LOG_FUNCTION(this << Simulator::Now().GetSeconds());
   double dist = std::sqrt(std::pow(pos1.at(0) - pos2.at(0), 2) + std::pow(pos1.at(1) - pos2.at(1), 2));
   return dist; // euclidean, sempre considera a distância atual calculada pelo DA
 }
@@ -746,19 +746,22 @@ void ServerApplication::runAgendamento(void)
   int id, i = 0;
   // std::ofstream file;
   double t = 0.0;
+  count = 0;
   vector<vector<long double> > f_mij;
   
   for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
-       u_i != m_uavContainer.End(); ++u_i, ++i)
+       u_i != m_uavContainer.End(); ++u_i, ++i, ++count)
   {
     id = s_final[i]; // id da localizacao que deve ir!
     f_mij.push_back(vector<long double>((int)m_locationContainer.GetN(), 0)); // inicia com zeros
     f_mij[i][id] = 1.0; // gravando matriz da solucao final
 
-    if (custo_x[i][id] == 1.0) { // UAv nao tem bateria suficiente para ir ate a localizacao
+    if (custo_x[i][id] == 1.0) { // UAV nao tem bateria suficiente para ir ate a localizacao
       // solicitando novo UAV para a posicao
       m_supplyPos = count; // posicao que será suprida
+      NS_LOG_DEBUG("UAV antigo ID " << (*u_i)->GetId());
       m_newUav(1, 1); // true, pois está o solicitando para suprir uma posicao
+      NS_LOG_DEBUG("UAV novo antigo ID " << (*u_i)->GetId());
       custo = CalculateCusto((*u_i), m_locationContainer.Get(id), central_pos); // calculando custo do novo uav para a loc
       custo_x[i][id] = custo;
     }
@@ -784,14 +787,21 @@ void ServerApplication::runAgendamento(void)
     NS_LOG_DEBUG("SERVER - definindo novo posicionamento @" << Simulator::Now().GetSeconds());
 
     (*u_i)->SetNewPosition(m_locationContainer.Get(id)->GetPosition());
+    NS_LOG_DEBUG("Not confirmed");
     (*u_i)->NotConfirmed(); // atualiza o valor para identificar se o UAV chegou a posicao correta
+    NS_LOG_DEBUG("Cancel send position event");
     (*u_i)->CancelSendPositionEvent();
+    NS_LOG_DEBUG("Calculate distance central");
     if (CalculateDistanceCentral(m_locationContainer.Get(id)->GetPosition())==0.0) {
+      NS_LOG_DEBUG("goto central, send event");
       (*u_i)->SetSendPositionEvent(Simulator::Schedule(Seconds(t), &ServerApplication::SendUavPacket, this, (*u_i)));
+      NS_LOG_DEBUG("Go to central");
       m_uavGoToCentral.Add((*u_i));
+      NS_LOG_DEBUG("remove uav");
       m_uavContainer.RemoveUav((*u_i));
       --u_i;
     } else {
+      NS_LOG_DEBUG("Go to location");
       (*u_i)->SetSendPositionEvent(Simulator::Schedule(Seconds(t), &ServerApplication::SendUavPacket, this, (*u_i)));
     }
     t += 0.005;
@@ -1097,7 +1107,7 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
   long double ce_te_lj = loc->GetTotalConsumption() * (m_scheduleServer-t_loc);
   double ce_hv, ce_s, ce_h, ce_d;
   ce_hv=1; ce_s=1; ce_h=1; ce_d=1;
-  double inf = global_nc*etapa*3 + (2*m_rmax/global_speed)*global_ec_persec + etapa*global_ec_persec; // 3 Joules/s wifi
+  //double inf = global_nc*etapa*3 + (2*m_rmax/global_speed)*global_ec_persec + etapa*global_ec_persec; // 3 Joules/s wifi
 
   // LOC_ID, AB_r, RB_r, T_r(d), EC_l
   file_custo << loc->GetId() << "," << b_ui_atu << "," << b_ui_res << "," << t_loc << "," << ce_te_lj << ",";
@@ -1156,7 +1166,7 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
       //   break;
     }
   } else {
-    custo = inf;
+    custo = 1.0;
   }
   file_custo << custo << "\n";
 
@@ -1667,29 +1677,29 @@ void ServerApplication::runDA() {
     } while (movimentoB && iterB < max_iterB);
 
     if (locConnected) {
-      NS_LOG_DEBUG("DARun: localizacoes conectadas\n");
+      // NS_LOG_DEBUG("DARun: localizacoes conectadas\n");
         if (tFixCon == tFix) {
-          NS_LOG_DEBUG("DARun: clientes fixos conectados\n");
+          // NS_LOG_DEBUG("DARun: clientes fixos conectados\n");
           if (tMovCon >= m_allCli*percentCli) {
-            NS_LOG_DEBUG("DARun: porcentagem de clientes conectados alcancado\n");
+            // NS_LOG_DEBUG("DARun: porcentagem de clientes conectados alcancado\n");
             // file << "--> Finalizado - temp=" << t << std::endl;
             // t *= 0.5; // resfria bastante
             // GraficoCenarioDa(t, iter, lCentral, uav_cob, r_max, raio_cob, 0.0);
             break;
           } else {
-            NS_LOG_DEBUG("DARun: porcentagem de clientes NAO alcancado\n");
+            // NS_LOG_DEBUG("DARun: porcentagem de clientes NAO alcancado\n");
           }
         } else {
-          NS_LOG_DEBUG("DARun: clientes fixos NAO conectados\n");
+          // NS_LOG_DEBUG("DARun: clientes fixos NAO conectados\n");
         } 
     } else {
-      NS_LOG_DEBUG("DARun: localizacoes NAO conectadas\n");
+      // NS_LOG_DEBUG("DARun: localizacoes NAO conectadas\n");
     }
 
     if (!MovimentoA()) { // } || (tFixCon != tFix && t == 0.1)) {
       // file << "--> Solicitando nova localizacao por não existir movimento em A @" << Simulator::Now().GetSeconds() << std::endl;
       // new_uav:
-      NS_LOG_DEBUG("DARun: nova localização\n");
+      // NS_LOG_DEBUG("DARun: nova localização\n");
       Ptr<LocationModel> nLoc = lObj.Create()->GetObject<LocationModel> ();
       nLoc->SetId(locId++);
       CentroDeMassa(nLoc, lCentral, r_max);

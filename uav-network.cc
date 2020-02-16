@@ -442,6 +442,7 @@ void UavNetwork::NewUav(int total, int update) // update = 0- normal 1- supply 2
   }
   NS_LOG_DEBUG ("Uav livre: " << uav_livre);
   if (uav_livre < uint32_t(total)) { // Caso nao, configurar um novo
+    NS_LOG_DEBUG("Configurando novo UAV");
     ConfigureUav(total - uav_livre); // diferenca
   }
   while (total--) {
