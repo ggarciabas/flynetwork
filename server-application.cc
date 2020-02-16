@@ -747,6 +747,7 @@ void ServerApplication::runAgendamento(void)
   // std::ofstream file;
   double t = 0.0;
   vector<vector<long double> > f_mij;
+  
   for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
        u_i != m_uavContainer.End(); ++u_i, ++i)
   {
@@ -1081,6 +1082,11 @@ std::vector<int> ServerApplication::DaPositioning (std::vector<std::vector<long 
 long double
 ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, vector<double> central_pos)
 {
+  std::ostringstream os_custo;
+  os_custo << global_path << "/"<<m_pathData<<"/etapa/"<<m_step<<"/custo_" << m_custo << "_uav_" << uav->GetId() << ".txt";
+  std::ofstream file_custo;
+  file_custo.open(os_custo.str().c_str(), std::ofstream::out | std::ofstream::app);
+
   // NS_LOG_DEBUG ("ServerApplication::CalculateCusto > uavId: " << uav->GetId() << " locId: " << loc->GetId());
   long double custo = 1.0;
   double t_loc = CalculateDistance(uav->GetPosition(), loc->GetPosition()) / global_speed; // time to go to location
@@ -1092,6 +1098,9 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
   double ce_hv, ce_s, ce_h, ce_d;
   ce_hv=1; ce_s=1; ce_h=1; ce_d=1;
   double inf = global_nc*etapa*3 + (2*m_rmax/global_speed)*global_ec_persec + etapa*global_ec_persec; // 3 Joules/s wifi
+
+  // LOC_ID, AB_r, RB_r, T_r(d), EC_l
+  file_custo << loc->GetId() << "," << b_ui_atu << "," << b_ui_res << "," << t_loc << "," << ce_te_lj << ",";
 
   // NS_LOG_DEBUG ("b_ui_atu=" << b_ui_atu << " b_ui_res=" << b_ui_res);
   if (b_ui_res > 0) {
@@ -1105,7 +1114,7 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
         custo = 1.0; // não tem bateria suficiente
         if (b_ui_res >= ce_te_lj) {
           custo = 1 - (ce_te_lj/global_nc*etapa*3); // UAV que terá mais bateria para servir a localizacao [0,1]
-        } 
+        }
         // NS_LOG_DEBUG ("P_te=" << P_te << " custo=" << custo);
         break;
       // case 3: nao mais utilizado
@@ -1120,14 +1129,17 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
         if (b_ui_res >= ce_te_lj) {
           ce_s = 1 - (ce_te_lj/global_nc*etapa*3); // UAV que terá mais bateria para servir a localizacao [0,1]
         }
+        file_custo << ce_s << ",";
 
         ce_hv = 1.0; // nao tem bateria suficiente
         ce_h = uav->GetHoverCost()*(m_scheduleServer-t_loc);
         if (b_ui_res >= ce_h) {
           ce_hv = 1 - (ce_h/etapa*global_ec_persec); // [0,1]
         }
+        file_custo << ce_h << "," << ce_hv << ",";
 
         ce_d = (ce_ui_la_lj + ce_ui_lj_lc) / ((2*m_rmax/global_speed)*global_ec_persec); // media do custo [0,1]
+        file_custo << ce_d << ",";
 
         custo = (ce_s + ce_d + ce_hv) / 3.0;
 
@@ -1144,9 +1156,11 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
   } else {
     custo = inf;
   }
+  file_custo << custo << "\n";
 
   ////NS_LOG_DEBUG ("ServerApplication::CalculateCusto > mcusto: " << m_custo << " custo: " << custo);
   central_pos.clear();
+  file_custo.close();
   return custo;
 }
 
