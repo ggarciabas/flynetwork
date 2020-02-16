@@ -1090,15 +1090,13 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
     switch (m_custo) {
       case 1:
       case 6: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45)
-        double inf_ = (2*m_rmax/global_speed)*global_ec_persec;
-        custo = (ce_ui_la_lj + ce_ui_lj_lc) / inf_; // media do custo [0,1]
+        custo = (ce_ui_la_lj + ce_ui_lj_lc) / ((2*m_rmax/global_speed)*global_ec_persec); // media do custo [0,1]
         break;
       case 2:
       case 7: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45
-        double inf_ = global_nc*etapa*3; // 3 Joules/s wifi
         custo = 1.0; // não tem bateria suficiente
         if (b_ui_res >= ce_te_lj) {
-          custo = 1 - (ce_te_lj/inf_); // UAV que terá mais bateria para servir a localizacao [0,1]
+          custo = 1 - (ce_te_lj/global_nc*etapa*3); // UAV que terá mais bateria para servir a localizacao [0,1]
         } 
         // NS_LOG_DEBUG ("P_te=" << P_te << " custo=" << custo);
         break;
@@ -1112,19 +1110,16 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
 
         ce_s = 1.0; // não tem bateria suficiente
         if (b_ui_res >= ce_te_lj) {
-          double inf_s = global_nc*etapa*3; // 3 Joules/s wifi
-          ce_s = 1 - (ce_te_lj/inf_s); // UAV que terá mais bateria para servir a localizacao [0,1]
+          ce_s = 1 - (ce_te_lj/global_nc*etapa*3); // UAV que terá mais bateria para servir a localizacao [0,1]
         }
 
         ce_hv = 1.0; // nao tem bateria suficiente
         ce_h = uav->GetHoverCost()*(m_scheduleServer-t_loc);
         if (b_ui_res >= ce_h) {
-          double inf_h = etapa*global_ec_persec;
-          ce_hv = 1 - (ce_h/inf_h); // [0,1]
+          ce_hv = 1 - (ce_h/etapa*global_ec_persec); // [0,1]
         }
 
-        double inf_d = (2*m_rmax/global_speed)*global_ec_persec;
-        ce_d = (ce_ui_la_lj + ce_ui_lj_lc) / inf_d; // media do custo [0,1]
+        ce_d = (ce_ui_la_lj + ce_ui_lj_lc) / ((2*m_rmax/global_speed)*global_ec_persec); // media do custo [0,1]
 
         custo = (ce_s + ce_d + ce_h) / 3.0;
 
