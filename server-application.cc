@@ -1082,6 +1082,8 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
   long double ce_ui_lj_lc = uav->CalculateEnergyCost(CalculateDistance(loc->GetPosition(), central_pos));
   long double b_ui_res = b_ui_atu - ce_ui_la_lj - ce_ui_lj_lc; // bateria residual
   long double ce_te_lj = loc->GetTotalConsumption() * (m_scheduleServer-t_loc);
+  double ce_hv, ce_s, ce_h, ce_d;
+  ce_hv=1; ce_s=1; ce_h=1; ce_d=1;
   double inf = global_nc*etapa*3 + (2*m_rmax/global_speed)*global_ec_persec + etapa*global_ec_persec; // 3 Joules/s wifi
 
   // NS_LOG_DEBUG ("b_ui_atu=" << b_ui_atu << " b_ui_res=" << b_ui_res);
@@ -1107,18 +1109,18 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
       case 4: // custo 2 -> com hover
       case 9: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45
 
-        double ce_s = 1.0; // não tem bateria suficiente
+        ce_s = 1.0; // não tem bateria suficiente
         if (b_ui_res >= ce_te_lj) {
           ce_s = 1 - (ce_te_lj/global_nc*etapa*3); // UAV que terá mais bateria para servir a localizacao [0,1]
         }
 
-        double ce_hv = 1.0; // nao tem bateria suficiente
-        double ce_h = uav->GetHoverCost()*(m_scheduleServer-t_loc);
+        ce_hv = 1.0; // nao tem bateria suficiente
+        ce_h = uav->GetHoverCost()*(m_scheduleServer-t_loc);
         if (b_ui_res >= ce_h) {
           ce_hv = 1 - (ce_h/etapa*global_ec_persec); // [0,1]
         }
 
-        double ce_d = (ce_ui_la_lj + ce_ui_lj_lc) / ((2*m_rmax/global_speed)*global_ec_persec); // media do custo [0,1]
+        ce_d = (ce_ui_la_lj + ce_ui_lj_lc) / ((2*m_rmax/global_speed)*global_ec_persec); // media do custo [0,1]
 
         custo = (ce_s + ce_d + ce_h) / 3.0;
 
