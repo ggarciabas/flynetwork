@@ -1113,8 +1113,8 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
       case 7: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45
         custo = 1.0; // não tem bateria suficiente
         if (b_ui_res >= ce_te_lj) {
-          custo = 1 - (ce_te_lj/global_nc*etapa*3); // UAV que terá mais bateria para servir a localizacao [0,1]
-          NS_FATAL_ERROR ("Custo 2: " << custo);
+          custo = 1 - (ce_te_lj/(global_nc*etapa*3)); // UAV que terá mais bateria para servir a localizacao [0,1]
+          NS_FATAL_ERROR ("Custo 2: " << custo << " CETE: "<< ce_te_lj << " INF: " << global_nc*etapa*3 << " DIV: " << (ce_te_lj/(global_nc*etapa*3)));
         }
         // NS_LOG_DEBUG ("P_te=" << P_te << " custo=" << custo);
         break;
