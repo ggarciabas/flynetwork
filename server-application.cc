@@ -732,6 +732,13 @@ void ServerApplication::runAgendamento(void)
     s_final = DaPositioning(custo_x, m_uavContainer.GetN());
   else if (m_custo > 5) // para os custos maior que 5 será executada a busca exaustiva
     s_final = Exhaustive(custo_x, m_uavContainer.GetN()); // lembrando que custo_x já tem calculado o valor do custo correspondente
+  else  { // executa aleatoriamente a escolha caso seja custo = 5
+    for (int i = 0; i<(int)m_locationContainer.GetN(); ++i) {
+      s_final.push_back(i);
+    } 
+    auto rng = std::default_random_engine {};
+    std::shuffle(std::begin(s_final), std::end(s_final), rng);
+  }
 
   NS_LOG_DEBUG("SERVER - Finalizada estrutura do DA para agendamento @" << Simulator::Now().GetSeconds());
 
@@ -762,12 +769,12 @@ void ServerApplication::runAgendamento(void)
 
     // Salvando onde o UAV estava e para onde ele será enviado.
     NS_LOG_DEBUG("SERVER - Salvando onde o UAV estava e para onde ele será enviado");
-    std::vector<double> vp = (*u_i)->GetPosition();
+    // std::vector<double> vp = (*u_i)->GetPosition();
     // if (i == 0)
     //   osuav << (*u_i)->GetId() << "," << vp.at(0) << "," << vp.at(1); // posicao do UAV
     // else
     //   osuav << "," << (*u_i)->GetId() << "," << vp.at(0) << "," << vp.at(1); // posicao do UAV
-    vp = m_locationContainer.Get(id)->GetPosition();
+    // vp = m_locationContainer.Get(id)->GetPosition();
     // if (i == 0)
     //   osloc << id << "," << vp.at(0) << "," << vp.at(1); // posicao da LOC
     // else
@@ -787,7 +794,7 @@ void ServerApplication::runAgendamento(void)
       (*u_i)->SetSendPositionEvent(Simulator::Schedule(Seconds(t), &ServerApplication::SendUavPacket, this, (*u_i)));
     }
     t += 0.005;
-    vp.clear();
+    // vp.clear();
   }
 
   os.str("");
