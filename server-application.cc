@@ -1122,7 +1122,7 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
 
         ce_d = (ce_ui_la_lj + ce_ui_lj_lc) / ((2*m_rmax/global_speed)*global_ec_persec); // media do custo [0,1]
 
-        custo = (ce_s + ce_d + ce_h) / 3.0;
+        custo = (ce_s + ce_d + ce_hv) / 3.0;
 
         // NS_LOG_DEBUG ("ce_hv=" << ce_hv << " P_te=" << P_te << " custo=" << custo);
         break;
