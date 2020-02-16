@@ -1111,7 +1111,7 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
         break;
       case 2:
       case 7: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45
-        custo = 1.0; // não tem bateria suficiente
+        custo = 0.999; // nao tem bateria suficiente, mas tem!
         if (b_ui_res >= ce_te_lj) {
           custo = 1 - (ce_te_lj/(global_nc*etapa*3)); // UAV que terá mais bateria para servir a localizacao [0,1]
           if (custo < 0 || custo > 1)
@@ -1127,13 +1127,13 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
       case 4: // custo 2 -> com hover
       case 9: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45
 
-        ce_s = 1.0; // não tem bateria suficiente
+        ce_s = 0.999; // nao tem bateria suficiente, mas tem!
         if (b_ui_res >= ce_te_lj) {
           ce_s = 1 - (ce_te_lj/global_nc*etapa*3); // UAV que terá mais bateria para servir a localizacao [0,1]
         }
         file_custo << ce_s << ",";
 
-        ce_hv = 1.0; // nao tem bateria suficiente
+        ce_hv = 0.999; // nao tem bateria suficiente, mas tem!
         ce_h = uav->GetHoverCost()*(m_scheduleServer-t_loc);
         if (b_ui_res >= ce_h) {
           ce_hv = 1 - (ce_h/etapa*global_ec_persec); // [0,1]
