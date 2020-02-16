@@ -1091,34 +1091,58 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
     switch (m_custo) {
       case 1:
       case 6: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45)
-        custo = (ce_ui_la_lj + ce_ui_lj_lc) / inf; // media do custo
+        double inf_ = (2*m_rmax/global_speed)*global_ec_persec;
+        custo = (ce_ui_la_lj + ce_ui_lj_lc) / inf_; // media do custo [0,1]
         break;
       case 2:
       case 7: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45
-        custo = ce_te_lj/inf; // UAV que terá mais bateria para servir a localizacao (conseguira servir por mais tempo)
+        double inf_ = global_nc*etapa*3; // 3 Joules/s wifi
+        custo = 1.0; // não tem bateria suficiente
+        if (b_ui_res >= ce_te_lj) {
+          custo = 1 - (ce_te_lj/inf_); // UAV que terá mais bateria para servir a localizacao [0,1]
+        } 
+
         // NS_LOG_DEBUG ("P_te=" << P_te << " custo=" << custo);
         break;
-      case 3:
-      case 8: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45
-        custo = (ce_te_lj + ce_ui_la_lj + ce_ui_lj_lc) / inf; // quantos TEs consegue suprir?!
-        // NS_LOG_DEBUG ("P_te=" << P_te << " custo=" << custo);
-        break;
+      // case 3: nao mais utilizado
+      // case 8: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45
+      //   custo = (ce_te_lj + ce_ui_la_lj + ce_ui_lj_lc) / inf; // quantos TEs consegue suprir?!
+      //   // NS_LOG_DEBUG ("P_te=" << P_te << " custo=" << custo);
+      //   break;
       case 4: // custo 2 -> com hover
       case 9: // para calcular o exaustivo e diferenciar nas pastas! (ver: https://github.com/ggarciabas/teste/issues/45
-        ce_hv = uav->GetHoverCost()*(m_scheduleServer-t_loc) ; // custo para o TE inteiro, considerando locs e hover
-        custo = (ce_te_lj + ce_ui_la_lj + ce_ui_lj_lc + ce_hv) / inf;
+        double inf = global_nc*etapa*3 + (2*m_rmax/global_speed)*global_ec_persec + etapa*global_ec_persec; // 3 Joules/s wifi
+
+        ce_s = 1.0; // não tem bateria suficiente
+        if (b_ui_res >= ce_te_lj) {
+          double inf_s = global_nc*etapa*3; // 3 Joules/s wifi
+          ce_s = 1 - (ce_te_lj/inf_s); // UAV que terá mais bateria para servir a localizacao [0,1]
+        }
+
+        ce_hv = 1.0; // nao tem bateria suficiente
+        ce_h = uav->GetHoverCost()*(m_scheduleServer-t_loc);
+        if (b_ui_res >= ce_h) {
+          double inf_h = etapa*global_ec_persec;
+          ce_hv = 1 - (ce_h/inf_h); // [0,1]
+        }
+
+        double inf_d = (2*m_rmax/global_speed)*global_ec_persec;
+        ce_d = (ce_ui_la_lj + ce_ui_lj_lc) / inf_d; // media do custo [0,1]
+
+        custo = (ce_s + ce_d + ce_h) / 3.0;
+
         // NS_LOG_DEBUG ("ce_hv=" << ce_hv << " P_te=" << P_te << " custo=" << custo);
         break;
       case 5: // aleatorio
         custo = 0; // quanto menor melhor, só pro aleatorio
         break;
-      case 10: // arrumando c2
-      case 11:
-        custo = ((m_scheduleServer-t_loc)/(b_ui_atu / loc->GetTotalConsumption()/* qt tempo supri a localizacao (S) */) /*qual proporcao da tapa supre?*/) / (m_scheduleServer/1e-10); // normalizando
-        break;
+      // case 10: // arrumando c2
+      // case 11:
+      //   custo = ((m_scheduleServer-t_loc)/(b_ui_atu / loc->GetTotalConsumption()/* qt tempo supri a localizacao (S) */) /*qual proporcao da tapa supre?*/) / (m_scheduleServer/1e-10); // normalizando
+      //   break;
     }
   } else {
-    custo = inf;
+    custo = 1.0;
   }
 
   ////NS_LOG_DEBUG ("ServerApplication::CalculateCusto > mcusto: " << m_custo << " custo: " << custo);
