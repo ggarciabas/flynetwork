@@ -1082,7 +1082,7 @@ ServerApplication::CalculateCusto (Ptr<UavModel> uav, Ptr<LocationModel> loc, ve
   long double ce_ui_lj_lc = uav->CalculateEnergyCost(CalculateDistance(loc->GetPosition(), central_pos));
   long double b_ui_res = b_ui_atu - ce_ui_la_lj - ce_ui_lj_lc; // bateria residual
   long double ce_te_lj = loc->GetTotalConsumption() * (m_scheduleServer-t_loc);
-  double ce_hv;
+  double ce_hv, ce_s, ce_h, ce_d;
   double inf = global_nc*etapa*3 + (2*m_rmax/global_speed)*global_ec_persec + etapa*global_ec_persec; // 3 Joules/s wifi
 
   // NS_LOG_DEBUG ("b_ui_atu=" << b_ui_atu << " b_ui_res=" << b_ui_res);
