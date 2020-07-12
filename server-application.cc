@@ -733,7 +733,7 @@ void ServerApplication::runAgendamento(void)
   else if (m_custo > 5) // para os custos maior que 5 será executada a busca exaustiva
     s_final = Exhaustive(custo_x, m_uavContainer.GetN()); // lembrando que custo_x já tem calculado o valor do custo correspondente
 
-  NS_LOG_DEBUG("SERVER - Finalizada estrutura do DA para agendamento @" << Simulator::Now().GetSeconds());
+  NS_LOG_DEBUG("SERVER - Finalizada estrutura do DA para agendamento tamanho s_final: " << s_final.size()  << " @" << Simulator::Now().GetSeconds());
 
   NS_LOG_DEBUG("SERVER - Atualizando posicionamento dos UAVs @" << Simulator::Now().GetSeconds());
   int id, i = 0;
@@ -743,6 +743,7 @@ void ServerApplication::runAgendamento(void)
   for (UavModelContainer::Iterator u_i = m_uavContainer.Begin();
        u_i != m_uavContainer.End(); ++u_i, ++i)
   {
+    NS_LOG_DEBUG("SERVER - pos i: " << i);
     id = s_final[i]; // id da localizacao que deve ir!
     f_mij.push_back(vector<long double>((int)m_locationContainer.GetN(), 0)); // inicia com zeros
     f_mij[i][id] = 1.0; // gravando matriz da solucao final
