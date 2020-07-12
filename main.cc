@@ -84,7 +84,7 @@ int main (int argc, char *argv[])
 	global_speed = 5.0; // m/s
 	
 	// LogComponentEnable("MyOnOffApplication", LOG_DEBUG);
-	 LogComponentEnable("ServerApplication", LOG_DEBUG);
+//	 LogComponentEnable("ServerApplication", LOG_DEBUG);
 	// LogComponentEnable("LocationModel", LOG_DEBUG);
 	// LogComponentEnable("UavApplication", LOG_FUNCTION);
 	// LogComponentEnable("UavApplication", LOG_DEBUG);
@@ -114,7 +114,7 @@ int main (int argc, char *argv[])
 	// LogComponentEnable("UavMobilityModel", LOG_DEBUG);
 	// LogComponentEnable("UavModelContainer", LOG_FUNCTION);
 	// LogComponentEnable("UavModel", LOG_DEBUG);
-	 LogComponentEnable("UavNetwork", LOG_DEBUG);
+//	 LogComponentEnable("UavNetwork", LOG_DEBUG);
 	// LogComponentEnable("UavNodeContainer", LOG_FUNCTION);
 
 	// SeedManager::SetSeed(6112018);
