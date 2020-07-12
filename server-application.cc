@@ -723,17 +723,17 @@ void ServerApplication::runAgendamento(void)
   }
   NS_LOG_DEBUG ("FIM custo ---------------------------- @" << Simulator::Now().GetSeconds());
 
-  // PrintCusto (custo_x, m_step, true, uav_ids, loc_ids);
+//  PrintCusto (custo_x, m_step, true, uav_ids, loc_ids);
 
   std::ostringstream os;
   // dsitribuindo UAVs
   std::vector<int> s_final; // cada posicao representa um UAV e o valor contido a localização que este deve ir!
-  if (m_custo < 5 && m_custo == 10) // somente executo o DA para os custos 1 à 4 e 10!
-    s_final = DaPositioning(custo_x, m_uavContainer.GetN());
-  else if (m_custo > 5) // para os custos maior que 5 será executada a busca exaustiva
-    s_final = Exhaustive(custo_x, m_uavContainer.GetN()); // lembrando que custo_x já tem calculado o valor do custo correspondente
+  if (m_custo < 5 || m_custo == 10) {// somente executo o DA para os custos 1 à 4 e 10!
+	  s_final = this->DaPositioning(custo_x, m_uavContainer.GetN());
+  } else if (m_custo > 5) // para os custos maior que 5 será executada a busca exaustiva
+    s_final = this->Exhaustive(custo_x, m_uavContainer.GetN()); // lembrando que custo_x já tem calculado o valor do custo correspondente
 
-  NS_LOG_DEBUG("SERVER - Finalizada estrutura do DA para agendamento tamanho s_final: " << s_final.size()  << " @" << Simulator::Now().GetSeconds());
+NS_LOG_DEBUG("SERVER - Finalizada estrutura do DA para agendamento tamanho s_final: " << s_final.size()  << " quantidade de UAVs: " << m_uavContainer.GetN() << " @" << Simulator::Now().GetSeconds());
 
   NS_LOG_DEBUG("SERVER - Atualizando posicionamento dos UAVs @" << Simulator::Now().GetSeconds());
   int id, i = 0;
@@ -867,6 +867,7 @@ ServerApplication::Exhaustive (std::vector<std::vector<long double> > custo, int
 }
 
 std::vector<int> ServerApplication::DaPositioning (std::vector<std::vector<long double> > b_ij, unsigned N) {
+ 
   double temp = 0.9;
   std::vector<int> proposed_FINAL;
   std::vector<int> used;
